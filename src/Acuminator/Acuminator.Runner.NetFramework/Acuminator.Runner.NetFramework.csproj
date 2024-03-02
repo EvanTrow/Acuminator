@@ -34,10 +34,6 @@
 		<DebugType>pdbonly</DebugType>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\Acuminator\Acuminator.Analyzers\Acuminator.Analyzers.csproj" />
-	  <ProjectReference Include="..\Acuminator\Acuminator.Utilities\Acuminator.Utilities.csproj" />
-	</ItemGroup>
-	<ItemGroup>
 		<PackageReference Include="CommandLineParser" Version="2.9.1" />
 		<PackageReference Include="Microsoft.Build.Locator" Version="1.7.1" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.9.2" />
@@ -54,5 +50,8 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="System.Text.Json" Version="8.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Acuminator.Analyzers\Acuminator.Analyzers.csproj" />
 	</ItemGroup>
 </Project>
