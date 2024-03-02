@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net48</TargetFramework>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<Deterministic>True</Deterministic>
+		<OutDir>bin\$(Configuration)\</OutDir>
+		<LangVersion>12.0</LangVersion>
+		<Nullable>enable</Nullable>
+		<WarningLevel>5</WarningLevel>
+		<DebugType>embedded</DebugType>
+		<RestorePackagesPath>../../packages</RestorePackagesPath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<AssemblyTitle>Acuminator.Runner.NetFramework</AssemblyTitle>
+		<AssemblyName>Acuminator.Runner.NetFramework</AssemblyName>
+		<Company>Acumatica, Inc.</Company>
+		<Authors>$(Company)</Authors>
+		<NeutralLanguage>en</NeutralLanguage>
+		<Description>Acuminator static code analysis runner that executes Acuminator diagnostics</Description>
+		<Copyright>Copyright © 2017-$([System.DateTime]::Now.Year) $(Company)</Copyright>
+		<Version>3.1.4</Version>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<DebugType>full</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<DebugType>pdbonly</DebugType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!--<PackageReference Include="CommandLineParser" Version="2.9.1" />
+		<PackageReference Include="Microsoft.Build.Locator" Version="1.5.5" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.5.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.5.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+		<PackageReference Include="PolySharp" Version="1.13.2">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Serilog" Version="2.12.0" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+		<PackageReference Include="SerilogAnalyzer" Version="0.15.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="System.Text.Json" Version="6.0.0" />-->
+	</ItemGroup>
+</Project>
