@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Acuminator.Runner.NetFramework
 {
-	internal class Program
+	internal class Runner
 	{
 		static void Main(string[] args)
 		{
