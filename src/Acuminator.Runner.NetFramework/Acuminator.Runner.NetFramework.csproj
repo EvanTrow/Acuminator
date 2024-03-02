@@ -1,26 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
+		<Title>Acuminator.Runner.NetFramework</Title>
+		<AssemblyTitle>Acuminator.Runner.NetFramework</AssemblyTitle>
+		<AssemblyName>Acuminator.Runner.NetFramework</AssemblyName>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net48</TargetFramework>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<Deterministic>True</Deterministic>
 		<OutDir>bin\$(Configuration)\</OutDir>
 		<LangVersion>12.0</LangVersion>
+		<Version>3.1.4</Version>
 		<Nullable>enable</Nullable>
 		<WarningLevel>5</WarningLevel>
 		<DebugType>embedded</DebugType>
 		<RestorePackagesPath>../../packages</RestorePackagesPath>
-	</PropertyGroup>
-
-	<PropertyGroup>
-		<AssemblyTitle>Acuminator.Runner.NetFramework</AssemblyTitle>
-		<AssemblyName>Acuminator.Runner.NetFramework</AssemblyName>
-		<Company>Acumatica, Inc.</Company>
-		<Authors>$(Company)</Authors>
 		<NeutralLanguage>en</NeutralLanguage>
-		<Description>Acuminator static code analysis runner that executes Acuminator diagnostics</Description>
+	</PropertyGroup>
+	<PropertyGroup>
+		<PackageLicenseUrl>https://github.com/Acumatica/Acuminator/blob/dev/LICENSE</PackageLicenseUrl>
+		<PackageProjectUrl>https://github.com/Acumatica/Acuminator</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/Acumatica/Acuminator</RepositoryUrl>
+		<PackageReleaseNotes>https://github.com/Acumatica/Acuminator/blob/dev/docs/ReleaseNotes.md</PackageReleaseNotes>
+	</PropertyGroup>
+	<PropertyGroup>
+		<Company>Acumatica, Inc.</Company>
+		<Authors>$(Company)</Authors>	
+		<Description>Acuminator static code analysis console runner that executes Acuminator diagnostics</Description>
 		<Copyright>Copyright © 2017-$([System.DateTime]::Now.Year) $(Company)</Copyright>
-		<Version>3.1.4</Version>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
