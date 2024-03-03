@@ -57,5 +57,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Acuminator.Analyzers\Acuminator.Analyzers.csproj" />
+	  <ProjectReference Include="..\Acuminator.Utilities\Acuminator.Utilities.csproj" />
 	</ItemGroup>
 </Project>
