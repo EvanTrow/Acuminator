@@ -6,7 +6,6 @@
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net48</TargetFramework>
 		<Deterministic>True</Deterministic>
-		<OutDir>bin\$(Configuration)\</OutDir>
 		<LangVersion>12.0</LangVersion>
 		<Version>3.1.4</Version>
 		<Nullable>enable</Nullable>
@@ -58,5 +57,18 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\Acuminator.Analyzers\Acuminator.Analyzers.csproj" />
 	  <ProjectReference Include="..\Acuminator.Utilities\Acuminator.Utilities.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="Resources\Messages.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Messages.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources\Messages.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
 	</ItemGroup>
 </Project>
