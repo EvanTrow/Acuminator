@@ -30,6 +30,8 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<DebugType>embedded</DebugType>
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisLevel>latest-recommended</AnalysisLevel>
 	</PropertyGroup>
 	<ItemGroup>
 	  <Content Include="Resources\acumatica.ico">
