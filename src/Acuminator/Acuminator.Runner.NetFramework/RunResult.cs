@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Acuminator.Runner.NetFramework
+namespace Acuminator.Runner
 {
     /// <summary>
     /// Run result
