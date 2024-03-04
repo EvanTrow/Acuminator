@@ -112,4 +112,7 @@
   <data name="NotSupportedOutputFormat" xml:space="preserve">
     <value>Not supported output format "{0}". You can specify only "{1}" and "{2}" values as output formats.</value>
   </data>
+  <data name="FailedToObtainCompilationWithAnalyzersError" xml:space="preserve">
+    <value>Failed to obtain compilation with analyzers</value>
+  </data>
 </root>

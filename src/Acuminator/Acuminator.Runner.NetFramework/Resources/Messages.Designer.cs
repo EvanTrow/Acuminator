@@ -79,6 +79,15 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to obtain compilation with analyzers.
+        /// </summary>
+        internal static string FailedToObtainCompilationWithAnalyzersError {
+            get {
+                return ResourceManager.GetString("FailedToObtainCompilationWithAnalyzersError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Not supported code source {0}. You can specify only C# projects (*.csproj) and solutions (*.sln) as code sources..
         /// </summary>
         internal static string NotSupportedCodeSourceType {
