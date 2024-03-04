@@ -100,4 +100,16 @@
   <data name="WelcomeMessage" xml:space="preserve">
     <value>Welcome to the Acuminator code analysis runner, the CLI tool that runs Acuminator diagnostics!</value>
   </data>
+  <data name="CodeSourceNotSpecifiedError" xml:space="preserve">
+    <value>Code source is not specified</value>
+  </data>
+  <data name="CodeSourceNotFoundError" xml:space="preserve">
+    <value>Code source to use for Acuminator validation is not found at {0}</value>
+  </data>
+  <data name="NotSupportedCodeSourceType" xml:space="preserve">
+    <value>Not supported code source {0}. You can specify only C# projects (*.csproj) and solutions (*.sln) as code sources.</value>
+  </data>
+  <data name="NotSupportedOutputFormat" xml:space="preserve">
+    <value>Not supported output format "{0}". You can specify only "{1}" and "{2}" values as output formats.</value>
+  </data>
 </root>

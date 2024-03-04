@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Acuminator.Runner.NetFramework.Resources {
+namespace Acuminator.Runner.Resources {
     using System;
     
     
@@ -57,6 +57,42 @@ namespace Acuminator.Runner.NetFramework.Resources {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Code source to use for Acuminator validation is not found at {0}.
+        /// </summary>
+        internal static string CodeSourceNotFoundError {
+            get {
+                return ResourceManager.GetString("CodeSourceNotFoundError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Code source is not specified.
+        /// </summary>
+        internal static string CodeSourceNotSpecifiedError {
+            get {
+                return ResourceManager.GetString("CodeSourceNotSpecifiedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not supported code source {0}. You can specify only C# projects (*.csproj) and solutions (*.sln) as code sources..
+        /// </summary>
+        internal static string NotSupportedCodeSourceType {
+            get {
+                return ResourceManager.GetString("NotSupportedCodeSourceType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not supported output format &quot;{0}&quot;. You can specify only &quot;{1}&quot; and &quot;{2}&quot; values as output formats..
+        /// </summary>
+        internal static string NotSupportedOutputFormat {
+            get {
+                return ResourceManager.GetString("NotSupportedOutputFormat", resourceCulture);
             }
         }
         

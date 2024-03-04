@@ -66,8 +66,9 @@ namespace Acuminator.Runner.Input
 				return OutputFormat.Json;
 			else
 			{
-				throw new NotSupportedException($"Not supported output format \"{rawOutputFormat}\". " +
-												$"You can specify only \"{plainTextFormat}\" and \"{jsonFormat}\" values as output formats.");
+				string errorMsg = string.Format(CultureInfo.InvariantCulture, Messages.NotSupportedOutputFormat, rawOutputFormat, 
+												plainTextFormat, jsonFormat);
+				throw new NotSupportedException(errorMsg);
 			}
 		}
 	}
