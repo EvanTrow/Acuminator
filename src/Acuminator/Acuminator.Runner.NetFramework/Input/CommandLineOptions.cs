@@ -89,11 +89,11 @@ namespace Acuminator.Runner.Input
 
 		// Constructor arguments order must be the same as the properties order. This allows command line parser to initialize immutable options object via constructor.
 		// See this for details: https://github.com/commandlineparser/commandline/wiki/Immutable-Options-Type
-		public CommandLineOptions(string codeSource, bool disableSuppressionMechanism, string? msBuildPath, bool includeApiUsages, bool includeAllDistinctApis,
-								  bool showMembersOfUsedType, string? reportGrouping, string? outputFileName, bool outputAbsolutePathsToUsages, string? outputFormat)
+		public CommandLineOptions(string codeSource, bool disableSuppressionMechanism, string? msBuildPath, string? outputFileName, 
+								  bool outputAbsolutePathsToUsages, string? outputFormat)
 		{
 			CodeSource 					= codeSource;
-			//Verbosity 					= verbosity;
+			//Verbosity 				= verbosity;
 			DisableSuppressionMechanism = disableSuppressionMechanism;
 			MSBuildPath 				= msBuildPath;
 			OutputFileName				= outputFileName;
