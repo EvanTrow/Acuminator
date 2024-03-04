@@ -23,21 +23,21 @@ namespace Acuminator.Runner.Input
 						  "Currently, the supported code sources are C# projects and C# solutions.")]
 		public string CodeSource { get; }
 
-		///// <summary>
-		///// Optional explicitly specified logger <see cref="LogEventLevel"/> verbosity for tool's own messages. <br/>
-		///// If null then <see cref="LogEventLevel.Information"/> will be used as default.
-		///// </summary>
-		///// <value>
-		///// The explicitly specified logger's verbosity.
-		///// </value>
-		//[Option(shortName: CommandLineArgNames.VerbosityShort, longName: CommandLineArgNames.VerbosityLong,
-		//		HelpText = "This optional parameter allows you to explicitly specify logger verbosity. The allowed values are taken from the \"" +
-		//				  $"{nameof(Serilog)}.{nameof(Serilog.Events)}.{nameof(Serilog.Events.LogEventLevel)} enum.\n\n" +
-		//				   "The allowed values:\n" +
-		//				  $"{nameof(LogEventLevel.Verbose)}, {nameof(LogEventLevel.Debug)}, {nameof(LogEventLevel.Information)}, " +
-		//				  $"{nameof(LogEventLevel.Warning)}, {nameof(LogEventLevel.Error)}, {nameof(LogEventLevel.Fatal)}.\n\n" +
-		//				  $"By default, the logger will use the \"{nameof(LogEventLevel.Information)}\" verbosity.")]
-		//public string? Verbosity { get; }
+		/// <summary>
+		/// Optional explicitly specified logger <see cref="LogEventLevel"/> verbosity for tool's own messages. <br/>
+		/// If null then <see cref="LogEventLevel.Information"/> will be used as default.
+		/// </summary>
+		/// <value>
+		/// The explicitly specified logger's verbosity.
+		/// </value>
+		[Option(shortName: CommandLineArgNames.VerbosityShort, longName: CommandLineArgNames.VerbosityLong,
+				HelpText = "This optional parameter allows you to explicitly specify logger verbosity. The allowed values are taken from the \"" +
+						  $"{nameof(Serilog)}.{nameof(Serilog.Events)}.{nameof(Serilog.Events.LogEventLevel)} enum.\n\n" +
+						   "The allowed values:\n" +
+						  $"{nameof(LogEventLevel.Verbose)}, {nameof(LogEventLevel.Debug)}, {nameof(LogEventLevel.Information)}, " +
+						  $"{nameof(LogEventLevel.Warning)}, {nameof(LogEventLevel.Error)}, {nameof(LogEventLevel.Fatal)}.\n\n" +
+						  $"By default, the logger will use the \"{nameof(LogEventLevel.Information)}\" verbosity.")]
+		public string? Verbosity { get; }
 
 		/// <summary>
 		/// If this flag is set to true then the code analysis won't take into consideration suppression comments present in the code.
@@ -89,11 +89,11 @@ namespace Acuminator.Runner.Input
 
 		// Constructor arguments order must be the same as the properties order. This allows command line parser to initialize immutable options object via constructor.
 		// See this for details: https://github.com/commandlineparser/commandline/wiki/Immutable-Options-Type
-		public CommandLineOptions(string codeSource, bool disableSuppressionMechanism, string? msBuildPath, string? outputFileName, 
+		public CommandLineOptions(string codeSource, string verbosity, bool disableSuppressionMechanism, string? msBuildPath, string? outputFileName, 
 								  bool outputAbsolutePathsToUsages, string? outputFormat)
 		{
 			CodeSource 					= codeSource;
-			//Verbosity 				= verbosity;
+			Verbosity 					= verbosity;
 			DisableSuppressionMechanism = disableSuppressionMechanism;
 			MSBuildPath 				= msBuildPath;
 			OutputFileName				= outputFileName;

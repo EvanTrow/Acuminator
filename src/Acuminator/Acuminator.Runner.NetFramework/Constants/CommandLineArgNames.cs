@@ -8,8 +8,8 @@ namespace Acuminator.Runner.Constants
 	{
 		public const string CodeSource = "codeSource";
 
-		//public const char VerbosityShort = 'v';
-		//public const string VerbosityLong = "verbosity";
+		public const char VerbosityShort = 'v';
+		public const string VerbosityLong = "verbosity";
 
 		public const string DisableSuppressionMechanism = "noSuppression";
 		public const string MSBuildPath = "msBuildPath";
