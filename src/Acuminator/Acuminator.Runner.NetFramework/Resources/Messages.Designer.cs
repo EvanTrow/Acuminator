@@ -61,6 +61,15 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error happened during the Acuminator analysis of &quot;{CodeSourcePath}&quot;..
+        /// </summary>
+        internal static string AnalysisOfCodeSourceRuntimeError {
+            get {
+                return ResourceManager.GetString("AnalysisOfCodeSourceRuntimeError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Code source to use for Acuminator validation is not found at {0}.
         /// </summary>
         internal static string CodeSourceNotFoundError {
@@ -79,11 +88,92 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Acuminator validation of &quot;{CodeSourcePath}&quot; was cancelled..
+        /// </summary>
+        internal static string CodeSourceValidationWasCancelled {
+            get {
+                return ResourceManager.GetString("CodeSourceValidationWasCancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load solution from the code source &quot;{CodeSourcePath}&quot;..
+        /// </summary>
+        internal static string FailedToLoadSolutionFromCodeSourceError {
+            get {
+                return ResourceManager.GetString("FailedToLoadSolutionFromCodeSourceError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to obtain compilation with analyzers.
         /// </summary>
         internal static string FailedToObtainCompilationWithAnalyzersError {
             get {
                 return ResourceManager.GetString("FailedToObtainCompilationWithAnalyzersError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Initialize Acuminator analyzers..
+        /// </summary>
+        internal static string InitializeAcuminatorAnalyzersStatusMessage {
+            get {
+                return ResourceManager.GetString("InitializeAcuminatorAnalyzersStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Count of loaded projects: {ProjectsCount}..
+        /// </summary>
+        internal static string LoadedProjectsCount_Information {
+            get {
+                return ResourceManager.GetString("LoadedProjectsCount_Information", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Found MSBuild instance with name &quot;{VisualStudioName}&quot;, version &quot;{VisualStudioVersion}&quot;..
+        /// </summary>
+        internal static string MSBuild_VisualStudioNameAndVersion_Info {
+            get {
+                return ResourceManager.GetString("MSBuild_VisualStudioNameAndVersion_Info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error during registration of MSBuild instance..
+        /// </summary>
+        internal static string MSBuildInstanceRegistrationError {
+            get {
+                return ResourceManager.GetString("MSBuildInstanceRegistrationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MSBuildPath: &quot;{MSBuildPath}&quot;..
+        /// </summary>
+        internal static string MSBuildPath_Info {
+            get {
+                return ResourceManager.GetString("MSBuildPath_Info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error during the registration of MSBuild instance. Failed to register MSBuild using a provided path &quot;{MSBuildPath}&quot;..
+        /// </summary>
+        internal static string MSBuildRegistrationAtProvidedPathFailedError {
+            get {
+                return ResourceManager.GetString("MSBuildRegistrationAtProvidedPathFailedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No installed MSBuild version was found on the machine..
+        /// </summary>
+        internal static string NoInstalledMSBuildFoundError {
+            get {
+                return ResourceManager.GetString("NoInstalledMSBuildFoundError", resourceCulture);
             }
         }
         
@@ -102,6 +192,87 @@ namespace Acuminator.Runner.Resources {
         internal static string NotSupportedOutputFormat {
             get {
                 return ResourceManager.GetString("NotSupportedOutputFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Registering MSBuild instance at the provided path &quot;{MSBuildPath}&quot;..
+        /// </summary>
+        internal static string RegisteringMSBuildAtTheProvidedPathStatusMessage {
+            get {
+                return ResourceManager.GetString("RegisteringMSBuildAtTheProvidedPathStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Searching for MSBuild instances installed on the current machine..
+        /// </summary>
+        internal static string SearchingForMSBuildInstancesStatusMessage {
+            get {
+                return ResourceManager.GetString("SearchingForMSBuildInstancesStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start analyzing the code source &quot;{CodeSourcePath}&quot;..
+        /// </summary>
+        internal static string StartAnalyzingTheCodeSourceStatusMessage {
+            get {
+                return ResourceManager.GetString("StartAnalyzingTheCodeSourceStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start loading the code source &quot;{CodeSourcePath}&quot;..
+        /// </summary>
+        internal static string StartLoadingTheCodeSourceAtPathStatusMessage {
+            get {
+                return ResourceManager.GetString("StartLoadingTheCodeSourceAtPathStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start validating the solution..
+        /// </summary>
+        internal static string StartValidatingSolutionStatusMessage {
+            get {
+                return ResourceManager.GetString("StartValidatingSolutionStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully finished validating the solution..
+        /// </summary>
+        internal static string SuccessfullyFinishedSolutionValidationStatusMessage {
+            get {
+                return ResourceManager.GetString("SuccessfullyFinishedSolutionValidationStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully loaded the code source &quot;{CodeSourcePath}&quot;..
+        /// </summary>
+        internal static string SuccessfullyLoadedCodeSourceAtPathStatusMessage {
+            get {
+                return ResourceManager.GetString("SuccessfullyLoadedCodeSourceAtPathStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully registered MSBuild instance at the provided path &quot;{MSBuildPath}&quot;..
+        /// </summary>
+        internal static string SuccessfullyRegisteredMSBuildAtProvidedPathStatusMessage {
+            get {
+                return ResourceManager.GetString("SuccessfullyRegisteredMSBuildAtProvidedPathStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error on attempt to unregister MSBuild..
+        /// </summary>
+        internal static string UnregisterMSBuildInstanceError {
+            get {
+                return ResourceManager.GetString("UnregisterMSBuildInstanceError", resourceCulture);
             }
         }
         
