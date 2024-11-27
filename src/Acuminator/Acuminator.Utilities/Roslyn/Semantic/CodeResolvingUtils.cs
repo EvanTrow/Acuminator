@@ -479,52 +479,5 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		public static bool IsFBQLJoin(this ITypeSymbol typeSymbol) =>
 			typeSymbol is INamedTypeSymbol namedType && namedType.IsStatic && namedType.TypeArguments.Length == 1 &&
 			TypeNames.FBqlJoins.Contains(namedType.Name);
-
-		/// <summary>
-		/// Returns event handler type for the provided method symbol.
-		/// </summary>
-		/// <param name="symbol">Method symbol for the event handler</param>
-		/// <param name="pxContext">PXContext instance</param>
-		/// <returns>Event Type (e.g. RowSelecting). If method is not an event handler, returns <code>EventType.None</code>.</returns>
-		public static EventType GetEventHandlerType(this IMethodSymbol symbol, PXContext pxContext)
-		{
-			return symbol.GetEventHandlerInfo(pxContext).Type;
-		}
-
-		/// <summary>
-		/// Returns information about an event handler for the provided method symbol.
-		/// </summary>
-		/// <param name="symbol">Method symbol for the event handler</param>
-		/// <param name="pxContext">PXContext instance</param>
-		/// <returns>Event Type (e.g. RowSelecting) and Event Signature Type (default or generic).
-		/// If method is not an event handler, returns <code>(EventType.None, EventHandlerSignatureType.None)</code>.</returns>
-		public static EventInfo GetEventHandlerInfo(this IMethodSymbol symbol, PXContext pxContext)
-		{
-			if (symbol.ReturnsVoid && symbol.TypeParameters.IsEmpty && !symbol.Parameters.IsEmpty)
-			{
-				// Loosely check method signature because sometimes business logic 
-				// is extracted from event handler calls to a separate method
-
-				// Old non-generic syntax
-				if (symbol.Parameters[0].Type.OriginalDefinition.InheritsFromOrEquals(pxContext.PXCache.Type))
-				{
-					if (symbol.Name.EndsWith("CacheAttached", StringComparison.Ordinal))
-						return new EventInfo(EventType.CacheAttached, EventHandlerSignatureType.Default);
-
-					if (symbol.Parameters.Length >= 2 && pxContext.Events.EventTypeMap.TryGetValue(
-						    symbol.Parameters[1].Type.OriginalDefinition, out EventType eventType))
-					{
-						return new EventInfo(eventType, EventHandlerSignatureType.Default);
-					}
-				}
-				else if (pxContext.Events.EventTypeMap.TryGetValue(
-					symbol.Parameters[0].Type.OriginalDefinition, out EventType eventType)) // New generic event handler syntax
-				{
-					return new EventInfo(eventType, EventHandlerSignatureType.Generic);
-				}
-			}
-
-			return EventInfo.None();
-		}
 	}
 }
