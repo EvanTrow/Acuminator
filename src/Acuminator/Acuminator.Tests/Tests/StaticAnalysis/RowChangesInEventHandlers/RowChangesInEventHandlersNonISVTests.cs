@@ -9,9 +9,10 @@ using Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
-using Acuminator.Utilities.Roslyn;
-using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.GraphEvents;
+
 using Microsoft.CodeAnalysis.Diagnostics;
+
 using Xunit;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.RowChangesInEventHandlers
