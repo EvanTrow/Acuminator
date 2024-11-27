@@ -6,6 +6,7 @@ using System.Linq;
 
 using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.GraphEvents;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
