@@ -9,9 +9,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Acuminator.Utilities.Roslyn.Semantic.EventsRecognition
+namespace Acuminator.Utilities.Roslyn.Semantic.GraphEvents
 {
-	public static class EventsRecognitionUtils
+	public static class EventsRecognition
 	{
 		/// <summary>
 		/// Returns event handler type <see cref="EventType"/> for the provided method symbol.

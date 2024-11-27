@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using Acuminator.Utilities.Common;
-using Microsoft.CodeAnalysis;
 using Acuminator.Utilities.Roslyn.Constants;
+using Acuminator.Utilities.Roslyn.Semantic.GraphEvents;
+
+using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 {
