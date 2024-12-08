@@ -53,7 +53,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.ForbidPrivateEventHandlers
 			return allInterfaceMethodsImplementations;
 		}
 
-		private static void AnalyzeEventHandler(SymbolAnalysisContext context, PXContext pxContext, GraphEventInfoBase handler, 
+		private static void AnalyzeEventHandler(SymbolAnalysisContext context, PXContext pxContext, GraphEventHandlerInfoBase handler, 
 												List<IMethodSymbol>? allInterfaceMethodsImplementations)
 		{
 			var location = handler.Symbol.Locations.FirstOrDefault();

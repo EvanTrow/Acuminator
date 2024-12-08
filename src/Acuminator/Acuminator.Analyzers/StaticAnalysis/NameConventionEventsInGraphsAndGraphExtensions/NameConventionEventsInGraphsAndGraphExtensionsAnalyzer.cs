@@ -32,7 +32,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 
 			INamedTypeSymbol pxOverrideAttribute = pxContext.AttributeTypes.PXOverrideAttribute;
 
-			foreach (GraphEventInfoBase eventInfo in allDeclaredNamingConventionEvents)
+			foreach (GraphEventHandlerInfoBase eventInfo in allDeclaredNamingConventionEvents)
 			{
 				symbolContext.CancellationToken.ThrowIfCancellationRequested();
 
@@ -43,7 +43,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 			}
 		}
 
-		private static void ReportDiagnosticForEvent(SymbolAnalysisContext symbolContext, PXContext pxContext, GraphEventInfoBase eventInfo)
+		private static void ReportDiagnosticForEvent(SymbolAnalysisContext symbolContext, PXContext pxContext, GraphEventHandlerInfoBase eventInfo)
 		{
 			// Node is not null here because aggregated graph analyzers work only on graphs and graph extensions declared in the source code,
 			// and only events declared in the graph or graph extension are analyzed
@@ -63,7 +63,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 					pxContext.CodeAnalysisSettings);
 		}
 
-		private bool IsSuitableForConversionToGenericSignature(GraphEventInfoBase eventInfo, PXContext pxContext, INamedTypeSymbol pxOverrideAttribute)
+		private bool IsSuitableForConversionToGenericSignature(GraphEventHandlerInfoBase eventInfo, PXContext pxContext, INamedTypeSymbol pxOverrideAttribute)
 		{
 			// event handlers with more than 2 parameters should be overrides which shouldn't be converted to generic events
 			// as well as C# overrides of base events

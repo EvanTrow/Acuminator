@@ -22,7 +22,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	{
 		protected delegate DacGroupingNodeBaseViewModel DacVmConstructor<TEventInfo>(GraphEventCategoryNodeViewModel graphEventCategory,
 																					 string dacName, IEnumerable<TEventInfo> eventInfos)
-		where TEventInfo : GraphEventInfoBase<TEventInfo>;
+		where TEventInfo : GraphEventHandlerInfoBase<TEventInfo>;
 
 		protected delegate DacFieldGroupingNodeBaseViewModel DacFieldVmConstructor(DacGroupingNodeBaseViewModel dacNodeVm, string dacName,
 																				   IEnumerable<GraphFieldEventInfo> fieldEvents);
@@ -170,7 +170,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		protected virtual IEnumerable<TreeNodeViewModel> CreateEventsCategoryChildren<TGraphEventInfo>(GraphEventCategoryNodeViewModel graphEventCategory,
 																									   DacVmConstructor<TGraphEventInfo> constructor)
-		where TGraphEventInfo : GraphEventInfoBase<TGraphEventInfo>
+		where TGraphEventInfo : GraphEventHandlerInfoBase<TGraphEventInfo>
 		{
 			graphEventCategory.ThrowOnNull();
 

@@ -242,7 +242,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			return eventsGraphModels;
 		}
 
-		public IEnumerable<GraphEventInfoBase> GetEventsByEventType(EventType eventType) => eventType switch
+		public IEnumerable<GraphEventHandlerInfoBase> GetEventsByEventType(EventType eventType) => eventType switch
 		{
 			EventType.RowSelecting 		=> RowSelectingEvents,
 			EventType.RowSelected 		=> RowSelectedEvents,
@@ -268,9 +268,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			_ 							=> throw new NotSupportedException($"Event type {eventType} is not supported")
 		};
 
-		public IEnumerable<GraphEventInfoBase> GetAllEvents()
+		public IEnumerable<GraphEventHandlerInfoBase> GetAllEvents()
 		{
-			IEnumerable<GraphEventInfoBase>? allEvents = RowSelectingByName.Values;
+			IEnumerable<GraphEventHandlerInfoBase>? allEvents = RowSelectingByName.Values;
 
 			AppendRowEvents(RowSelectedByName);
 			AppendRowEvents(RowInsertingByName);

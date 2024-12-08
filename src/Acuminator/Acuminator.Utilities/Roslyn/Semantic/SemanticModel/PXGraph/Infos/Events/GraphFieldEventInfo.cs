@@ -14,7 +14,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	/// <summary>
 	/// Information about the graph events related to the DAC fields.
 	/// </summary>
-	public class GraphFieldEventInfo : GraphEventInfoBase<GraphFieldEventInfo>
+	public class GraphFieldEventInfo : GraphEventHandlerInfoBase<GraphFieldEventInfo>
 	{
 		/// <summary>
 		/// The DAC field name.

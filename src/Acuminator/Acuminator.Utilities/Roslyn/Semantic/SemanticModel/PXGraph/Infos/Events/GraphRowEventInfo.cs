@@ -10,7 +10,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	/// <summary>
 	/// Information about the row event in graph.
 	/// </summary>
-	public class GraphRowEventInfo : GraphEventInfoBase<GraphRowEventInfo>
+	public class GraphRowEventInfo : GraphEventHandlerInfoBase<GraphRowEventInfo>
 	{
 		
 		public GraphRowEventInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,

@@ -86,7 +86,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 														.Where(graphEvent => graphEvent.Symbol.IsDeclaredInType(graphOrGraphExtensionWithEvents.Symbol));
 			ThrowInGraphEventsWalker? walker = null;
 
-			foreach (GraphEventInfoBase graphEvent in declaredGraphEventsOfEventType)
+			foreach (GraphEventHandlerInfoBase graphEvent in declaredGraphEventsOfEventType)
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
 				walker ??= new ThrowInGraphEventsWalker(context, pxContext, eventType, graphOrGraphExtensionWithEvents);

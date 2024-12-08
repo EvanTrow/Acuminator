@@ -11,8 +11,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	/// <summary>
 	/// A common generic graph event info DTO base class.
 	/// </summary>
-	public abstract class GraphEventInfoBase<TEventInfoType> : GraphEventInfoBase, IWriteableBaseItem<TEventInfoType>
-	where TEventInfoType : GraphEventInfoBase<TEventInfoType>
+	public abstract class GraphEventHandlerInfoBase<TEventInfoType> : GraphEventHandlerInfoBase, IWriteableBaseItem<TEventInfoType>
+	where TEventInfoType : GraphEventHandlerInfoBase<TEventInfoType>
 	{
 		protected TEventInfoType? _baseInfo;
 
@@ -41,14 +41,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			}
 		}
 
-		protected GraphEventInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-									 EventHandlerSignatureType signatureType, EventType eventType) :
+		protected GraphEventHandlerInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
+											EventHandlerSignatureType signatureType, EventType eventType) :
 								base(node, symbol, declarationOrder, signatureType, eventType)
 		{		
 		}
 
-		protected GraphEventInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-									 EventHandlerSignatureType signatureType, EventType eventType, TEventInfoType baseEventInfo)
+		protected GraphEventHandlerInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
+											EventHandlerSignatureType signatureType, EventType eventType, TEventInfoType baseEventInfo)
 							  : base(node, symbol, declarationOrder, signatureType, eventType)
 		{
 			_baseInfo = baseEventInfo.CheckIfNull();

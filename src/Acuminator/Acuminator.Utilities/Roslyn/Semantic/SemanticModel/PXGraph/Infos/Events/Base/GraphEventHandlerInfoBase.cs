@@ -11,7 +11,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	/// <summary>
 	/// A common non-generic graph event info DTO base class.
 	/// </summary>
-	public abstract class GraphEventInfoBase : NodeSymbolItem<MethodDeclarationSyntax, IMethodSymbol>
+	public abstract class GraphEventHandlerInfoBase : NodeSymbolItem<MethodDeclarationSyntax, IMethodSymbol>
 	{
 		public EventHandlerSignatureType SignatureType { get; }
 
@@ -21,8 +21,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 		public override string Name => GetEventGroupingKey();
 
-		protected GraphEventInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-									 EventHandlerSignatureType signatureType, EventType eventType) :
+		protected GraphEventHandlerInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
+											EventHandlerSignatureType signatureType, EventType eventType) :
 								base(node, symbol, declarationOrder)
 		{
 			SignatureType = signatureType;
