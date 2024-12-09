@@ -1,12 +1,11 @@
 ﻿#nullable enable
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Semantic.GraphEvents;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
+namespace Acuminator.Utilities.Roslyn.Semantic.GraphEvents
 {
 	/// <summary>
 	/// A common generic graph event info DTO base class.

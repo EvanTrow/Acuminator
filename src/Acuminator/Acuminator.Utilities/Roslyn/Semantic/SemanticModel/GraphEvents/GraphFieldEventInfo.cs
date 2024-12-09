@@ -4,12 +4,11 @@ using System;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
-using Acuminator.Utilities.Roslyn.Semantic.GraphEvents;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
+namespace Acuminator.Utilities.Roslyn.Semantic.GraphEvents
 {
 	/// <summary>
 	/// Information about the graph events related to the DAC fields.
