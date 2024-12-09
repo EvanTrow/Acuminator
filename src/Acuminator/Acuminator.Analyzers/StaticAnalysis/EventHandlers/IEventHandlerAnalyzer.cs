@@ -2,7 +2,7 @@
 using Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator;
 using Acuminator.Utilities;
 using Acuminator.Utilities.Roslyn.Semantic;
-using Acuminator.Utilities.Roslyn.Semantic.GraphEvents;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 using Microsoft.CodeAnalysis.Diagnostics;
 

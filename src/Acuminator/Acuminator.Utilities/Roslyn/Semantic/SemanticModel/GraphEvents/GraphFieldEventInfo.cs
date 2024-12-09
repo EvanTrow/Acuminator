@@ -8,7 +8,7 @@ using Acuminator.Utilities.Roslyn.Semantic.Dac;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Acuminator.Utilities.Roslyn.Semantic.GraphEvents
+namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 {
 	/// <summary>
 	/// Information about the graph events related to the DAC fields.

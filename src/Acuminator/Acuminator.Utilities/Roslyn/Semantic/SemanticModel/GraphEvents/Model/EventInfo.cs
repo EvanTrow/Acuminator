@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 
 using Acuminator.Utilities.Common;
 
-namespace Acuminator.Utilities.Roslyn.Semantic.GraphEvents;
+namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 /// <summary>
 /// Information about the graph event.

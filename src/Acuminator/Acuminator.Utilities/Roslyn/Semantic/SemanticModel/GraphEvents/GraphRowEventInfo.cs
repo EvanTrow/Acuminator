@@ -4,7 +4,7 @@ using Acuminator.Utilities.Common;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Acuminator.Utilities.Roslyn.Semantic.GraphEvents;
+namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 /// <summary>
 /// Information about the row event in graph.

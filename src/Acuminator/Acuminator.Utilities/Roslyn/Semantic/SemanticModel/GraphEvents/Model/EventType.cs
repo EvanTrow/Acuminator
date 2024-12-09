@@ -1,4 +1,4 @@
-﻿namespace Acuminator.Utilities.Roslyn.Semantic.GraphEvents;
+﻿namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 /// <summary>
 /// Represents an event type in Acumatica Event Model.
