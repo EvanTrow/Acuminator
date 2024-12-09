@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Vsix.ToolWindows.CodeMap.Filter;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
