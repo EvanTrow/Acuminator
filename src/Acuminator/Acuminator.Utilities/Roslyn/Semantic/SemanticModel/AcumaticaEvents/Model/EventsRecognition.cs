@@ -34,7 +34,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 			pxContext.ThrowOnNull();
 
 			if (!symbol.ReturnsVoid || !symbol.TypeParameters.IsDefaultOrEmpty || symbol.Parameters.IsDefaultOrEmpty)
-				return EventInfo.None(symbol);
+				return EventInfo.None;
 
 			// Loosely check method signature because sometimes business logic 
 			// is extracted from event handler calls to a separate method
@@ -43,21 +43,21 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 			if (symbol.Parameters[0].Type.OriginalDefinition.InheritsFromOrEquals(pxContext.PXCache.Type))
 			{
 				if (symbol.Name.EndsWith("CacheAttached", StringComparison.Ordinal))
-					return new EventInfo(symbol, EventType.CacheAttached, EventHandlerSignatureType.Default, null);
+					return new EventInfo(EventType.CacheAttached, EventHandlerSignatureType.Default);
 
 				if (symbol.Parameters.Length >= 2 && pxContext.Events.EventTypeMap.TryGetValue(
 						symbol.Parameters[1].Type.OriginalDefinition, out EventType eventType))
 				{
-					return new EventInfo(symbol, eventType, EventHandlerSignatureType.Default, null);
+					return new EventInfo(eventType, EventHandlerSignatureType.Default);
 				}
 			}
 			else if (pxContext.Events.EventTypeMap.TryGetValue(
 				symbol.Parameters[0].Type.OriginalDefinition, out EventType eventType)) // New generic event handler syntax
 			{
-				return new EventInfo(symbol, eventType, EventHandlerSignatureType.Generic, null);
+				return new EventInfo(eventType, EventHandlerSignatureType.Generic);
 			}
 
-			return EventInfo.None(symbol);
+			return EventInfo.None;
 		}
 	}
 }
