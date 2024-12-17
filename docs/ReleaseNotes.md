@@ -1,6 +1,18 @@
 # Acuminator Release Notes
 This document provides information about fixes, enhancements, and key features that are available in Acuminator.
 
+## Acuminator 4.0.0: TODO
+Acuminator 4.0.0 includes the new features, bug fixes and enhancements described in this section, as well as the features that have been implemented in previous versions.
+
+### New Features
+In Acumaminator 4.0.0, the following new features have been introduced:
+ - The new 
+ 
+### Fixed Bugs
+In this version of Acuminator, the following bugs have been fixed:
+ - The [PX1042](diagnostics/PX1042.md) diagnostic no longer shows false alerts about Acumatica DLLs version.
+ - 
+
 ## Acuminator 3.1.3: October 24, 2023
 Acuminator 3.1.3 includes the bug fixes and enhancements described in this section, as well as the features that have been implemented in previous versions.
 
