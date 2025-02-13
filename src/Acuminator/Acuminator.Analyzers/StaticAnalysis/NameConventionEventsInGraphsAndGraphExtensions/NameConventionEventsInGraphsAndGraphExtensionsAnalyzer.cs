@@ -26,7 +26,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 			symbolContext.CancellationToken.ThrowIfCancellationRequested();
 
 			var allDeclaredNamingConventionEvents = from @event in graphOrExtensionWithEvents.GetAllEvents()
-													where @event.SignatureType == EventHandlerSignatureType.Default &&
+													where @event.SignatureType == EventHandlerSignatureType.Classic &&
 														  @event.Symbol.IsDeclaredInType(graphOrExtensionWithEvents.Symbol)
 													select @event;
 

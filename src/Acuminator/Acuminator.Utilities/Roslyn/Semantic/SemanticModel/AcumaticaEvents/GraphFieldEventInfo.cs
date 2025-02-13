@@ -47,7 +47,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 		private string GetDacFieldName() =>
 			SignatureType switch
 			{
-				EventHandlerSignatureType.Default => GetDacFieldNameForDefaultFieldEvent(),
+				EventHandlerSignatureType.Classic => GetDacFieldNameForDefaultFieldEvent(),
 				EventHandlerSignatureType.Generic => GetDacFieldNameForGenericFieldEvent(),
 				_ => string.Empty,
 			};

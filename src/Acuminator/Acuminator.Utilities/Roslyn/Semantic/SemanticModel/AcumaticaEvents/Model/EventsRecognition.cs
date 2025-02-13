@@ -43,12 +43,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 			if (symbol.Parameters[0].Type.OriginalDefinition.InheritsFromOrEquals(pxContext.PXCache.Type))
 			{
 				if (symbol.Name.EndsWith("CacheAttached", StringComparison.Ordinal))
-					return new EventInfo(EventType.CacheAttached, EventHandlerSignatureType.Default);
+					return new EventInfo(EventType.CacheAttached, EventHandlerSignatureType.Classic);
 
 				if (symbol.Parameters.Length >= 2 && pxContext.Events.EventTypeMap.TryGetValue(
 						symbol.Parameters[1].Type.OriginalDefinition, out EventType eventType))
 				{
-					return new EventInfo(eventType, EventHandlerSignatureType.Default);
+					return new EventInfo(eventType, EventHandlerSignatureType.Classic);
 				}
 			}
 			else if (pxContext.Events.EventTypeMap.TryGetValue(

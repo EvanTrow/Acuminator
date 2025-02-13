@@ -37,7 +37,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 
 		private string GetDacName() => SignatureType switch
 		{
-			EventHandlerSignatureType.Default => Symbol.Name.IndexOf('_') is int underscoreIndex && underscoreIndex > 0
+			EventHandlerSignatureType.Classic => Symbol.Name.IndexOf('_') is int underscoreIndex && underscoreIndex > 0
 													? Symbol.Name[..underscoreIndex]
 													: string.Empty,				
 
