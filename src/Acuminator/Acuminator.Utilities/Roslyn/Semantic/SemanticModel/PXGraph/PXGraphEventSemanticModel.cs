@@ -373,42 +373,5 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			OverridableItemsCollection<GraphFieldEventInfo>? rawCollection = eventsCollector.GetFieldEvents(eventType);
 			return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphFieldEventInfo>.Empty;
 		}
-
-		private GraphEventCategory GetEventCategoryByEventType(EventType eventType) =>
-			eventType.IsDacRowEvent()
-				? GraphEventCategory.Row
-				: eventType.IsDacFieldEvent()
-					? GraphEventCategory.Field
-					: GraphEventCategory.None;
-
-		/// <summary>
-		/// <see cref="CodeResolvingUtils.GetEventHandlerInfo"/> helper allows not only graph events but also helper methods with appropriate signature. 
-		/// However, for graph events semantic model we are interested only in graph events, so we need to rule out helper methods by checking their signature.
-		/// </summary>
-		/// <param name="eventCandidate">The event candidate.</param>
-		/// <param name="signatureType">Type of the signature.</param>
-		/// <param name="eventCategory">Category the event belongs to.</param>
-		/// <returns/>
-		private bool IsValidGraphEvent(IMethodSymbol eventCandidate, EventHandlerSignatureType signatureType, GraphEventCategory eventCategory)
-		{
-			if (eventCandidate.IsStatic || eventCandidate.Parameters.Length > 2 || eventCategory == GraphEventCategory.None)
-				return false;
-			else if (signatureType != EventHandlerSignatureType.Default)
-				return true;
-
-			const char underscore = '_';
-
-			if (eventCandidate.Name[0] == underscore || eventCandidate.Name[eventCandidate.Name.Length - 1] == underscore)
-				return false;
-
-			int underscoresCount = eventCandidate.Name.Count(c => c == underscore);
-
-			return eventCategory switch
-			{
-				GraphEventCategory.Row => underscoresCount == 1,
-				GraphEventCategory.Field => underscoresCount == 2,
-				_ => false,
-			};
-		}
 	}
 }
