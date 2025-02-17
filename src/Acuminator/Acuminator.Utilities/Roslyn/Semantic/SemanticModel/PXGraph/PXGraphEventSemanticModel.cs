@@ -19,13 +19,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
 	public partial class PXGraphEventSemanticModel : ISemanticModel
 	{
-		private enum GraphEventCategory
-		{
-			None,
-			Row,
-			Field
-		};
-
 		private readonly CancellationToken _cancellation;
 
 		public PXContext PXContext => BaseGraphModel.PXContext;
@@ -325,16 +318,16 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				if (eventInfo.SignatureType == EventHandlerSignatureType.None || eventInfo.Type == EventType.None)
 					continue;
 
-				GraphEventCategory eventCategory = GetEventCategoryByEventType(eventInfo.Type);
+				EventTargetKind eventTargetKind = eventInfo.Type.GetEventTargetKindByEventType();
 
-				if (!IsValidGraphEvent(method, eventInfo.SignatureType, eventCategory))
+				if (!method.IsValidGraphEventHandlerSignature(eventInfo.SignatureType, eventInfo.Type, eventTargetKind))
 					continue;
 
-				if (eventCategory == GraphEventCategory.Row)
+				if (eventTargetKind == EventTargetKind.Row)
 				{
 					eventsCollector.AddEvent(eventInfo.SignatureType, eventInfo.Type, method, declarationOrder, _cancellation);
 				}
-				else if (eventCategory == GraphEventCategory.Field)
+				else if (eventTargetKind == EventTargetKind.Field)
 				{
 					eventsCollector.AddFieldEvent(eventInfo.SignatureType, eventInfo.Type, method, declarationOrder, _cancellation);
 				}
