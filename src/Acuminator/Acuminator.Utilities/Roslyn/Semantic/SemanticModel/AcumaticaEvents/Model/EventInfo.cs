@@ -16,10 +16,13 @@ public readonly struct EventInfo : IEquatable<EventInfo>
 
 	public EventHandlerSignatureType SignatureType { get; }
 
+	public EventTargetKind TargetKind { get; }
+
 	public EventInfo(EventType type, EventHandlerSignatureType signatureType)
 	{
-		Type = type;
+		Type 		  = type;
 		SignatureType = signatureType;
+		TargetKind 	  = Type.GetEventTargetKindByEventType();
 	}
 
 	public override bool Equals(object obj) => obj is EventInfo other && Equals(other);

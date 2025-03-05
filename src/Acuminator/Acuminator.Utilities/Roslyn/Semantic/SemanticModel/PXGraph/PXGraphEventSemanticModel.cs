@@ -318,16 +318,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				if (eventInfo.SignatureType == EventHandlerSignatureType.None || eventInfo.Type == EventType.None)
 					continue;
 
-				EventTargetKind eventTargetKind = eventInfo.Type.GetEventTargetKindByEventType();
-
-				if (!method.IsValidGraphEventHandlerSignature(eventInfo.SignatureType, eventInfo.Type, eventTargetKind))
+				if (!method.IsValidGraphEventHandlerSignature(eventInfo.SignatureType, eventInfo.Type, eventInfo.TargetKind))
 					continue;
 
-				if (eventTargetKind == EventTargetKind.Row)
+				if (eventInfo.TargetKind == EventTargetKind.Row)
 				{
 					eventsCollector.AddEvent(eventInfo.SignatureType, eventInfo.Type, method, declarationOrder, _cancellation);
 				}
-				else if (eventTargetKind == EventTargetKind.Field)
+				else if (eventInfo.TargetKind == EventTargetKind.Field)
 				{
 					eventsCollector.AddFieldEvent(eventInfo.SignatureType, eventInfo.Type, method, declarationOrder, _cancellation);
 				}
