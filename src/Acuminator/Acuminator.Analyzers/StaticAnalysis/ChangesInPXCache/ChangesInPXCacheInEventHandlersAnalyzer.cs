@@ -15,7 +15,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.ChangesInPXCache
 {
-	public class ChangesInPXCacheInEventHandlersAnalyzer : EventHandlerAggregatedAnalyzerBase
+	public class ChangesInPXCacheInEventHandlersAnalyzer : LooseEventHandlerAggregatedAnalyzerBase
 	{
 		private static readonly ImmutableHashSet<EventType> AnalyzedEventTypes = new []
 		{

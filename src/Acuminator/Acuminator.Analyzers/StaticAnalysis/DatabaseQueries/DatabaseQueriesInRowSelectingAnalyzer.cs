@@ -18,7 +18,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.DatabaseQueries
 {
-	public class DatabaseQueriesInRowSelectingAnalyzer : EventHandlerAggregatedAnalyzerBase
+	public class DatabaseQueriesInRowSelectingAnalyzer : LooseEventHandlerAggregatedAnalyzerBase
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(Descriptors.PX1042_DatabaseQueriesInRowSelecting);

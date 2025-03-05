@@ -17,14 +17,14 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 {
-	public partial class ThrowingExceptionsInEventHandlersAnalyzer : IEventHandlerAnalyzer, IPXGraphAnalyzer
+	public partial class ThrowingExceptionsInEventHandlersAnalyzer : ILooseEventHandlerAggregatedAnalyzer, IPXGraphAnalyzer
 	{
 		public ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
 			Descriptors.PX1073_ThrowingExceptionsInRowPersisted,
 			Descriptors.PX1073_ThrowingExceptionsInRowPersisted_NonISV,
 			Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers);
 
-		bool IEventHandlerAnalyzer.ShouldAnalyze(PXContext pxContext, EventType eventType) => 
+		bool ILooseEventHandlerAggregatedAnalyzer.ShouldAnalyze(PXContext pxContext, EventType eventType) => 
 			eventType != EventType.None;
 
 		bool IPXGraphAnalyzer.ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graphOrGraphExtension) => 
@@ -36,7 +36,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 		/// <param name="context">The context.</param>
 		/// <param name="pxContext">The Acumatica context.</param>
 		/// <param name="eventType">Type of the event.</param>
-		void IEventHandlerAnalyzer.Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+		void ILooseEventHandlerAggregatedAnalyzer.Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 

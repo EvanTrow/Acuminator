@@ -17,7 +17,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.RaiseExceptionHandling
 {
-	public class RaiseExceptionHandlingInEventHandlersAnalyzer : EventHandlerAggregatedAnalyzerBase
+	public class RaiseExceptionHandlingInEventHandlersAnalyzer : LooseEventHandlerAggregatedAnalyzerBase
 	{
 		private static readonly ISet<EventType> AnalyzedEventTypes = new HashSet<EventType>()
 		{

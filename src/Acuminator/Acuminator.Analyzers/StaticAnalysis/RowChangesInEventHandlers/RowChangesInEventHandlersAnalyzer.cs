@@ -13,7 +13,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 {
-	public partial class RowChangesInEventHandlersAnalyzer : EventHandlerAggregatedAnalyzerBase
+	public partial class RowChangesInEventHandlersAnalyzer : LooseEventHandlerAggregatedAnalyzerBase
 	{
 		private enum RowChangesAnalysisMode
 		{

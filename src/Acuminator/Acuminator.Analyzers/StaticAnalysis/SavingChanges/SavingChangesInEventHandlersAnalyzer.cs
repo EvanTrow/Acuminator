@@ -16,7 +16,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.SavingChanges
 {
-	public class SavingChangesInEventHandlersAnalyzer : EventHandlerAggregatedAnalyzerBase
+	public class SavingChangesInEventHandlersAnalyzer : LooseEventHandlerAggregatedAnalyzerBase
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
 			Descriptors.PX1043_SavingChangesInEventHandlers,

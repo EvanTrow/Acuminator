@@ -10,9 +10,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 {
 	/// <summary>
-	/// Base class for aggregated event handler analyzers.
+	/// Base class for aggregated loosely recognized event handler analyzers.
 	/// </summary>
-	public abstract class EventHandlerAggregatedAnalyzerBase : IEventHandlerAnalyzer
+	public abstract class LooseEventHandlerAggregatedAnalyzerBase : ILooseEventHandlerAggregatedAnalyzer
 	{
 		public abstract ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
 

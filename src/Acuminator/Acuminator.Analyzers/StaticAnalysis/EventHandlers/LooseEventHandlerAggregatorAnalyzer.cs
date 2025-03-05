@@ -32,7 +32,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 	/// </remarks>
 	/// <seealso cref="EventHandlerLooseInfo"/>
 	[DiagnosticAnalyzer(LanguageNames.CSharp)]
-	public class LooseEventHandlerAggregatorAnalyzer : SymbolAnalyzersAggregator<IEventHandlerAnalyzer>
+	public class LooseEventHandlerAggregatorAnalyzer : SymbolAnalyzersAggregator<ILooseEventHandlerAggregatedAnalyzer>
 	{
         protected override SymbolKind SymbolKind => SymbolKind.Method;
 
@@ -55,7 +55,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 		/// <summary>
 		/// Constructor for the unit tests.
 		/// </summary>
-		public LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings? settings, params IEventHandlerAnalyzer[] innerAnalyzers)
+		public LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings? settings, params ILooseEventHandlerAggregatedAnalyzer[] innerAnalyzers)
             : base(settings, innerAnalyzers)
 		{
 		}

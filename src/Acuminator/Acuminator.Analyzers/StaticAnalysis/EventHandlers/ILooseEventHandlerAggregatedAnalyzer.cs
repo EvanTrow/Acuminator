@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 {
-    public interface IEventHandlerAnalyzer : ISymbolAnalyzer
+    public interface ILooseEventHandlerAggregatedAnalyzer : ISymbolAnalyzer
 	{
 		void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType);
 

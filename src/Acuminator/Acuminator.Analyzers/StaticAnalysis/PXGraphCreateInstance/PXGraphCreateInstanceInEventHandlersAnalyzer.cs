@@ -14,7 +14,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 {
-	public class PXGraphCreateInstanceInEventHandlersAnalyzer : EventHandlerAggregatedAnalyzerBase
+	public class PXGraphCreateInstanceInEventHandlersAnalyzer : LooseEventHandlerAggregatedAnalyzerBase
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(
