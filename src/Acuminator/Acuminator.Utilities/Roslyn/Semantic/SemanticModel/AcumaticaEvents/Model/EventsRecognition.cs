@@ -36,23 +36,37 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 			if (!symbol.ReturnsVoid || !symbol.TypeParameters.IsDefaultOrEmpty || symbol.Parameters.IsDefaultOrEmpty)
 				return EventInfo.None;
 
+			ITypeSymbol firstParameterType = symbol.Parameters[0].Type.OriginalDefinition;
+
 			// Loosely check method signature because sometimes business logic 
-			// is extracted from event handler calls to a separate method
-
-			// Old non-generic syntax
-			if (symbol.Parameters[0].Type.OriginalDefinition.InheritsFromOrEquals(pxContext.PXCache.Type))
-			{
-				if (symbol.Name.EndsWith("CacheAttached", StringComparison.Ordinal))
-					return new EventInfo(EventType.CacheAttached, EventHandlerSignatureType.Classic);
-
-				if (symbol.Parameters.Length >= 2 && pxContext.Events.EventTypeMap.TryGetValue(
-						symbol.Parameters[1].Type.OriginalDefinition, out EventType eventType))
-				{
-					return new EventInfo(eventType, EventHandlerSignatureType.Classic);
-				}
+			// is extracted from event handler calls to a separate method	
+			if (firstParameterType.InheritsFromOrEquals(pxContext.PXCache.Type))
+			{ 
+				return RecognizeEventHandlerWithClassicSyntax(symbol, pxContext); 
 			}
-			else if (pxContext.Events.EventTypeMap.TryGetValue(
-				symbol.Parameters[0].Type.OriginalDefinition, out EventType eventType)) // New generic event handler syntax
+
+			return RecognizeEventHandlerWithGenericSyntax(firstParameterType, pxContext);
+		}
+
+		private static EventInfo RecognizeEventHandlerWithClassicSyntax(IMethodSymbol candidateSymbol, PXContext pxContext)
+		{
+			if (candidateSymbol.Name.EndsWith("CacheAttached", StringComparison.Ordinal))
+				return new EventInfo(EventType.CacheAttached, EventHandlerSignatureType.Classic);
+
+			if (candidateSymbol.Parameters.Length < 2)
+				return EventInfo.None;
+
+			var secondParameterType = candidateSymbol.Parameters[1].Type.OriginalDefinition;
+
+			if (pxContext.Events.EventTypeMap.TryGetValue(secondParameterType, out EventType eventType))
+				return new EventInfo(eventType, EventHandlerSignatureType.Classic);
+			else
+				return EventInfo.None;
+		}
+
+		private static EventInfo RecognizeEventHandlerWithGenericSyntax(ITypeSymbol firstParameterType, PXContext pxContext)
+		{
+			if (pxContext.Events.EventTypeMap.TryGetValue(firstParameterType, out EventType eventType)) 
 			{
 				return new EventInfo(eventType, EventHandlerSignatureType.Generic);
 			}

@@ -124,8 +124,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 			return map;
 		}
 
-		private static IReadOnlyDictionary<EventInfo, INamedTypeSymbol>
-			CreateEventHandlerSignatureTypeMap(EventSymbols eventSymbols)
+		private static IReadOnlyDictionary<EventInfo, INamedTypeSymbol> CreateEventHandlerSignatureTypeMap(EventSymbols eventSymbols)
 		{
 			return new Dictionary<EventInfo, INamedTypeSymbol>()
 			{
