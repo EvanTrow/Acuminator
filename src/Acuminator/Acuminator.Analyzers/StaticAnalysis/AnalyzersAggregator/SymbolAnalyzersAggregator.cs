@@ -70,7 +70,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 					return;
 				default:
 				{
-#if DEBUG1
+#if DEBUG
 					for (int analyzerIndex = 0; analyzerIndex < effectiveAnalyzers.Count; analyzerIndex++)
 					{
 						aggregatedAnalyserAction(analyzerIndex);
