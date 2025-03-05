@@ -313,7 +313,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			{
 				_cancellation.ThrowIfCancellationRequested();
 
-				var eventInfo = method.GetEventHandlerInfo(PXContext);
+				var eventInfo = method.GetEventHandlerLooseInfo(PXContext);
 
 				if (eventInfo.SignatureType == EventHandlerSignatureType.None || eventInfo.Type == EventType.None)
 					continue;

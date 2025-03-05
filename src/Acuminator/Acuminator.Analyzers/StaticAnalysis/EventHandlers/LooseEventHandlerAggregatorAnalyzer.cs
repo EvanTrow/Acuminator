@@ -67,7 +67,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 			if (context.Symbol is not IMethodSymbol methodSymbol)
 				return;
 		
-			EventHandlerLooseInfo eventHandlerLooseInfo = methodSymbol.GetEventHandlerInfo(pxContext);
+			EventHandlerLooseInfo eventHandlerLooseInfo = methodSymbol.GetEventHandlerLooseInfo(pxContext);
 
 			if (eventHandlerLooseInfo.Type == EventType.None)
 				return;

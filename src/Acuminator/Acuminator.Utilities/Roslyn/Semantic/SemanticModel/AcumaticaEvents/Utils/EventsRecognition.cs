@@ -19,7 +19,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 		/// <see cref="EventType"/> (e.g. RowSelecting). If method is not an event handler, returns <see cref="EventType.None"/>.
 		/// </returns>
 		public static EventType GetEventHandlerType(this IMethodSymbol symbol, PXContext pxContext) =>
-			symbol.GetEventHandlerInfo(pxContext).Type;
+			symbol.GetEventHandlerLooseInfo(pxContext).Type;
 
 		/// <summary>
 		/// Returns information about an event handler for the provided method symbol.
@@ -28,7 +28,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 		/// <param name="pxContext">PXContext instance</param>
 		/// <returns>Event Type (e.g. RowSelecting) and Event Signature Type (default or generic).
 		/// If method is not an event handler, returns <code>(EventType.None, EventHandlerSignatureType.None)</code>.</returns>
-		public static EventHandlerLooseInfo GetEventHandlerInfo(this IMethodSymbol symbol, PXContext pxContext)
+		public static EventHandlerLooseInfo GetEventHandlerLooseInfo(this IMethodSymbol symbol, PXContext pxContext)
 		{
 			symbol.ThrowOnNull();
 			pxContext.ThrowOnNull();
