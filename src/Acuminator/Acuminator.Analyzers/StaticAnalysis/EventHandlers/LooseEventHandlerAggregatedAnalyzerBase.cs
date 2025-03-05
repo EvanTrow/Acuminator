@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
@@ -16,8 +15,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 	{
 		public abstract ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
 
-		public abstract void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType);
+		public abstract void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo);
 
-		public virtual bool ShouldAnalyze(PXContext pxContext, EventType eventType) => true;
+		public virtual bool ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo) => 
+			eventHandlerInfo.Type != EventType.None;
 	}
 }

@@ -67,13 +67,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 			if (context.Symbol is not IMethodSymbol methodSymbol)
 				return;
 		
-			EventType eventType = methodSymbol.GetEventHandlerType(pxContext);
+			EventHandlerLooseInfo eventHandlerLooseInfo = methodSymbol.GetEventHandlerInfo(pxContext);
 
-			if (eventType == EventType.None)
+			if (eventHandlerLooseInfo.Type == EventType.None)
 				return;
 
 			context.CancellationToken.ThrowIfCancellationRequested();
-			var effectiveEventAnalyzers = _innerAnalyzers.Where(analyzer => analyzer.ShouldAnalyze(pxContext, eventType))
+			var effectiveEventAnalyzers = _innerAnalyzers.Where(analyzer => analyzer.ShouldAnalyze(pxContext, eventHandlerLooseInfo))
 														 .ToList(capacity: _innerAnalyzers.Length);
 
 			RunAggregatedAnalyzersInParallel(effectiveEventAnalyzers, context, analyzerIndex =>
@@ -81,7 +81,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 				context.CancellationToken.ThrowIfCancellationRequested();
 
 				var aggregatedAnalyzer = effectiveEventAnalyzers[analyzerIndex];
-				aggregatedAnalyzer.Analyze(context, pxContext, eventType);
+				aggregatedAnalyzer.Analyze(context, pxContext, eventHandlerLooseInfo);
 			});
 		}
 
