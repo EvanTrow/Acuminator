@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 {
 	/// <summary>
-	/// Information about the graph events related to the DAC fields.
+	/// Information about the graph event handlers related to the DAC fields.
 	/// </summary>
 	public class GraphFieldEventInfo : GraphEventHandlerInfoBase<GraphFieldEventInfo>
 	{
