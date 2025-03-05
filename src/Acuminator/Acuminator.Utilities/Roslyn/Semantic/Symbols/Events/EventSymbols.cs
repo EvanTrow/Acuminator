@@ -15,15 +15,15 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 		{
 			_eventTypeMap = new Lazy<IReadOnlyDictionary<ITypeSymbol, EventType>>(
 				() => CreateEventTypeMap(this));
-			_eventHandlerSignatureTypeMap = new Lazy<IReadOnlyDictionary<EventHandlerGeneralInfo, INamedTypeSymbol>>(
+			_eventHandlerSignatureTypeMap = new Lazy<IReadOnlyDictionary<EventHandlerLooseInfo, INamedTypeSymbol>>(
 				() => CreateEventHandlerSignatureTypeMap(this));
 		}
 
 		private readonly Lazy<IReadOnlyDictionary<ITypeSymbol, EventType>> _eventTypeMap;
 		public IReadOnlyDictionary<ITypeSymbol, EventType> EventTypeMap => _eventTypeMap.Value;
 
-		private readonly Lazy<IReadOnlyDictionary<EventHandlerGeneralInfo, INamedTypeSymbol>> _eventHandlerSignatureTypeMap;
-		public IReadOnlyDictionary<EventHandlerGeneralInfo, INamedTypeSymbol> EventHandlerSignatureTypeMap => _eventHandlerSignatureTypeMap.Value;
+		private readonly Lazy<IReadOnlyDictionary<EventHandlerLooseInfo, INamedTypeSymbol>> _eventHandlerSignatureTypeMap;
+		public IReadOnlyDictionary<EventHandlerLooseInfo, INamedTypeSymbol> EventHandlerSignatureTypeMap => _eventHandlerSignatureTypeMap.Value;
 
 		public INamedTypeSymbol PXRowSelectingEventArgs => Compilation.GetTypeByMetadataName(EventArgsNames.PXRowSelectingEventArgs)!;
 		public INamedTypeSymbol PXRowSelectedEventArgs => Compilation.GetTypeByMetadataName(EventArgsNames.PXRowSelectedEventArgs)!;
@@ -124,46 +124,46 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 			return map;
 		}
 
-		private static IReadOnlyDictionary<EventHandlerGeneralInfo, INamedTypeSymbol> CreateEventHandlerSignatureTypeMap(EventSymbols eventSymbols)
+		private static IReadOnlyDictionary<EventHandlerLooseInfo, INamedTypeSymbol> CreateEventHandlerSignatureTypeMap(EventSymbols eventSymbols)
 		{
-			return new Dictionary<EventHandlerGeneralInfo, INamedTypeSymbol>()
+			return new Dictionary<EventHandlerLooseInfo, INamedTypeSymbol>()
 			{
-				{ new EventHandlerGeneralInfo(EventType.RowSelecting, EventHandlerSignatureType.Classic), eventSymbols.PXRowSelectingEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.RowSelected, EventHandlerSignatureType.Classic), eventSymbols.PXRowSelectedEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.RowInserting, EventHandlerSignatureType.Classic), eventSymbols.PXRowInsertingEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.RowInserted, EventHandlerSignatureType.Classic), eventSymbols.PXRowInsertedEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.RowUpdating, EventHandlerSignatureType.Classic), eventSymbols.PXRowUpdatingEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.RowUpdated, EventHandlerSignatureType.Classic), eventSymbols.PXRowUpdatedEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.RowDeleting, EventHandlerSignatureType.Classic), eventSymbols.PXRowDeletingEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.RowDeleted, EventHandlerSignatureType.Classic), eventSymbols.PXRowDeletedEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.RowPersisting, EventHandlerSignatureType.Classic), eventSymbols.PXRowPersistingEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.RowPersisted, EventHandlerSignatureType.Classic), eventSymbols.PXRowPersistedEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.FieldSelecting, EventHandlerSignatureType.Classic), eventSymbols.PXFieldSelectingEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.FieldDefaulting, EventHandlerSignatureType.Classic), eventSymbols.PXFieldDefaultingEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.FieldVerifying, EventHandlerSignatureType.Classic), eventSymbols.PXFieldVerifyingEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.FieldUpdating, EventHandlerSignatureType.Classic), eventSymbols.PXFieldUpdatingEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.FieldUpdated, EventHandlerSignatureType.Classic), eventSymbols.PXFieldUpdatedEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.CommandPreparing, EventHandlerSignatureType.Classic), eventSymbols.PXCommandPreparingEventArgs },
-				{ new EventHandlerGeneralInfo(EventType.ExceptionHandling, EventHandlerSignatureType.Classic), eventSymbols.PXExceptionHandlingEventArgs },
+				{ new EventHandlerLooseInfo(EventType.RowSelecting, EventHandlerSignatureType.Classic), eventSymbols.PXRowSelectingEventArgs },
+				{ new EventHandlerLooseInfo(EventType.RowSelected, EventHandlerSignatureType.Classic), eventSymbols.PXRowSelectedEventArgs },
+				{ new EventHandlerLooseInfo(EventType.RowInserting, EventHandlerSignatureType.Classic), eventSymbols.PXRowInsertingEventArgs },
+				{ new EventHandlerLooseInfo(EventType.RowInserted, EventHandlerSignatureType.Classic), eventSymbols.PXRowInsertedEventArgs },
+				{ new EventHandlerLooseInfo(EventType.RowUpdating, EventHandlerSignatureType.Classic), eventSymbols.PXRowUpdatingEventArgs },
+				{ new EventHandlerLooseInfo(EventType.RowUpdated, EventHandlerSignatureType.Classic), eventSymbols.PXRowUpdatedEventArgs },
+				{ new EventHandlerLooseInfo(EventType.RowDeleting, EventHandlerSignatureType.Classic), eventSymbols.PXRowDeletingEventArgs },
+				{ new EventHandlerLooseInfo(EventType.RowDeleted, EventHandlerSignatureType.Classic), eventSymbols.PXRowDeletedEventArgs },
+				{ new EventHandlerLooseInfo(EventType.RowPersisting, EventHandlerSignatureType.Classic), eventSymbols.PXRowPersistingEventArgs },
+				{ new EventHandlerLooseInfo(EventType.RowPersisted, EventHandlerSignatureType.Classic), eventSymbols.PXRowPersistedEventArgs },
+				{ new EventHandlerLooseInfo(EventType.FieldSelecting, EventHandlerSignatureType.Classic), eventSymbols.PXFieldSelectingEventArgs },
+				{ new EventHandlerLooseInfo(EventType.FieldDefaulting, EventHandlerSignatureType.Classic), eventSymbols.PXFieldDefaultingEventArgs },
+				{ new EventHandlerLooseInfo(EventType.FieldVerifying, EventHandlerSignatureType.Classic), eventSymbols.PXFieldVerifyingEventArgs },
+				{ new EventHandlerLooseInfo(EventType.FieldUpdating, EventHandlerSignatureType.Classic), eventSymbols.PXFieldUpdatingEventArgs },
+				{ new EventHandlerLooseInfo(EventType.FieldUpdated, EventHandlerSignatureType.Classic), eventSymbols.PXFieldUpdatedEventArgs },
+				{ new EventHandlerLooseInfo(EventType.CommandPreparing, EventHandlerSignatureType.Classic), eventSymbols.PXCommandPreparingEventArgs },
+				{ new EventHandlerLooseInfo(EventType.ExceptionHandling, EventHandlerSignatureType.Classic), eventSymbols.PXExceptionHandlingEventArgs },
 
-				{ new EventHandlerGeneralInfo(EventType.CacheAttached, EventHandlerSignatureType.Generic), eventSymbols.CacheAttached },
-				{ new EventHandlerGeneralInfo(EventType.RowSelecting, EventHandlerSignatureType.Generic), eventSymbols.RowSelecting },
-				{ new EventHandlerGeneralInfo(EventType.RowSelected, EventHandlerSignatureType.Generic), eventSymbols.RowSelected },
-				{ new EventHandlerGeneralInfo(EventType.RowInserting, EventHandlerSignatureType.Generic), eventSymbols.RowInserting },
-				{ new EventHandlerGeneralInfo(EventType.RowInserted, EventHandlerSignatureType.Generic), eventSymbols.RowInserted },
-				{ new EventHandlerGeneralInfo(EventType.RowUpdating, EventHandlerSignatureType.Generic), eventSymbols.RowUpdating },
-				{ new EventHandlerGeneralInfo(EventType.RowUpdated, EventHandlerSignatureType.Generic), eventSymbols.RowUpdated },
-				{ new EventHandlerGeneralInfo(EventType.RowDeleting, EventHandlerSignatureType.Generic), eventSymbols.RowDeleting },
-				{ new EventHandlerGeneralInfo(EventType.RowDeleted, EventHandlerSignatureType.Generic), eventSymbols.RowDeleted },
-				{ new EventHandlerGeneralInfo(EventType.RowPersisting, EventHandlerSignatureType.Generic), eventSymbols.RowPersisting },
-				{ new EventHandlerGeneralInfo(EventType.RowPersisted, EventHandlerSignatureType.Generic), eventSymbols.RowPersisted },
-				{ new EventHandlerGeneralInfo(EventType.FieldSelecting, EventHandlerSignatureType.Generic), eventSymbols.FieldSelectingTypedRow ?? eventSymbols.FieldSelecting },
-				{ new EventHandlerGeneralInfo(EventType.FieldDefaulting, EventHandlerSignatureType.Generic), eventSymbols.FieldDefaultingTypedRow ?? eventSymbols.FieldDefaulting },
-				{ new EventHandlerGeneralInfo(EventType.FieldVerifying, EventHandlerSignatureType.Generic), eventSymbols.FieldVerifyingTypedRow ?? eventSymbols.FieldVerifying },
-				{ new EventHandlerGeneralInfo(EventType.FieldUpdating, EventHandlerSignatureType.Generic), eventSymbols.FieldUpdatingTypedRow ?? eventSymbols.FieldUpdating },
-				{ new EventHandlerGeneralInfo(EventType.FieldUpdated, EventHandlerSignatureType.Generic), eventSymbols.FieldUpdatedTypedRow ?? eventSymbols.FieldUpdated },
-				{ new EventHandlerGeneralInfo(EventType.CommandPreparing, EventHandlerSignatureType.Generic), eventSymbols.CommandPreparing },
-				{ new EventHandlerGeneralInfo(EventType.ExceptionHandling, EventHandlerSignatureType.Generic), eventSymbols.ExceptionHandlingTypedRow ?? eventSymbols.ExceptionHandling },
+				{ new EventHandlerLooseInfo(EventType.CacheAttached, EventHandlerSignatureType.Generic), eventSymbols.CacheAttached },
+				{ new EventHandlerLooseInfo(EventType.RowSelecting, EventHandlerSignatureType.Generic), eventSymbols.RowSelecting },
+				{ new EventHandlerLooseInfo(EventType.RowSelected, EventHandlerSignatureType.Generic), eventSymbols.RowSelected },
+				{ new EventHandlerLooseInfo(EventType.RowInserting, EventHandlerSignatureType.Generic), eventSymbols.RowInserting },
+				{ new EventHandlerLooseInfo(EventType.RowInserted, EventHandlerSignatureType.Generic), eventSymbols.RowInserted },
+				{ new EventHandlerLooseInfo(EventType.RowUpdating, EventHandlerSignatureType.Generic), eventSymbols.RowUpdating },
+				{ new EventHandlerLooseInfo(EventType.RowUpdated, EventHandlerSignatureType.Generic), eventSymbols.RowUpdated },
+				{ new EventHandlerLooseInfo(EventType.RowDeleting, EventHandlerSignatureType.Generic), eventSymbols.RowDeleting },
+				{ new EventHandlerLooseInfo(EventType.RowDeleted, EventHandlerSignatureType.Generic), eventSymbols.RowDeleted },
+				{ new EventHandlerLooseInfo(EventType.RowPersisting, EventHandlerSignatureType.Generic), eventSymbols.RowPersisting },
+				{ new EventHandlerLooseInfo(EventType.RowPersisted, EventHandlerSignatureType.Generic), eventSymbols.RowPersisted },
+				{ new EventHandlerLooseInfo(EventType.FieldSelecting, EventHandlerSignatureType.Generic), eventSymbols.FieldSelectingTypedRow ?? eventSymbols.FieldSelecting },
+				{ new EventHandlerLooseInfo(EventType.FieldDefaulting, EventHandlerSignatureType.Generic), eventSymbols.FieldDefaultingTypedRow ?? eventSymbols.FieldDefaulting },
+				{ new EventHandlerLooseInfo(EventType.FieldVerifying, EventHandlerSignatureType.Generic), eventSymbols.FieldVerifyingTypedRow ?? eventSymbols.FieldVerifying },
+				{ new EventHandlerLooseInfo(EventType.FieldUpdating, EventHandlerSignatureType.Generic), eventSymbols.FieldUpdatingTypedRow ?? eventSymbols.FieldUpdating },
+				{ new EventHandlerLooseInfo(EventType.FieldUpdated, EventHandlerSignatureType.Generic), eventSymbols.FieldUpdatedTypedRow ?? eventSymbols.FieldUpdated },
+				{ new EventHandlerLooseInfo(EventType.CommandPreparing, EventHandlerSignatureType.Generic), eventSymbols.CommandPreparing },
+				{ new EventHandlerLooseInfo(EventType.ExceptionHandling, EventHandlerSignatureType.Generic), eventSymbols.ExceptionHandlingTypedRow ?? eventSymbols.ExceptionHandling },
 			};
 		}
 	}

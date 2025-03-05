@@ -104,7 +104,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 				return Task.FromResult(document);
 
 			// Get a corresponding generic event args symbol
-			var genericEventHandlerInfoKey = new EventHandlerGeneralInfo(eventType, EventHandlerSignatureType.Generic);
+			var genericEventHandlerInfoKey = new EventHandlerLooseInfo(eventType, EventHandlerSignatureType.Generic);
 
 			if (!pxContext.Events.EventHandlerSignatureTypeMap.TryGetValue(genericEventHandlerInfoKey, out INamedTypeSymbol genericArgsSymbol))
 				return Task.FromResult(document);

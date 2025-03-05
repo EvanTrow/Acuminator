@@ -77,7 +77,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 				return false;
 
 			// check that there is a corresponding generic event args symbol
-			var eventHandlerInfoForGenericSignature = new EventHandlerGeneralInfo(eventInfo.EventType, EventHandlerSignatureType.Generic);
+			var eventHandlerInfoForGenericSignature = new EventHandlerLooseInfo(eventInfo.EventType, EventHandlerSignatureType.Generic);
 			return pxContext.Events.EventHandlerSignatureTypeMap.ContainsKey(eventHandlerInfoForGenericSignature);
 		}
 	}

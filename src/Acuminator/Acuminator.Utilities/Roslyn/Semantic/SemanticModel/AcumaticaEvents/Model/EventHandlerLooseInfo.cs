@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 /// <summary>
-/// General information about Acumatica event handler.
+/// Information about Acumatica loosely recognized event handler.
 /// </summary>
 /// <remarks>
 /// Event handlers described by this structure are loosely recognized event handlers.<br/>
-/// This means that <see cref="EventHandlerGeneralInfo"/> describes not only event handlers from graphs and graph extensions but also event handlers from attributes and general helpers.<br/>
+/// This means that <see cref="EventHandlerLooseInfo"/> describes not only event handlers from graphs and graph extensions but also event handlers from attributes and general helpers.<br/>
 /// Such event handlers are reconized by Acumiantor by their signature. Loosely recognition means that:
 /// <list type="bullet">
 /// <item>Event handler method can be declared outside of graphs and graph extensions.</item>
@@ -18,9 +18,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 /// </list>
 /// </remarks>
 [StructLayout(LayoutKind.Auto)]
-public readonly struct EventHandlerGeneralInfo : IEquatable<EventHandlerGeneralInfo>
+public readonly struct EventHandlerLooseInfo : IEquatable<EventHandlerLooseInfo>
 {
-	public static EventHandlerGeneralInfo None { get; } = new(EventType.None, EventHandlerSignatureType.None);
+	public static EventHandlerLooseInfo None { get; } = new(EventType.None, EventHandlerSignatureType.None);
 
 	public EventType Type { get; }
 
@@ -28,16 +28,16 @@ public readonly struct EventHandlerGeneralInfo : IEquatable<EventHandlerGeneralI
 
 	public EventTargetKind TargetKind { get; }
 
-	public EventHandlerGeneralInfo(EventType type, EventHandlerSignatureType signatureType)
+	public EventHandlerLooseInfo(EventType type, EventHandlerSignatureType signatureType)
 	{
 		Type 		  = type;
 		SignatureType = signatureType;
 		TargetKind 	  = Type.GetEventTargetKindByEventType();
 	}
 
-	public override bool Equals(object obj) => obj is EventHandlerGeneralInfo other && Equals(other);
+	public override bool Equals(object obj) => obj is EventHandlerLooseInfo other && Equals(other);
 
-	public bool Equals(EventHandlerGeneralInfo other) => Type == other.Type && SignatureType == other.SignatureType;
+	public bool Equals(EventHandlerLooseInfo other) => Type == other.Type && SignatureType == other.SignatureType;
 
 	public override int GetHashCode()
 	{
