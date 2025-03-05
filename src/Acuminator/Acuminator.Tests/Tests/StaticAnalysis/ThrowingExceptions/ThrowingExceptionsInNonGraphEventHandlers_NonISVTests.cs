@@ -16,7 +16,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ThrowingExceptions
 	public class ThrowingExceptionsInNonGraphEventHandlers_NonISVTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new EventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
+			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 														 .WithIsvSpecificAnalyzersDisabled()
 														 .WithRecursiveAnalysisEnabled()
 														 .WithSuppressionMechanismDisabled(),

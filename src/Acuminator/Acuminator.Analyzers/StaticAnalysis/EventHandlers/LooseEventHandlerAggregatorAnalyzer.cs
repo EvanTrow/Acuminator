@@ -32,11 +32,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 	/// </remarks>
 	/// <seealso cref="EventHandlerGeneralInfo"/>
 	[DiagnosticAnalyzer(LanguageNames.CSharp)]
-	public class EventHandlerAggregatorAnalyzer : SymbolAnalyzersAggregator<IEventHandlerAnalyzer>
+	public class LooseEventHandlerAggregatorAnalyzer : SymbolAnalyzersAggregator<IEventHandlerAnalyzer>
 	{
         protected override SymbolKind SymbolKind => SymbolKind.Method;
 
-		public EventHandlerAggregatorAnalyzer() : this(null,
+		public LooseEventHandlerAggregatorAnalyzer() : this(null,
 			// can be replaced with DI from ServiceLocator if DI-container is used
 			new DatabaseQueriesInRowSelectingAnalyzer(),
 			new SavingChangesInEventHandlersAnalyzer(),
@@ -55,7 +55,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 		/// <summary>
 		/// Constructor for the unit tests.
 		/// </summary>
-		public EventHandlerAggregatorAnalyzer(CodeAnalysisSettings? settings, params IEventHandlerAnalyzer[] innerAnalyzers)
+		public LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings? settings, params IEventHandlerAnalyzer[] innerAnalyzers)
             : base(settings, innerAnalyzers)
 		{
 		}

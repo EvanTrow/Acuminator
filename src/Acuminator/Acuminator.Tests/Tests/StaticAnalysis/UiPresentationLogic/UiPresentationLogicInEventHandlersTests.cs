@@ -21,7 +21,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.UiPresentationLogic
 	public class UiPresentationLogicInEventHandlersTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new EventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
+			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 					.WithRecursiveAnalysisEnabled(),
 				new UiPresentationLogicInEventHandlersAnalyzer());
 

@@ -40,7 +40,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DatabaseQueries
 		protected override CodeFixProvider GetCSharpCodeFixProvider() => new DatabaseQueriesInRowSelectingFixInTests();
 
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => 
-			new EventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
+			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 														 .WithRecursiveAnalysisEnabled()
 														 .WithStaticAnalysisEnabled()
 														 .WithSuppressionMechanismDisabled(),

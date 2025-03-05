@@ -21,7 +21,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.RaiseExceptionHandling
 	public class RaiseExceptionHandlingInEventHandlersTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new EventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
+			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 					.WithRecursiveAnalysisEnabled()
 					.WithIsvSpecificAnalyzersEnabled(),
 				new RaiseExceptionHandlingInEventHandlersAnalyzer());
