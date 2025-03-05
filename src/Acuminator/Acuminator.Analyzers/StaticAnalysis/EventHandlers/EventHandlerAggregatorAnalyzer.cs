@@ -1,5 +1,4 @@
-﻿
-using System.Linq;
+﻿using System.Linq;
 
 using Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator;
 using Acuminator.Analyzers.StaticAnalysis.ChangesInPXCache;
@@ -23,15 +22,17 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 {
 	/// <summary>
-	/// An event handler aggregator analyzer. This analyzer validates loosely recognized event handlers. <br/>
-	/// Loosely recognized event handlers are not only event handlers from graphs and graph extensions but also event handlers from attributes and other helpers.<br/><br/>
-	/// 
-	///
+	/// An event handler aggregator analyzer. This analyzer validates loosely recognized event handlers.<br/>
+	/// Loosely recognized event handlers are not only event handlers from graphs and graph extensions but also event handlers from attributes and other helpers.<br/>
+	/// You can see more info about loose event handlers in <see cref="EventHandlerGeneralInfo"/>.<br/>
 	/// </summary>
+	/// <remarks>
+	/// For analysis of strictly recognized event handlers from graphs and graph extensions and aggregated graph analyzer should be written.<br/>
+	/// See <see cref="PXGraph.IPXGraphAnalyzer"/> and <see cref="PXGraph.PXGraphAnalyzer"/> for details.
+	/// </remarks>
+	/// <seealso cref="EventHandlerGeneralInfo"/>
 	[DiagnosticAnalyzer(LanguageNames.CSharp)]
-#pragma warning disable RS1036 // Specify analyzer banned API enforcement setting
 	public class EventHandlerAggregatorAnalyzer : SymbolAnalyzersAggregator<IEventHandlerAnalyzer>
-#pragma warning restore RS1036 // Specify analyzer banned API enforcement setting
 	{
         protected override SymbolKind SymbolKind => SymbolKind.Method;
 

@@ -5,8 +5,18 @@ using System.Runtime.InteropServices;
 namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 /// <summary>
-/// General information defining the category of Acumatica event handler.
+/// General information about Acumatica event handler.
 /// </summary>
+/// <remarks>
+/// Event handlers described by this structure are loosely recognized event handlers.<br/>
+/// This means that <see cref="EventHandlerGeneralInfo"/> describes not only event handlers from graphs and graph extensions but also event handlers from attributes and general helpers.<br/>
+/// Such event handlers are reconized by Acumiantor by their signature. Loosely recognition means that:
+/// <list type="bullet">
+/// <item>Event handler method can be declared outside of graphs and graph extensions.</item>
+/// <item>Event handler's parameters list may have additional parameters besided the standard parameters for classic and generic syntaxes.<br/>
+/// However, the standard parameters must be declared first and in the same order as they are in the standard syntaxes for graph event handlers.</item>
+/// </list>
+/// </remarks>
 [StructLayout(LayoutKind.Auto)]
 public readonly struct EventHandlerGeneralInfo : IEquatable<EventHandlerGeneralInfo>
 {
