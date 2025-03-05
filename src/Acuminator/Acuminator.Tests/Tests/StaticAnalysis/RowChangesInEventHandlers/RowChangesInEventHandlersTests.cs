@@ -20,7 +20,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.RowChangesInEventHandlers
 	public class RowChangesInEventHandlersTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new EventHandlerAnalyzer(CodeAnalysisSettings.Default
+			new EventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 					.WithRecursiveAnalysisEnabled()
 					.WithIsvSpecificAnalyzersEnabled(),
 				new RowChangesInEventHandlersAnalyzer());

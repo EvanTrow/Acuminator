@@ -14,7 +14,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ChangesInPXCache
 	public class ChangesInPXCacheInEventHandlersIsvSpecificTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new EventHandlerAnalyzer(
+			new EventHandlerAggregatorAnalyzer(
 				CodeAnalysisSettings.Default
 					.WithRecursiveAnalysisEnabled()
 					.WithIsvSpecificAnalyzersEnabled(), 

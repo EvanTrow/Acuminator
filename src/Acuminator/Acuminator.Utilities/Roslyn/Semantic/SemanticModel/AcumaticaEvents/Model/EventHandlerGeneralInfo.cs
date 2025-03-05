@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 /// <summary>
-/// General information defining the category of Acumatica event.
+/// General information defining the category of Acumatica event handler.
 /// </summary>
 [StructLayout(LayoutKind.Auto)]
-public readonly struct EventInfo : IEquatable<EventInfo>
+public readonly struct EventHandlerGeneralInfo : IEquatable<EventHandlerGeneralInfo>
 {
-	public static EventInfo None { get; } = new(EventType.None, EventHandlerSignatureType.None);
+	public static EventHandlerGeneralInfo None { get; } = new(EventType.None, EventHandlerSignatureType.None);
 
 	public EventType Type { get; }
 
@@ -18,16 +18,16 @@ public readonly struct EventInfo : IEquatable<EventInfo>
 
 	public EventTargetKind TargetKind { get; }
 
-	public EventInfo(EventType type, EventHandlerSignatureType signatureType)
+	public EventHandlerGeneralInfo(EventType type, EventHandlerSignatureType signatureType)
 	{
 		Type 		  = type;
 		SignatureType = signatureType;
 		TargetKind 	  = Type.GetEventTargetKindByEventType();
 	}
 
-	public override bool Equals(object obj) => obj is EventInfo other && Equals(other);
+	public override bool Equals(object obj) => obj is EventHandlerGeneralInfo other && Equals(other);
 
-	public bool Equals(EventInfo other) => Type == other.Type && SignatureType == other.SignatureType;
+	public bool Equals(EventHandlerGeneralInfo other) => Type == other.Type && SignatureType == other.SignatureType;
 
 	public override int GetHashCode()
 	{

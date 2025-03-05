@@ -15,7 +15,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DatabaseQueries
 	public class DatabaseQueriesInRowSelectedTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => 
-			new EventHandlerAnalyzer(CodeAnalysisSettings.Default
+			new EventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 					.WithRecursiveAnalysisEnabled()
 					.WithIsvSpecificAnalyzersEnabled(),
 				new DatabaseQueriesInRowSelectedAnalyzer());
