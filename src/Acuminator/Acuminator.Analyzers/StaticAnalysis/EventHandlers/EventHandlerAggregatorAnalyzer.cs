@@ -22,12 +22,20 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 {
+	/// <summary>
+	/// An event handler aggregator analyzer. This analyzer validates loosely recognized event handlers. <br/>
+	/// Loosely recognized event handlers are not only event handlers from graphs and graph extensions but also event handlers from attributes and other helpers.<br/><br/>
+	/// 
+	///
+	/// </summary>
 	[DiagnosticAnalyzer(LanguageNames.CSharp)]
-	public class EventHandlerAnalyzer : SymbolAnalyzersAggregator<IEventHandlerAnalyzer>
+#pragma warning disable RS1036 // Specify analyzer banned API enforcement setting
+	public class EventHandlerAggregatorAnalyzer : SymbolAnalyzersAggregator<IEventHandlerAnalyzer>
+#pragma warning restore RS1036 // Specify analyzer banned API enforcement setting
 	{
         protected override SymbolKind SymbolKind => SymbolKind.Method;
 
-		public EventHandlerAnalyzer() : this(null,
+		public EventHandlerAggregatorAnalyzer() : this(null,
 			// can be replaced with DI from ServiceLocator if DI-container is used
 			new DatabaseQueriesInRowSelectingAnalyzer(),
 			new SavingChangesInEventHandlersAnalyzer(),
@@ -46,7 +54,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 		/// <summary>
 		/// Constructor for the unit tests.
 		/// </summary>
-		public EventHandlerAnalyzer(CodeAnalysisSettings? settings, params IEventHandlerAnalyzer[] innerAnalyzers)
+		public EventHandlerAggregatorAnalyzer(CodeAnalysisSettings? settings, params IEventHandlerAnalyzer[] innerAnalyzers)
             : base(settings, innerAnalyzers)
 		{
 		}
