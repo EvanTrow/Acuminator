@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 
 using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
@@ -33,16 +32,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.RaiseExceptionHandling
 				Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers_NonISV
 			);
 
-		public override bool ShouldAnalyze(PXContext pxContext, EventType eventType) =>
-			base.ShouldAnalyze(pxContext, eventType) && AnalyzedEventTypes.Contains(eventType);
+		public override bool ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo) =>
+			base.ShouldAnalyze(pxContext, eventHandlerInfo) && AnalyzedEventTypes.Contains(eventHandlerInfo.Type);
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
 			var methodSymbol = (IMethodSymbol) context.Symbol;
 			var methodSyntax = methodSymbol.GetSyntax(context.CancellationToken) as CSharpSyntaxNode;
-			var walker = new Walker(context, pxContext, eventType);
+			var walker = new Walker(context, pxContext, eventHandlerInfo.Type);
 
 			methodSyntax?.Accept(walker);
 		}

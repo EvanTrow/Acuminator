@@ -19,12 +19,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.UiPresentationLogic
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => 
 			ImmutableArray.Create(Descriptors.PX1070_UiPresentationLogicInEventHandlers);
 
-		public override bool ShouldAnalyze(PXContext pxContext, EventType eventType) =>
-			base.ShouldAnalyze(pxContext, eventType) &&
-			eventType != EventType.RowSelected && 
-			eventType != EventType.CacheAttached;
+		public override bool ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo) =>
+			base.ShouldAnalyze(pxContext, eventHandlerInfo) &&
+			eventHandlerInfo.Type is not (EventType.RowSelected or EventType.CacheAttached);
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 

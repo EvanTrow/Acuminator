@@ -21,7 +21,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 				Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers,
 				Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers_NonISV);
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 

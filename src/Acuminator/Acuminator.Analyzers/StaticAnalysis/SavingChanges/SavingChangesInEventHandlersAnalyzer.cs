@@ -23,13 +23,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.SavingChanges
 			Descriptors.PX1043_SavingChangesInRowPerstisting,
 			Descriptors.PX1043_SavingChangesInRowPerstistedNonISV);
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerLooseInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
 			var methodSymbol = (IMethodSymbol)context.Symbol;
 			var methodSyntax = methodSymbol.GetSyntax(context.CancellationToken) as CSharpSyntaxNode;
-			methodSyntax?.Accept(new Walker(context, pxContext, eventType));
+			methodSyntax?.Accept(new Walker(context, pxContext, eventHandlerLooseInfo.Type));
 		}
 
 		private class Walker : NestedInvocationWalker

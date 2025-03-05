@@ -24,8 +24,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 			Descriptors.PX1073_ThrowingExceptionsInRowPersisted_NonISV,
 			Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers);
 
-		bool ILooseEventHandlerAggregatedAnalyzer.ShouldAnalyze(PXContext pxContext, EventType eventType) => 
-			eventType != EventType.None;
+		bool ILooseEventHandlerAggregatedAnalyzer.ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo) => 
+			eventHandlerInfo.Type != EventType.None;
 
 		bool IPXGraphAnalyzer.ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graphOrGraphExtension) => 
 			graphOrGraphExtension?.IsInSource == true && !graphOrGraphExtension.Symbol.IsStatic;
@@ -35,8 +35,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="pxContext">The Acumatica context.</param>
-		/// <param name="eventType">Type of the event.</param>
-		void ILooseEventHandlerAggregatedAnalyzer.Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+		/// <param name="eventHandlerInfo">Information describing the event handler.</param>
+		void ILooseEventHandlerAggregatedAnalyzer.Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -51,7 +51,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 
 			if (methodSyntax != null)
 			{
-				var walker = new ThrowInEventsWalker(context, pxContext, eventType);
+				var walker = new ThrowInEventsWalker(context, pxContext, eventHandlerInfo.Type);
 
 				methodSyntax.Accept(walker);
 			}

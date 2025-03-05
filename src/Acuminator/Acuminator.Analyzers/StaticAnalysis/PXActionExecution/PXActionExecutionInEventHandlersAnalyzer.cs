@@ -21,7 +21,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXActionExecution
 				Descriptors.PX1071_PXActionExecutionInEventHandlers,
 				Descriptors.PX1071_PXActionExecutionInEventHandlers_NonISV);
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 

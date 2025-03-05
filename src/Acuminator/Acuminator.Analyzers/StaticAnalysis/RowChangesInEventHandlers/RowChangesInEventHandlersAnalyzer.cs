@@ -38,11 +38,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs_NonISV,
 			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly);
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			if (AnalyzedEventTypes.TryGetValue(eventType, out RowChangesAnalysisMode analysisMode))
+			if (AnalyzedEventTypes.TryGetValue(eventHandlerInfo.Type, out RowChangesAnalysisMode analysisMode))
 			{
 				var methodSymbol = (IMethodSymbol) context.Symbol;
 				var methodSyntax = methodSymbol.GetSyntax(context.CancellationToken) as MethodDeclarationSyntax;
@@ -58,7 +58,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 
 					// Perform analysis
 					var diagnosticWalker = new DiagnosticWalker(context, semanticModel, pxContext, variablesWalker.Result,
-						analysisMode, eventType);
+						analysisMode, eventHandlerInfo.Type);
 					methodSyntax.Accept(diagnosticWalker);
 				}
 			}

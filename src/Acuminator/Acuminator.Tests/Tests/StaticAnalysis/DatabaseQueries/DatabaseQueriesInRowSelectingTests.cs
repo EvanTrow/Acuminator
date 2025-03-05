@@ -25,8 +25,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DatabaseQueries
 		/// </summary>
 		private class DatabaseQueriesInRowSelectingAnalyzerInTests : DatabaseQueriesInRowSelectingAnalyzer
 		{
-			public override bool ShouldAnalyze(PXContext pxContext, EventType eventType) =>
-				eventType == EventType.RowSelecting;
+			public override bool ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo) =>
+				eventHandlerInfo.Type == EventType.RowSelecting;
 		}
 
 		/// <summary>
