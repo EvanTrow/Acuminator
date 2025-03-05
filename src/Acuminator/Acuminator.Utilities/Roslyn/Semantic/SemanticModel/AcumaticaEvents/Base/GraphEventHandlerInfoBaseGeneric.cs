@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Acuminator.Utilities.Common;
+﻿using Acuminator.Utilities.Common;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -8,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 {
 	/// <summary>
-	/// A common generic graph event info DTO base class.
+	/// A common generic base class for the graph event handler info.
 	/// </summary>
 	public abstract class GraphEventHandlerInfoBase<TEventInfoType> : GraphEventHandlerInfoBase, IWriteableBaseItem<TEventInfoType>
 	where TEventInfoType : GraphEventHandlerInfoBase<TEventInfoType>

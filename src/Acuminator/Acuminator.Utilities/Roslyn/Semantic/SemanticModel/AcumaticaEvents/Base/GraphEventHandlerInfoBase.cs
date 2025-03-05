@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 {
 	/// <summary>
-	/// A common non-generic graph event info DTO base class.
+	/// A common non-generic base class for the graph event handler info.
 	/// </summary>
 	public abstract class GraphEventHandlerInfoBase : NodeSymbolItem<MethodDeclarationSyntax, IMethodSymbol>
 	{
