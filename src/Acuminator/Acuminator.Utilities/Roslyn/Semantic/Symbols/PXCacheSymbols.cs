@@ -34,7 +34,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 			Delete = Type.GetMethods(DelegateNames.Delete).ToImmutableArray();
 
 			RaiseExceptionHandling   = Type.GetMethods(DelegateNames.RaiseExceptionHandling).ToImmutableArray();
-			RowSelectingWhileReading = Type.GetMembers(EventsNames.PXCache.RowSelectingWhileReading)
+			RowSelectingWhileReading = Type.GetMembers(Events.Names.PXCache.RowSelectingWhileReading)
 										   .OfType<IEventSymbol>()
 										   .FirstOrDefault();
 		}
