@@ -161,7 +161,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 					(eventCategory, dacName, rowEvents) => new DacGroupingNodeForRowEventViewModel(eventCategory, dacName, rowEvents, ExpandCreatedNodes));
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(CacheAttachedCategoryNodeViewModel cacheAttachedCategory) =>
-			CreateEventsCategoryChildren<GraphFieldEventInfo>(cacheAttachedCategory,
+			CreateEventsCategoryChildren<GraphCacheAttachedEventInfo>(cacheAttachedCategory,
 					(eventCategory, dacName, fieldEvents) => new DacGroupingNodeForCacheAttachedEventViewModel(eventCategory, dacName, fieldEvents, ExpandCreatedNodes));
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(FieldEventCategoryNodeViewModel fieldEventCategory) =>
@@ -179,7 +179,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 													   ?.OfType<TGraphEventInfo>()
 														.Where(eventInfo => eventInfo.SignatureType != EventHandlerSignatureType.None);
 			if (graphCategoryEvents.IsNullOrEmpty())
-				return Enumerable.Empty<TreeNodeViewModel>();
+				return [];
 
 			Cancellation.ThrowIfCancellationRequested();
 			var dacGroupingNodesViewModels = from eventInfo in graphCategoryEvents

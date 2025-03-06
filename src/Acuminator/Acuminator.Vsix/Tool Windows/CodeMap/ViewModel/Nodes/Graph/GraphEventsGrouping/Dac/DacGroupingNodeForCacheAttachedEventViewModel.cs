@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
-using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class DacGroupingNodeForCacheAttachedEventViewModel : DacGroupingNodeForFieldEventViewModel
+	public class DacGroupingNodeForCacheAttachedEventViewModel : DacGroupingNodeForFieldEventBaseViewModel<GraphCacheAttachedEventInfo>
 	{
 		public DacGroupingNodeForCacheAttachedEventViewModel(GraphEventCategoryNodeViewModel graphEventsCategoryVM, string dacName,
-																IEnumerable<GraphFieldEventInfo> cacheAttachedEvents, bool isExpanded) :
-														   base(graphEventsCategoryVM, dacName, cacheAttachedEvents, isExpanded)
+															IEnumerable<GraphCacheAttachedEventInfo> cacheAttachedEvents, bool isExpanded) :
+														base(graphEventsCategoryVM, dacName, cacheAttachedEvents, isExpanded)
 		{
 		}
 

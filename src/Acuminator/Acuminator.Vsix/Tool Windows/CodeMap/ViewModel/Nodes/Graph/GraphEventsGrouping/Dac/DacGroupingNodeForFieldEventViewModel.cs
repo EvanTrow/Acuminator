@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
-using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class DacGroupingNodeForFieldEventViewModel : DacGroupingNodeBaseViewModel
+	public class DacGroupingNodeForFieldEventViewModel : DacGroupingNodeForFieldEventBaseViewModel<GraphFieldEventInfo>
 	{
-		public ImmutableArray<GraphFieldEventInfo> AllFieldEvents { get; }
-
 		public DacGroupingNodeForFieldEventViewModel(GraphEventCategoryNodeViewModel graphEventsCategoryVM, string dacName,
-														IEnumerable<GraphFieldEventInfo> fieldEvents, bool isExpanded) :
-												   base(graphEventsCategoryVM, dacName, isExpanded)
-		{
-			AllFieldEvents = fieldEvents?.ToImmutableArray() ?? ImmutableArray.Create<GraphFieldEventInfo>();
+													 IEnumerable<GraphFieldEventInfo> fieldEvents, bool isExpanded) :
+												base(graphEventsCategoryVM, dacName, fieldEvents, isExpanded)
+		{ 
 		}
 
 		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => treeVisitor.VisitNode(this, input);
