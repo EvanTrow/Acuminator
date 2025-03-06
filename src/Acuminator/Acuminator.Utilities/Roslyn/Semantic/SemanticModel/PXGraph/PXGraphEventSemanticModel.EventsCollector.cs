@@ -50,11 +50,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					[EventType.FieldUpdating] 	  = [],
 					[EventType.FieldUpdated] 	  = [],
 
-					[EventType.CacheAttached] 	  = [],
-
 					[EventType.CommandPreparing]  = [],
 					[EventType.ExceptionHandling] = [],
 				};
+
+			public OverridableItemsCollection<GraphCacheAttachedEventInfo> CacheAttachedEvents { get; } = [];
 
 			public EventsCollector(PXGraphEventSemanticModel graphEventSemanticModel, PXContext context)
 			{
@@ -72,36 +72,35 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					? events
 					: null;
 
-			public void AddEvent(EventHandlerSignatureType signatureType, EventType eventType, IMethodSymbol methodSymbol,
-								 int declarationOrder, CancellationToken cancellationToken)
+			public void AddEventHandlerInfo(GraphEventHandlerInfoBase eventHandlerInfo)
 			{
-				var methodNode = GetMethodNode(methodSymbol, cancellationToken);
-
-				if (!_rowEvents.TryGetValue(eventType, out OverridableItemsCollection<GraphRowEventInfo> collectionToAdd))
-					return;
-
-				var eventToAdd = new GraphRowEventInfo(methodNode, methodSymbol, declarationOrder, signatureType, eventType);
-
-				if (!eventToAdd.DacName.IsNullOrEmpty())
+				switch (eventHandlerInfo)
 				{
-					collectionToAdd.Add(eventToAdd);
+					case GraphRowEventInfo rowEventInfo 
+					when !rowEventInfo.DacName.IsNullOrEmpty():
+						AddEventHandlerInfo(rowEventInfo, _rowEvents);
+						return;
+
+					case GraphFieldEventInfo fieldEventInfo
+					when !fieldEventInfo.DacName.IsNullOrEmpty() && !fieldEventInfo.DacFieldName.IsNullOrEmpty():
+						AddEventHandlerInfo(fieldEventInfo, _fieldEvents);
+						return;
+					
+					case GraphCacheAttachedEventInfo cacheAttachedEventInfo
+					when !cacheAttachedEventInfo.DacName.IsNullOrEmpty() && !cacheAttachedEventInfo.DacFieldName.IsNullOrEmpty():
+						CacheAttachedEvents.Add(cacheAttachedEventInfo);
+						return;
 				}
 			}
 
-			public void AddFieldEvent(EventHandlerSignatureType signatureType, EventType eventType, IMethodSymbol methodSymbol,
-									  int declarationOrder, CancellationToken cancellationToken)
+			private void AddEventHandlerInfo<TEventHandlerInfo>(TEventHandlerInfo eventHandlerInfo, 
+																Dictionary<EventType, OverridableItemsCollection<TEventHandlerInfo>> eventHandlersByEventType)
+			where TEventHandlerInfo : GraphEventHandlerInfoBase<TEventHandlerInfo>
 			{
-				var methodNode = GetMethodNode(methodSymbol, cancellationToken);
-
-				if (!_fieldEvents.TryGetValue(eventType, out OverridableItemsCollection<GraphFieldEventInfo> collectionToAdd))
+				if (!eventHandlersByEventType.TryGetValue(eventHandlerInfo.EventType, out var eventHandlers))
 					return;
 
-				var eventToAdd = new GraphFieldEventInfo(methodNode, methodSymbol, declarationOrder, signatureType, eventType);
-
-				if (!eventToAdd.DacName.IsNullOrEmpty() && !eventToAdd.DacFieldName.IsNullOrEmpty())
-				{
-					collectionToAdd.Add(eventToAdd);
-				}
+				eventHandlers.Add(eventHandlerInfo);
 			}
 
 			private MethodDeclarationSyntax? GetMethodNode(IMethodSymbol methodSymbol, CancellationToken cancellationToken) =>

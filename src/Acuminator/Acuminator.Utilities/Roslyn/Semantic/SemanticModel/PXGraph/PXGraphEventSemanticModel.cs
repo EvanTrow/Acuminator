@@ -177,8 +177,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public ImmutableDictionary<string, GraphFieldEventInfo> FieldUpdatedByName { get; }
 		public IEnumerable<GraphFieldEventInfo> FieldUpdatedEvents => FieldUpdatedByName.Values;
 
-		public ImmutableDictionary<string, GraphFieldEventInfo> CacheAttachedByName { get; }
-		public IEnumerable<GraphFieldEventInfo> CacheAttachedEvents => CacheAttachedByName.Values;
+		public ImmutableDictionary<string, GraphCacheAttachedEventInfo> CacheAttachedByName { get; }
+		public IEnumerable<GraphCacheAttachedEventInfo> CacheAttachedEvents => CacheAttachedByName.Values;
 
 		public ImmutableDictionary<string, GraphFieldEventInfo> CommandPreparingByName { get; }
 		public IEnumerable<GraphFieldEventInfo> CommandPreparingEvents => CommandPreparingByName.Values;
@@ -209,13 +209,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			RowPersistingByName = GetRowEvents(eventsCollector, EventType.RowPersisting);
 			RowPersistedByName  = GetRowEvents(eventsCollector, EventType.RowPersisted);
 
+			CacheAttachedByName = GetCacheAttachedEvents(eventsCollector);
+
 			FieldSelectingByName  = GetFieldEvents(eventsCollector, EventType.FieldSelecting);
 			FieldDefaultingByName = GetFieldEvents(eventsCollector, EventType.FieldDefaulting);
 			FieldVerifyingByName  = GetFieldEvents(eventsCollector, EventType.FieldVerifying);
 			FieldUpdatingByName   = GetFieldEvents(eventsCollector, EventType.FieldUpdating);
 			FieldUpdatedByName 	  = GetFieldEvents(eventsCollector, EventType.FieldUpdated);
 
-			CacheAttachedByName 	= GetFieldEvents(eventsCollector, EventType.CacheAttached);
 			CommandPreparingByName 	= GetFieldEvents(eventsCollector, EventType.CommandPreparing);
 			ExceptionHandlingByName = GetFieldEvents(eventsCollector, EventType.ExceptionHandling);
 		}
@@ -281,7 +282,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			AppendFieldEvents(FieldUpdatingByName);
 			AppendFieldEvents(FieldUpdatedByName);
 
-			AppendFieldEvents(CacheAttachedByName);
+			if (CacheAttachedByName.Count > 0)
+				allEvents = allEvents.Concat(CacheAttachedByName.Values);
+
 			AppendFieldEvents(CommandPreparingByName);
 			AppendFieldEvents(ExceptionHandlingByName);
 
@@ -313,21 +316,13 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			{
 				_cancellation.ThrowIfCancellationRequested();
 
-				EventHandlerLooseInfo eventHandlerInfo = method.GetEventHandlerLooseInfo(PXContext);
+				var handlerInfo = GraphEventsRecognition.TryRecognizeEventHandler(method, PXContext, declarationOrder, _cancellation);
 
-				if (!IsValidGraphEventHandlerSignature(method, eventHandlerInfo))
-					continue;
-
-				if (eventHandlerInfo.TargetKind == EventTargetKind.Row)
+				if (handlerInfo != null)
 				{
-					eventsCollector.AddEvent(eventHandlerInfo.SignatureType, eventHandlerInfo.Type, method, declarationOrder, _cancellation);
+					eventsCollector.AddEventHandlerInfo(handlerInfo);
+					declarationOrder++;
 				}
-				else if (eventHandlerInfo.TargetKind == EventTargetKind.Field)
-				{
-					eventsCollector.AddFieldEvent(eventHandlerInfo.SignatureType, eventHandlerInfo.Type, method, declarationOrder, _cancellation);
-				}
-				
-				declarationOrder++;
 			}
 
 			return eventsCollector;
@@ -362,64 +357,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphFieldEventInfo>.Empty;
 		}
 
-		private bool IsValidGraphEventHandlerSignature(IMethodSymbol eventHandlerCandidate, EventHandlerLooseInfo handlerInfo)
+		private ImmutableDictionary<string, GraphCacheAttachedEventInfo> GetCacheAttachedEvents(EventsCollector eventsCollector)
 		{
-			if (handlerInfo.Type == EventType.None || handlerInfo.SignatureType == EventHandlerSignatureType.None ||
-				handlerInfo.TargetKind == EventTargetKind.None)
-			{
-				return false;
-			}
-
-			int parametersCount = eventHandlerCandidate.Parameters.Length;
-
-			if (eventHandlerCandidate.CheckIfNull().IsStatic || !eventHandlerCandidate.ReturnsVoid || eventHandlerCandidate.IsGenericMethod ||
-				parametersCount < 1 || parametersCount > 3)
-			{
-				return false;
-			}
-
-			return handlerInfo.SignatureType switch
-			{
-				EventHandlerSignatureType.Classic => IsValidClassicGraphEventHandlerSignature(eventHandlerCandidate, handlerInfo, parametersCount),
-				EventHandlerSignatureType.Generic => IsValidGenericGraphEventHandlerSignature(eventHandlerCandidate, parametersCount),
-				_								  => false
-			};
+			OverridableItemsCollection<GraphCacheAttachedEventInfo>? rawCollection = eventsCollector.CacheAttachedEvents;
+			return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphCacheAttachedEventInfo>.Empty;
 		}
-
-		private static bool IsValidClassicGraphEventHandlerSignature(IMethodSymbol eventHandlerCandidate, EventHandlerLooseInfo handlerInfo,
-																	int parametersCount)
-		{
-			if (!IsValidNumberOfParametersForClassicGraphEventHandler(eventHandlerCandidate, handlerInfo, parametersCount))
-				return false;
-
-			const char underscore = '_';
-
-			if (eventHandlerCandidate.Name[0] == underscore || eventHandlerCandidate.Name[^1] == underscore)
-				return false;
-
-			int underscoresCount = eventHandlerCandidate.Name.Count(c => c == underscore);
-			return handlerInfo.TargetKind switch
-			{
-				EventTargetKind.Row   => underscoresCount == 1,
-				EventTargetKind.Field => underscoresCount == 2,
-				_ 					  => false,
-			};
-		}
-
-		private static bool IsValidNumberOfParametersForClassicGraphEventHandler(IMethodSymbol eventHandlerCandidate, EventHandlerLooseInfo handlerInfo, 
-																				 int parametersCount)
-		{
-			if (handlerInfo.TargetKind == EventTargetKind.Field)
-			{
-				return handlerInfo.Type == EventType.CacheAttached
-					? parametersCount is (1 or 2)
-					: parametersCount >= 2;                 // 2 or 3 parameters
-			}
-			else
-				return parametersCount >= 2;                // 2 or 3 parameters
-		}
-
-		private static bool IsValidGenericGraphEventHandlerSignature(IMethodSymbol eventHandlerCandidate, int parametersCount) =>
-			parametersCount is (1 or 2);
 	}
 }
