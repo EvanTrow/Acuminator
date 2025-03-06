@@ -1,4 +1,5 @@
-﻿#nullable enable
+﻿using System;
+
 using Acuminator.Utilities.Common;
 
 using Microsoft.CodeAnalysis;
@@ -12,16 +13,22 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 public class GraphRowEventInfo : GraphEventHandlerInfoBase<GraphRowEventInfo>
 {
 	
-	public GraphRowEventInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-							EventHandlerSignatureType signatureType, EventType eventType) :
-					 base(node, symbol, declarationOrder, signatureType, eventType)
+	public GraphRowEventInfo(MethodDeclarationSyntax? handlerNode, IMethodSymbol handlerSymbol, int declarationOrder,
+							 EventHandlerLooseInfo handlerLooseInfo) :
+						 base(handlerNode, handlerSymbol, declarationOrder, handlerLooseInfo)
 	{			
 	}
 
-	public GraphRowEventInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-							 EventHandlerSignatureType signatureType, EventType eventType, GraphRowEventInfo baseInfo)
-				   : base(node, symbol, declarationOrder, signatureType, eventType, baseInfo)
+	public GraphRowEventInfo(MethodDeclarationSyntax? handlerNode, IMethodSymbol handlerSymbol, int declarationOrder,
+							 EventHandlerLooseInfo handlerLooseInfo, GraphRowEventInfo baseInfo)
+				   : base(handlerNode, handlerSymbol, declarationOrder, handlerLooseInfo, baseInfo)
 	{		
+	}
+
+	protected override void ValidateEventType(EventType eventType)
+	{
+		if (!eventType.IsDacRowEvent())
+			throw new ArgumentOutOfRangeException(nameof(eventType), $"The {eventType} is not a row event type.");
 	}
 
 	internal override string GetEventGroupingKey() => $"{DacName}_{EventType.ToString()}";

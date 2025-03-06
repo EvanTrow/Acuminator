@@ -21,27 +21,25 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 		public string DacFieldName { get; }
 
 		public GraphFieldEventInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-								   EventHandlerSignatureType signatureType, EventType eventType) :
-							  base(node, symbol, declarationOrder, signatureType, eventType)
+								   EventHandlerLooseInfo handlerLooseInfo) :
+							  base(node, symbol, declarationOrder, handlerLooseInfo)
 		{
-			ValidateEventType(eventType);
 			DacFieldName = GetDacFieldName();
 		}
 
 		public GraphFieldEventInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-								   EventHandlerSignatureType signatureType, EventType eventType, GraphFieldEventInfo baseInfo)
-							: base(node, symbol, declarationOrder, signatureType, eventType, baseInfo)
+								   EventHandlerLooseInfo handlerLooseInfo, GraphFieldEventInfo baseInfo)
+							: base(node, symbol, declarationOrder, handlerLooseInfo, baseInfo)
 		{
-			ValidateEventType(eventType);
 			DacFieldName = GetDacFieldName();
 		}
 
 		internal override string GetEventGroupingKey() => $"{DacName}_{DacFieldName}_{EventType.ToString()}";
 
-		private void ValidateEventType(EventType eventType)
+		protected override void ValidateEventType(EventType eventType)
 		{
-			if (!EventType.IsDacFieldEvent())
-				throw new ArgumentOutOfRangeException(nameof(eventType), $"The {eventType.ToString()} is not a field event type.");
+			if (!eventType.IsDacFieldEvent())
+				throw new ArgumentOutOfRangeException(nameof(eventType), $"The {eventType} is not a field event type.");
 		}
 
 		private string GetDacFieldName() =>

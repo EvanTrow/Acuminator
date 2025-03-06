@@ -8,53 +8,56 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 	/// <summary>
 	/// A common generic base class for the graph event handler info.
 	/// </summary>
-	public abstract class GraphEventHandlerInfoBase<TEventInfoType> : GraphEventHandlerInfoBase, IWriteableBaseItem<TEventInfoType>
-	where TEventInfoType : GraphEventHandlerInfoBase<TEventInfoType>
+	public abstract class GraphEventHandlerInfoBase<TEventHandlerInfoType> : GraphEventHandlerInfoBase, IWriteableBaseItem<TEventHandlerInfoType>
+	where TEventHandlerInfoType : GraphEventHandlerInfoBase<TEventHandlerInfoType>
 	{
-		protected TEventInfoType? _baseInfo;
+		protected TEventHandlerInfoType? _baseEventHandlerInfo;
 
 		/// <summary>
-		/// The base event. 
+		/// The base event handler info. 
+		/// </summary>
+		public TEventHandlerInfoType? Base => _baseEventHandlerInfo;
+
+		/// <summary>
+		/// The base event handler info. 
 		/// </summary>
 		/// <remarks>
 		/// Internal setter is used for two reasons:
 		/// 1) Perfomance - to avoid allocation of objects during retrieval of overrides hierarchy.  
 		/// 2) Overcomplicated architecture - the use of completely readonly objects will require a more complex <see cref="GraphEventsCollection{TEventInfoType}"/> class
-		/// which will know how to create a new <typeparamref name="TEventInfoType"/> event info. 
+		/// which will know how to create a new <typeparamref name="TEventHandlerInfoType"/> event info. 
 		/// This will lead to a two concrete implementations of collection for <see cref="GraphRowEventInfo"/> and <see cref="GraphFieldEventInfo"/> 
 		/// or to a hard to read code in the <see cref="PXGraphEventSemanticModel.EventsCollector"/> if we choose to pass the delegates to the generic collection class. 
 		/// </remarks>
-		public TEventInfoType? Base => _baseInfo;
-
-		TEventInfoType? IWriteableBaseItem<TEventInfoType>.Base
+		TEventHandlerInfoType? IWriteableBaseItem<TEventHandlerInfoType>.Base
 		{
 			get => Base;
 			set 
 			{
-				_baseInfo = value;
+				_baseEventHandlerInfo = value;
 
 				if (value != null)
 					CombineWithBaseInfo(value);
 			}
 		}
 
-		protected GraphEventHandlerInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-											EventHandlerSignatureType signatureType, EventType eventType) :
-								base(node, symbol, declarationOrder, signatureType, eventType)
+		protected GraphEventHandlerInfoBase(MethodDeclarationSyntax? handlerNode, IMethodSymbol handlerSymbol, int declarationOrder,
+											EventHandlerLooseInfo handlerLooseInfo) :
+										base(handlerNode, handlerSymbol, declarationOrder, handlerLooseInfo)
 		{		
 		}
 
-		protected GraphEventHandlerInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-											EventHandlerSignatureType signatureType, EventType eventType, TEventInfoType baseEventInfo)
-							  : base(node, symbol, declarationOrder, signatureType, eventType)
+		protected GraphEventHandlerInfoBase(MethodDeclarationSyntax? handlerNode, IMethodSymbol handlerSymbol, int declarationOrder,
+											EventHandlerLooseInfo handlerLooseInfo, TEventHandlerInfoType baseEventHandlerInfo) : 
+										base(handlerNode, handlerSymbol, declarationOrder, handlerLooseInfo)
 		{
-			_baseInfo = baseEventInfo.CheckIfNull();
-			CombineWithBaseInfo(baseEventInfo);
+			_baseEventHandlerInfo = baseEventHandlerInfo.CheckIfNull();
+			CombineWithBaseInfo(baseEventHandlerInfo);
 		}
 
-		void IWriteableBaseItem<TEventInfoType>.CombineWithBaseInfo(TEventInfoType baseInfo) => CombineWithBaseInfo(baseInfo);
+		void IWriteableBaseItem<TEventHandlerInfoType>.CombineWithBaseInfo(TEventHandlerInfoType baseInfo) => CombineWithBaseInfo(baseInfo);
 
-		private void CombineWithBaseInfo(TEventInfoType baseInfo)
+		protected virtual void CombineWithBaseInfo(TEventHandlerInfoType baseInfo)
 		{
 
 		}

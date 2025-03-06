@@ -12,22 +12,29 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 	/// </summary>
 	public abstract class GraphEventHandlerInfoBase : NodeSymbolItem<MethodDeclarationSyntax, IMethodSymbol>
 	{
-		public EventHandlerSignatureType SignatureType { get; }
+		private readonly EventHandlerLooseInfo _handlerLooseInfo;
 
-		public EventType EventType { get; }
+		public EventHandlerSignatureType SignatureType => _handlerLooseInfo.SignatureType;
+
+		public EventType EventType => _handlerLooseInfo.Type;
+
+		public EventTargetKind TargetKind => _handlerLooseInfo.TargetKind;
 
 		public string DacName { get; }
 
 		public override string Name => GetEventGroupingKey();
 
-		protected GraphEventHandlerInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-											EventHandlerSignatureType signatureType, EventType eventType) :
-								base(node, symbol, declarationOrder)
+		protected GraphEventHandlerInfoBase(MethodDeclarationSyntax? handlerNode, IMethodSymbol handlerSymbol, int declarationOrder,
+											EventHandlerLooseInfo handlerLooseInfo) :
+									  base(handlerNode, handlerSymbol, declarationOrder)
 		{
-			SignatureType = signatureType;
-			EventType = eventType;
+			ValidateEventType(handlerLooseInfo.Type);
+
+			_handlerLooseInfo = handlerLooseInfo;
 			DacName = GetDacName();
 		}
+
+		protected abstract void ValidateEventType(EventType eventType);
 
 		/// <summary>
 		/// Gets the event grouping key. The key should contain enough data to distinguish events with different types or different DACs/DAC fields.
