@@ -34,7 +34,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		{
 			NodeIcon = GetNodeIcon();
 
-			if (MemberSymbol is IMethodSymbol method && method.Name == EventsNames.CommonEventHandlerWithGenericSignatureName)
+			if (MemberSymbol is IMethodSymbol method && method.Name == Events.Names.CommonEventHandlerWithGenericSignatureName)
 			{	
 				Name = GetNameForOverridenGraphEventHandler(method) ?? baseMemberOverrideInfo.Symbol.Name;
 			}
