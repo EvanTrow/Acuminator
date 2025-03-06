@@ -313,21 +313,18 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			{
 				_cancellation.ThrowIfCancellationRequested();
 
-				var eventInfo = method.GetEventHandlerLooseInfo(PXContext);
+				EventHandlerLooseInfo eventHandlerInfo = method.GetEventHandlerLooseInfo(PXContext);
 
-				if (eventInfo.SignatureType == EventHandlerSignatureType.None || eventInfo.Type == EventType.None)
+				if (!IsValidGraphEventHandlerSignature(method, eventHandlerInfo))
 					continue;
 
-				if (!method.IsValidGraphEventHandlerSignature(eventInfo.SignatureType, eventInfo.Type, eventInfo.TargetKind))
-					continue;
-
-				if (eventInfo.TargetKind == EventTargetKind.Row)
+				if (eventHandlerInfo.TargetKind == EventTargetKind.Row)
 				{
-					eventsCollector.AddEvent(eventInfo.SignatureType, eventInfo.Type, method, declarationOrder, _cancellation);
+					eventsCollector.AddEvent(eventHandlerInfo.SignatureType, eventHandlerInfo.Type, method, declarationOrder, _cancellation);
 				}
-				else if (eventInfo.TargetKind == EventTargetKind.Field)
+				else if (eventHandlerInfo.TargetKind == EventTargetKind.Field)
 				{
-					eventsCollector.AddFieldEvent(eventInfo.SignatureType, eventInfo.Type, method, declarationOrder, _cancellation);
+					eventsCollector.AddFieldEvent(eventHandlerInfo.SignatureType, eventHandlerInfo.Type, method, declarationOrder, _cancellation);
 				}
 				
 				declarationOrder++;
@@ -364,5 +361,65 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			OverridableItemsCollection<GraphFieldEventInfo>? rawCollection = eventsCollector.GetFieldEvents(eventType);
 			return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphFieldEventInfo>.Empty;
 		}
+
+		private bool IsValidGraphEventHandlerSignature(IMethodSymbol eventHandlerCandidate, EventHandlerLooseInfo handlerInfo)
+		{
+			if (handlerInfo.Type == EventType.None || handlerInfo.SignatureType == EventHandlerSignatureType.None ||
+				handlerInfo.TargetKind == EventTargetKind.None)
+			{
+				return false;
+			}
+
+			int parametersCount = eventHandlerCandidate.Parameters.Length;
+
+			if (eventHandlerCandidate.CheckIfNull().IsStatic || !eventHandlerCandidate.ReturnsVoid || eventHandlerCandidate.IsGenericMethod ||
+				parametersCount < 1 || parametersCount > 3)
+			{
+				return false;
+			}
+
+			return handlerInfo.SignatureType switch
+			{
+				EventHandlerSignatureType.Classic => IsValidClassicGraphEventHandlerSignature(eventHandlerCandidate, handlerInfo, parametersCount),
+				EventHandlerSignatureType.Generic => IsValidGenericGraphEventHandlerSignature(eventHandlerCandidate, parametersCount),
+				_								  => false
+			};
+		}
+
+		private static bool IsValidClassicGraphEventHandlerSignature(IMethodSymbol eventHandlerCandidate, EventHandlerLooseInfo handlerInfo,
+																	int parametersCount)
+		{
+			if (!IsValidNumberOfParametersForClassicGraphEventHandler(eventHandlerCandidate, handlerInfo, parametersCount))
+				return false;
+
+			const char underscore = '_';
+
+			if (eventHandlerCandidate.Name[0] == underscore || eventHandlerCandidate.Name[^1] == underscore)
+				return false;
+
+			int underscoresCount = eventHandlerCandidate.Name.Count(c => c == underscore);
+			return handlerInfo.TargetKind switch
+			{
+				EventTargetKind.Row   => underscoresCount == 1,
+				EventTargetKind.Field => underscoresCount == 2,
+				_ 					  => false,
+			};
+		}
+
+		private static bool IsValidNumberOfParametersForClassicGraphEventHandler(IMethodSymbol eventHandlerCandidate, EventHandlerLooseInfo handlerInfo, 
+																				 int parametersCount)
+		{
+			if (handlerInfo.TargetKind == EventTargetKind.Field)
+			{
+				return handlerInfo.Type == EventType.CacheAttached
+					? parametersCount is (1 or 2)
+					: parametersCount >= 2;                 // 2 or 3 parameters
+			}
+			else
+				return parametersCount >= 2;                // 2 or 3 parameters
+		}
+
+		private static bool IsValidGenericGraphEventHandlerSignature(IMethodSymbol eventHandlerCandidate, int parametersCount) =>
+			parametersCount is (1 or 2);
 	}
 }
