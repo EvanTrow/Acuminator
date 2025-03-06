@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 {
-	public static class EventsRecognition
+	public static class LooseEventsRecognition
 	{
 		/// <summary>
 		/// Returns event handler type <see cref="EventType"/> for the provided method symbol.
