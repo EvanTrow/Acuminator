@@ -20,8 +20,8 @@ public class GraphRowEventInfo : GraphEventHandlerInfoBase<GraphRowEventInfo>
 	}
 
 	public GraphRowEventInfo(MethodDeclarationSyntax? handlerNode, IMethodSymbol handlerSymbol, int declarationOrder,
-							 EventHandlerLooseInfo handlerLooseInfo, GraphRowEventInfo baseInfo)
-				   : base(handlerNode, handlerSymbol, declarationOrder, handlerLooseInfo, baseInfo)
+							 EventHandlerLooseInfo handlerLooseInfo, GraphRowEventInfo baseInfo) :
+						base(handlerNode, handlerSymbol, declarationOrder, handlerLooseInfo, baseInfo)
 	{		
 	}
 
