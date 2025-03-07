@@ -1,17 +1,12 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
-using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
@@ -72,7 +67,46 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					? events
 					: null;
 
-			public void AddEventHandlerInfo(GraphEventHandlerInfoBase eventHandlerInfo)
+			public void CollectGraphEvents(CancellationToken cancellation)
+			{
+				cancellation.ThrowIfCancellationRequested();
+
+				var methods = GetAllGraphMethodsFromBaseToDerived();
+				int declarationOrder = 0;
+
+				foreach (IMethodSymbol method in methods)
+				{
+					cancellation.ThrowIfCancellationRequested();
+
+					var handlerInfo = GraphEventsRecognition.TryRecognizeEventHandler(method, _pxContext, declarationOrder, cancellation);
+
+					if (handlerInfo != null)
+					{
+						AddEventHandlerInfo(handlerInfo);
+						declarationOrder++;
+					}
+				}
+			}
+
+			private IEnumerable<IMethodSymbol> GetAllGraphMethodsFromBaseToDerived()
+			{
+				var graphModel = _graphEventSemanticModel.BaseGraphModel;
+				IEnumerable<ITypeSymbol>? baseTypes = graphModel.GraphSymbol
+															   ?.GetGraphWithBaseTypes()
+																.Reverse();
+
+				if (graphModel.GraphType == GraphType.PXGraphExtension)
+				{
+					baseTypes = baseTypes?.Concat(
+											graphModel.Symbol.GetGraphExtensionWithBaseExtensions(_pxContext,
+																								  SortDirection.Ascending,
+																								  includeGraph: false));
+				}
+
+				return baseTypes?.SelectMany(t => t.GetMethods()) ?? [];
+			}
+
+			private void AddEventHandlerInfo(GraphEventHandlerInfoBase eventHandlerInfo)
 			{
 				switch (eventHandlerInfo)
 				{
@@ -102,9 +136,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 				eventHandlers.Add(eventHandlerInfo);
 			}
-
-			private MethodDeclarationSyntax? GetMethodNode(IMethodSymbol methodSymbol, CancellationToken cancellationToken) =>
-				methodSymbol.GetSyntax(cancellationToken) as MethodDeclarationSyntax;
 		}
 	}
 }

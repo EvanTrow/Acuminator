@@ -192,7 +192,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			_cancellation = cancellation;
 			BaseGraphModel = baseGraphModel;
 
-			var eventsCollector = InitializeEvents();
+			var eventsCollector = new EventsCollector(this, PXContext);
+			eventsCollector.CollectGraphEvents(_cancellation);
 
 			RowSelectingByName = GetRowEvents(eventsCollector, EventType.RowSelecting);
 			RowSelectedByName  = GetRowEvents(eventsCollector, EventType.RowSelected);
@@ -302,47 +303,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				if (fieldEvents.Count > 0)
 					allEvents = allEvents.Concat(fieldEvents.Values);
 			}
-		}
-
-		private EventsCollector InitializeEvents()
-		{
-			_cancellation.ThrowIfCancellationRequested();
-			var methods = GetAllGraphMethodsFromBaseToDerived();
-
-			var eventsCollector = new EventsCollector(this, PXContext);
-			int declarationOrder = 0;
-
-			foreach (IMethodSymbol method in methods)
-			{
-				_cancellation.ThrowIfCancellationRequested();
-
-				var handlerInfo = GraphEventsRecognition.TryRecognizeEventHandler(method, PXContext, declarationOrder, _cancellation);
-
-				if (handlerInfo != null)
-				{
-					eventsCollector.AddEventHandlerInfo(handlerInfo);
-					declarationOrder++;
-				}
-			}
-
-			return eventsCollector;
-		}
-
-		private IEnumerable<IMethodSymbol> GetAllGraphMethodsFromBaseToDerived()
-		{
-			IEnumerable<ITypeSymbol>? baseTypes = BaseGraphModel.GraphSymbol
-															   ?.GetGraphWithBaseTypes()
-																.Reverse();
-
-			if (BaseGraphModel.GraphType == GraphType.PXGraphExtension)
-			{
-				baseTypes = baseTypes?.Concat(
-										BaseGraphModel.Symbol.GetGraphExtensionWithBaseExtensions(PXContext, 
-																								  SortDirection.Ascending,
-																								  includeGraph: false));
-			}
-
-			return baseTypes?.SelectMany(t => t.GetMethods()) ?? [];
 		}
 
 		private ImmutableDictionary<string, GraphRowEventInfo> GetRowEvents(EventsCollector eventsCollector, EventType eventType)
