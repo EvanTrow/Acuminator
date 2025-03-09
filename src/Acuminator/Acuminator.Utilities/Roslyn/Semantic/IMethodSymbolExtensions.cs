@@ -1,14 +1,13 @@
-﻿#nullable enable
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 
-using Microsoft.CodeAnalysis;
-
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Syntax;
+
+using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Roslyn.Semantic
 {
@@ -222,6 +221,57 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 			method.ThrowOnNull();
 
 			return method.IsVirtual || method.IsOverride || method.IsAbstract;
+		}
+
+		/// <summary>
+		/// Check if <paramref name="method"/> signature equals the signature of <paramref name="methodToCheck"/>.
+		/// </summary>
+		/// <param name="method">The method to act on.</param>
+		/// <param name="methodToCheck">The method with signature to check.</param>
+		/// <returns>
+		/// True if signatures are equal.
+		/// </returns>
+		/// <remarks>
+		/// This method does not check constraints on type parameters.
+		/// </remarks>
+		public static bool SignatureEquals(this IMethodSymbol method, [NotNullWhen(returnValue: true)] IMethodSymbol? methodToCheck)
+		{
+			if (!method.AreParametersEqual(methodToCheck) || !method.ReturnType.Equals(methodToCheck.ReturnType, SymbolEqualityComparer.Default) ||
+				method.IsGenericMethod != methodToCheck.IsGenericMethod)
+			{
+				return false;
+			}
+
+			if (method.IsGenericMethod)
+				return method.TypeParameters.Length == methodToCheck.TypeParameters.Length;		// TODO no constraints check on type parameters currently
+
+			return true;
+		}
+
+		/// <summary>
+		/// Check if <paramref name="method"/> parameters are equal to the parameters of <paramref name="methodToCheck"/>.
+		/// </summary>
+		/// <param name="method">The method to act on.</param>
+		/// <param name="methodToCheck">The method with parameters to check.</param>
+		/// <returns>
+		/// True if parameters are equal.
+		/// </returns>
+		public static bool AreParametersEqual(this IMethodSymbol method, [NotNullWhen(returnValue: true)] IMethodSymbol? methodToCheck)
+		{
+			method.ThrowOnNull();
+
+			if (methodToCheck == null || method.Parameters.Length != methodToCheck.Parameters.Length)
+				return false;
+
+			for (var i = 0; i < method.Parameters.Length; i++)
+			{
+				if (!method.Parameters[i].Type.Equals(methodToCheck.Parameters[i].Type, SymbolEqualityComparer.Default))
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 	}
 }
