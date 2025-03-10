@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 
 using Acuminator.Utilities.Common;
 
@@ -62,6 +61,42 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				: (baseMethodParametersCount + 1) == pxOverrideMethodParametersCount
 					? MethodsCompatibility.ParametersMatchWithDelegate
 					: MethodsCompatibility.NotCompatible;
+		}
+
+		/// <summary>
+		/// Check if <paramref name="methodWithBaseDelegate"/> has a valid base delegate as a last parameter.
+		/// </summary>
+		/// <param name="methodWithBaseDelegate">The method with the base delegate last parameter.</param>
+		/// <returns>
+		/// True if <paramref name="methodWithBaseDelegate"/> has a valid base delegate parameter as a last parameter, false if not.
+		/// </returns>
+		public static bool HasValidBaseDelegateParameter(this IMethodSymbol methodWithBaseDelegate)
+		{
+			if (methodWithBaseDelegate.CheckIfNull().Parameters.IsDefaultOrEmpty)
+				return false;
+
+			var delegateParameter = methodWithBaseDelegate.Parameters[^1];
+
+			if (delegateParameter.Type is not INamedTypeSymbol delegateType || delegateType.TypeKind != TypeKind.Delegate ||
+				delegateType.DelegateInvokeMethod == null)
+			{
+				return false;
+			}
+
+			IMethodSymbol baseDelegateMethod = delegateType.DelegateInvokeMethod;
+
+			if (!baseDelegateMethod.ReturnType.Equals(methodWithBaseDelegate.ReturnType, SymbolEqualityComparer.Default) ||
+				baseDelegateMethod.Parameters.Length != (methodWithBaseDelegate.Parameters.Length - 1) ||
+				baseDelegateMethod.IsGenericMethod != methodWithBaseDelegate.IsGenericMethod)
+			{
+				return false;
+			}
+
+			if (methodWithBaseDelegate.IsGenericMethod)
+				return methodWithBaseDelegate.TypeParameters.Length == baseDelegateMethod.TypeParameters.Length;     // TODO no constraints check on type parameters currently
+
+			return baseDelegateMethod.Parameters.EqualsParameterRange(methodWithBaseDelegate.Parameters, 
+																	  rangeStart: 0, rangeEnd: baseDelegateMethod.Parameters.Length);
 		}
 	}
 }
