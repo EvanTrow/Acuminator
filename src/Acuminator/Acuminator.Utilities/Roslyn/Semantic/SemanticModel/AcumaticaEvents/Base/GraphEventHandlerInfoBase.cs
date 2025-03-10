@@ -1,5 +1,4 @@
-﻿#nullable enable
-using Acuminator.Utilities.Common;
+﻿using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 
 using Microsoft.CodeAnalysis;
@@ -24,6 +23,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 
 		public override string Name => GetEventGroupingKey();
 
+		public IMethodSymbol? BaseDelegate { get; }
+
 		protected GraphEventHandlerInfoBase(MethodDeclarationSyntax? handlerNode, IMethodSymbol handlerSymbol, int declarationOrder,
 											EventHandlerLooseInfo handlerLooseInfo) :
 									  base(handlerNode, handlerSymbol, declarationOrder)
@@ -31,7 +32,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 			ValidateEventType(handlerLooseInfo.Type);
 
 			_handlerLooseInfo = handlerLooseInfo;
-			DacName = GetDacName();
+			DacName 		  = GetDacName();
+			BaseDelegate 	  = GetBaseDelegate(handlerSymbol);
 		}
 
 		protected abstract void ValidateEventType(EventType eventType);
@@ -70,6 +72,19 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 				return dacOrDacField.ContainingType?.Name ?? string.Empty;
 			else
 				return string.Empty;
+		}
+
+		private static IMethodSymbol? GetBaseDelegate(IMethodSymbol handlerSymbol)
+		{
+			if (handlerSymbol.Parameters.IsDefaultOrEmpty)
+				return null;
+
+			var lastParameter = handlerSymbol.Parameters[^1];
+
+			if (lastParameter.Type is not INamedTypeSymbol delegateType || delegateType.TypeKind != TypeKind.Delegate)
+				return null;
+
+			return delegateType.DelegateInvokeMethod;
 		}
 	}
 }
