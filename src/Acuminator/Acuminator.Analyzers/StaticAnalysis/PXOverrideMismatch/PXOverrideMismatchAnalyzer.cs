@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -53,7 +52,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverrideMismatch
 				foreach (var baseType in allBaseTypes)
 				{
 					bool hasSuitablePXOverride = baseType.GetMethods(methodWithPXOverride.Name)
-														 .Any(m => PXOverrideHelper.IsSuitable(methodWithPXOverride, m));
+														 .Any(m => methodWithPXOverride.IsPXOverrideOf(m));
 					if (hasSuitablePXOverride)
 						return;
 				}
@@ -66,97 +65,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverrideMismatch
 				var diagnostic = Diagnostic.Create(Descriptors.PX1096_PXOverrideMustMatchSignature, location);
 
 				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
-			}
-		}
-
-		private class PXOverrideHelper
-		{
-			/// <summary>
-			/// Special signature check between a derived method with the PXOverride attribute and the base method.
-			/// </summary>
-			/// <param name="pxOverrideMethod">The method from the derived class, with the PXOverride attribute</param>
-			/// <param name="baseMethod">The method from the base</param>
-			/// <returns></returns>
-			public static bool IsSuitable(IMethodSymbol pxOverrideMethod, IMethodSymbol baseMethod)
-			{
-				var methodsCompatibility = GetMethodsCompatibility(baseMethod.Parameters.Length, pxOverrideMethod.Parameters.Length);
-
-				if (methodsCompatibility == MethodsCompatibility.NotCompatible)
-				{
-					return false;
-				}
-
-				if (!baseMethod.CanBeOverriden() || !baseMethod.IsAccessibleOutsideOfAssembly())
-				{
-					return false;
-				}
-
-				if (methodsCompatibility == MethodsCompatibility.ParametersMatch)
-				{
-					return CheckExactMatch(pxOverrideMethod, baseMethod);
-				}
-
-				if (methodsCompatibility == MethodsCompatibility.ParametersMatchWithDelegate)
-				{
-					if (pxOverrideMethod.Parameters[pxOverrideMethod.Parameters.Length - 1].Type is not INamedTypeSymbol @delegate || 
-						@delegate.TypeKind != TypeKind.Delegate)
-					{
-						return false;
-					}
-
-					return
-						DoParametersMatch(baseMethod.Parameters, pxOverrideMethod.Parameters) &&
-						CheckExactMatch(baseMethod, @delegate.DelegateInvokeMethod);
-				}
-
-				return false;
-			}
-
-			private static bool CheckExactMatch(IMethodSymbol pxOverrideMethod, IMethodSymbol? delegateInvokeMethod)
-			{
-				if (delegateInvokeMethod == null || 
-					!pxOverrideMethod.ReturnType.Equals(delegateInvokeMethod.ReturnType, SymbolEqualityComparer.Default))
-				{
-					return false;
-				}
-
-				if (pxOverrideMethod.Parameters.Length != delegateInvokeMethod.Parameters.Length)
-				{
-					return false;
-				}
-
-				if (!DoParametersMatch(pxOverrideMethod.Parameters, delegateInvokeMethod.Parameters))
-				{
-					return false;
-				}
-
-				return true;
-			}
-
-			private static bool DoParametersMatch(ImmutableArray<IParameterSymbol> sourceParameters, ImmutableArray<IParameterSymbol> targetParameters)
-			{
-				for (var i = 0; i < sourceParameters.Length; i++)
-				{
-					if (!sourceParameters[i].Type.Equals(targetParameters[i].Type, SymbolEqualityComparer.Default))
-					{
-						return false;
-					}
-				}
-
-				return true;
-			}
-
-			private static MethodsCompatibility GetMethodsCompatibility(int baseMethodParametersCount, int pxOverrideMethodParametersCount)
-			{
-				return baseMethodParametersCount == pxOverrideMethodParametersCount ? MethodsCompatibility.ParametersMatch :
-					baseMethodParametersCount + 1 == pxOverrideMethodParametersCount ? MethodsCompatibility.ParametersMatchWithDelegate : MethodsCompatibility.NotCompatible;
-			}
-
-			private enum MethodsCompatibility
-			{
-				NotCompatible,
-				ParametersMatch,
-				ParametersMatchWithDelegate
 			}
 		}
 	}

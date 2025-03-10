@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -263,12 +264,34 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 			if (methodToCheck == null || method.Parameters.Length != methodToCheck.Parameters.Length)
 				return false;
 
-			for (var i = 0; i < method.Parameters.Length; i++)
+			return method.Parameters.EqualsParameterRange(methodToCheck.Parameters, rangeStart: 0, rangeEnd: method.Parameters.Length);
+		}
+
+		/// <summary>
+		/// Check if parameters in the range from <paramref name="rangeStart"/> to <paramref name="rangeEnd"/> are equal.<br/>
+		/// If one of the lists does not contain the entire range, then an exception will be thrown.
+		/// </summary>
+		/// <param name="sourceParameters">The source parameters to act on.</param>
+		/// <param name="parametersToCheck">Parameters to check.</param>
+		/// <param name="rangeStart">The range start. The range start is inclusive, all indexes greater than it will be taken.</param>
+		/// <param name="rangeEnd">The range end. The range end is exclusive to the list of parameters, all indexes lower than it will be taken.</param>
+		/// <returns>
+		/// True if parameters in the specified range are equal, false if not.
+		/// </returns>
+		internal static bool EqualsParameterRange(this ImmutableArray<IParameterSymbol> sourceParameters, ImmutableArray<IParameterSymbol> parametersToCheck,
+												  int rangeStart, int rangeEnd)
+		{
+			int minParamsCount = Math.Min(sourceParameters.Length, parametersToCheck.Length);
+
+			if (rangeStart > rangeEnd || rangeStart < 0 || rangeEnd > minParamsCount)
+				throw new ArgumentOutOfRangeException($"Invalid range - start: {rangeStart}, end: {rangeEnd}");
+			else if (rangeStart == rangeEnd)
+				return true;
+
+			for (var i = rangeStart; i < rangeEnd; i++)
 			{
-				if (!method.Parameters[i].Type.Equals(methodToCheck.Parameters[i].Type, SymbolEqualityComparer.Default))
-				{
+				if (!sourceParameters[i].Type.Equals(parametersToCheck[i].Type, SymbolEqualityComparer.Default))
 					return false;
-				}
 			}
 
 			return true;
