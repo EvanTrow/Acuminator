@@ -42,9 +42,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		#region DAC Grouping
 		public virtual TResult VisitNode(DacGroupingNodeForRowEventViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
 
-		public virtual TResult VisitNode(DacGroupingNodeForCacheAttachedEventViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
+		public virtual TResult VisitNode(DacGroupingNodeForCacheAttachedEventHandlerViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
 
-		public virtual TResult VisitNode(DacGroupingNodeForFieldEventViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
+		public virtual TResult VisitNode(DacGroupingNodeForFieldEventHandlerViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
 
 		public virtual TResult VisitNode(DacFieldGroupingNodeForFieldEventViewModel dacFieldGroupingNode) => DefaultVisit(dacFieldGroupingNode);
 		#endregion

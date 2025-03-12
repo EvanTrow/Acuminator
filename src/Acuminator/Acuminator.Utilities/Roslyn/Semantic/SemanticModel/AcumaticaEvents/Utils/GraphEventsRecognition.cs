@@ -38,7 +38,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 					return new GraphRowEventInfo(handlerNode, handlerSymbol, declarationOrder, eventHandlerInfo);
 				case EventTargetKind.Field:
 					if (eventHandlerInfo.Type == EventType.CacheAttached)
-						return new GraphCacheAttachedEventInfo(handlerNode, handlerSymbol, declarationOrder, eventHandlerInfo);
+						return new GraphCacheAttachedEventHandlerInfo(handlerNode, handlerSymbol, declarationOrder, eventHandlerInfo);
 					else
 						return new GraphFieldEventInfo(handlerNode, handlerSymbol, declarationOrder, eventHandlerInfo);
 				default:

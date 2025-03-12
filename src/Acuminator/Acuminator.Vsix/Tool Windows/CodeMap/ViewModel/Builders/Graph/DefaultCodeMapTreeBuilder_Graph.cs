@@ -161,12 +161,12 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 					(eventCategory, dacName, rowEvents) => new DacGroupingNodeForRowEventViewModel(eventCategory, dacName, rowEvents, ExpandCreatedNodes));
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(CacheAttachedCategoryNodeViewModel cacheAttachedCategory) =>
-			CreateEventsCategoryChildren<GraphCacheAttachedEventInfo>(cacheAttachedCategory,
-					(eventCategory, dacName, fieldEvents) => new DacGroupingNodeForCacheAttachedEventViewModel(eventCategory, dacName, fieldEvents, ExpandCreatedNodes));
+			CreateEventsCategoryChildren<GraphCacheAttachedEventHandlerInfo>(cacheAttachedCategory,
+					(eventCategory, dacName, fieldEvents) => new DacGroupingNodeForCacheAttachedEventHandlerViewModel(eventCategory, dacName, fieldEvents, ExpandCreatedNodes));
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(FieldEventCategoryNodeViewModel fieldEventCategory) =>
 			CreateEventsCategoryChildren<GraphFieldEventInfo>(fieldEventCategory,
-					(eventCategory, dacName, fieldEvents) => new DacGroupingNodeForFieldEventViewModel(eventCategory, dacName, fieldEvents, ExpandCreatedNodes));
+					(eventCategory, dacName, fieldEvents) => new DacGroupingNodeForFieldEventHandlerViewModel(eventCategory, dacName, fieldEvents, ExpandCreatedNodes));
 
 		protected virtual IEnumerable<TreeNodeViewModel> CreateEventsCategoryChildren<TGraphEventInfo>(GraphEventCategoryNodeViewModel graphEventCategory,
 																									   DacVmConstructor<TGraphEventInfo> constructor)
@@ -196,15 +196,15 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			dacGroupingNode.RowEvents.Select(rowEventInfo => new RowEventNodeViewModel(dacGroupingNode, rowEventInfo, ExpandCreatedNodes))
 									 .Where(graphMemberVM => !graphMemberVM.Name.IsNullOrEmpty());
 
-		public override IEnumerable<TreeNodeViewModel>? VisitNode(DacGroupingNodeForCacheAttachedEventViewModel? dacGroupingNode) =>
+		public override IEnumerable<TreeNodeViewModel>? VisitNode(DacGroupingNodeForCacheAttachedEventHandlerViewModel? dacGroupingNode) =>
 			dacGroupingNode?.AllFieldEvents.Select(fieldEvent => new CacheAttachedNodeViewModel(dacGroupingNode, fieldEvent, ExpandCreatedNodes))
 										   .Where(graphMemberVM => !graphMemberVM.Name.IsNullOrEmpty());
 
-		public override IEnumerable<TreeNodeViewModel> VisitNode(DacGroupingNodeForFieldEventViewModel dacGroupingNode) =>
+		public override IEnumerable<TreeNodeViewModel> VisitNode(DacGroupingNodeForFieldEventHandlerViewModel dacGroupingNode) =>
 			CreateDacChildrenForFieldEvents(dacGroupingNode,
 				constructor: (dacVm, dacFieldName, dacFieldEvents) => new DacFieldGroupingNodeForFieldEventViewModel(dacVm, dacFieldName, dacFieldEvents, ExpandCreatedNodes));
 
-		protected virtual IEnumerable<TreeNodeViewModel> CreateDacChildrenForFieldEvents(DacGroupingNodeForFieldEventViewModel dacEventsGroupingNode,
+		protected virtual IEnumerable<TreeNodeViewModel> CreateDacChildrenForFieldEvents(DacGroupingNodeForFieldEventHandlerViewModel dacEventsGroupingNode,
 																						 DacFieldVmConstructor constructor)
 		{
 			return from eventInfo in dacEventsGroupingNode.AllFieldEvents

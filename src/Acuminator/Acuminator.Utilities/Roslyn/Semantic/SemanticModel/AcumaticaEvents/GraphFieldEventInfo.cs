@@ -8,7 +8,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 	/// <summary>
 	/// Information about the graph event handlers related to the DAC fields.
 	/// </summary>
-	public class GraphFieldEventInfo : GraphFieldEventInfoBase<GraphFieldEventInfo>
+	public class GraphFieldEventInfo : GraphFieldEventHandlerInfoBase<GraphFieldEventInfo>
 	{
 		public GraphFieldEventInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
 								   EventHandlerLooseInfo handlerLooseInfo) :
@@ -29,7 +29,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 			else if (eventType == EventType.CacheAttached)
 			{
 				throw new ArgumentOutOfRangeException(nameof(eventType), $"The {eventType} is a cache attached event." +
-													  $"The {nameof(GraphCacheAttachedEventInfo)} type should be used.");
+													  $"The {nameof(GraphCacheAttachedEventHandlerInfo)} type should be used.");
 			}
 		}
 	}

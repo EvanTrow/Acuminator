@@ -177,8 +177,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public ImmutableDictionary<string, GraphFieldEventInfo> FieldUpdatedByName { get; }
 		public IEnumerable<GraphFieldEventInfo> FieldUpdatedEvents => FieldUpdatedByName.Values;
 
-		public ImmutableDictionary<string, GraphCacheAttachedEventInfo> CacheAttachedByName { get; }
-		public IEnumerable<GraphCacheAttachedEventInfo> CacheAttachedEvents => CacheAttachedByName.Values;
+		public ImmutableDictionary<string, GraphCacheAttachedEventHandlerInfo> CacheAttachedByName { get; }
+		public IEnumerable<GraphCacheAttachedEventHandlerInfo> CacheAttachedEvents => CacheAttachedByName.Values;
 
 		public ImmutableDictionary<string, GraphFieldEventInfo> CommandPreparingByName { get; }
 		public IEnumerable<GraphFieldEventInfo> CommandPreparingEvents => CommandPreparingByName.Values;
@@ -317,10 +317,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphFieldEventInfo>.Empty;
 		}
 
-		private ImmutableDictionary<string, GraphCacheAttachedEventInfo> GetCacheAttachedEvents(EventsCollector eventsCollector)
+		private ImmutableDictionary<string, GraphCacheAttachedEventHandlerInfo> GetCacheAttachedEvents(EventsCollector eventsCollector)
 		{
-			OverridableItemsCollection<GraphCacheAttachedEventInfo>? rawCollection = eventsCollector.CacheAttachedEvents;
-			return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphCacheAttachedEventInfo>.Empty;
+			OverridableItemsCollection<GraphCacheAttachedEventHandlerInfo>? rawCollection = eventsCollector.CacheAttachedEvents;
+			return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphCacheAttachedEventHandlerInfo>.Empty;
 		}
 	}
 }

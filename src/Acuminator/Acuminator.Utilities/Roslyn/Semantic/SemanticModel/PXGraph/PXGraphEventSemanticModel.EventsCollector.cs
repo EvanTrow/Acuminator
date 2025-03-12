@@ -49,7 +49,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					[EventType.ExceptionHandling] = [],
 				};
 
-			public OverridableItemsCollection<GraphCacheAttachedEventInfo> CacheAttachedEvents { get; } = [];
+			public OverridableItemsCollection<GraphCacheAttachedEventHandlerInfo> CacheAttachedEvents { get; } = [];
 
 			public EventsCollector(PXGraphEventSemanticModel graphEventSemanticModel, PXContext context)
 			{
@@ -120,7 +120,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 						AddEventHandlerInfo(fieldEventInfo, _fieldEvents);
 						return;
 					
-					case GraphCacheAttachedEventInfo cacheAttachedEventInfo
+					case GraphCacheAttachedEventHandlerInfo cacheAttachedEventInfo
 					when !cacheAttachedEventInfo.DacName.IsNullOrEmpty() && !cacheAttachedEventInfo.DacFieldName.IsNullOrEmpty():
 						CacheAttachedEvents.Add(cacheAttachedEventInfo);
 						return;

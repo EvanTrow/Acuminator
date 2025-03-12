@@ -11,23 +11,23 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 	/// <summary>
 	/// A base type for information about the graph event handlers related to DAC fields.
 	/// </summary>
-	public abstract class GraphFieldEventInfoBase<TFieldEventHandlerInfo> : GraphEventHandlerInfoBase<TFieldEventHandlerInfo>
-	where TFieldEventHandlerInfo : GraphFieldEventInfoBase<TFieldEventHandlerInfo>
+	public abstract class GraphFieldEventHandlerInfoBase<TFieldEventHandlerInfo> : GraphEventHandlerInfoBase<TFieldEventHandlerInfo>
+	where TFieldEventHandlerInfo : GraphFieldEventHandlerInfoBase<TFieldEventHandlerInfo>
 	{
 		/// <summary>
 		/// The DAC field name.
 		/// </summary>
 		public string DacFieldName { get; }
 
-		public GraphFieldEventInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-									   EventHandlerLooseInfo handlerLooseInfo) :
+		public GraphFieldEventHandlerInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
+											  EventHandlerLooseInfo handlerLooseInfo) :
 								  base(node, symbol, declarationOrder, handlerLooseInfo)
 		{
 			DacFieldName = GetDacFieldName();
 		}
 
-		public GraphFieldEventInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-									   EventHandlerLooseInfo handlerLooseInfo, TFieldEventHandlerInfo baseInfo) : 
+		public GraphFieldEventHandlerInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
+											  EventHandlerLooseInfo handlerLooseInfo, TFieldEventHandlerInfo baseInfo) : 
 								  base(node, symbol, declarationOrder, handlerLooseInfo, baseInfo)
 		{
 			DacFieldName = GetDacFieldName();
