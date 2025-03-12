@@ -20,6 +20,11 @@ namespace PX.Objects.HackathonDemo.OverrideTest
 		{
 
 		}
+
+		protected virtual void _(Events.FieldUpdating<APInvoice, APInvoice.docBal> e)
+		{
+
+		}
 	}
 
 	// Acuminator disable once PX1016 ExtensionDoesNotDeclareIsActiveMethod extension should be constantly active
@@ -37,6 +42,11 @@ namespace PX.Objects.HackathonDemo.OverrideTest
 		{
 			fieldUpdatedBase(e);
 		}
+
+		protected virtual void _(Events.FieldUpdating<APInvoice, APInvoice.docBal> e, PXFieldUpdating fieldUpdatingBase)
+		{
+
+		}
 	}
 
 	// Acuminator disable once PX1016 ExtensionDoesNotDeclareIsActiveMethod extension should be constantly active
@@ -53,6 +63,11 @@ namespace PX.Objects.HackathonDemo.OverrideTest
 		protected virtual void _(Events.FieldUpdated<APInvoice, APInvoice.docBal> e, Events.FieldUpdated<APInvoice, APInvoice.docBal>.ClassicDelegate fieldUpdatedBase)
 		{
 			fieldUpdatedBase(e.Cache, e.Args);
+		}
+
+		protected virtual void _(Events.FieldUpdating<APInvoice, APInvoice.docBal> e, PXFieldUpdating fieldUpdatingBase)
+		{
+			fieldUpdatingBase(e.Cache, e.Args);
 		}
 	}
 }
