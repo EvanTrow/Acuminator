@@ -54,8 +54,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 				{ DiagnosticProperty.DacName, eventInfo.DacName }
 			};
 
-			if (eventInfo is GraphFieldEventHandlerInfo graphFieldEvent)
-				properties.Add(DiagnosticProperty.DacFieldName, graphFieldEvent.DacFieldName);
+			if (eventInfo is IGraphFieldEventHandlerInfo graphFieldEventHandler)
+				properties.Add(DiagnosticProperty.DacFieldName, graphFieldEventHandler.DacFieldName);
 
 			symbolContext.ReportDiagnosticWithSuppressionCheck(
 					Diagnostic.Create(Descriptors.PX1041_NameConventionEventsInGraphsAndGraphExtensions, graphEventLocation,
