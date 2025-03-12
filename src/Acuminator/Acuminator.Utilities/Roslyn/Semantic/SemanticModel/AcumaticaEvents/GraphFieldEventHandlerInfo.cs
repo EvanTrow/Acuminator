@@ -8,17 +8,17 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 	/// <summary>
 	/// Information about the graph event handlers related to the DAC fields.
 	/// </summary>
-	public class GraphFieldEventInfo : GraphFieldEventHandlerInfoBase<GraphFieldEventInfo>
+	public class GraphFieldEventHandlerInfo : GraphFieldEventHandlerInfoBase<GraphFieldEventHandlerInfo>
 	{
-		public GraphFieldEventInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-								   EventHandlerLooseInfo handlerLooseInfo) :
-							  base(node, symbol, declarationOrder, handlerLooseInfo)
+		public GraphFieldEventHandlerInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
+										  EventHandlerLooseInfo handlerLooseInfo) :
+									 base(node, symbol, declarationOrder, handlerLooseInfo)
 		{
 		}
 
-		public GraphFieldEventInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-								   EventHandlerLooseInfo handlerLooseInfo, GraphFieldEventInfo baseInfo) :
-							  base(node, symbol, declarationOrder, handlerLooseInfo, baseInfo)
+		public GraphFieldEventHandlerInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
+										  EventHandlerLooseInfo handlerLooseInfo, GraphFieldEventHandlerInfo baseInfo) :
+									 base(node, symbol, declarationOrder, handlerLooseInfo, baseInfo)
 		{
 		}
 

@@ -36,7 +36,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					[EventType.RowPersisted]  = [],
 				};
 
-			private readonly Dictionary<EventType, OverridableItemsCollection<GraphFieldEventInfo>> _fieldEvents =
+			private readonly Dictionary<EventType, OverridableItemsCollection<GraphFieldEventHandlerInfo>> _fieldEvents =
 				new()
 				{
 					[EventType.FieldSelecting] 	  = [],
@@ -62,8 +62,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					? events
 					: null;
 
-			public OverridableItemsCollection<GraphFieldEventInfo>? GetFieldEvents(EventType eventType) =>
-				_fieldEvents.TryGetValue(eventType, out OverridableItemsCollection<GraphFieldEventInfo> events)
+			public OverridableItemsCollection<GraphFieldEventHandlerInfo>? GetFieldEvents(EventType eventType) =>
+				_fieldEvents.TryGetValue(eventType, out OverridableItemsCollection<GraphFieldEventHandlerInfo> events)
 					? events
 					: null;
 
@@ -115,7 +115,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 						AddEventHandlerInfo(rowEventInfo, _rowEvents);
 						return;
 
-					case GraphFieldEventInfo fieldEventInfo
+					case GraphFieldEventHandlerInfo fieldEventInfo
 					when !fieldEventInfo.DacName.IsNullOrEmpty() && !fieldEventInfo.DacFieldName.IsNullOrEmpty():
 						AddEventHandlerInfo(fieldEventInfo, _fieldEvents);
 						return;

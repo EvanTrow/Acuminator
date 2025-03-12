@@ -11,7 +11,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	public class DacFieldGroupingNodeForFieldEventViewModel : DacFieldGroupingNodeBaseViewModel
 	{
 		public DacFieldGroupingNodeForFieldEventViewModel(DacGroupingNodeBaseViewModel dacVM, string dacFieldName, 
-														  IEnumerable<GraphFieldEventInfo> dacFieldEvents, bool isExpanded) :
+														  IEnumerable<GraphFieldEventHandlerInfo> dacFieldEvents, bool isExpanded) :
 													 base(dacVM, dacFieldName, dacFieldEvents, isExpanded)
 		{
 		}

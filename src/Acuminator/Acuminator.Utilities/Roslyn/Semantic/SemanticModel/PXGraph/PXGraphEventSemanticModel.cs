@@ -162,29 +162,29 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public ImmutableDictionary<string, GraphRowEventInfo> RowPersistedByName { get; }
 		public IEnumerable<GraphRowEventInfo> RowPersistedEvents => RowPersistedByName.Values;
 
-		public ImmutableDictionary<string, GraphFieldEventInfo> FieldSelectingByName { get; }
-		public IEnumerable<GraphFieldEventInfo> FieldSelectingEvents => FieldSelectingByName.Values;
+		public ImmutableDictionary<string, GraphFieldEventHandlerInfo> FieldSelectingByName { get; }
+		public IEnumerable<GraphFieldEventHandlerInfo> FieldSelectingEvents => FieldSelectingByName.Values;
 
-		public ImmutableDictionary<string, GraphFieldEventInfo> FieldDefaultingByName { get; }
-		public IEnumerable<GraphFieldEventInfo> FieldDefaultingEvents => FieldDefaultingByName.Values;
+		public ImmutableDictionary<string, GraphFieldEventHandlerInfo> FieldDefaultingByName { get; }
+		public IEnumerable<GraphFieldEventHandlerInfo> FieldDefaultingEvents => FieldDefaultingByName.Values;
 
-		public ImmutableDictionary<string, GraphFieldEventInfo> FieldVerifyingByName { get; }
-		public IEnumerable<GraphFieldEventInfo> FieldVerifyingEvents => FieldVerifyingByName.Values;
+		public ImmutableDictionary<string, GraphFieldEventHandlerInfo> FieldVerifyingByName { get; }
+		public IEnumerable<GraphFieldEventHandlerInfo> FieldVerifyingEvents => FieldVerifyingByName.Values;
 
-		public ImmutableDictionary<string, GraphFieldEventInfo> FieldUpdatingByName { get; }
-		public IEnumerable<GraphFieldEventInfo> FieldUpdatingEvents => FieldUpdatingByName.Values;
+		public ImmutableDictionary<string, GraphFieldEventHandlerInfo> FieldUpdatingByName { get; }
+		public IEnumerable<GraphFieldEventHandlerInfo> FieldUpdatingEvents => FieldUpdatingByName.Values;
 
-		public ImmutableDictionary<string, GraphFieldEventInfo> FieldUpdatedByName { get; }
-		public IEnumerable<GraphFieldEventInfo> FieldUpdatedEvents => FieldUpdatedByName.Values;
+		public ImmutableDictionary<string, GraphFieldEventHandlerInfo> FieldUpdatedByName { get; }
+		public IEnumerable<GraphFieldEventHandlerInfo> FieldUpdatedEvents => FieldUpdatedByName.Values;
 
 		public ImmutableDictionary<string, GraphCacheAttachedEventHandlerInfo> CacheAttachedByName { get; }
 		public IEnumerable<GraphCacheAttachedEventHandlerInfo> CacheAttachedEvents => CacheAttachedByName.Values;
 
-		public ImmutableDictionary<string, GraphFieldEventInfo> CommandPreparingByName { get; }
-		public IEnumerable<GraphFieldEventInfo> CommandPreparingEvents => CommandPreparingByName.Values;
+		public ImmutableDictionary<string, GraphFieldEventHandlerInfo> CommandPreparingByName { get; }
+		public IEnumerable<GraphFieldEventHandlerInfo> CommandPreparingEvents => CommandPreparingByName.Values;
 
-		public ImmutableDictionary<string, GraphFieldEventInfo> ExceptionHandlingByName { get; }
-		public IEnumerable<GraphFieldEventInfo> ExceptionHandlingEvents => ExceptionHandlingByName.Values;
+		public ImmutableDictionary<string, GraphFieldEventHandlerInfo> ExceptionHandlingByName { get; }
+		public IEnumerable<GraphFieldEventHandlerInfo> ExceptionHandlingEvents => ExceptionHandlingByName.Values;
 		#endregion
 
 		private PXGraphEventSemanticModel(PXGraphSemanticModel baseGraphModel, CancellationToken cancellation = default)
@@ -298,7 +298,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					allEvents = allEvents.Concat(rowEvents.Values);
 			}
 
-			void AppendFieldEvents(ImmutableDictionary<string, GraphFieldEventInfo> fieldEvents)
+			void AppendFieldEvents(ImmutableDictionary<string, GraphFieldEventHandlerInfo> fieldEvents)
 			{
 				if (fieldEvents.Count > 0)
 					allEvents = allEvents.Concat(fieldEvents.Values);
@@ -311,10 +311,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphRowEventInfo>.Empty;
 		}
 
-		private ImmutableDictionary<string, GraphFieldEventInfo> GetFieldEvents(EventsCollector eventsCollector, EventType eventType)
+		private ImmutableDictionary<string, GraphFieldEventHandlerInfo> GetFieldEvents(EventsCollector eventsCollector, EventType eventType)
 		{
-			OverridableItemsCollection<GraphFieldEventInfo>? rawCollection = eventsCollector.GetFieldEvents(eventType);
-			return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphFieldEventInfo>.Empty;
+			OverridableItemsCollection<GraphFieldEventHandlerInfo>? rawCollection = eventsCollector.GetFieldEvents(eventType);
+			return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphFieldEventHandlerInfo>.Empty;
 		}
 
 		private ImmutableDictionary<string, GraphCacheAttachedEventHandlerInfo> GetCacheAttachedEvents(EventsCollector eventsCollector)

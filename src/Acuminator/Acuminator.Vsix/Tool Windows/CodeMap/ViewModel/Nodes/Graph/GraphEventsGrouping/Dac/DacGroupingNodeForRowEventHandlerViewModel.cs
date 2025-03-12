@@ -9,13 +9,13 @@ using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class DacGroupingNodeForRowEventViewModel : DacGroupingNodeBaseViewModel
+	public class DacGroupingNodeForRowEventHandlerViewModel : DacGroupingNodeBaseViewModel
 	{
 		public ImmutableArray<GraphRowEventInfo> RowEvents { get; }
 
-		public DacGroupingNodeForRowEventViewModel(GraphEventCategoryNodeViewModel graphEventsCategoryVM, string dacName,
-												   IEnumerable<GraphRowEventInfo> rowEvents, bool isExpanded) :
-											  base(graphEventsCategoryVM, dacName, isExpanded)
+		public DacGroupingNodeForRowEventHandlerViewModel(GraphEventCategoryNodeViewModel graphEventsCategoryVM, string dacName,
+														  IEnumerable<GraphRowEventInfo> rowEvents, bool isExpanded) :
+													 base(graphEventsCategoryVM, dacName, isExpanded)
 		{
 			RowEvents = rowEvents?.ToImmutableArray() ?? ImmutableArray.Create<GraphRowEventInfo>(); 
 		}

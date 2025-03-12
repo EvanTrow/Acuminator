@@ -122,7 +122,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			}
 		}
 
-		public override IReadOnlyCollection<TreeNodeViewModel> VisitNode(DacGroupingNodeForRowEventViewModel dacGroupingNode,
+		public override IReadOnlyCollection<TreeNodeViewModel> VisitNode(DacGroupingNodeForRowEventHandlerViewModel dacGroupingNode,
 														  IReadOnlyCollection<TreeNodeViewModel> generatedChildren)
 		{
 			SortType oldSortType = SortType;

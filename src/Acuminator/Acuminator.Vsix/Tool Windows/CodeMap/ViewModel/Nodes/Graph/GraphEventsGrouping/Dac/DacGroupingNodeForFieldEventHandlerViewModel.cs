@@ -6,10 +6,10 @@ using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class DacGroupingNodeForFieldEventHandlerViewModel : DacGroupingNodeForFieldEventHandlerBaseViewModel<GraphFieldEventInfo>
+	public class DacGroupingNodeForFieldEventHandlerViewModel : DacGroupingNodeForFieldEventHandlerBaseViewModel<GraphFieldEventHandlerInfo>
 	{
 		public DacGroupingNodeForFieldEventHandlerViewModel(GraphEventCategoryNodeViewModel graphEventsCategoryVM, string dacName,
-															IEnumerable<GraphFieldEventInfo> fieldEvents, bool isExpanded) :
+															IEnumerable<GraphFieldEventHandlerInfo> fieldEvents, bool isExpanded) :
 														base(graphEventsCategoryVM, dacName, fieldEvents, isExpanded)
 		{ 
 		}

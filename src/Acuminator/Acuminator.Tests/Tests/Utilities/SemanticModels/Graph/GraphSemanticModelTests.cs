@@ -126,13 +126,13 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			graphWithEvents.FieldUpdatingByName.Should().HaveCount(1);
 			graphWithEvents.FieldUpdatedByName.Should().HaveCount(1);
 
-			GraphFieldEventInfo fieldUpdatingEventHandler = graphWithEvents.FieldUpdatingEvents.First();
-			GraphFieldEventInfo fieldUpdatedEventHandler = graphWithEvents.FieldUpdatedEvents.First();
+			GraphFieldEventHandlerInfo fieldUpdatingEventHandler = graphWithEvents.FieldUpdatingEvents.First();
+			GraphFieldEventHandlerInfo fieldUpdatedEventHandler = graphWithEvents.FieldUpdatedEvents.First();
 
 			ValidateEventHandler(fieldUpdatedEventHandler, "SomeDac", "DocBal");
 
 			//----------------------------------Local Function--------------------------------------
-			static void ValidateEventHandler(GraphFieldEventInfo eventHandler, string expectedDacName, string expectedDacFieldName)
+			static void ValidateEventHandler(GraphFieldEventHandlerInfo eventHandler, string expectedDacName, string expectedDacFieldName)
 			{
 				eventHandler.DacName.Should().Be(expectedDacName);
 				eventHandler.DacFieldName.Should().Be(expectedDacFieldName);
