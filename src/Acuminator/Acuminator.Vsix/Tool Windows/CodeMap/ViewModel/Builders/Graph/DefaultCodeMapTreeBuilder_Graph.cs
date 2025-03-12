@@ -157,7 +157,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		}
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(RowEventCategoryNodeViewModel rowEventCategory) =>
-			CreateEventsCategoryChildren<GraphRowEventInfo>(rowEventCategory,
+			CreateEventsCategoryChildren<GraphRowEventHandlerInfo>(rowEventCategory,
 					(eventCategory, dacName, rowEvents) => new DacGroupingNodeForRowEventHandlerViewModel(eventCategory, dacName, rowEvents, ExpandCreatedNodes));
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(CacheAttachedCategoryNodeViewModel cacheAttachedCategory) =>

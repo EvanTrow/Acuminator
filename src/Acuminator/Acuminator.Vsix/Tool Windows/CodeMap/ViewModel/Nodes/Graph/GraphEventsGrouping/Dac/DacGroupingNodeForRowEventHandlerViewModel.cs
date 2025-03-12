@@ -11,13 +11,13 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public class DacGroupingNodeForRowEventHandlerViewModel : DacGroupingNodeBaseViewModel
 	{
-		public ImmutableArray<GraphRowEventInfo> RowEvents { get; }
+		public ImmutableArray<GraphRowEventHandlerInfo> RowEvents { get; }
 
 		public DacGroupingNodeForRowEventHandlerViewModel(GraphEventCategoryNodeViewModel graphEventsCategoryVM, string dacName,
-														  IEnumerable<GraphRowEventInfo> rowEvents, bool isExpanded) :
+														  IEnumerable<GraphRowEventHandlerInfo> rowEvents, bool isExpanded) :
 													 base(graphEventsCategoryVM, dacName, isExpanded)
 		{
-			RowEvents = rowEvents?.ToImmutableArray() ?? ImmutableArray.Create<GraphRowEventInfo>(); 
+			RowEvents = rowEvents?.ToImmutableArray() ?? ImmutableArray.Create<GraphRowEventHandlerInfo>(); 
 		}
 
 		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => treeVisitor.VisitNode(this, input);

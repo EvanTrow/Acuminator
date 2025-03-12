@@ -132,35 +132,35 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		#endregion
 
 		#region Events
-		public ImmutableDictionary<string, GraphRowEventInfo> RowSelectingByName { get; }
-		public IEnumerable<GraphRowEventInfo> RowSelectingEvents => RowSelectingByName.Values;
+		public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowSelectingByName { get; }
+		public IEnumerable<GraphRowEventHandlerInfo> RowSelectingEvents => RowSelectingByName.Values;
 
-		public ImmutableDictionary<string, GraphRowEventInfo> RowSelectedByName { get; }
-		public IEnumerable<GraphRowEventInfo> RowSelectedEvents => RowSelectedByName.Values;
+		public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowSelectedByName { get; }
+		public IEnumerable<GraphRowEventHandlerInfo> RowSelectedEvents => RowSelectedByName.Values;
 
-		public ImmutableDictionary<string, GraphRowEventInfo> RowInsertingByName { get; }
-		public IEnumerable<GraphRowEventInfo> RowInsertingEvents => RowInsertingByName.Values;
+		public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowInsertingByName { get; }
+		public IEnumerable<GraphRowEventHandlerInfo> RowInsertingEvents => RowInsertingByName.Values;
 
-		public ImmutableDictionary<string, GraphRowEventInfo> RowInsertedByName { get; }
-		public IEnumerable<GraphRowEventInfo> RowInsertedEvents => RowInsertedByName.Values;
+		public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowInsertedByName { get; }
+		public IEnumerable<GraphRowEventHandlerInfo> RowInsertedEvents => RowInsertedByName.Values;
 
-		public ImmutableDictionary<string, GraphRowEventInfo> RowUpdatingByName { get; }
-		public IEnumerable<GraphRowEventInfo> RowUpdatingEvents => RowUpdatingByName.Values;
+		public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowUpdatingByName { get; }
+		public IEnumerable<GraphRowEventHandlerInfo> RowUpdatingEvents => RowUpdatingByName.Values;
 
-		public ImmutableDictionary<string, GraphRowEventInfo> RowUpdatedByName { get; }
-		public IEnumerable<GraphRowEventInfo> RowUpdatedEvents => RowUpdatedByName.Values;
+		public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowUpdatedByName { get; }
+		public IEnumerable<GraphRowEventHandlerInfo> RowUpdatedEvents => RowUpdatedByName.Values;
 
-		public ImmutableDictionary<string, GraphRowEventInfo> RowDeletingByName { get; }
-		public IEnumerable<GraphRowEventInfo> RowDeletingEvents => RowDeletingByName.Values;
+		public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowDeletingByName { get; }
+		public IEnumerable<GraphRowEventHandlerInfo> RowDeletingEvents => RowDeletingByName.Values;
 
-		public ImmutableDictionary<string, GraphRowEventInfo> RowDeletedByName { get; }
-		public IEnumerable<GraphRowEventInfo> RowDeletedEvents => RowDeletedByName.Values;
+		public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowDeletedByName { get; }
+		public IEnumerable<GraphRowEventHandlerInfo> RowDeletedEvents => RowDeletedByName.Values;
 
-		public ImmutableDictionary<string, GraphRowEventInfo> RowPersistingByName { get; }
-		public IEnumerable<GraphRowEventInfo> RowPersistingEvents => RowPersistingByName.Values;
+		public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowPersistingByName { get; }
+		public IEnumerable<GraphRowEventHandlerInfo> RowPersistingEvents => RowPersistingByName.Values;
 
-		public ImmutableDictionary<string, GraphRowEventInfo> RowPersistedByName { get; }
-		public IEnumerable<GraphRowEventInfo> RowPersistedEvents => RowPersistedByName.Values;
+		public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowPersistedByName { get; }
+		public IEnumerable<GraphRowEventHandlerInfo> RowPersistedEvents => RowPersistedByName.Values;
 
 		public ImmutableDictionary<string, GraphFieldEventHandlerInfo> FieldSelectingByName { get; }
 		public IEnumerable<GraphFieldEventHandlerInfo> FieldSelectingEvents => FieldSelectingByName.Values;
@@ -292,7 +292,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			return allEvents;
 
 			//------------------------------------Local Function----------------------------------------------
-			void AppendRowEvents(ImmutableDictionary<string, GraphRowEventInfo> rowEvents)
+			void AppendRowEvents(ImmutableDictionary<string, GraphRowEventHandlerInfo> rowEvents)
 			{
 				if (rowEvents.Count > 0)
 					allEvents = allEvents.Concat(rowEvents.Values);
@@ -305,10 +305,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			}
 		}
 
-		private ImmutableDictionary<string, GraphRowEventInfo> GetRowEvents(EventsCollector eventsCollector, EventType eventType)
+		private ImmutableDictionary<string, GraphRowEventHandlerInfo> GetRowEvents(EventsCollector eventsCollector, EventType eventType)
 		{
-			OverridableItemsCollection<GraphRowEventInfo>? rawCollection = eventsCollector.GetRowEvents(eventType);
-			return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphRowEventInfo>.Empty;
+			OverridableItemsCollection<GraphRowEventHandlerInfo>? rawCollection = eventsCollector.GetRowEvents(eventType);
+			return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphRowEventHandlerInfo>.Empty;
 		}
 
 		private ImmutableDictionary<string, GraphFieldEventHandlerInfo> GetFieldEvents(EventsCollector eventsCollector, EventType eventType)
