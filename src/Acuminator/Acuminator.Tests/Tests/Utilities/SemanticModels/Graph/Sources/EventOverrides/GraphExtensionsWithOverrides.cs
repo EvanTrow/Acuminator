@@ -53,7 +53,7 @@ namespace PX.Objects.HackathonDemo.OverrideTest
 	{
 		public virtual void Test(object a) { }
 
-		protected virtual void APInvoice_DocBal_FieldUpdated(PXCache cache, PXFieldUpdatedEventArgs e)
+		protected virtual void SomeDac_DocBal_FieldUpdated(PXCache cache, PXFieldUpdatedEventArgs e)
 		{ }
 
 		protected virtual void _(Events.FieldUpdated<SomeDac, SomeDac.docBal> e)
@@ -61,5 +61,20 @@ namespace PX.Objects.HackathonDemo.OverrideTest
 
 		protected virtual void _(Events.FieldUpdating<SomeDac, SomeDac.docBal> e)
 		{ }
+	}
+
+	/// <exclude/>
+	[PXHidden]
+	public class SomeDac : IBqlTable
+	{
+		#region DocBal
+		public abstract class docBal : IBqlField
+		{
+		}
+
+		[PXDBDecimal]
+		[PXDefault(TypeCode.Decimal, "0.0")]
+		public virtual decimal? DocBal { get; set; }
+		#endregion
 	}
 }

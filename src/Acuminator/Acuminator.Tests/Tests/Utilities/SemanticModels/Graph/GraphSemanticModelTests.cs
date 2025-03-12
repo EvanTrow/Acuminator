@@ -114,7 +114,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 
 		#region Graph Extension Overrides
 		[Theory]
-		[EmbeddedFileData(@"EventOverrides\GraphExtensionsWithOverrides.cs", @"EventOverrides\SomeDac.cs")]
+		[EmbeddedFileData(@"EventOverrides\GraphExtensionsWithOverrides.cs")]
 		public async Task GraphExtensions_Overrides_Recognition(string text)
 		{
 			var graph = await PrepareSemanticModelAsync(text).ConfigureAwait(false);

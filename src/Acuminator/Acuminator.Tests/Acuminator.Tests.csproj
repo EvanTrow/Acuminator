@@ -699,7 +699,6 @@
     <EmbeddedResource Include="Tests\Utilities\SemanticModels\Dac\Sources\DacChainedExtensionWithBaseTypeNonDac.cs" />
     <Compile Include="Tests\Utilities\DataTypeToBqlFieldTypeMapping\DataTypeNameTests.cs" />
     <EmbeddedResource Include="Tests\Utilities\SemanticModels\Graph\Sources\2ndLevelGraphExtension.cs" />
-    <EmbeddedResource Include="Tests\Utilities\SemanticModels\Graph\Sources\EventOverrides\SomeDac.cs" />
     <EmbeddedResource Include="Tests\Utilities\SemanticModels\Graph\Sources\EventOverrides\GraphExtensionsWithOverrides.cs" />
     <Compile Include="Tests\Utilities\SemanticModels\RoslynTestContext.cs" />
     <Compile Include="Tests\Utilities\SemanticModels\SemanticModelTestsBase.cs" />
