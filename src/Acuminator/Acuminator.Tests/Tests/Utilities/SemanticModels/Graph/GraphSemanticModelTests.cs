@@ -8,14 +8,16 @@ using System.Threading.Tasks;
 
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
+
+using FluentAssertions;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Xunit;
-using FluentAssertions;
 
 namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 {
@@ -54,6 +56,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			}
 		}
 
+		#region Initialize Method Tests
 		[Theory]
 		[EmbeddedFileData(@"InitializeMethod\GraphWithExplicitInitializeMethod.cs")]
 		public async Task Graph_WithExplicitInitialize_Recognition(string text)
@@ -107,6 +110,38 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			graphSemanticModel.GraphType.Should().Be(GraphType.PXGraphExtension);
 			graphSemanticModel.InitializeMethodInfo.Should().BeNull();
 		}
+		#endregion
+
+		#region Graph Extension Overrides
+		[Theory]
+		[EmbeddedFileData(@"EventOverrides\GraphExtensionsWithOverrides.cs", @"EventOverrides\SomeDac.cs")]
+		public async Task GraphExtensions_Overrides_Recognition(string text)
+		{
+			var graph = await PrepareSemanticModelAsync(text).ConfigureAwait(false);
+			var graphWithEvents = PXGraphEventSemanticModel.EnrichGraphModelWithEvents(graph, CancellationToken.None);
+
+			graphWithEvents.Should().NotBeNull();
+			graphWithEvents.PXOverrides.Should().HaveCount(1);
+
+			graphWithEvents.FieldUpdatingByName.Should().HaveCount(1);
+			graphWithEvents.FieldUpdatedByName.Should().HaveCount(1);
+
+			GraphFieldEventInfo fieldUpdatingEventHandler = graphWithEvents.FieldUpdatingEvents.First();
+			GraphFieldEventInfo fieldUpdatedEventHandler = graphWithEvents.FieldUpdatedEvents.First();
+
+			ValidateEventHandler(fieldUpdatedEventHandler, "SomeDac", "DocBal");
+
+			//----------------------------------Local Function--------------------------------------
+			static void ValidateEventHandler(GraphFieldEventInfo eventHandler, string expectedDacName, string expectedDacFieldName)
+			{
+				eventHandler.DacName.Should().Be(expectedDacName);
+				eventHandler.DacFieldName.Should().Be(expectedDacFieldName);
+				eventHandler.Base.Should().NotBeNull();
+				eventHandler.BaseDelegate.Should().NotBeNull();
+				eventHandler.OverrideType.Should().Be(GraphEventHandlerOverrideType.AcumaticaEventsOverride);
+			}
+		}
+		#endregion
 
 		protected override Task<PXGraphSemanticModel> PrepareSemanticModelAsync(RoslynTestContext context, CancellationToken cancellation)
 		{
