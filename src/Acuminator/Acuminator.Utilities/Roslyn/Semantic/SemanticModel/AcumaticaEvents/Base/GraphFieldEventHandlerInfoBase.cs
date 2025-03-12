@@ -11,7 +11,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 	/// <summary>
 	/// A base type for information about the graph event handlers related to DAC fields.
 	/// </summary>
-	public abstract class GraphFieldEventHandlerInfoBase<TFieldEventHandlerInfo> : GraphEventHandlerInfoBase<TFieldEventHandlerInfo>
+	public abstract class GraphFieldEventHandlerInfoBase<TFieldEventHandlerInfo> : GraphEventHandlerInfoBase<TFieldEventHandlerInfo>, IGraphFieldEventHandlerInfo
 	where TFieldEventHandlerInfo : GraphFieldEventHandlerInfoBase<TFieldEventHandlerInfo>
 	{
 		/// <summary>
