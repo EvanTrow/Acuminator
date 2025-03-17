@@ -13,14 +13,15 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 	{
 		internal EventSymbols(Compilation compilation) : base(compilation)
 		{
-			_eventTypeMap = new Lazy<IReadOnlyDictionary<ITypeSymbol, EventType>>(
-				() => CreateEventTypeMap(this));
+			_eventArgTypeToEventTypeMap = new Lazy<IReadOnlyDictionary<ITypeSymbol, EventType>>(
+				() => CreateEventArgsTypeToEventTypeMap(this));
 			_eventHandlerSignatureTypeMap = new Lazy<IReadOnlyDictionary<EventHandlerLooseInfo, INamedTypeSymbol>>(
 				() => CreateEventHandlerSignatureTypeMap(this));
 		}
 
-		private readonly Lazy<IReadOnlyDictionary<ITypeSymbol, EventType>> _eventTypeMap;
-		public IReadOnlyDictionary<ITypeSymbol, EventType> EventTypeMap => _eventTypeMap.Value;
+		private readonly Lazy<IReadOnlyDictionary<ITypeSymbol, EventType>> _eventArgTypeToEventTypeMap;
+
+		public IReadOnlyDictionary<ITypeSymbol, EventType> EventArgTypeToEventTypeMap => _eventArgTypeToEventTypeMap.Value;
 
 		private readonly Lazy<IReadOnlyDictionary<EventHandlerLooseInfo, INamedTypeSymbol>> _eventHandlerSignatureTypeMap;
 		public IReadOnlyDictionary<EventHandlerLooseInfo, INamedTypeSymbol> EventHandlerSignatureTypeMap => _eventHandlerSignatureTypeMap.Value;
@@ -71,7 +72,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 		public INamedTypeSymbol FieldUpdatedTypedRow => Compilation.GetTypeByMetadataName(Events.Names.FieldUpdated2)!;
 		public INamedTypeSymbol ExceptionHandlingTypedRow => Compilation.GetTypeByMetadataName(Events.Names.ExceptionHandling2)!;
 
-		private static IReadOnlyDictionary<ITypeSymbol, EventType> CreateEventTypeMap(EventSymbols eventSymbols)
+		private static IReadOnlyDictionary<ITypeSymbol, EventType> CreateEventArgsTypeToEventTypeMap(EventSymbols eventSymbols)
 		{
 			var map = new Dictionary<ITypeSymbol, EventType>(SymbolEqualityComparer.Default)
 				{

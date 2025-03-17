@@ -47,7 +47,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 					var propertySymbol = _semanticModel.GetSymbolInfo(node).Symbol as IPropertySymbol;
 					var containingType = propertySymbol?.ContainingType?.OriginalDefinition;
 
-					if (containingType != null && _pxContext.Events.EventTypeMap.ContainsKey(containingType))
+					if (containingType != null && _pxContext.Events.EventArgTypeToEventTypeMap.ContainsKey(containingType))
 					{
 						Success = true;
 					}

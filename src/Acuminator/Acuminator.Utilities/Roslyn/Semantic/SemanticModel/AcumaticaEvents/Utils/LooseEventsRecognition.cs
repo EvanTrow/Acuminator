@@ -58,7 +58,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 
 			var secondParameterType = candidateSymbol.Parameters[1].Type.OriginalDefinition;
 
-			if (pxContext.Events.EventTypeMap.TryGetValue(secondParameterType, out EventType eventType))
+			if (pxContext.Events.EventArgTypeToEventTypeMap.TryGetValue(secondParameterType, out EventType eventType))
 				return new EventHandlerLooseInfo(eventType, EventHandlerSignatureType.Classic);
 			else
 				return EventHandlerLooseInfo.None;
@@ -66,7 +66,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 
 		private static EventHandlerLooseInfo RecognizeEventHandlerWithGenericSyntax(ITypeSymbol firstParameterType, PXContext pxContext)
 		{
-			if (pxContext.Events.EventTypeMap.TryGetValue(firstParameterType, out EventType eventType)) 
+			if (pxContext.Events.EventArgTypeToEventTypeMap.TryGetValue(firstParameterType, out EventType eventType)) 
 			{
 				return new EventHandlerLooseInfo(eventType, EventHandlerSignatureType.Generic);
 			}
