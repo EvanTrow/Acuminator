@@ -64,7 +64,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		}
 
 		/// <summary>
-		/// Check if <paramref name="methodWithBaseDelegate"/> has a valid base delegate as a last parameter.
+		/// Check if <paramref name="methodWithBaseDelegate"/> has a valid base delegate as a last parameter.<br/>
+		/// The valid base delegate should have the same return type and parameters as the method, except the last one.
 		/// </summary>
 		/// <param name="methodWithBaseDelegate">The method with the base delegate last parameter.</param>
 		/// <returns>
