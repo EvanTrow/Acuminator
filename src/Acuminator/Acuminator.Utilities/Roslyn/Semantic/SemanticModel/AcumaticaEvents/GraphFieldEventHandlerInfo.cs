@@ -11,14 +11,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 	public class GraphFieldEventHandlerInfo : GraphFieldEventHandlerInfoBase<GraphFieldEventHandlerInfo>
 	{
 		public GraphFieldEventHandlerInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-										  EventHandlerLooseInfo handlerLooseInfo) :
-									 base(node, symbol, declarationOrder, handlerLooseInfo)
+										  EventHandlerLooseInfo handlerLooseInfo, PXContext pxContext) :
+									 base(node, symbol, declarationOrder, handlerLooseInfo, pxContext)
 		{
 		}
 
 		public GraphFieldEventHandlerInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-										  EventHandlerLooseInfo handlerLooseInfo, GraphFieldEventHandlerInfo baseInfo) :
-									 base(node, symbol, declarationOrder, handlerLooseInfo, baseInfo)
+										  EventHandlerLooseInfo handlerLooseInfo, GraphFieldEventHandlerInfo baseInfo, PXContext pxContext) :
+									 base(node, symbol, declarationOrder, handlerLooseInfo, baseInfo, pxContext)
 		{
 		}
 

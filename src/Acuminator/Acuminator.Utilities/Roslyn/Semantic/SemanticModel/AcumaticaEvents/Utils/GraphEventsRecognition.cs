@@ -35,12 +35,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 			switch (eventHandlerInfo.TargetKind)
 			{
 				case EventTargetKind.Row:
-					return new GraphRowEventHandlerInfo(handlerNode, handlerSymbol, declarationOrder, eventHandlerInfo);
+					return new GraphRowEventHandlerInfo(handlerNode, handlerSymbol, declarationOrder, eventHandlerInfo, pxContext);
 				case EventTargetKind.Field:
 					if (eventHandlerInfo.Type == EventType.CacheAttached)
-						return new GraphCacheAttachedEventHandlerInfo(handlerNode, handlerSymbol, declarationOrder, eventHandlerInfo);
+						return new GraphCacheAttachedEventHandlerInfo(handlerNode, handlerSymbol, declarationOrder, eventHandlerInfo, pxContext);
 					else
-						return new GraphFieldEventHandlerInfo(handlerNode, handlerSymbol, declarationOrder, eventHandlerInfo);
+						return new GraphFieldEventHandlerInfo(handlerNode, handlerSymbol, declarationOrder, eventHandlerInfo, pxContext);
 				default:
 					return null;
 			}

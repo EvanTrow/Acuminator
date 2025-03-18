@@ -14,14 +14,14 @@ public class GraphRowEventHandlerInfo : GraphEventHandlerInfoBase<GraphRowEventH
 {
 	
 	public GraphRowEventHandlerInfo(MethodDeclarationSyntax? handlerNode, IMethodSymbol handlerSymbol, int declarationOrder,
-									EventHandlerLooseInfo handlerLooseInfo) :
-							   base(handlerNode, handlerSymbol, declarationOrder, handlerLooseInfo)
+									EventHandlerLooseInfo handlerLooseInfo, PXContext pxContext) :
+							   base(handlerNode, handlerSymbol, declarationOrder, handlerLooseInfo, pxContext)
 	{			
 	}
 
 	public GraphRowEventHandlerInfo(MethodDeclarationSyntax? handlerNode, IMethodSymbol handlerSymbol, int declarationOrder,
-									EventHandlerLooseInfo handlerLooseInfo, GraphRowEventHandlerInfo baseInfo) :
-							   base(handlerNode, handlerSymbol, declarationOrder, handlerLooseInfo, baseInfo)
+									EventHandlerLooseInfo handlerLooseInfo, GraphRowEventHandlerInfo baseInfo, PXContext pxContext) :
+							   base(handlerNode, handlerSymbol, declarationOrder, handlerLooseInfo, baseInfo, pxContext)
 	{		
 	}
 

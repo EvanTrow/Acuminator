@@ -20,15 +20,15 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 		public string DacFieldName { get; }
 
 		public GraphFieldEventHandlerInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-											  EventHandlerLooseInfo handlerLooseInfo) :
-								  base(node, symbol, declarationOrder, handlerLooseInfo)
+											  EventHandlerLooseInfo handlerLooseInfo, PXContext pxContext) :
+								  base(node, symbol, declarationOrder, handlerLooseInfo, pxContext)
 		{
 			DacFieldName = GetDacFieldName();
 		}
 
 		public GraphFieldEventHandlerInfoBase(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder,
-											  EventHandlerLooseInfo handlerLooseInfo, TFieldEventHandlerInfo baseInfo) : 
-								  base(node, symbol, declarationOrder, handlerLooseInfo, baseInfo)
+											  EventHandlerLooseInfo handlerLooseInfo, TFieldEventHandlerInfo baseInfo, PXContext pxContext) : 
+								  base(node, symbol, declarationOrder, handlerLooseInfo, baseInfo, pxContext)
 		{
 			DacFieldName = GetDacFieldName();
 		}

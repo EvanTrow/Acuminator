@@ -45,15 +45,15 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 		public GraphEventHandlerOverrideType OverrideType { get; private set; }
 
 		protected GraphEventHandlerInfoBase(MethodDeclarationSyntax? handlerNode, IMethodSymbol handlerSymbol, int declarationOrder,
-											EventHandlerLooseInfo handlerLooseInfo) :
-										base(handlerNode, handlerSymbol, declarationOrder, handlerLooseInfo)
+											EventHandlerLooseInfo handlerLooseInfo, PXContext pxContext) :
+										base(handlerNode, handlerSymbol, declarationOrder, handlerLooseInfo, pxContext)
 		{
 			OverrideType = GetOverrideType();
 		}
 
 		protected GraphEventHandlerInfoBase(MethodDeclarationSyntax? handlerNode, IMethodSymbol handlerSymbol, int declarationOrder,
-											EventHandlerLooseInfo handlerLooseInfo, TEventHandlerInfo baseEventHandlerInfo) : 
-										base(handlerNode, handlerSymbol, declarationOrder, handlerLooseInfo)
+											EventHandlerLooseInfo handlerLooseInfo, TEventHandlerInfo baseEventHandlerInfo, PXContext pxContext) : 
+										base(handlerNode, handlerSymbol, declarationOrder, handlerLooseInfo, pxContext)
 		{
 			_baseEventHandlerInfo = baseEventHandlerInfo.CheckIfNull();
 			OverrideType = GetOverrideType();
@@ -74,7 +74,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 			else if (Symbol.IsOverride)
 				return GraphEventHandlerOverrideType.CSharp;
 			else
-				return GraphEventHandlerOverrideType.AcumaticaEventsOverride;
+				return GraphEventHandlerOverrideType.OverrideWithInterceptor;
 		}
 	}
 }

@@ -25,15 +25,20 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 
 		public IMethodSymbol? BaseDelegate { get; }
 
+		public bool IsPXOverride { get; }
+
 		protected GraphEventHandlerInfoBase(MethodDeclarationSyntax? handlerNode, IMethodSymbol handlerSymbol, int declarationOrder,
-											EventHandlerLooseInfo handlerLooseInfo) :
+											EventHandlerLooseInfo handlerLooseInfo, PXContext pxContext) :
 									  base(handlerNode, handlerSymbol, declarationOrder)
 		{
+			pxContext.ThrowOnNull();
 			ValidateEventType(handlerLooseInfo.Type);
 
 			_handlerLooseInfo = handlerLooseInfo;
 			DacName 		  = GetDacName();
 			BaseDelegate 	  = GetBaseDelegate(handlerSymbol);
+			IsPXOverride	  = handlerSymbol.HasAttribute(pxContext.AttributeTypes.PXOverrideAttribute, checkOverrides: true, 
+														   checkForDerivedAttributes: false);
 		}
 
 		protected abstract void ValidateEventType(EventType eventType);
