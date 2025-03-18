@@ -1,4 +1,7 @@
-﻿using Acuminator.Utilities.Common;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+
+using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 
 using Microsoft.CodeAnalysis;
@@ -26,6 +29,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 		public IMethodSymbol? BaseDelegate { get; }
 
 		public bool IsPXOverride { get; }
+
+		public bool IsCSharpOverride => Symbol.IsOverride;
 
 		protected GraphEventHandlerInfoBase(MethodDeclarationSyntax? handlerNode, IMethodSymbol handlerSymbol, int declarationOrder,
 											EventHandlerLooseInfo handlerLooseInfo, PXContext pxContext) :

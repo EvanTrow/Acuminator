@@ -71,7 +71,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 		{
 			if (Base == null)
 				return GraphEventHandlerOverrideType.None;
-			else if (Symbol.IsOverride)
+			else if (IsPXOverride)
+				// PXOverride priority is higher than C# override because Acumatica will consider C# overrides of PXOverride-methods as PXOverrides too.
+				// The PXOverride attribute is checked on the entire overrides chain, so if the base method is PXOverride, the derived method is PXOverride too.
+				return GraphEventHandlerOverrideType.OverrrideWithPXOverrideAttribute;
+			else if (IsCSharpOverride)
 				return GraphEventHandlerOverrideType.CSharp;
 			else
 				return GraphEventHandlerOverrideType.OverrideWithInterceptor;
