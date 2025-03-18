@@ -15,8 +15,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 		private readonly Lazy<IReadOnlyDictionary<ITypeSymbol, EventType>> _eventArgTypeToEventTypeMap;
 		public IReadOnlyDictionary<ITypeSymbol, EventType> EventArgTypeToEventTypeMap => _eventArgTypeToEventTypeMap.Value;
 
-		private readonly Lazy<IReadOnlyDictionary<EventType, IReadOnlyCollection<ITypeSymbol>>> _eventTypeToEventArgTypesLookup;
-		public IReadOnlyDictionary<EventType, IReadOnlyCollection<ITypeSymbol>> EventTypeToEventArgTypesLookup => _eventTypeToEventArgTypesLookup.Value;
+		private readonly Lazy<IReadOnlyDictionary<EventType, ITypeSymbol>> _eventTypeToClassicEventArgTypeMap;
+		public IReadOnlyDictionary<EventType, ITypeSymbol> EventTypeToClassicEventArgTypeMap => _eventTypeToClassicEventArgTypeMap.Value;
 
 		private readonly Lazy<IReadOnlyDictionary<EventHandlerLooseInfo, INamedTypeSymbol>> _eventHandlerSignatureTypeMap;
 		public IReadOnlyDictionary<EventHandlerLooseInfo, INamedTypeSymbol> EventHandlerSignatureTypeMap => _eventHandlerSignatureTypeMap.Value;
@@ -73,8 +73,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 				() => CreateEventArgsTypeToEventTypeMap(this));
 			_eventHandlerSignatureTypeMap = new Lazy<IReadOnlyDictionary<EventHandlerLooseInfo, INamedTypeSymbol>>(
 				() => CreateEventHandlerSignatureTypeMap(this));
-			_eventTypeToEventArgTypesLookup = new Lazy<IReadOnlyDictionary<EventType, IReadOnlyCollection<ITypeSymbol>>>(
-				() => CreateEventTypeToEventArgTypesLookup(this));
+			_eventTypeToClassicEventArgTypeMap = new Lazy<IReadOnlyDictionary<EventType, ITypeSymbol>>(
+				() => CreateEventTypeToClassicEventArgTypeMap(this));
 		}
 
 		private static IReadOnlyDictionary<ITypeSymbol, EventType> CreateEventArgsTypeToEventTypeMap(EventSymbols eventSymbols)
@@ -173,13 +173,26 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 			};
 		}
 
-		private static IReadOnlyDictionary<EventType, IReadOnlyCollection<ITypeSymbol>> CreateEventTypeToEventArgTypesLookup(EventSymbols eventSymbols)
-		{
-			var lookup = eventSymbols.EventArgTypeToEventTypeMap
-									 .GroupBy(pair => pair.Value, pair => pair.Key)
-									 .ToDictionary(group => group.Key, 
-												   group => group.ToList(capacity: 3) as IReadOnlyCollection<ITypeSymbol>);
-			return lookup;
-		}
+		private static IReadOnlyDictionary<EventType, ITypeSymbol> CreateEventTypeToClassicEventArgTypeMap(EventSymbols eventSymbols) =>
+			new Dictionary<EventType, ITypeSymbol>()
+			{
+				{ EventType.RowSelecting, eventSymbols.PXRowSelectingEventArgs },
+				{ EventType.RowSelected, eventSymbols.PXRowSelectedEventArgs },
+				{ EventType.RowInserting, eventSymbols.PXRowInsertingEventArgs },
+				{ EventType.RowInserted, eventSymbols.PXRowInsertedEventArgs },
+				{ EventType.RowUpdating, eventSymbols.PXRowUpdatingEventArgs },
+				{ EventType.RowUpdated, eventSymbols.PXRowUpdatedEventArgs },
+				{ EventType.RowDeleting, eventSymbols.PXRowDeletingEventArgs },
+				{ EventType.RowDeleted, eventSymbols.PXRowDeletedEventArgs },
+				{ EventType.RowPersisting, eventSymbols.PXRowPersistingEventArgs },
+				{ EventType.RowPersisted, eventSymbols.PXRowPersistedEventArgs },
+				{ EventType.FieldSelecting, eventSymbols.PXFieldSelectingEventArgs },
+				{ EventType.FieldDefaulting, eventSymbols.PXFieldDefaultingEventArgs },
+				{ EventType.FieldVerifying, eventSymbols.PXFieldVerifyingEventArgs },
+				{ EventType.FieldUpdating, eventSymbols.PXFieldUpdatingEventArgs },
+				{ EventType.FieldUpdated, eventSymbols.PXFieldUpdatedEventArgs },
+				{ EventType.CommandPreparing, eventSymbols.PXCommandPreparingEventArgs },
+				{ EventType.ExceptionHandling, eventSymbols.PXExceptionHandlingEventArgs }
+			};
 	}
 }
