@@ -34,7 +34,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			{
 				cancellation.ThrowIfCancellationRequested();
 
-				if (method.HasAttribute(pxOverrideAttribute, checkOverrides: true, checkForDerivedAttributes: false))
+				if (method.HasPXOverrideAttribute(pxOverrideAttribute))
 				{
 					yield return new PXOverrideInfo(method, declarationOrder);
 					declarationOrder++;

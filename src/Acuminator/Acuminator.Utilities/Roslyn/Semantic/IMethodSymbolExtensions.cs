@@ -296,5 +296,27 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 			return true;
 		}
+
+		/// <summary>
+		/// Check if the <paramref name="method"/> has PXOverrideAttribute declared on the overrides chain.
+		/// </summary>
+		/// <param name="method">The method to act on.</param>
+		/// <param name="pxContext">The context.</param>
+		/// <returns>
+		/// True the <paramref name="method"/> has PXOverrideAttribute declared on the overrides chain, false if not.
+		/// </returns>
+		public static bool HasPXOverrideAttribute(this IMethodSymbol method, PXContext pxContext) =>
+			method.CheckIfNull().HasPXOverrideAttribute(pxContext.CheckIfNull().AttributeTypes.PXOverrideAttribute);
+
+		/// <summary>
+		/// Check if the <paramref name="method"/> has PXOverrideAttribute declared on the overrides chain.
+		/// </summary>
+		/// <param name="method">The method to act on.</param>
+		/// <param name="pxContext">The context.</param>
+		/// <returns>
+		/// True the <paramref name="method"/> has PXOverrideAttribute declared on the overrides chain, false if not.
+		/// </returns>
+		internal static bool HasPXOverrideAttribute(this IMethodSymbol method, INamedTypeSymbol pxOverrideAttribute) =>
+			method.HasAttribute(pxOverrideAttribute, checkOverrides: true, checkForDerivedAttributes: false);
 	}
 }

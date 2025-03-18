@@ -30,13 +30,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 														  @event.Symbol.IsDeclaredInType(graphOrExtensionWithEvents.Symbol)
 													select @event;
 
-			INamedTypeSymbol pxOverrideAttribute = pxContext.AttributeTypes.PXOverrideAttribute;
-
 			foreach (GraphEventHandlerInfoBase eventInfo in allDeclaredNamingConventionEvents)
 			{
 				symbolContext.CancellationToken.ThrowIfCancellationRequested();
 
-				if (IsSuitableForConversionToGenericSignature(eventInfo, pxContext, pxOverrideAttribute))
+				if (IsSuitableForConversionToGenericSignature(eventInfo, pxContext))
 				{
 					ReportDiagnosticForEvent(symbolContext, pxContext, eventInfo);
 				}
@@ -63,18 +61,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 					pxContext.CodeAnalysisSettings);
 		}
 
-		private bool IsSuitableForConversionToGenericSignature(GraphEventHandlerInfoBase eventHandlerInfo, PXContext pxContext, INamedTypeSymbol pxOverrideAttribute)
+		private bool IsSuitableForConversionToGenericSignature(GraphEventHandlerInfoBase eventHandlerInfo, PXContext pxContext)
 		{
 			// event handlers with more than 2 parameters should be overrides which shouldn't be converted to generic events
 			// as well as C# overrides of base events
 			if (eventHandlerInfo.Symbol.Parameters.Length > 2 || eventHandlerInfo.IsCSharpOverride)
 				return false;
 
-			var eventAttributes	= eventHandlerInfo.Symbol.GetAttributes();
-
 			// PXOverridden events can't be converted either.
 			// We don't need to check for PXOverride attribute on overridden methods, because we already filtered out C# overrides in the previous check
-			if (!eventAttributes.IsDefaultOrEmpty && eventAttributes.Any(a => pxOverrideAttribute.Equals(a.AttributeClass, SymbolEqualityComparer.Default)))
+			if (eventHandlerInfo.IsPXOverride)
 				return false;
 
 			// check that there is a corresponding generic event args symbol
