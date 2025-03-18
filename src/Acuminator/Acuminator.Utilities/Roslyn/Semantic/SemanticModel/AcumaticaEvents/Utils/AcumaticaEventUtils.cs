@@ -91,5 +91,37 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 					return false;
 			}
 		}
+
+		public static EventCollectionMode GetEventCollectionMode(this EventType eventType)
+		{
+			switch (eventType)
+			{
+				case EventType.RowDeleting:
+				case EventType.RowInserting:
+				case EventType.RowUpdating:
+				case EventType.RowPersisting:
+				case EventType.FieldSelecting:
+				case EventType.FieldDefaulting:
+				case EventType.FieldVerifying:
+				case EventType.FieldUpdating:
+				case EventType.CommandPreparing:
+				case EventType.ExceptionHandling:
+					return EventCollectionMode.AddedToBeginning;
+
+				case EventType.RowSelecting:    // row selecting is an exception among -ing ending events
+				case EventType.RowSelected:
+				case EventType.RowInserted:
+				case EventType.RowUpdated:
+				case EventType.RowDeleted:
+				case EventType.RowPersisted:
+				case EventType.CacheAttached:
+				case EventType.FieldUpdated:
+					return EventCollectionMode.AddedToEnd;
+
+				case EventType.None:
+				default:
+					return EventCollectionMode.None;
+			}
+		}
 	}
 }

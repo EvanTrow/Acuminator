@@ -22,6 +22,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 
 		public EventTargetKind TargetKind => _handlerLooseInfo.TargetKind;
 
+		public EventCollectionMode CollectionMode { get; }
+
 		public string DacName { get; }
 
 		public override string Name => GetEventGroupingKey();
@@ -40,6 +42,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 			ValidateEventType(handlerLooseInfo.Type);
 
 			_handlerLooseInfo = handlerLooseInfo;
+			CollectionMode	  = handlerLooseInfo.CollectionMode;
 			DacName 		  = GetDacName();
 			BaseDelegate 	  = GetBaseDelegate(handlerSymbol);
 			IsPXOverride	  = handlerSymbol.HasAttribute(pxContext.AttributeTypes.PXOverrideAttribute, checkOverrides: true, 

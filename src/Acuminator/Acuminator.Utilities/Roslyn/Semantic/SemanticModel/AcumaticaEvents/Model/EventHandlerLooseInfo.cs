@@ -28,6 +28,8 @@ public readonly struct EventHandlerLooseInfo : IEquatable<EventHandlerLooseInfo>
 
 	public EventTargetKind TargetKind { get; }
 
+	public EventCollectionMode CollectionMode => Type.GetEventCollectionMode();
+
 	public EventHandlerLooseInfo(EventType type, EventHandlerSignatureType signatureType)
 	{
 		Type 		  = type;
