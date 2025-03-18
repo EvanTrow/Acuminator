@@ -138,7 +138,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 				eventHandler.DacFieldName.Should().Be(expectedDacFieldName);
 				eventHandler.Base.Should().NotBeNull();
 				eventHandler.BaseDelegate.Should().NotBeNull();
-				eventHandler.OverrideType.Should().Be(GraphEventHandlerOverrideType.AcumaticaEventsOverride);
+				eventHandler.OverrideType.Should().Be(GraphEventHandlerOverrideType.OverrideWithInterceptor);
 			}
 		}
 		#endregion
