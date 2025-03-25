@@ -71,8 +71,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoIsActiveMethodForExtension
 				return true;
 			}
 
-			return graphExtension.GetAllEvents()
-								 .Any(graphEvent => graphEvent.Symbol.IsDeclaredInType(graphExtension.Symbol));
+			return graphExtension.DeclaredEventHandlers.AllEventHandlersCount > 0;
 		}
 
 		public void Analyze(SymbolAnalysisContext symbolContext, PXContext pxContext, PXGraphEventSemanticModel graphExtension)
