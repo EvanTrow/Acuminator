@@ -56,11 +56,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 
 			int parametersCount = eventHandlerCandidate.Parameters.Length;
 
-			if (eventHandlerCandidate.CheckIfNull().IsStatic || !eventHandlerCandidate.ReturnsVoid || eventHandlerCandidate.IsGenericMethod ||
-				parametersCount < 1 || parametersCount > 3)
-			{
+			if (!eventHandlerCandidate.CheckIfNull().ReturnsVoid || eventHandlerCandidate.IsGenericMethod || parametersCount < 1 || parametersCount > 3)
 				return GraphEventHandlerKind.NotRecognized;
-			}
 
 			return handlerInfo.SignatureType switch
 			{
