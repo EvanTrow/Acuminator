@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
@@ -20,14 +21,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.ForbidPrivateEventHandlers
 				Descriptors.PX1077_EventHandlersShouldNotBePrivate,
 				Descriptors.PX1077_EventHandlersShouldBeProtectedVirtual,
 				Descriptors.PX1077_EventHandlersShouldNotBeExplicitInterfaceImplementations);
-		
+
+		public override bool ShouldAnalyze(PXContext pxContext,PXGraphEventSemanticModel graph) => 
+			base.ShouldAnalyze(pxContext, graph) && graph.DeclaredEventHandlers.AllEventHandlersCount > 0;
+
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel graphOrGraphExtension)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 			
-			var declaredEventHandlers = graphOrGraphExtension.GetAllEvents()
-															 .Where(graphEvent => graphEvent.Symbol.IsDeclaredInType(graphOrGraphExtension.Symbol));
-
+			var declaredEventHandlers = graphOrGraphExtension.DeclaredEventHandlers.GetAllEventHandlers();
 			List<IMethodSymbol>? allInterfaceMethodsImplementations = GetAllInterfaceMethodsImplementations(graphOrGraphExtension.Symbol, pxContext);
 
 			foreach (var handler in declaredEventHandlers)
