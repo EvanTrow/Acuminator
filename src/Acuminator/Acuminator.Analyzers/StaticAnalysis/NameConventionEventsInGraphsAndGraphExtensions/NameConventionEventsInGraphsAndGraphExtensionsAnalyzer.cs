@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
@@ -21,42 +22,44 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(Descriptors.PX1041_NameConventionEventsInGraphsAndGraphExtensions);
 
+		public override bool ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graph) => 
+			base.ShouldAnalyze(pxContext, graph) && graph.DeclaredEventHandlers.AllEventHandlersCount > 0;
+
 		public override void Analyze(SymbolAnalysisContext symbolContext, PXContext pxContext, PXGraphEventSemanticModel graphOrExtensionWithEvents)
 		{
 			symbolContext.CancellationToken.ThrowIfCancellationRequested();
 
-			var allDeclaredNamingConventionEvents = from @event in graphOrExtensionWithEvents.GetAllEvents()
-													where @event.SignatureType == EventHandlerSignatureType.Classic &&
-														  @event.Symbol.IsDeclaredInType(graphOrExtensionWithEvents.Symbol)
-													select @event;
+			var allDeclaredNamingConventionEventHandlers = from eventHandler in graphOrExtensionWithEvents.DeclaredEventHandlers.GetAllEventHandlers()
+														   where eventHandler.SignatureType == EventHandlerSignatureType.Classic
+														   select eventHandler;
 
-			foreach (GraphEventHandlerInfoBase eventInfo in allDeclaredNamingConventionEvents)
+			foreach (GraphEventHandlerInfoBase handlerInfo in allDeclaredNamingConventionEventHandlers)
 			{
 				symbolContext.CancellationToken.ThrowIfCancellationRequested();
 
-				if (IsSuitableForConversionToGenericSignature(eventInfo, pxContext))
+				if (IsSuitableForConversionToGenericSignature(handlerInfo, pxContext))
 				{
-					ReportDiagnosticForEvent(symbolContext, pxContext, eventInfo);
+					ReportDiagnosticForEventHandler(symbolContext, pxContext, handlerInfo);
 				}
 			}
 		}
 
-		private static void ReportDiagnosticForEvent(SymbolAnalysisContext symbolContext, PXContext pxContext, GraphEventHandlerInfoBase eventInfo)
+		private static void ReportDiagnosticForEventHandler(SymbolAnalysisContext symbolContext, PXContext pxContext, GraphEventHandlerInfoBase handlerInfo)
 		{
 			// Node is not null here because aggregated graph analyzers work only on graphs and graph extensions declared in the source code,
 			// and only events declared in the graph or graph extension are analyzed
-			var graphEventLocation = eventInfo.Node!.Identifier.GetLocation();
+			var graphEventHandlerLocation = handlerInfo.Node!.Identifier.GetLocation();
 			var properties = new Dictionary<string, string?>
 			{
-				{ NameConventionEventsInGraphsAndGraphExtensionsDiagnosticProperties.EventType, eventInfo.EventType.ToString() },
-				{ DiagnosticProperty.DacName, eventInfo.DacName }
+				{ NameConventionEventsInGraphsAndGraphExtensionsDiagnosticProperties.EventType, handlerInfo.EventType.ToString() },
+				{ DiagnosticProperty.DacName, handlerInfo.DacName }
 			};
 
-			if (eventInfo is IGraphFieldEventHandlerInfo graphFieldEventHandler)
+			if (handlerInfo is IGraphFieldEventHandlerInfo graphFieldEventHandler)
 				properties.Add(DiagnosticProperty.DacFieldName, graphFieldEventHandler.DacFieldName);
 
 			symbolContext.ReportDiagnosticWithSuppressionCheck(
-					Diagnostic.Create(Descriptors.PX1041_NameConventionEventsInGraphsAndGraphExtensions, graphEventLocation,
+					Diagnostic.Create(Descriptors.PX1041_NameConventionEventsInGraphsAndGraphExtensions, graphEventHandlerLocation,
 									  properties: properties.ToImmutableDictionary()),
 					pxContext.CodeAnalysisSettings);
 		}
