@@ -49,7 +49,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					[EventType.ExceptionHandling] = [],
 				};
 
-			public OverridableItemsCollection<GraphCacheAttachedEventHandlerInfo> CacheAttachedEvents { get; } = [];
+			public OverridableItemsCollection<GraphCacheAttachedEventHandlerInfo> CacheAttachedEventHandlers { get; } = [];
 
 			public EventsCollector(PXGraphEventSemanticModel graphEventSemanticModel, PXContext context)
 			{
@@ -57,17 +57,17 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				_graphEventSemanticModel = graphEventSemanticModel;
 			}
 
-			public OverridableItemsCollection<GraphRowEventHandlerInfo>? GetRowEvents(EventType eventType) =>
+			public OverridableItemsCollection<GraphRowEventHandlerInfo>? GetRowEventHandlers(EventType eventType) =>
 				_rowEvents.TryGetValue(eventType, out OverridableItemsCollection<GraphRowEventHandlerInfo> events)
 					? events
 					: null;
 
-			public OverridableItemsCollection<GraphFieldEventHandlerInfo>? GetFieldEvents(EventType eventType) =>
+			public OverridableItemsCollection<GraphFieldEventHandlerInfo>? GetFieldEventHandlers(EventType eventType) =>
 				_fieldEvents.TryGetValue(eventType, out OverridableItemsCollection<GraphFieldEventHandlerInfo> events)
 					? events
 					: null;
 
-			public void CollectGraphEvents(CancellationToken cancellation)
+			public void CollectGraphEventHandlers(CancellationToken cancellation)
 			{
 				cancellation.ThrowIfCancellationRequested();
 
