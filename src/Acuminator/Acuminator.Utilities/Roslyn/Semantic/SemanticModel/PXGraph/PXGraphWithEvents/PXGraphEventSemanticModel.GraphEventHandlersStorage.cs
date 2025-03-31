@@ -157,35 +157,35 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					 exceptionHandlingByName: GetFieldEventHandlers(eventsCollector, EventType.ExceptionHandling)
 					);
 
-			public static IGraphEventHandlersStorage GetDeclaredEventHandlers(INamedTypeSymbol containingType, 
-																			  IGraphEventHandlersStorage eventHandlersInCollectionOrder) =>
+			public static IGraphEventHandlersStorage FromEventHandlersInNaturalCollectionOrder(INamedTypeSymbol containingType,
+																							IGraphEventHandlersStorage allEventHandlers) =>
 				new GraphEventHandlersStorage(
-					 rowSelectingByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.RowSelectingByName),
-		 			 rowSelectedByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.RowSelectedByName),
+						 rowSelectingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.RowSelectingByName),
+						 rowSelectedByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.RowSelectedByName),
 
-			 		 rowInsertingByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.RowInsertingByName),
-		 			 rowInsertedByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.RowInsertedByName),
+						 rowInsertingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.RowInsertingByName),
+						 rowInsertedByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.RowInsertedByName),
 
-		 			 rowUpdatingByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.RowUpdatingByName),
-					 rowUpdatedByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.RowUpdatedByName),
+						 rowUpdatingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.RowUpdatingByName),
+						 rowUpdatedByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.RowUpdatedByName),
 
-		 			 rowDeletingByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.RowDeletingByName),
-					 rowDeletedByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.RowDeletedByName),
+						 rowDeletingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.RowDeletingByName),
+						 rowDeletedByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.RowDeletedByName),
 
-				 	 rowPersistingByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.RowPersistingByName),
-			 		 rowPersistedByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.RowPersistedByName),
+						 rowPersistingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.RowPersistingByName),
+						 rowPersistedByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.RowPersistedByName),
 
-				 	 cacheAttachedByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.CacheAttachedByName),
+						 cacheAttachedByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.CacheAttachedByName),
 
-					 fieldSelectingByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.FieldSelectingByName),
-					 fieldDefaultingByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.FieldDefaultingByName),
-					 fieldVerifyingByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.FieldVerifyingByName),
-				 	 fieldUpdatingByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.FieldUpdatingByName),
-			 		 fieldUpdatedByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.FieldUpdatedByName),
+						 fieldSelectingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.FieldSelectingByName),
+						 fieldDefaultingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.FieldDefaultingByName),
+						 fieldVerifyingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.FieldVerifyingByName),
+						 fieldUpdatingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.FieldUpdatingByName),
+						 fieldUpdatedByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.FieldUpdatedByName),
 
-					 commandPreparingByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.CommandPreparingByName),
-					 exceptionHandlingByName: GetDeclaredEventHandlers(containingType, eventHandlersInCollectionOrder.ExceptionHandlingByName)
-					);
+						 commandPreparingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.CommandPreparingByName),
+						 exceptionHandlingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, allEventHandlers.ExceptionHandlingByName)
+						);
 
 			public IEnumerable<GraphEventHandlerInfoBase> GetEventHandlersByEventType(EventType eventType) => eventType switch
 			{
@@ -273,22 +273,45 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphCacheAttachedEventHandlerInfo>.Empty;
 			}
 
-			private static ImmutableDictionary<string, THandler> GetDeclaredEventHandlers<THandler>(INamedTypeSymbol containingType,
-																									ImmutableDictionary<string, THandler> handlersInCollectionOrder)
+			private static ImmutableDictionary<string, THandler> GetDeclaredEventHandlersInNaturalOrder<THandler>(INamedTypeSymbol containingType,
+																								ImmutableDictionary<string, THandler> handlersOfSameEventType)
 			where THandler : GraphEventHandlerInfoBase<THandler>
 			{
-				if (handlersInCollectionOrder.Count == 0)
-					return handlersInCollectionOrder;
+				if (handlersOfSameEventType.Count == 0)
+					return handlersOfSameEventType;
 
 				// HOT PATH optimization - if all handlers in the source dictionary are declared in the containing type, return the source dictionary
-				bool sourceHasNotDeclaredHandlers = handlersInCollectionOrder.Values.Any(handler => !handler.Symbol.IsDeclaredInType(containingType));
+				bool sourceHasNotDeclaredHandlers = handlersOfSameEventType.Values.Any(handler => !handler.Symbol.IsDeclaredInType(containingType));
 
 				if (!sourceHasNotDeclaredHandlers)
-					return handlersInCollectionOrder;
+					return handlersOfSameEventType;
 
-				var declaredEventHandlers = new Dictionary<string, THandler>(handlersInCollectionOrder.Count, handlersInCollectionOrder.KeyComparer);			
+				// For natural order it is enough to check the most overriden handler. If it is not declared in the containing type, 
+				// then all its base handlers are not declared in the containing type too.
+				var declaredEventHandlers = handlersOfSameEventType.Where(pair => pair.Value.Symbol.IsDeclaredInType(containingType))
+																   .ToImmutableDictionary(keyComparer: handlersOfSameEventType.KeyComparer);
+				return declaredEventHandlers;
+			}
 
-				foreach (var (key, eventHandler) in handlersInCollectionOrder)
+			/// <summary>
+			/// Gets event handlers in Acumatica collection order. Left as is for the possible future usage if support of Acumatica event handlers order will be needed. 
+			/// </summary>
+			private static ImmutableDictionary<string, THandler> GetDeclaredEventHandlersInAcumaticaCollectionOrder<THandler>(INamedTypeSymbol containingType,
+																								ImmutableDictionary<string, THandler> handlersOfSameEventType)
+			where THandler : GraphEventHandlerInfoBase<THandler>
+			{
+				if (handlersOfSameEventType.Count == 0)
+					return handlersOfSameEventType;
+
+				// HOT PATH optimization - if all handlers in the source dictionary are declared in the containing type, return the source dictionary
+				bool sourceHasNotDeclaredHandlers = handlersOfSameEventType.Values.Any(handler => !handler.Symbol.IsDeclaredInType(containingType));
+
+				if (!sourceHasNotDeclaredHandlers)
+					return handlersOfSameEventType;
+
+				var declaredEventHandlers = new Dictionary<string, THandler>(handlersOfSameEventType.Count, handlersOfSameEventType.KeyComparer);			
+
+				foreach (var (key, eventHandler) in handlersOfSameEventType)
 				{
 					if (eventHandler.Symbol.IsDeclaredInType(containingType))
 					{

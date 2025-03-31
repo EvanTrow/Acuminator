@@ -129,23 +129,23 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public IEnumerable<GraphAttributeInfo> Attributes => BaseGraphModel.Attributes;
 		#endregion
 
-		#region All Event Handlers In Collected Order
+		#region Event Handlers Storage
 		/// <summary>
-		/// The storage with event handlers ordered in the Acumatica collection order.<br/>
-		/// This means, that overrides of the same event handler are ordered from the most overridden to the base event handler.
+		/// The storage with all event handlers ordered in the natural collection order.<br/>
+		/// This means, that overrides of the same event handler are ordered by their containing types:<br/>
+		/// from the handler declared in the most derived graph or graph extension type to event handlers declared in ancestor types.
 		/// </summary>
 		/// <remarks>
-		/// Warning: Due to how Acumatica collects event handlers, the most overridden (top) event handler may be declared not in the current <see cref="Symbol"/> type,<br/>
-		/// but in its base type.
+		/// Warning: Some event handlers may be declared not in the <see cref="Symbol"/> type but in its base types.
 		/// </remarks>
-		public IGraphEventHandlersStorage OrderedEventHandlers { get; }
+		public IGraphEventHandlersStorage AllEventHandlers { get; }
 
 		/// <summary>
-		/// The storage with event handlers declared in <see cref="Symbol"/>.<br/>
+		/// The storage with all event handlers declared in <see cref="Symbol"/>.<br/>
 		/// Each top event handler in the collection is declared in the current <see cref="Symbol"/> type.
 		/// </summary>
 		/// <remarks>
-		/// Due to how Acumatica collects event handlers, the top event handlers in the collection may be not the most overridden one.
+		/// Warning: Event handlers declared in base types may be missing in this collection unless they are overridden in the <see cref="Symbol"/> type.
 		/// </remarks>
 		public IGraphEventHandlersStorage DeclaredEventHandlers { get; }
 		#endregion
@@ -158,8 +158,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			var eventsCollector = new NaturalOrderEventHandlersCollector(this, PXContext);
 			eventsCollector.CollectGraphEventHandlers(_cancellation);
 
-			OrderedEventHandlers  = GraphEventHandlersStorage.FromCollected(eventsCollector);
-			DeclaredEventHandlers = GraphEventHandlersStorage.GetDeclaredEventHandlers(Symbol, OrderedEventHandlers);
+			AllEventHandlers	  = GraphEventHandlersStorage.FromCollected(eventsCollector);
+			DeclaredEventHandlers = GraphEventHandlersStorage.FromEventHandlersInNaturalCollectionOrder(Symbol, AllEventHandlers);
 		}
 
 		public static PXGraphEventSemanticModel EnrichGraphModelWithEvents(PXGraphSemanticModel baseGraphModel, 
