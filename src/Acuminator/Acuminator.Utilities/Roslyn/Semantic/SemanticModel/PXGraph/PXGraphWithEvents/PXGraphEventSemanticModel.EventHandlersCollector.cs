@@ -12,7 +12,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
 	public partial class PXGraphEventSemanticModel : ISemanticModel
 	{
-		private class EventsCollector
+		private class EventHandlersCollector
 		{
 			private readonly PXContext _pxContext;
 			private readonly PXGraphEventSemanticModel _graphEventSemanticModel;
@@ -51,7 +51,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 			public OverridableItemsCollection<GraphCacheAttachedEventHandlerInfo> CacheAttachedEventHandlers { get; } = [];
 
-			public EventsCollector(PXGraphEventSemanticModel graphEventSemanticModel, PXContext context)
+			public EventHandlersCollector(PXGraphEventSemanticModel graphEventSemanticModel, PXContext context)
 			{
 				_pxContext = context;
 				_graphEventSemanticModel = graphEventSemanticModel;

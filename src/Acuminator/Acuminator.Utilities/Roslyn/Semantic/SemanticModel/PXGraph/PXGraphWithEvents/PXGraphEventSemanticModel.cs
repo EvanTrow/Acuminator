@@ -155,7 +155,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			_cancellation = cancellation;
 			BaseGraphModel = baseGraphModel;
 
-			var eventsCollector = new EventsCollector(this, PXContext);
+			var eventsCollector = new EventHandlersCollector(this, PXContext);
 			eventsCollector.CollectGraphEventHandlers(_cancellation);
 
 			OrderedEventHandlers  = GraphEventHandlersStorage.FromCollected(eventsCollector);
