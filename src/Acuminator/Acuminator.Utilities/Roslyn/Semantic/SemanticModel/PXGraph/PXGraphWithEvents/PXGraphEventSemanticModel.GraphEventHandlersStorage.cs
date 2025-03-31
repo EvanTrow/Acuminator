@@ -128,7 +128,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 										FieldUpdatingByName.Count + FieldUpdatedByName.Count + CommandPreparingByName.Count + ExceptionHandlingByName.Count;
 			}
 
-			public static IGraphEventHandlersStorage FromCollected(EventHandlersCollector eventsCollector) =>
+			public static IGraphEventHandlersStorage FromCollected(NaturalOrderEventHandlersCollector eventsCollector) =>
 				new GraphEventHandlersStorage(
 					 rowSelectingByName: GetRowEventHandlers(eventsCollector, EventType.RowSelecting),
 		 			 rowSelectedByName: GetRowEventHandlers(eventsCollector, EventType.RowSelected),
@@ -255,19 +255,19 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				}
 			}
 
-			private static ImmutableDictionary<string, GraphRowEventHandlerInfo> GetRowEventHandlers(EventHandlersCollector eventsCollector, EventType eventType)
+			private static ImmutableDictionary<string, GraphRowEventHandlerInfo> GetRowEventHandlers(NaturalOrderEventHandlersCollector eventsCollector, EventType eventType)
 			{
 				OverridableItemsCollection<GraphRowEventHandlerInfo>? rawCollection = eventsCollector.GetRowEventHandlers(eventType);
 				return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphRowEventHandlerInfo>.Empty;
 			}
 
-			private static ImmutableDictionary<string, GraphFieldEventHandlerInfo> GetFieldEventHandlers(EventHandlersCollector eventsCollector, EventType eventType)
+			private static ImmutableDictionary<string, GraphFieldEventHandlerInfo> GetFieldEventHandlers(NaturalOrderEventHandlersCollector eventsCollector, EventType eventType)
 			{
 				OverridableItemsCollection<GraphFieldEventHandlerInfo>? rawCollection = eventsCollector.GetFieldEventHandlers(eventType);
 				return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphFieldEventHandlerInfo>.Empty;
 			}
 
-			private static ImmutableDictionary<string, GraphCacheAttachedEventHandlerInfo> GetCacheAttachedEventHandlers(EventHandlersCollector eventsCollector)
+			private static ImmutableDictionary<string, GraphCacheAttachedEventHandlerInfo> GetCacheAttachedEventHandlers(NaturalOrderEventHandlersCollector eventsCollector)
 			{
 				OverridableItemsCollection<GraphCacheAttachedEventHandlerInfo>? rawCollection = eventsCollector.CacheAttachedEventHandlers;
 				return rawCollection?.ToImmutableDictionary() ?? ImmutableDictionary<string, GraphCacheAttachedEventHandlerInfo>.Empty;
