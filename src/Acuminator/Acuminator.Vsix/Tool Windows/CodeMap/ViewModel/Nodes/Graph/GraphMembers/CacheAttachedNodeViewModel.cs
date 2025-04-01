@@ -25,7 +25,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		}
 
 		public CacheAttachedNodeViewModel(DacGroupingNodeBaseViewModel dacVM, GraphCacheAttachedEventHandlerInfo eventInfo, bool isExpanded = false) :
-									 base(dacVM?.GraphEventsCategoryVM!, dacVM!, eventInfo, isExpanded)
+									 base(dacVM?.GraphEventHandlersCategoryVM!, dacVM!, eventInfo, isExpanded)
 		{
 			DacVM = dacVM!;
 			Name = eventInfo.DacFieldName;

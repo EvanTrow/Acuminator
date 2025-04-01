@@ -7,7 +7,7 @@ using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class RowEventNodeViewModel : GraphMemberNodeViewModel
+	public class RowEventHandlerNodeViewModel : GraphMemberNodeViewModel
 	{
 		private readonly string _dacNameWithEventTypeForSearch;
 
@@ -21,8 +21,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override Icon NodeIcon => Icon.RowEvent;
 
-		public RowEventNodeViewModel(DacGroupingNodeBaseViewModel dacViewModel, GraphRowEventHandlerInfo eventInfo, bool isExpanded = false) :
-								base(dacViewModel?.GraphEventsCategoryVM!, dacViewModel!, eventInfo, isExpanded)
+		public RowEventHandlerNodeViewModel(DacGroupingNodeBaseViewModel dacViewModel, GraphRowEventHandlerInfo eventInfo, bool isExpanded = false) :
+									   base(dacViewModel?.GraphEventHandlersCategoryVM!, dacViewModel!, eventInfo, isExpanded)
 		{
 			DacViewModel = dacViewModel!;
 			Name = eventInfo.EventType.ToString();

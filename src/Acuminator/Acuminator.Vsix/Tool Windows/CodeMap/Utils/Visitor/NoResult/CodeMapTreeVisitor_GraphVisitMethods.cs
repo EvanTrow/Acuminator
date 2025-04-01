@@ -60,7 +60,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual void VisitNode(CacheAttachedNodeViewModel cacheAttachedNode) => DefaultVisit(cacheAttachedNode);
 
-		public virtual void VisitNode(RowEventNodeViewModel rowEventNode) => DefaultVisit(rowEventNode);
+		public virtual void VisitNode(RowEventHandlerNodeViewModel rowEventNode) => DefaultVisit(rowEventNode);
 
 		public virtual void VisitNode(FieldEventNodeViewModel fieldEventNode) => DefaultVisit(fieldEventNode);
 

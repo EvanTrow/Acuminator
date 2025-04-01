@@ -44,7 +44,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Remove || 
 				e.Action == NotifyCollectionChangedAction.Reset)
 			{
-				int eventsCount = DisplayedChildren.OfType<DacGroupingNodeBaseViewModel>().Sum(dacVM => dacVM.EventsCount);
+				int eventsCount = DisplayedChildren.OfType<DacGroupingNodeBaseViewModel>().Sum(dacVM => dacVM.EventHandlersCount);
 
 				if (DisplayedChildren.Count <= 0)
 					return;

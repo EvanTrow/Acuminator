@@ -58,7 +58,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual TResult VisitNode(CacheAttachedNodeViewModel cacheAttachedNode, TInput input) => DefaultVisit(cacheAttachedNode, input);
 
-		public virtual TResult VisitNode(RowEventNodeViewModel rowEventNode, TInput input) => DefaultVisit(rowEventNode, input);
+		public virtual TResult VisitNode(RowEventHandlerNodeViewModel rowEventNode, TInput input) => DefaultVisit(rowEventNode, input);
 
 		public virtual TResult VisitNode(FieldEventNodeViewModel fieldEventNode, TInput input) => DefaultVisit(fieldEventNode, input);
 

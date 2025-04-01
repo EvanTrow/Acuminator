@@ -16,11 +16,11 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	{
 		public override TreeNodeFilterBehavior FilterBehavior => TreeNodeFilterBehavior.DisplayedIfChildrenMeetFilter;
 
-		public GraphEventHandlerCategoryNodeViewModel GraphEventsCategoryVM { get; }
+		public GraphEventHandlerCategoryNodeViewModel GraphEventHandlersCategoryVM { get; }
 
 		public string DacName { get; }
 
-		public int EventsCount
+		public int EventHandlersCount
 		{
 			get;
 			protected set;
@@ -28,7 +28,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override string Name
 		{
-			get => $"{DacName}({EventsCount})";
+			get => $"{DacName}({EventHandlersCount})";
 			protected set { }
 		}
 
@@ -52,12 +52,12 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		IList<TreeNodeViewModel> IGroupNodeWithCyclingNavigation.DisplayedChildren => DisplayedChildren;
 
-		protected DacGroupingNodeBaseViewModel(GraphEventHandlerCategoryNodeViewModel graphEventsCategoryVM, string dacName, bool isExpanded) :
-												base(graphEventsCategoryVM?.Tree!, graphEventsCategoryVM, isExpanded)
+		protected DacGroupingNodeBaseViewModel(GraphEventHandlerCategoryNodeViewModel graphEventHandlersCategoryVM, string dacName, bool isExpanded) :
+										  base(graphEventHandlersCategoryVM?.Tree!, graphEventHandlersCategoryVM, isExpanded)
 		{
 			dacName.ThrowOnNullOrWhiteSpace();
 
-			GraphEventsCategoryVM = graphEventsCategoryVM!;
+			GraphEventHandlersCategoryVM = graphEventHandlersCategoryVM!;
 			DacName = dacName;
 
 			SubscribeOnDisplayedChildrenCollectionChanged(DacChildrenChanged);
@@ -68,7 +68,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			if (e.Action == NotifyCollectionChangedAction.Move)
 				return;
 
-			EventsCount = GraphEventsCategoryVM.CategoryType == GraphMemberCategory.FieldEvent
+			EventHandlersCount = GraphEventHandlersCategoryVM.CategoryType == GraphMemberCategory.FieldEvent
 				? DisplayedChildren.Sum(dacFieldVM => dacFieldVM.DisplayedChildren.Count)
 				: DisplayedChildren.Count;
 		}
@@ -77,7 +77,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		{
 			TreeNodeViewModel? childToNavigateTo = null;
 
-			switch (GraphEventsCategoryVM)
+			switch (GraphEventHandlersCategoryVM)
 			{
 				case CacheAttachedCategoryNodeViewModel _:
 				case RowEventCategoryNodeViewModel _:
@@ -86,10 +86,10 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				case FieldEventCategoryNodeViewModel _:
 					childToNavigateTo = GetChildToNavigateToFromFieldEvents();
 
-					if (childToNavigateTo is not FieldEventNodeViewModel fieldEventNode)
+					if (childToNavigateTo is not FieldEventNodeViewModel fieldEventHandlerNode)
 						return;
 
-					fieldEventNode.DacFieldVM.IsExpanded = true;
+					fieldEventHandlerNode.DacFieldVM.IsExpanded = true;
 					break;
 			}
 
@@ -105,7 +105,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		bool IGroupNodeWithCyclingNavigation.CanNavigateToChild(TreeNodeViewModel child) => CanNavigateToChild(child);
 
 		protected bool CanNavigateToChild(TreeNodeViewModel child) =>
-			child is RowEventNodeViewModel ||
+			child is RowEventHandlerNodeViewModel ||
 			child is FieldEventNodeViewModel ||
 			child is CacheAttachedNodeViewModel;
 
@@ -114,17 +114,17 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			if (AllowNavigation != true || DisplayedChildren.Count == 0)
 				return null;
 
-			List<TreeNodeViewModel> dacFieldEvents = DisplayedChildren.SelectMany(dacFieldEvent => dacFieldEvent.DisplayedChildren).ToList();
+			List<TreeNodeViewModel> dacFieldEventHandlers = DisplayedChildren.SelectMany(dacFieldEventHandler => dacFieldEventHandler.DisplayedChildren).ToList();
 
-			if (dacFieldEvents.Count == 0)
+			if (dacFieldEventHandlers.Count == 0)
 				return null;
 
 			int counter = 0;
 
-			while (counter < EventsCount)
+			while (counter < EventHandlersCount)
 			{
-				TreeNodeViewModel child = dacFieldEvents[CurrentNavigationIndex];
-				CurrentNavigationIndex = (CurrentNavigationIndex + 1) % EventsCount;
+				TreeNodeViewModel child = dacFieldEventHandlers[CurrentNavigationIndex];
+				CurrentNavigationIndex = (CurrentNavigationIndex + 1) % EventHandlersCount;
 
 				if (CanNavigateToChild(child))
 				{
