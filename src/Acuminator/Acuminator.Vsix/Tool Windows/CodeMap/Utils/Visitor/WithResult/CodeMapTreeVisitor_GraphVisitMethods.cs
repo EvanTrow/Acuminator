@@ -23,9 +23,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual TResult VisitNode(CacheAttachedCategoryNodeViewModel cacheAttachedCategory) => DefaultVisit(cacheAttachedCategory);
 
-		public virtual TResult VisitNode(RowEventCategoryNodeViewModel rowEventCategory) => DefaultVisit(rowEventCategory);
+		public virtual TResult VisitNode(RowEventHandlerCategoryNodeViewModel rowEventHandlerCategory) => DefaultVisit(rowEventHandlerCategory);
 
-		public virtual TResult VisitNode(FieldEventCategoryNodeViewModel rowEventCategory) => DefaultVisit(rowEventCategory);
+		public virtual TResult VisitNode(FieldEventHandlerCategoryNodeViewModel fieldEventHandlerCategory) => DefaultVisit(fieldEventHandlerCategory);
 
 		public virtual TResult VisitNode(PXOverridesCategoryNodeViewModel pxOverridesCategory) => DefaultVisit(pxOverridesCategory);
 
@@ -58,9 +58,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual TResult VisitNode(CacheAttachedNodeViewModel cacheAttachedNode) => DefaultVisit(cacheAttachedNode);
 
-		public virtual TResult VisitNode(RowEventHandlerNodeViewModel rowEventNode) => DefaultVisit(rowEventNode);
+		public virtual TResult VisitNode(RowEventHandlerNodeViewModel rowEventHandlerNode) => DefaultVisit(rowEventHandlerNode);
 
-		public virtual TResult VisitNode(FieldEventNodeViewModel fieldEventNode) => DefaultVisit(fieldEventNode);
+		public virtual TResult VisitNode(FieldEventHandlerNodeViewModel fieldEventHandlerNode) => DefaultVisit(fieldEventHandlerNode);
 
 		public virtual TResult VisitNode(GraphMemberInfoNodeViewModel graphMemberInfo) => DefaultVisit(graphMemberInfo);
 

@@ -10,10 +10,10 @@ using Acuminator.Vsix.ToolWindows.CodeMap.Graph;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class RowEventCategoryNodeViewModel : GraphEventHandlerCategoryNodeViewModel
+	public class RowEventHandlerCategoryNodeViewModel : GraphEventHandlerCategoryNodeViewModel
 	{
-		public RowEventCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) : 
-										base(graphViewModel, parent, GraphMemberCategory.RowEvent, isExpanded)
+		public RowEventHandlerCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) : 
+											   base(graphViewModel, parent, GraphMemberCategory.RowEvent, isExpanded)
 		{
 		}
 

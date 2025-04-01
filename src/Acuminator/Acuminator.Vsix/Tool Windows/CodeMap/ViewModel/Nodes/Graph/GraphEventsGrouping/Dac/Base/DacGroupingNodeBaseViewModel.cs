@@ -80,13 +80,13 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			switch (GraphEventHandlersCategoryVM)
 			{
 				case CacheAttachedCategoryNodeViewModel _:
-				case RowEventCategoryNodeViewModel _:
+				case RowEventHandlerCategoryNodeViewModel _:
 					childToNavigateTo = this.GetChildToNavigateTo();
 					break;
-				case FieldEventCategoryNodeViewModel _:
+				case FieldEventHandlerCategoryNodeViewModel _:
 					childToNavigateTo = GetChildToNavigateToFromFieldEvents();
 
-					if (childToNavigateTo is not FieldEventNodeViewModel fieldEventHandlerNode)
+					if (childToNavigateTo is not FieldEventHandlerNodeViewModel fieldEventHandlerNode)
 						return;
 
 					fieldEventHandlerNode.DacFieldVM.IsExpanded = true;
@@ -106,7 +106,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		protected bool CanNavigateToChild(TreeNodeViewModel child) =>
 			child is RowEventHandlerNodeViewModel ||
-			child is FieldEventNodeViewModel ||
+			child is FieldEventHandlerNodeViewModel ||
 			child is CacheAttachedNodeViewModel;
 
 		protected TreeNodeViewModel? GetChildToNavigateToFromFieldEvents()

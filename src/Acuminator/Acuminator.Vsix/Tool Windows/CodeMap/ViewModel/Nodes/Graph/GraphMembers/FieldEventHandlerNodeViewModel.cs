@@ -6,7 +6,7 @@ using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class FieldEventNodeViewModel : GraphMemberNodeViewModel
+	public class FieldEventHandlerNodeViewModel : GraphMemberNodeViewModel
 	{
 		private readonly string _dacNameWithFieldNameWithEventTypeForSearch;
 
@@ -20,11 +20,12 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			protected set;
 		}
 
-		public FieldEventNodeViewModel(DacFieldGroupingNodeBaseViewModel dacFieldVM, GraphFieldEventHandlerInfo eventInfo, bool isExpanded = false) :
-								  base(dacFieldVM?.GraphEventsCategoryVM!, dacFieldVM!, eventInfo, isExpanded)
+		public FieldEventHandlerNodeViewModel(DacFieldGroupingNodeBaseViewModel dacFieldVM, GraphFieldEventHandlerInfo eventHandlerInfo, 
+											  bool isExpanded = false) :
+										 base(dacFieldVM?.GraphEventHandlersCategoryVM!, dacFieldVM!, eventHandlerInfo, isExpanded)
 		{
 			DacFieldVM = dacFieldVM!;
-			Name = eventInfo.EventType.ToString();
+			Name = eventHandlerInfo.EventType.ToString();
 			_dacNameWithFieldNameWithEventTypeForSearch = $"{DacFieldVM.DacVM.Name}#{DacFieldVM.DacFieldName}#{Name}";
 		}
 

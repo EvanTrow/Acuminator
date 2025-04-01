@@ -9,9 +9,9 @@ using Acuminator.Vsix.ToolWindows.CodeMap.Graph;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class FieldEventCategoryNodeViewModel : GraphEventHandlerCategoryNodeViewModel
+	public class FieldEventHandlerCategoryNodeViewModel : GraphEventHandlerCategoryNodeViewModel
 	{
-		public FieldEventCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) :
+		public FieldEventHandlerCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) :
 										  base(graphViewModel, parent, GraphMemberCategory.FieldEvent, isExpanded)
 		{
 		}
