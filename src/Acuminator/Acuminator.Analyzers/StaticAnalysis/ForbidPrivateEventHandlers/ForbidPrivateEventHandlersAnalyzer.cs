@@ -60,7 +60,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.ForbidPrivateEventHandlers
 		{
 			var location = handler.Symbol.Locations.FirstOrDefault();
 
-			if (location == null || handler.Symbol.IsOverride)  // Do not report C# overrides of event handlers because their signature cannot be changed
+			// Do not report C# overrides and Acumatica PXOverrides of event handlers because their signature cannot be changed
+			if (location == null || handler.IsCSharpOverride || handler.IsPXOverride)  
 				return;
 
 			if (handler.Symbol.MethodKind == MethodKind.ExplicitInterfaceImplementation)
