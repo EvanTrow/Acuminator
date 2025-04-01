@@ -9,7 +9,7 @@ using Acuminator.Vsix.ToolWindows.CodeMap.Graph;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class FieldEventCategoryNodeViewModel : GraphEventCategoryNodeViewModel
+	public class FieldEventCategoryNodeViewModel : GraphEventHandlerCategoryNodeViewModel
 	{
 		public FieldEventCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) :
 										  base(graphViewModel, parent, GraphMemberCategory.FieldEvent, isExpanded)
@@ -17,13 +17,13 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		}
 
 		public override IEnumerable<SymbolItem> GetCategoryGraphNodeSymbols() =>
-			GraphSemanticModel.FieldDefaultingEvents
-							  .Concat(GraphSemanticModel.FieldVerifyingEvents)
-							  .Concat(GraphSemanticModel.FieldSelectingEvents)
-							  .Concat(GraphSemanticModel.FieldUpdatingEvents)
-							  .Concat(GraphSemanticModel.FieldUpdatedEvents)
-							  .Concat(GraphSemanticModel.ExceptionHandlingEvents)
-							  .Concat(GraphSemanticModel.CommandPreparingEvents);
+			GraphSemanticModel.DeclaredEventHandlers.FieldDefaultingEvents
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.FieldVerifyingEvents)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.FieldSelectingEvents)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.FieldUpdatingEvents)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.FieldUpdatedEvents)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.ExceptionHandlingEvents)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.CommandPreparingEvents);
 
 		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => treeVisitor.VisitNode(this, input);
 

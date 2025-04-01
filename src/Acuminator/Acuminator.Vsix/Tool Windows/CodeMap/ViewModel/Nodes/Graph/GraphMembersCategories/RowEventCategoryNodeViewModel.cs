@@ -10,7 +10,7 @@ using Acuminator.Vsix.ToolWindows.CodeMap.Graph;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class RowEventCategoryNodeViewModel : GraphEventCategoryNodeViewModel
+	public class RowEventCategoryNodeViewModel : GraphEventHandlerCategoryNodeViewModel
 	{
 		public RowEventCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) : 
 										base(graphViewModel, parent, GraphMemberCategory.RowEvent, isExpanded)
@@ -18,16 +18,16 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		}
 
 		public override IEnumerable<SymbolItem> GetCategoryGraphNodeSymbols() =>
-			GraphSemanticModel.RowInsertingEvents
-							  .Concat(GraphSemanticModel.RowInsertedEvents)
-							  .Concat(GraphSemanticModel.RowSelectingEvents)
-							  .Concat(GraphSemanticModel.RowSelectedEvents)
-							  .Concat(GraphSemanticModel.RowUpdatingEvents)
-							  .Concat(GraphSemanticModel.RowUpdatedEvents)
-							  .Concat(GraphSemanticModel.RowDeletingEvents)
-							  .Concat(GraphSemanticModel.RowDeletedEvents)
-							  .Concat(GraphSemanticModel.RowPersistingEvents)
-							  .Concat(GraphSemanticModel.RowPersistedEvents);
+			GraphSemanticModel.DeclaredEventHandlers.RowInsertingEvents
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowInsertedEvents)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowSelectingEvents)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowSelectedEvents)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowUpdatingEvents)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowUpdatedEvents)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowDeletingEvents)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowDeletedEvents)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowPersistingEvents)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowPersistedEvents);
 
 		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => treeVisitor.VisitNode(this, input);
 

@@ -157,35 +157,34 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		}
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(RowEventCategoryNodeViewModel rowEventCategory) =>
-			CreateEventsCategoryChildren<GraphRowEventHandlerInfo>(rowEventCategory,
+			CreateEventHandlersCategoryChildren<GraphRowEventHandlerInfo>(rowEventCategory,
 					(eventCategory, dacName, rowEvents) => new DacGroupingNodeForRowEventHandlerViewModel(eventCategory, dacName, rowEvents, ExpandCreatedNodes));
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(CacheAttachedCategoryNodeViewModel cacheAttachedCategory) =>
-			CreateEventsCategoryChildren<GraphCacheAttachedEventHandlerInfo>(cacheAttachedCategory,
+			CreateEventHandlersCategoryChildren<GraphCacheAttachedEventHandlerInfo>(cacheAttachedCategory,
 					(eventCategory, dacName, fieldEvents) => new DacGroupingNodeForCacheAttachedEventHandlerViewModel(eventCategory, dacName, fieldEvents, ExpandCreatedNodes));
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(FieldEventCategoryNodeViewModel fieldEventCategory) =>
-			CreateEventsCategoryChildren<GraphFieldEventHandlerInfo>(fieldEventCategory,
+			CreateEventHandlersCategoryChildren<GraphFieldEventHandlerInfo>(fieldEventCategory,
 					(eventCategory, dacName, fieldEvents) => new DacGroupingNodeForFieldEventHandlerViewModel(eventCategory, dacName, fieldEvents, ExpandCreatedNodes));
 
-		protected virtual IEnumerable<TreeNodeViewModel> CreateEventsCategoryChildren<TGraphEventInfo>(GraphEventCategoryNodeViewModel graphEventCategory,
-																									   DacVmConstructor<TGraphEventInfo> constructor)
-		where TGraphEventInfo : GraphEventHandlerInfoBase<TGraphEventInfo>
+		protected virtual IEnumerable<TreeNodeViewModel> CreateEventHandlersCategoryChildren<THandlerInfo>(GraphEventHandlerCategoryNodeViewModel graphEventHandlersCategory,
+																										   DacVmConstructor<THandlerInfo> constructor)
+		where THandlerInfo : GraphEventHandlerInfoBase<THandlerInfo>
 		{
-			graphEventCategory.ThrowOnNull();
+			graphEventHandlersCategory.ThrowOnNull();
 
-			var graphSemanticModel = graphEventCategory.GraphViewModel.GraphSemanticModel;
-			var graphCategoryEvents = graphEventCategory.GetCategoryGraphNodeSymbols()
-													   ?.OfType<TGraphEventInfo>()
-														.Where(eventInfo => eventInfo.SignatureType != EventHandlerSignatureType.None);
-			if (graphCategoryEvents.IsNullOrEmpty())
+			var graphSemanticModel = graphEventHandlersCategory.GraphViewModel.GraphSemanticModel;
+			var graphCategoryEventHandlers = graphEventHandlersCategory.GetCategoryGraphNodeSymbols()
+																	  ?.OfType<THandlerInfo>()
+																	   .Where(eventInfo => eventInfo.SignatureType != EventHandlerSignatureType.None);
+			if (graphCategoryEventHandlers.IsNullOrEmpty())
 				return [];
 
 			Cancellation.ThrowIfCancellationRequested();
-			var dacGroupingNodesViewModels = from eventInfo in graphCategoryEvents
-											 where eventInfo.Symbol.IsDeclaredInType(graphSemanticModel.Symbol)
-											 group eventInfo by eventInfo.DacName into graphEventsForDAC
-											 select constructor(graphEventCategory, graphEventsForDAC.Key, graphEventsForDAC) into dacNodeVM
+			var dacGroupingNodesViewModels = from handlerInfo in graphCategoryEventHandlers
+											 group handlerInfo by handlerInfo.DacName into handlersForDac
+											 select constructor(graphEventHandlersCategory, handlersForDac.Key, handlersForDac) into dacNodeVM
 											 where dacNodeVM != null
 											 select dacNodeVM;
 
