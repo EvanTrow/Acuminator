@@ -38,12 +38,12 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			graphExtensionInfo.Base.Should().NotBeNull();
 			graphExtensionInfo.Base!.Name.Should().Be("SecondLevelGraphExtension");
 
-			var extensionFromPreviousLevel = graphExtensionInfo.Base!.Base;
+			var extensionFromPreviousLevel = graphExtensionInfo.Base!.Base as GraphExtensionInfo;
 
 			extensionFromPreviousLevel.Should().NotBeNull();
 			extensionFromPreviousLevel!.Name.Should().Be("BaseExtension");
 			extensionFromPreviousLevel!.Graph.Should().NotBeNull();
-			extensionFromPreviousLevel.Base.Should().BeNull();
+			extensionFromPreviousLevel.Base.Should().NotBeNull();
 		}
 
 		[Theory]
