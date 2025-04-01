@@ -44,6 +44,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			extensionFromPreviousLevel!.Name.Should().Be("BaseExtension");
 			extensionFromPreviousLevel!.Graph.Should().NotBeNull();
 			extensionFromPreviousLevel.Base.Should().NotBeNull();
+			extensionFromPreviousLevel.Base.Should().Be(extensionFromPreviousLevel.Graph);
 		}
 
 		[Theory]
@@ -156,21 +157,21 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			void CheckCacheAttachedEventHandlers()
 			{
 				declaredEventHandlers.CacheAttachedByName.Should().HaveCount(1);
-				allEventHandlersOverridesChains.CacheAttachedByName.Should().HaveCount(1);
+				allEventHandlersOverridesChains.CacheAttachedByName.Should().HaveCount(2);
 
 				var cacheAttachedDeclared = declaredEventHandlers.CacheAttachedEventHandlers.First();
-				var cacheAttachedOverrides = allEventHandlersOverridesChains.CacheAttachedEventHandlers.First();
+				var cacheAttachedOverrides = allEventHandlersOverridesChains.CacheAttachedEventHandlers.First(h => h.Name == cacheAttachedDeclared.Name);
 
 				cacheAttachedDeclared.Should().Be(cacheAttachedOverrides);
 
 				CheckEventHandler(cacheAttachedDeclared, containingType: graphExtensionModelWithEvents.Symbol, dacName: "SomeDac", fieldName: "BranchID",
-								  overrideType: GraphEventHandlerOverrideType.OverrrideWithPXOverrideAttribute, hasBaseDelegate: true,
-								  eventType: EventType.CacheAttached, signatureType: EventHandlerSignatureType.Classic);
+								  GraphEventHandlerOverrideType.OverrrideWithPXOverrideAttribute, hasBaseDelegate: true,
+								  EventType.CacheAttached, EventHandlerSignatureType.Classic, EventTargetKind.Field);
 
 				var cacheAttachedInGraph = cacheAttachedOverrides.Base!;
 				CheckEventHandler(cacheAttachedInGraph, containingType: graph, dacName: "SomeDac", fieldName: "BranchID",
-								  overrideType: GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
-								  eventType: EventType.CacheAttached, signatureType: EventHandlerSignatureType.Classic);
+								  GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
+								  EventType.CacheAttached, EventHandlerSignatureType.Classic, EventTargetKind.Field);
 			}
 			//-----------------------------------------------------------------------------
 			void CheckFieldUpdatingEventHandlers()
@@ -183,18 +184,18 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 				fieldUpdatingDeclared.Should().Be(fieldUpdatingOverrides);
 
 				CheckEventHandler(fieldUpdatingDeclared, containingType: graphExtensionModelWithEvents.Symbol, dacName: "SomeDac", fieldName: "DocBal",
-								  overrideType: GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: true,
-								  eventType: EventType.FieldUpdating, signatureType: EventHandlerSignatureType.Generic);
+								  GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: true,
+								  EventType.FieldUpdating, EventHandlerSignatureType.Generic, EventTargetKind.Field);
 
 				var fieldUpdatingBaseExtension = fieldUpdatingOverrides.Base!;
 				CheckEventHandler(fieldUpdatingBaseExtension, containingType: baseExtension.Symbol, dacName: "SomeDac", fieldName: "DocBal",
-								  overrideType: GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: true,
-								  eventType: EventType.FieldUpdating, signatureType: EventHandlerSignatureType.Generic);
+								  GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: true,
+								  EventType.FieldUpdating, EventHandlerSignatureType.Generic, EventTargetKind.Field);
 
 				var fieldUpdatingInGraph = fieldUpdatingBaseExtension.Base!;
 				CheckEventHandler(fieldUpdatingInGraph, containingType: graph, dacName: "SomeDac", fieldName: "DocBal",
-								  overrideType: GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
-								  eventType: EventType.FieldUpdating, signatureType: EventHandlerSignatureType.Generic);
+								  GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
+								  EventType.FieldUpdating, EventHandlerSignatureType.Generic, EventTargetKind.Field);
 			}
 			//-----------------------------------------------------------------------------
 			void CheckFieldUpdatedEventHandlers()
@@ -207,13 +208,13 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 				fieldUpdatedDeclared.Should().Be(fieldUpdatedOverrides);
 
 				CheckEventHandler(fieldUpdatedDeclared, containingType: graphExtensionModelWithEvents.Symbol, dacName: "SomeDac", fieldName: "DocBal",
-								  overrideType: GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: true,
-								  eventType: EventType.FieldUpdated, signatureType: EventHandlerSignatureType.Generic);
+								  GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: true,
+								  EventType.FieldUpdated, EventHandlerSignatureType.Generic, EventTargetKind.Field);
 
 				var fieldUpdatedBaseExtension = fieldUpdatedOverrides.Base!;
 				CheckEventHandler(fieldUpdatedBaseExtension, containingType: baseExtension.Symbol, dacName: "SomeDac", fieldName: "DocBal",
-								  overrideType: GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: true,
-								  eventType: EventType.FieldUpdated, signatureType: EventHandlerSignatureType.Classic);
+								  GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: true,
+								  EventType.FieldUpdated, EventHandlerSignatureType.Classic, EventTargetKind.Field);
 
 				var allFieldUpdatedInBaseExtension = fieldUpdatedOverrides.JustOverridenItems()
 																		  .Where(h => h.Symbol.IsDeclaredInType(baseExtension.Symbol))
@@ -223,12 +224,12 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 
 				var fieldUpdatedInGraph = fieldUpdatedBaseExtension.Base!;
 				CheckEventHandler(fieldUpdatedInGraph, containingType: graph, dacName: "SomeDac", fieldName: "DocBal",
-								  overrideType: GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: false,
-								  eventType: EventType.FieldUpdated, signatureType: EventHandlerSignatureType.Generic);
+								  GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: false,
+								  EventType.FieldUpdated, EventHandlerSignatureType.Generic, EventTargetKind.Field);
 
 				CheckEventHandler(fieldUpdatedInGraph.Base!, containingType: graph, dacName: "SomeDac", fieldName: "DocBal",
-								  overrideType: GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
-								  eventType: EventType.FieldUpdated, signatureType: EventHandlerSignatureType.Classic);
+								  GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
+								  EventType.FieldUpdated, EventHandlerSignatureType.Classic, EventTargetKind.Field);
 
 				var allFieldUpdatedInGraph = fieldUpdatedOverrides.JustOverridenItems()
 																  .Where(h => h.Symbol.IsDeclaredInType(graph))
@@ -243,23 +244,23 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 
 				var fieldSelectingOverrides = allEventHandlersOverridesChains.FieldSelectingEventHandlers.First();
 				CheckEventHandler(fieldSelectingOverrides, baseExtension.Symbol, dacName: "SomeDac", fieldName: "DocBal",
-								  overrideType: GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: false,
-								  eventType: EventType.FieldSelecting, signatureType: EventHandlerSignatureType.Generic);
+								  GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: false,
+								  EventType.FieldSelecting, EventHandlerSignatureType.Generic, EventTargetKind.Field);
 
 				var fieldSelectingInGraphWithDelegateParameter = fieldSelectingOverrides.Base!;
 				CheckEventHandler(fieldSelectingInGraphWithDelegateParameter, containingType: graph, dacName: "SomeDac", fieldName: "DocBal",
-								  overrideType: GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: true,
-								  eventType: EventType.FieldSelecting, signatureType: EventHandlerSignatureType.Generic);
+								  GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: true,
+								  EventType.FieldSelecting, EventHandlerSignatureType.Generic, EventTargetKind.Field);
 
 				var secondFieldSelectingInGraphWithoutDelegateParameter = fieldSelectingInGraphWithDelegateParameter.Base!;
 				CheckEventHandler(secondFieldSelectingInGraphWithoutDelegateParameter, containingType: graph, dacName: "SomeDac", fieldName: "DocBal",
-								  overrideType: GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: false,
-								  eventType: EventType.FieldSelecting, signatureType: EventHandlerSignatureType.Generic);
+								  GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: false,
+								  EventType.FieldSelecting, EventHandlerSignatureType.Generic, EventTargetKind.Field);
 
 				var firstFieldSelectingInGraphWithoutDelegateParameter = secondFieldSelectingInGraphWithoutDelegateParameter.Base!;
 				CheckEventHandler(firstFieldSelectingInGraphWithoutDelegateParameter, containingType: graph, dacName: "SomeDac", fieldName: "DocBal",
-								  overrideType: GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
-								  eventType: EventType.FieldSelecting, signatureType: EventHandlerSignatureType.Generic);
+								  GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
+								  EventType.FieldSelecting, EventHandlerSignatureType.Generic, EventTargetKind.Field);
 
 				var fieldSelectingEventHandlersInGraph = fieldSelectingOverrides.JustOverridenItems()
 																				.Where(h => h.Symbol.IsDeclaredInType(graph))
@@ -280,18 +281,18 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 				rowUpdatingDeclared.Should().Be(rowUpdatingOverrides);
 
 				CheckEventHandler(rowUpdatingDeclared, containingType: graphExtensionModelWithEvents.Symbol, dacName: "SomeDac", fieldName: null,
-								  overrideType: GraphEventHandlerOverrideType.OverrrideWithPXOverrideAttribute, hasBaseDelegate: true,
-								  eventType: EventType.RowUpdating, signatureType: EventHandlerSignatureType.Generic);
+								  GraphEventHandlerOverrideType.OverrrideWithPXOverrideAttribute, hasBaseDelegate: true,
+								  EventType.RowUpdating, EventHandlerSignatureType.Generic, EventTargetKind.Row);
 
 				var rowUpdatingBaseExtension = rowUpdatingOverrides.Base!;
 				CheckEventHandler(rowUpdatingBaseExtension, containingType: baseExtension.Symbol, dacName: "SomeDac", fieldName: null,
-								  overrideType: GraphEventHandlerOverrideType.OverrrideWithPXOverrideAttribute, hasBaseDelegate: false,
-								  eventType: EventType.RowUpdating, signatureType: EventHandlerSignatureType.Generic);
+								  GraphEventHandlerOverrideType.OverrrideWithPXOverrideAttribute, hasBaseDelegate: false,
+								  EventType.RowUpdating, EventHandlerSignatureType.Generic, EventTargetKind.Row);
 
 				var rowUpdatingInGraph = rowUpdatingBaseExtension.Base!;
 				CheckEventHandler(rowUpdatingInGraph, containingType: graph, dacName: "SomeDac", fieldName: null,
-								  overrideType: GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
-								  eventType: EventType.RowUpdating, signatureType: EventHandlerSignatureType.Generic);
+								  GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
+								  EventType.RowUpdating, EventHandlerSignatureType.Generic, EventTargetKind.Row);
 			}
 			//-----------------------------------------------------------------------------
 			void CheckRowUpdatedEventHandlers()
@@ -301,24 +302,24 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 
 				var rowUpdatedWithDelegateParameterInBaseExtension = allEventHandlersOverridesChains.RowUpdatedEventHandlers.First();
 				CheckEventHandler(rowUpdatedWithDelegateParameterInBaseExtension, containingType: baseExtension.Symbol, dacName: "SomeDac", fieldName: null,
-								  overrideType: GraphEventHandlerOverrideType.OverrrideWithPXOverrideAttribute, hasBaseDelegate: true,
-								  eventType: EventType.RowUpdated, signatureType: EventHandlerSignatureType.Classic);
+								  GraphEventHandlerOverrideType.OverrrideWithPXOverrideAttribute, hasBaseDelegate: true,
+								  EventType.RowUpdated, EventHandlerSignatureType.Classic, EventTargetKind.Row);
 
 				var rowUpdatedWithoutDelegateParameterInBaseExtension = rowUpdatedWithDelegateParameterInBaseExtension.Base!;
 				CheckEventHandler(rowUpdatedWithoutDelegateParameterInBaseExtension, containingType: baseExtension.Symbol, dacName: "SomeDac", fieldName: null,
-								  overrideType: GraphEventHandlerOverrideType.OverrrideWithPXOverrideAttribute, hasBaseDelegate: false,
-								  eventType: EventType.RowUpdated, signatureType: EventHandlerSignatureType.Classic);
+								  GraphEventHandlerOverrideType.OverrrideWithPXOverrideAttribute, hasBaseDelegate: false,
+								  EventType.RowUpdated, EventHandlerSignatureType.Classic, EventTargetKind.Row);
 
 				var rowUpdatedInGraph = rowUpdatedWithoutDelegateParameterInBaseExtension.Base!;
 				CheckEventHandler(rowUpdatedInGraph, containingType: graph, dacName: "SomeDac", fieldName: null,
-								  overrideType: GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
-								  eventType: EventType.RowUpdated, signatureType: EventHandlerSignatureType.Classic);
+								  GraphEventHandlerOverrideType.None, hasBaseDelegate: false, EventType.RowUpdated, 
+								  EventHandlerSignatureType.Classic, EventTargetKind.Row);
 			}
 		}
 
 		private void CheckEventHandler<THandler>(THandler eventHandler, ITypeSymbol containingType, string dacName, string? fieldName,
 												 GraphEventHandlerOverrideType overrideType, bool hasBaseDelegate,
-												 EventType eventType, EventHandlerSignatureType signatureType)
+												 EventType eventType, EventHandlerSignatureType signatureType, EventTargetKind targetKind)
 		where THandler : GraphEventHandlerInfoBase<THandler>
 		{
 			eventHandler.Symbol.ContainingType.Should().Be(containingType);
@@ -332,7 +333,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 					cacheAttachedEventHandler.DacFieldName.Should().Be(fieldName);
 			}
 
-			eventHandler.TargetKind.Should().Be(EventTargetKind.Field);
+			eventHandler.TargetKind.Should().Be(targetKind);
 			eventHandler.EventType.Should().Be(eventType);
 			eventHandler.SignatureType.Should().Be(signatureType);
 
