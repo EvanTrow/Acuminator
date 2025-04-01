@@ -18,58 +18,58 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			public int AllEventHandlersCount { get; }
 
 			public ImmutableDictionary<string, ImmutableArray<GraphRowEventHandlerInfo>> RowSelectingByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowSelectingEvents => RowSelectingByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphRowEventHandlerInfo> RowSelectingEventHandlers => RowSelectingByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphRowEventHandlerInfo>> RowSelectedByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowSelectedEvents => RowSelectedByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphRowEventHandlerInfo> RowSelectedEventHandlers => RowSelectedByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphRowEventHandlerInfo>> RowInsertingByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowInsertingEvents => RowInsertingByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphRowEventHandlerInfo> RowInsertingEventHandlers => RowInsertingByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphRowEventHandlerInfo>> RowInsertedByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowInsertedEvents => RowInsertedByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphRowEventHandlerInfo> RowInsertedEventHandlers => RowInsertedByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphRowEventHandlerInfo>> RowUpdatingByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowUpdatingEvents => RowUpdatingByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphRowEventHandlerInfo> RowUpdatingEventHandlers => RowUpdatingByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphRowEventHandlerInfo>> RowUpdatedByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowUpdatedEvents => RowUpdatedByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphRowEventHandlerInfo> RowUpdatedEventHandlers => RowUpdatedByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphRowEventHandlerInfo>> RowDeletingByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowDeletingEvents => RowDeletingByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphRowEventHandlerInfo> RowDeletingEventHandlers => RowDeletingByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphRowEventHandlerInfo>> RowDeletedByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowDeletedEvents => RowDeletedByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphRowEventHandlerInfo> RowDeletedEventHandlers => RowDeletedByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphRowEventHandlerInfo>> RowPersistingByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowPersistingEvents => RowPersistingByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphRowEventHandlerInfo> RowPersistingEventHandlers => RowPersistingByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphRowEventHandlerInfo>> RowPersistedByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowPersistedEvents => RowPersistedByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphRowEventHandlerInfo> RowPersistedEventHandlers => RowPersistedByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphFieldEventHandlerInfo>> FieldSelectingByName { get; }
-			public IEnumerable<GraphFieldEventHandlerInfo> FieldSelectingEvents => FieldSelectingByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphFieldEventHandlerInfo> FieldSelectingEventHandlers => FieldSelectingByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphFieldEventHandlerInfo>> FieldDefaultingByName { get; }
-			public IEnumerable<GraphFieldEventHandlerInfo> FieldDefaultingEvents => FieldDefaultingByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphFieldEventHandlerInfo> FieldDefaultingEventHandlers => FieldDefaultingByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphFieldEventHandlerInfo>> FieldVerifyingByName { get; }
-			public IEnumerable<GraphFieldEventHandlerInfo> FieldVerifyingEvents => FieldVerifyingByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphFieldEventHandlerInfo> FieldVerifyingEventHandlers => FieldVerifyingByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphFieldEventHandlerInfo>> FieldUpdatingByName { get; }
-			public IEnumerable<GraphFieldEventHandlerInfo> FieldUpdatingEvents => FieldUpdatingByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphFieldEventHandlerInfo> FieldUpdatingEventHandlers => FieldUpdatingByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphFieldEventHandlerInfo>> FieldUpdatedByName { get; }
-			public IEnumerable<GraphFieldEventHandlerInfo> FieldUpdatedEvents => FieldUpdatedByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphFieldEventHandlerInfo> FieldUpdatedEventHandlers => FieldUpdatedByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphCacheAttachedEventHandlerInfo>> CacheAttachedByName { get; }
-			public IEnumerable<GraphCacheAttachedEventHandlerInfo> CacheAttachedEvents => CacheAttachedByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphCacheAttachedEventHandlerInfo> CacheAttachedEventHandlers => CacheAttachedByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphFieldEventHandlerInfo>> CommandPreparingByName { get; }
-			public IEnumerable<GraphFieldEventHandlerInfo> CommandPreparingEvents => CommandPreparingByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphFieldEventHandlerInfo> CommandPreparingEventHandlers => CommandPreparingByName.Values.SelectMany(handler => handler);
 
 			public ImmutableDictionary<string, ImmutableArray<GraphFieldEventHandlerInfo>> ExceptionHandlingByName { get; }
-			public IEnumerable<GraphFieldEventHandlerInfo> ExceptionHandlingEvents => ExceptionHandlingByName.Values.SelectMany(handler => handler);
+			public IEnumerable<GraphFieldEventHandlerInfo> ExceptionHandlingEventHandlers => ExceptionHandlingByName.Values.SelectMany(handler => handler);
 
 			public DeclaredGraphEventHandlerStorage(ImmutableDictionary<string, ImmutableArray<GraphRowEventHandlerInfo>> rowSelectingByName, 
 													 ImmutableDictionary<string, ImmutableArray<GraphRowEventHandlerInfo>> rowSelectedByName,
@@ -163,26 +163,26 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 			public IEnumerable<GraphEventHandlerInfoBase> GetEventHandlersByEventType(EventType eventType) => eventType switch
 			{
-				EventType.RowSelecting 	=> RowSelectingEvents,
-				EventType.RowSelected 	=> RowSelectedEvents,
-				EventType.RowInserting 	=> RowInsertingEvents,
-				EventType.RowInserted 	=> RowInsertedEvents,
-				EventType.RowUpdating 	=> RowUpdatingEvents,
-				EventType.RowUpdated 	=> RowUpdatedEvents,
-				EventType.RowDeleting 	=> RowDeletingEvents,
-				EventType.RowDeleted 	=> RowDeletedEvents,
-				EventType.RowPersisting => RowPersistingEvents,
-				EventType.RowPersisted 	=> RowPersistedEvents,
+				EventType.RowSelecting 	=> RowSelectingEventHandlers,
+				EventType.RowSelected 	=> RowSelectedEventHandlers,
+				EventType.RowInserting 	=> RowInsertingEventHandlers,
+				EventType.RowInserted 	=> RowInsertedEventHandlers,
+				EventType.RowUpdating 	=> RowUpdatingEventHandlers,
+				EventType.RowUpdated 	=> RowUpdatedEventHandlers,
+				EventType.RowDeleting 	=> RowDeletingEventHandlers,
+				EventType.RowDeleted 	=> RowDeletedEventHandlers,
+				EventType.RowPersisting => RowPersistingEventHandlers,
+				EventType.RowPersisted 	=> RowPersistedEventHandlers,
 
-				EventType.FieldSelecting  => FieldSelectingEvents,
-				EventType.FieldDefaulting => FieldDefaultingEvents,
-				EventType.FieldVerifying  => FieldVerifyingEvents,
-				EventType.FieldUpdating   => FieldUpdatingEvents,
-				EventType.FieldUpdated 	  => FieldUpdatedEvents,
+				EventType.FieldSelecting  => FieldSelectingEventHandlers,
+				EventType.FieldDefaulting => FieldDefaultingEventHandlers,
+				EventType.FieldVerifying  => FieldVerifyingEventHandlers,
+				EventType.FieldUpdating   => FieldUpdatingEventHandlers,
+				EventType.FieldUpdated 	  => FieldUpdatedEventHandlers,
 
-				EventType.CacheAttached 	=> CacheAttachedEvents,
-				EventType.CommandPreparing 	=> CommandPreparingEvents,
-				EventType.ExceptionHandling => ExceptionHandlingEvents,
+				EventType.CacheAttached 	=> CacheAttachedEventHandlers,
+				EventType.CommandPreparing 	=> CommandPreparingEventHandlers,
+				EventType.ExceptionHandling => ExceptionHandlingEventHandlers,
 				EventType.None 				=> [],
 				_ 							=> throw new NotSupportedException($"Event type {eventType} is not supported")
 			};

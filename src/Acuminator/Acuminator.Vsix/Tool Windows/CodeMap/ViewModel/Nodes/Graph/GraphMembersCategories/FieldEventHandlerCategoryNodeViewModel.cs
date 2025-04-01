@@ -17,13 +17,13 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		}
 
 		public override IEnumerable<SymbolItem> GetCategoryGraphNodeSymbols() =>
-			GraphSemanticModel.DeclaredEventHandlers.FieldDefaultingEvents
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.FieldVerifyingEvents)
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.FieldSelectingEvents)
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.FieldUpdatingEvents)
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.FieldUpdatedEvents)
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.ExceptionHandlingEvents)
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.CommandPreparingEvents);
+			GraphSemanticModel.DeclaredEventHandlers.FieldDefaultingEventHandlers
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.FieldVerifyingEventHandlers)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.FieldSelectingEventHandlers)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.FieldUpdatingEventHandlers)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.FieldUpdatedEventHandlers)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.ExceptionHandlingEventHandlers)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.CommandPreparingEventHandlers);
 
 		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => treeVisitor.VisitNode(this, input);
 

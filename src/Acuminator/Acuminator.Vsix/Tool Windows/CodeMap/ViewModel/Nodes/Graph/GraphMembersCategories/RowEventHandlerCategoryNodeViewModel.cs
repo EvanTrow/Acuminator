@@ -18,16 +18,16 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		}
 
 		public override IEnumerable<SymbolItem> GetCategoryGraphNodeSymbols() =>
-			GraphSemanticModel.DeclaredEventHandlers.RowInsertingEvents
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowInsertedEvents)
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowSelectingEvents)
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowSelectedEvents)
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowUpdatingEvents)
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowUpdatedEvents)
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowDeletingEvents)
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowDeletedEvents)
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowPersistingEvents)
-													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowPersistedEvents);
+			GraphSemanticModel.DeclaredEventHandlers.RowInsertingEventHandlers
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowInsertedEventHandlers)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowSelectingEventHandlers)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowSelectedEventHandlers)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowUpdatingEventHandlers)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowUpdatedEventHandlers)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowDeletingEventHandlers)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowDeletedEventHandlers)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowPersistingEventHandlers)
+													.Concat(GraphSemanticModel.DeclaredEventHandlers.RowPersistedEventHandlers);
 
 		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => treeVisitor.VisitNode(this, input);
 

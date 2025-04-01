@@ -16,58 +16,58 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			public int AllEventHandlersCount { get; }
 
 			public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowSelectingByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowSelectingEvents => RowSelectingByName.Values;
+			public IEnumerable<GraphRowEventHandlerInfo> RowSelectingEventHandlers => RowSelectingByName.Values;
 
 			public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowSelectedByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowSelectedEvents => RowSelectedByName.Values;
+			public IEnumerable<GraphRowEventHandlerInfo> RowSelectedEventHandlers => RowSelectedByName.Values;
 
 			public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowInsertingByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowInsertingEvents => RowInsertingByName.Values;
+			public IEnumerable<GraphRowEventHandlerInfo> RowInsertingEventHandlers => RowInsertingByName.Values;
 
 			public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowInsertedByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowInsertedEvents => RowInsertedByName.Values;
+			public IEnumerable<GraphRowEventHandlerInfo> RowInsertedEventHandlers => RowInsertedByName.Values;
 
 			public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowUpdatingByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowUpdatingEvents => RowUpdatingByName.Values;
+			public IEnumerable<GraphRowEventHandlerInfo> RowUpdatingEventHandlers => RowUpdatingByName.Values;
 
 			public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowUpdatedByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowUpdatedEvents => RowUpdatedByName.Values;
+			public IEnumerable<GraphRowEventHandlerInfo> RowUpdatedEventHandlers => RowUpdatedByName.Values;
 
 			public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowDeletingByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowDeletingEvents => RowDeletingByName.Values;
+			public IEnumerable<GraphRowEventHandlerInfo> RowDeletingEventHandlers => RowDeletingByName.Values;
 
 			public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowDeletedByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowDeletedEvents => RowDeletedByName.Values;
+			public IEnumerable<GraphRowEventHandlerInfo> RowDeletedEventHandlers => RowDeletedByName.Values;
 
 			public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowPersistingByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowPersistingEvents => RowPersistingByName.Values;
+			public IEnumerable<GraphRowEventHandlerInfo> RowPersistingEventHandlers => RowPersistingByName.Values;
 
 			public ImmutableDictionary<string, GraphRowEventHandlerInfo> RowPersistedByName { get; }
-			public IEnumerable<GraphRowEventHandlerInfo> RowPersistedEvents => RowPersistedByName.Values;
+			public IEnumerable<GraphRowEventHandlerInfo> RowPersistedEventHandlers => RowPersistedByName.Values;
 
 			public ImmutableDictionary<string, GraphFieldEventHandlerInfo> FieldSelectingByName { get; }
-			public IEnumerable<GraphFieldEventHandlerInfo> FieldSelectingEvents => FieldSelectingByName.Values;
+			public IEnumerable<GraphFieldEventHandlerInfo> FieldSelectingEventHandlers => FieldSelectingByName.Values;
 
 			public ImmutableDictionary<string, GraphFieldEventHandlerInfo> FieldDefaultingByName { get; }
-			public IEnumerable<GraphFieldEventHandlerInfo> FieldDefaultingEvents => FieldDefaultingByName.Values;
+			public IEnumerable<GraphFieldEventHandlerInfo> FieldDefaultingEventHandlers => FieldDefaultingByName.Values;
 
 			public ImmutableDictionary<string, GraphFieldEventHandlerInfo> FieldVerifyingByName { get; }
-			public IEnumerable<GraphFieldEventHandlerInfo> FieldVerifyingEvents => FieldVerifyingByName.Values;
+			public IEnumerable<GraphFieldEventHandlerInfo> FieldVerifyingEventHandlers => FieldVerifyingByName.Values;
 
 			public ImmutableDictionary<string, GraphFieldEventHandlerInfo> FieldUpdatingByName { get; }
-			public IEnumerable<GraphFieldEventHandlerInfo> FieldUpdatingEvents => FieldUpdatingByName.Values;
+			public IEnumerable<GraphFieldEventHandlerInfo> FieldUpdatingEventHandlers => FieldUpdatingByName.Values;
 
 			public ImmutableDictionary<string, GraphFieldEventHandlerInfo> FieldUpdatedByName { get; }
-			public IEnumerable<GraphFieldEventHandlerInfo> FieldUpdatedEvents => FieldUpdatedByName.Values;
+			public IEnumerable<GraphFieldEventHandlerInfo> FieldUpdatedEventHandlers => FieldUpdatedByName.Values;
 
 			public ImmutableDictionary<string, GraphCacheAttachedEventHandlerInfo> CacheAttachedByName { get; }
-			public IEnumerable<GraphCacheAttachedEventHandlerInfo> CacheAttachedEvents => CacheAttachedByName.Values;
+			public IEnumerable<GraphCacheAttachedEventHandlerInfo> CacheAttachedEventHandlers => CacheAttachedByName.Values;
 
 			public ImmutableDictionary<string, GraphFieldEventHandlerInfo> CommandPreparingByName { get; }
-			public IEnumerable<GraphFieldEventHandlerInfo> CommandPreparingEvents => CommandPreparingByName.Values;
+			public IEnumerable<GraphFieldEventHandlerInfo> CommandPreparingEventHandlers => CommandPreparingByName.Values;
 
 			public ImmutableDictionary<string, GraphFieldEventHandlerInfo> ExceptionHandlingByName { get; }
-			public IEnumerable<GraphFieldEventHandlerInfo> ExceptionHandlingEvents => ExceptionHandlingByName.Values;
+			public IEnumerable<GraphFieldEventHandlerInfo> ExceptionHandlingEventHandlers => ExceptionHandlingByName.Values;
 
 			public AllGraphEventHandlerOverridesChainsStorage(ImmutableDictionary<string, GraphRowEventHandlerInfo> rowSelectingByName, 
 											 ImmutableDictionary<string, GraphRowEventHandlerInfo> rowSelectedByName,
@@ -155,26 +155,26 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 			public IEnumerable<GraphEventHandlerInfoBase> GetEventHandlersByEventType(EventType eventType) => eventType switch
 			{
-				EventType.RowSelecting 	=> RowSelectingEvents,
-				EventType.RowSelected 	=> RowSelectedEvents,
-				EventType.RowInserting 	=> RowInsertingEvents,
-				EventType.RowInserted 	=> RowInsertedEvents,
-				EventType.RowUpdating 	=> RowUpdatingEvents,
-				EventType.RowUpdated 	=> RowUpdatedEvents,
-				EventType.RowDeleting 	=> RowDeletingEvents,
-				EventType.RowDeleted 	=> RowDeletedEvents,
-				EventType.RowPersisting => RowPersistingEvents,
-				EventType.RowPersisted 	=> RowPersistedEvents,
+				EventType.RowSelecting 	=> RowSelectingEventHandlers,
+				EventType.RowSelected 	=> RowSelectedEventHandlers,
+				EventType.RowInserting 	=> RowInsertingEventHandlers,
+				EventType.RowInserted 	=> RowInsertedEventHandlers,
+				EventType.RowUpdating 	=> RowUpdatingEventHandlers,
+				EventType.RowUpdated 	=> RowUpdatedEventHandlers,
+				EventType.RowDeleting 	=> RowDeletingEventHandlers,
+				EventType.RowDeleted 	=> RowDeletedEventHandlers,
+				EventType.RowPersisting => RowPersistingEventHandlers,
+				EventType.RowPersisted 	=> RowPersistedEventHandlers,
 
-				EventType.FieldSelecting  => FieldSelectingEvents,
-				EventType.FieldDefaulting => FieldDefaultingEvents,
-				EventType.FieldVerifying  => FieldVerifyingEvents,
-				EventType.FieldUpdating   => FieldUpdatingEvents,
-				EventType.FieldUpdated 	  => FieldUpdatedEvents,
+				EventType.FieldSelecting  => FieldSelectingEventHandlers,
+				EventType.FieldDefaulting => FieldDefaultingEventHandlers,
+				EventType.FieldVerifying  => FieldVerifyingEventHandlers,
+				EventType.FieldUpdating   => FieldUpdatingEventHandlers,
+				EventType.FieldUpdated 	  => FieldUpdatedEventHandlers,
 
-				EventType.CacheAttached 	=> CacheAttachedEvents,
-				EventType.CommandPreparing 	=> CommandPreparingEvents,
-				EventType.ExceptionHandling => ExceptionHandlingEvents,
+				EventType.CacheAttached 	=> CacheAttachedEventHandlers,
+				EventType.CommandPreparing 	=> CommandPreparingEventHandlers,
+				EventType.ExceptionHandling => ExceptionHandlingEventHandlers,
 				EventType.None 				=> [],
 				_ 							=> throw new NotSupportedException($"Event type {eventType} is not supported")
 			};

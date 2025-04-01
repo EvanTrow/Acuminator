@@ -16,40 +16,40 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 		int AllEventHandlersCount { get; }
 
-		IEnumerable<GraphRowEventHandlerInfo> RowSelectingEvents { get; }
+		IEnumerable<GraphRowEventHandlerInfo> RowSelectingEventHandlers { get; }
 
-		IEnumerable<GraphRowEventHandlerInfo> RowSelectedEvents { get; }
+		IEnumerable<GraphRowEventHandlerInfo> RowSelectedEventHandlers { get; }
 
-		IEnumerable<GraphRowEventHandlerInfo> RowInsertingEvents { get; }
+		IEnumerable<GraphRowEventHandlerInfo> RowInsertingEventHandlers { get; }
 
-		IEnumerable<GraphRowEventHandlerInfo> RowInsertedEvents { get; }
+		IEnumerable<GraphRowEventHandlerInfo> RowInsertedEventHandlers { get; }
 
-		IEnumerable<GraphRowEventHandlerInfo> RowUpdatingEvents { get; }
+		IEnumerable<GraphRowEventHandlerInfo> RowUpdatingEventHandlers { get; }
 
-		IEnumerable<GraphRowEventHandlerInfo> RowUpdatedEvents { get; }
+		IEnumerable<GraphRowEventHandlerInfo> RowUpdatedEventHandlers { get; }
 
-		IEnumerable<GraphRowEventHandlerInfo> RowDeletingEvents { get; }
+		IEnumerable<GraphRowEventHandlerInfo> RowDeletingEventHandlers { get; }
 
-		IEnumerable<GraphRowEventHandlerInfo> RowDeletedEvents { get; }
+		IEnumerable<GraphRowEventHandlerInfo> RowDeletedEventHandlers { get; }
 
-		IEnumerable<GraphRowEventHandlerInfo> RowPersistingEvents { get; }
+		IEnumerable<GraphRowEventHandlerInfo> RowPersistingEventHandlers { get; }
 
-		IEnumerable<GraphRowEventHandlerInfo> RowPersistedEvents { get; }
+		IEnumerable<GraphRowEventHandlerInfo> RowPersistedEventHandlers { get; }
 
-		IEnumerable<GraphFieldEventHandlerInfo> FieldSelectingEvents { get; }
+		IEnumerable<GraphFieldEventHandlerInfo> FieldSelectingEventHandlers { get; }
 
-		IEnumerable<GraphFieldEventHandlerInfo> FieldDefaultingEvents { get; }
+		IEnumerable<GraphFieldEventHandlerInfo> FieldDefaultingEventHandlers { get; }
 
-		IEnumerable<GraphFieldEventHandlerInfo> FieldVerifyingEvents { get; }
+		IEnumerable<GraphFieldEventHandlerInfo> FieldVerifyingEventHandlers { get; }
 
-		IEnumerable<GraphFieldEventHandlerInfo> FieldUpdatingEvents { get; }
+		IEnumerable<GraphFieldEventHandlerInfo> FieldUpdatingEventHandlers { get; }
 
-		IEnumerable<GraphFieldEventHandlerInfo> FieldUpdatedEvents { get; }
+		IEnumerable<GraphFieldEventHandlerInfo> FieldUpdatedEventHandlers { get; }
 
-		IEnumerable<GraphCacheAttachedEventHandlerInfo> CacheAttachedEvents { get; }
+		IEnumerable<GraphCacheAttachedEventHandlerInfo> CacheAttachedEventHandlers { get; }
 
-		IEnumerable<GraphFieldEventHandlerInfo> CommandPreparingEvents { get; }
+		IEnumerable<GraphFieldEventHandlerInfo> CommandPreparingEventHandlers { get; }
 
-		IEnumerable<GraphFieldEventHandlerInfo> ExceptionHandlingEvents { get; }
+		IEnumerable<GraphFieldEventHandlerInfo> ExceptionHandlingEventHandlers { get; }
 	}
 }
