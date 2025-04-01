@@ -170,7 +170,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			}
 		}
 
-		public override IReadOnlyCollection<TreeNodeViewModel> VisitNode(DacFieldGroupingNodeForFieldEventViewModel dacFieldGroupingNode,
+		public override IReadOnlyCollection<TreeNodeViewModel> VisitNode(DacFieldGroupingNodeForFieldEventHandlerViewModel dacFieldGroupingNode,
 														  IReadOnlyCollection<TreeNodeViewModel> generatedChildren)
 		{
 			SortType oldSortType = SortType;

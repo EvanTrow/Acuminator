@@ -46,7 +46,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual TResult VisitNode(DacGroupingNodeForFieldEventHandlerViewModel dacGroupingNode, TInput input) => DefaultVisit(dacGroupingNode, input);
 
-		public virtual TResult VisitNode(DacFieldGroupingNodeForFieldEventViewModel dacFieldGroupingNode, TInput input) => DefaultVisit(dacFieldGroupingNode, input);
+		public virtual TResult VisitNode(DacFieldGroupingNodeForFieldEventHandlerViewModel dacFieldGroupingNode, TInput input) => DefaultVisit(dacFieldGroupingNode, input);
 		#endregion
 
 		#region Leaf Nodes

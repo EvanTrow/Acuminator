@@ -8,9 +8,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public class DacGroupingNodeForFieldEventHandlerViewModel : DacGroupingNodeForFieldEventHandlerBaseViewModel<GraphFieldEventHandlerInfo>
 	{
-		public DacGroupingNodeForFieldEventHandlerViewModel(GraphEventHandlerCategoryNodeViewModel graphEventsCategoryVM, string dacName,
-															IEnumerable<GraphFieldEventHandlerInfo> fieldEvents, bool isExpanded) :
-														base(graphEventsCategoryVM, dacName, fieldEvents, isExpanded)
+		public DacGroupingNodeForFieldEventHandlerViewModel(GraphEventHandlerCategoryNodeViewModel graphEventHandlersCategoryVM, string dacName,
+															IEnumerable<GraphFieldEventHandlerInfo> fieldEventHandlers, bool isExpanded) :
+														base(graphEventHandlersCategoryVM, dacName, fieldEventHandlers, isExpanded)
 		{ 
 		}
 

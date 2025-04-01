@@ -8,11 +8,11 @@ using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class DacFieldGroupingNodeForFieldEventViewModel : DacFieldGroupingNodeBaseViewModel
+	public class DacFieldGroupingNodeForFieldEventHandlerViewModel : DacFieldGroupingNodeBaseViewModel
 	{
-		public DacFieldGroupingNodeForFieldEventViewModel(DacGroupingNodeBaseViewModel dacVM, string dacFieldName, 
-														  IEnumerable<GraphFieldEventHandlerInfo> dacFieldEvents, bool isExpanded) :
-													 base(dacVM, dacFieldName, dacFieldEvents, isExpanded)
+		public DacFieldGroupingNodeForFieldEventHandlerViewModel(DacGroupingNodeBaseViewModel dacVM, string dacFieldName, 
+																 IEnumerable<GraphFieldEventHandlerInfo> dacFieldEventHandlers, bool isExpanded) :
+															base(dacVM, dacFieldName, dacFieldEventHandlers, isExpanded)
 		{
 		}
 

@@ -38,16 +38,16 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		IList<TreeNodeViewModel> IGroupNodeWithCyclingNavigation.DisplayedChildren => DisplayedChildren;
 
-		public ImmutableArray<GraphFieldEventHandlerInfo> FieldEvents { get; }
+		public ImmutableArray<GraphFieldEventHandlerInfo> FieldEventHandlers { get; }
 
-		protected DacFieldGroupingNodeBaseViewModel(DacGroupingNodeBaseViewModel dacVM, string dacFieldName, IEnumerable<GraphFieldEventHandlerInfo> dacFieldEvents,
-													bool isExpanded) :
+		protected DacFieldGroupingNodeBaseViewModel(DacGroupingNodeBaseViewModel dacVM, string dacFieldName,
+													IEnumerable<GraphFieldEventHandlerInfo> dacFieldEventHandlers, bool isExpanded) :
 												base(dacVM?.Tree!, dacVM, isExpanded)
 		{
 			DacVM = dacVM!;
 			DacFieldName = dacFieldName.CheckIfNullOrWhiteSpace();
 			_dacAndDacFieldNameForSearch = $"{DacVM.DacName}#{dacFieldName}";
-			FieldEvents = dacFieldEvents?.ToImmutableArray() ?? ImmutableArray.Create<GraphFieldEventHandlerInfo>();
+			FieldEventHandlers = dacFieldEventHandlers?.ToImmutableArray() ?? ImmutableArray.Create<GraphFieldEventHandlerInfo>();
 		}
 
 		public async override Task NavigateToItemAsync()

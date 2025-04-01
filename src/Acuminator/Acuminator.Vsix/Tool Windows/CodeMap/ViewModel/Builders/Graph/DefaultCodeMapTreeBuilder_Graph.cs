@@ -20,9 +20,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public partial class DefaultCodeMapTreeBuilder : TreeBuilderBase
 	{
-		protected delegate DacGroupingNodeBaseViewModel DacVmConstructor<TEventInfo>(GraphEventHandlerCategoryNodeViewModel graphEventHandlerCategory,
-																					 string dacName, IEnumerable<TEventInfo> eventInfos)
-		where TEventInfo : GraphEventHandlerInfoBase<TEventInfo>;
+		protected delegate DacGroupingNodeBaseViewModel DacVmConstructor<THandlerInfo>(GraphEventHandlerCategoryNodeViewModel graphEventHandlerCategory,
+																					   string dacName, IEnumerable<THandlerInfo> eventHandlerInfos)
+		where THandlerInfo : GraphEventHandlerInfoBase<THandlerInfo>;
 
 		protected delegate DacFieldGroupingNodeBaseViewModel DacFieldVmConstructor(DacGroupingNodeBaseViewModel dacNodeVm, string dacName,
 																				   IEnumerable<GraphFieldEventHandlerInfo> fieldEventHandlers);
@@ -195,32 +195,36 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		}
 
 		public override IEnumerable<TreeNodeViewModel>? VisitNode(DacGroupingNodeForRowEventHandlerViewModel dacGroupingNode) =>
-			dacGroupingNode.RowEvents.Select(rowEventInfo => new RowEventHandlerNodeViewModel(dacGroupingNode, rowEventInfo, ExpandCreatedNodes))
-									 .Where(graphMemberVM => !graphMemberVM.Name.IsNullOrEmpty());
+			dacGroupingNode.RowEventHandlers
+						   .Select(rowEventHandlerInfo => new RowEventHandlerNodeViewModel(dacGroupingNode, rowEventHandlerInfo, ExpandCreatedNodes))
+						   .Where(graphMemberVM => !graphMemberVM.Name.IsNullOrEmpty());
 
 		public override IEnumerable<TreeNodeViewModel>? VisitNode(DacGroupingNodeForCacheAttachedEventHandlerViewModel? dacGroupingNode) =>
-			dacGroupingNode?.AllFieldEventHandlers.Select(fieldEvent => new CacheAttachedNodeViewModel(dacGroupingNode, fieldEvent, ExpandCreatedNodes))
-										   .Where(graphMemberVM => !graphMemberVM.Name.IsNullOrEmpty());
+			dacGroupingNode?.AllFieldEventHandlers
+							.Select(fieldEventHandler => new CacheAttachedNodeViewModel(dacGroupingNode, fieldEventHandler, ExpandCreatedNodes))
+							.Where(graphMemberVM => !graphMemberVM.Name.IsNullOrEmpty());
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(DacGroupingNodeForFieldEventHandlerViewModel dacGroupingNode) =>
 			CreateDacChildrenForFieldEvents(dacGroupingNode,
-				constructor: (dacVm, dacFieldName, dacFieldEvents) => new DacFieldGroupingNodeForFieldEventViewModel(dacVm, dacFieldName, dacFieldEvents, ExpandCreatedNodes));
+				constructor: (dacVm, dacFieldName, dacFieldEventHandlers) => 
+								new DacFieldGroupingNodeForFieldEventHandlerViewModel(dacVm, dacFieldName, dacFieldEventHandlers, ExpandCreatedNodes));
 
 		protected virtual IEnumerable<TreeNodeViewModel> CreateDacChildrenForFieldEvents(DacGroupingNodeForFieldEventHandlerViewModel dacEventHandlersGroupingNode,
 																						 DacFieldVmConstructor constructor)
 		{
 			return from handlerInfo in dacEventHandlersGroupingNode.AllFieldEventHandlers
 				   group handlerInfo by handlerInfo.DacFieldName
-						into dacFieldEvents
-				   select constructor(dacEventHandlersGroupingNode, dacFieldEvents.Key, dacFieldEvents)
+						into dacFieldEventHandlers
+				   select constructor(dacEventHandlersGroupingNode, dacFieldEventHandlers.Key, dacFieldEventHandlers)
 						into dacFieldNodeVM
 				   where !dacFieldNodeVM.DacFieldName.IsNullOrEmpty()
 				   select dacFieldNodeVM;
 		}
 
-		public override IEnumerable<TreeNodeViewModel>? VisitNode(DacFieldGroupingNodeForFieldEventViewModel dacFieldGroupingNode) =>
-			dacFieldGroupingNode?.FieldEvents.Select(fieldEvent => new FieldEventHandlerNodeViewModel(dacFieldGroupingNode, fieldEvent, ExpandCreatedNodes))
-											 .Where(graphMemberVM => !graphMemberVM.Name.IsNullOrEmpty());
+		public override IEnumerable<TreeNodeViewModel>? VisitNode(DacFieldGroupingNodeForFieldEventHandlerViewModel dacFieldGroupingNode) =>
+			dacFieldGroupingNode?.FieldEventHandlers
+								 .Select(fieldEventHandler => new FieldEventHandlerNodeViewModel(dacFieldGroupingNode, fieldEventHandler, ExpandCreatedNodes))
+								 .Where(graphMemberVM => !graphMemberVM.Name.IsNullOrEmpty());
 
 		public override IEnumerable<TreeNodeViewModel>? VisitNode(ViewNodeViewModel viewNode)
 		{
