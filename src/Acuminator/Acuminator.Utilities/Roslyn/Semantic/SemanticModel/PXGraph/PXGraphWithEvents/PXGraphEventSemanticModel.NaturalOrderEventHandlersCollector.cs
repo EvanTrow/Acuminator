@@ -79,8 +79,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			{
 				cancellation.ThrowIfCancellationRequested();
 
-				var graphHierarchyFromBaseGraphToDerivedExtension = _graphEventSemanticModel.GraphOrGraphExtInfo.ThisAndOverridenItems()
-																												.Reverse();
+				var graphHierarchyFromBaseGraphToDerivedExtension = _graphEventSemanticModel.GraphOrGraphExtInfo
+																							.ThisAndOverridenItems().Reverse();
 				int declarationOrder = 0;
 
 				foreach (GraphOrGraphExtInfoBase graphOrExtInfo in graphHierarchyFromBaseGraphToDerivedExtension)
