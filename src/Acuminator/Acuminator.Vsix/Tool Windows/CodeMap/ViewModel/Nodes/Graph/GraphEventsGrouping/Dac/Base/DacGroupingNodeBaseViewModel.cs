@@ -16,7 +16,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	{
 		public override TreeNodeFilterBehavior FilterBehavior => TreeNodeFilterBehavior.DisplayedIfChildrenMeetFilter;
 
-		public GraphEventCategoryNodeViewModel GraphEventsCategoryVM { get; }
+		public GraphEventHandlerCategoryNodeViewModel GraphEventsCategoryVM { get; }
 
 		public string DacName { get; }
 
@@ -52,7 +52,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		IList<TreeNodeViewModel> IGroupNodeWithCyclingNavigation.DisplayedChildren => DisplayedChildren;
 
-		protected DacGroupingNodeBaseViewModel(GraphEventCategoryNodeViewModel graphEventsCategoryVM, string dacName, bool isExpanded) :
+		protected DacGroupingNodeBaseViewModel(GraphEventHandlerCategoryNodeViewModel graphEventsCategoryVM, string dacName, bool isExpanded) :
 												base(graphEventsCategoryVM?.Tree!, graphEventsCategoryVM, isExpanded)
 		{
 			dacName.ThrowOnNullOrWhiteSpace();

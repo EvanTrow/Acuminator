@@ -18,7 +18,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override TreeNodeFilterBehavior FilterBehavior => TreeNodeFilterBehavior.DisplayedIfChildrenMeetFilter;
 
-		public GraphEventCategoryNodeViewModel GraphEventsCategoryVM => DacVM.GraphEventsCategoryVM;
+		public GraphEventHandlerCategoryNodeViewModel GraphEventsCategoryVM => DacVM.GraphEventsCategoryVM;
 
 		public DacGroupingNodeBaseViewModel DacVM { get; }
 

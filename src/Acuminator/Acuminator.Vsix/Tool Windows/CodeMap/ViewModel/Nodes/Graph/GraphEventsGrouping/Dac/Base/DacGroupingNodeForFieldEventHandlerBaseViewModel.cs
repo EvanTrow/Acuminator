@@ -11,13 +11,13 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	public abstract class DacGroupingNodeForFieldEventHandlerBaseViewModel<TFieldEventHandlerInfo> : DacGroupingNodeBaseViewModel
 	where TFieldEventHandlerInfo : GraphFieldEventHandlerInfoBase<TFieldEventHandlerInfo>
 	{
-		public ImmutableArray<TFieldEventHandlerInfo> AllFieldEvents { get; }
+		public ImmutableArray<TFieldEventHandlerInfo> AllFieldEventHandlers { get; }
 
-		public DacGroupingNodeForFieldEventHandlerBaseViewModel(GraphEventCategoryNodeViewModel graphEventsCategoryVM, string dacName,
-																IEnumerable<TFieldEventHandlerInfo> fieldEvents, bool isExpanded) :
-															base(graphEventsCategoryVM, dacName, isExpanded)
+		public DacGroupingNodeForFieldEventHandlerBaseViewModel(GraphEventHandlerCategoryNodeViewModel graphEventHandlersCategoryVM, string dacName,
+																IEnumerable<TFieldEventHandlerInfo> fieldEventHandlers, bool isExpanded) :
+															base(graphEventHandlersCategoryVM, dacName, isExpanded)
 		{
-			AllFieldEvents = fieldEvents?.ToImmutableArray() ?? ImmutableArray.Create<TFieldEventHandlerInfo>();
+			AllFieldEventHandlers = fieldEventHandlers?.ToImmutableArray() ?? ImmutableArray.Create<TFieldEventHandlerInfo>();
 		}
 	}
 }

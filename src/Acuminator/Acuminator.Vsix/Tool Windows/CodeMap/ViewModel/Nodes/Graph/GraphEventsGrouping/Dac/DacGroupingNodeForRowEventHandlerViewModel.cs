@@ -13,7 +13,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	{
 		public ImmutableArray<GraphRowEventHandlerInfo> RowEvents { get; }
 
-		public DacGroupingNodeForRowEventHandlerViewModel(GraphEventCategoryNodeViewModel graphEventsCategoryVM, string dacName,
+		public DacGroupingNodeForRowEventHandlerViewModel(GraphEventHandlerCategoryNodeViewModel graphEventsCategoryVM, string dacName,
 														  IEnumerable<GraphRowEventHandlerInfo> rowEvents, bool isExpanded) :
 													 base(graphEventsCategoryVM, dacName, isExpanded)
 		{
