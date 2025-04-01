@@ -10,7 +10,7 @@ using NotifyCollectionChangedAction = System.Collections.Specialized.NotifyColle
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public abstract class GraphEventCategoryNodeViewModel : GraphMemberCategoryNodeViewModel
+	public abstract class GraphEventHandlerCategoryNodeViewModel : GraphMemberCategoryNodeViewModel
 	{
 		private string _name;
 
@@ -31,9 +31,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		protected override bool AllowNavigation => false;
 
-		protected GraphEventCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, GraphMemberCategory graphMemberType, 
-												  bool isExpanded) :
-											 base(graphViewModel, parent, graphMemberType, isExpanded)
+		protected GraphEventHandlerCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, GraphMemberCategory graphMemberType, 
+														 bool isExpanded) :
+													base(graphViewModel, parent, graphMemberType, isExpanded)
 		{
 			_name = CategoryDescription;
 			SubscribeOnDisplayedChildrenCollectionChanged(DisplayedChildren_CollectionChanged);
