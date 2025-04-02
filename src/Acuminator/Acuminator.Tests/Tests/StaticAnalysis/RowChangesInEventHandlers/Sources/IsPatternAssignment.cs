@@ -11,7 +11,7 @@ namespace PX.Objects
 	{
 		protected virtual void _(Events.RowSelected<SOInvoice> e)
 		{
-			if (!(e.Row is SOInvoice invoice))
+			if (e.Row is not SOInvoice invoice)
 				return;
 
 			invoice.RefNbr = "<NEW>";
