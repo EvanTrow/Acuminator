@@ -29,6 +29,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 				{ EventType.FieldVerifying, RowChangesAnalysisMode.ChangesForbiddenForRowFromEventArgs },
 				{ EventType.RowSelected, RowChangesAnalysisMode.ChangesForbiddenForRowFromEventArgs },
 				// Changes are allowed for e.Row only
+				{ EventType.FieldUpdating, RowChangesAnalysisMode.ChangesAllowedOnlyForRowFromEventArgs },
 				{ EventType.RowInserting, RowChangesAnalysisMode.ChangesAllowedOnlyForRowFromEventArgs },
 				{ EventType.RowSelecting, RowChangesAnalysisMode.ChangesAllowedOnlyForRowFromEventArgs },
 			};
