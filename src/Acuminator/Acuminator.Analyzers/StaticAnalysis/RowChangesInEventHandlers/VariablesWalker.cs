@@ -1,4 +1,3 @@
-﻿
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -24,10 +23,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 			private readonly SemanticModel _semanticModel;
 			private readonly PXContext _pxContext;
 			private CancellationToken _cancellationToken;
-			private readonly ImmutableHashSet<ILocalSymbol>? _variables;
+			private readonly HashSet<ILocalSymbol>? _variables;
 			private readonly EventArgsRowWalker _eventArgsRowWalker;
 
-			private readonly ISet<ILocalSymbol> _result = new HashSet<ILocalSymbol>(SymbolEqualityComparer.Default);
+			private readonly HashSet<ILocalSymbol> _result = new(SymbolEqualityComparer.Default);
+
 			public ImmutableArray<ILocalSymbol> Result => _result.ToImmutableArray();
 
 			public VariablesWalker(MethodDeclarationSyntax methodSyntax, SemanticModel semanticModel, PXContext pxContext,
@@ -52,10 +52,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 						_variables = dataFlow.WrittenInside
 							.Intersect(dataFlow.VariablesDeclared, SymbolEqualityComparer.Default)
 							.OfType<ILocalSymbol>()
-							.ToImmutableHashSet<ILocalSymbol>(SymbolEqualityComparer.Default);
+							.ToHashSet<ILocalSymbol>(SymbolEqualityComparer.Default);
 					}
 				}
-
 			}
 
 			public override void VisitAssignmentExpression(AssignmentExpressionSyntax assignment)
@@ -100,7 +99,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 
 			private void ValidateThatVariableIsSetToDacFromEvent(ILocalSymbol? variableSymbol, ExpressionSyntax variableInitializerExpression)
 			{
-				if (variableSymbol == null || !_variables?.Contains(variableSymbol) == true)
+				if (variableSymbol == null || _variables == null || !_variables.Contains(variableSymbol))
 					return;
 
 				_eventArgsRowWalker.Reset();

@@ -16,7 +16,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 		/// </summary>
 		private class EventArgsRowWalker : CSharpSyntaxWalker
 		{
-			private static readonly string RowPropertyName = "Row";
+			private const string RowPropertyName = "Row";
 
 			private readonly SemanticModel _semanticModel;
 			private readonly PXContext _pxContext;
