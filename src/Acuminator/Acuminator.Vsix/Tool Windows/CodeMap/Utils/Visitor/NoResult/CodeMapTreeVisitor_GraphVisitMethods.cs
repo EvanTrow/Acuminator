@@ -26,9 +26,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual void VisitNode(CacheAttachedCategoryNodeViewModel cacheAttachedCategory) => DefaultVisit(cacheAttachedCategory);
 
-		public virtual void VisitNode(RowEventCategoryNodeViewModel rowEventCategory) => DefaultVisit(rowEventCategory);
+		public virtual void VisitNode(RowEventHandlerCategoryNodeViewModel rowEventHandlerCategory) => DefaultVisit(rowEventHandlerCategory);
 
-		public virtual void VisitNode(FieldEventCategoryNodeViewModel rowEventCategory) => DefaultVisit(rowEventCategory);
+		public virtual void VisitNode(FieldEventHandlerCategoryNodeViewModel fieldEventHandlerCategory) => DefaultVisit(fieldEventHandlerCategory);
 
 		public virtual void VisitNode(PXOverridesCategoryNodeViewModel pxOverridesCategory) => DefaultVisit(pxOverridesCategory);
 
@@ -42,13 +42,13 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		#endregion
 
 		#region DAC Grouping
-		public virtual void VisitNode(DacGroupingNodeForRowEventViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
+		public virtual void VisitNode(DacGroupingNodeForRowEventHandlerViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
 
-		public virtual void VisitNode(DacGroupingNodeForCacheAttachedEventViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
+		public virtual void VisitNode(DacGroupingNodeForCacheAttachedEventHandlerViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
 
-		public virtual void VisitNode(DacGroupingNodeForFieldEventViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
+		public virtual void VisitNode(DacGroupingNodeForFieldEventHandlerViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
 
-		public virtual void VisitNode(DacFieldGroupingNodeForFieldEventViewModel dacFieldGroupingNode) => DefaultVisit(dacFieldGroupingNode);
+		public virtual void VisitNode(DacFieldGroupingNodeForFieldEventHandlerViewModel dacFieldGroupingNode) => DefaultVisit(dacFieldGroupingNode);
 		#endregion
 
 		#region Leaf Nodes
@@ -60,9 +60,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual void VisitNode(CacheAttachedNodeViewModel cacheAttachedNode) => DefaultVisit(cacheAttachedNode);
 
-		public virtual void VisitNode(RowEventNodeViewModel rowEventNode) => DefaultVisit(rowEventNode);
+		public virtual void VisitNode(RowEventHandlerNodeViewModel rowEventHandlerNode) => DefaultVisit(rowEventHandlerNode);
 
-		public virtual void VisitNode(FieldEventNodeViewModel fieldEventNode) => DefaultVisit(fieldEventNode);
+		public virtual void VisitNode(FieldEventHandlerNodeViewModel fieldEventHandlerNode) => DefaultVisit(fieldEventHandlerNode);
 
 		public virtual void VisitNode(GraphMemberInfoNodeViewModel graphMemberInfo) => DefaultVisit(graphMemberInfo);
 

@@ -32,7 +32,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			else
 			{
 				BaseGraphInfo = GraphViewModel.CodeMapGraphModel.GraphInfo;
-				BaseGraphExtensionInfo = GraphViewModel.CodeMapGraphModel.GraphExtensionInfo?.Base;
+				BaseGraphExtensionInfo = GraphViewModel.CodeMapGraphModel.GraphExtensionInfo?.Base as GraphExtensionInfo;
 			}
 		}
 

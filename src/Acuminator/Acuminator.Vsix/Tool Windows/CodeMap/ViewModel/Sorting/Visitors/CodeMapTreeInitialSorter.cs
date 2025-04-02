@@ -122,7 +122,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			}
 		}
 
-		public override IReadOnlyCollection<TreeNodeViewModel> VisitNode(DacGroupingNodeForRowEventViewModel dacGroupingNode,
+		public override IReadOnlyCollection<TreeNodeViewModel> VisitNode(DacGroupingNodeForRowEventHandlerViewModel dacGroupingNode,
 														  IReadOnlyCollection<TreeNodeViewModel> generatedChildren)
 		{
 			SortType oldSortType = SortType;
@@ -138,7 +138,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			}
 		}
 
-		public override IReadOnlyCollection<TreeNodeViewModel> VisitNode(DacGroupingNodeForFieldEventViewModel dacGroupingNode,
+		public override IReadOnlyCollection<TreeNodeViewModel> VisitNode(DacGroupingNodeForFieldEventHandlerViewModel dacGroupingNode,
 														  IReadOnlyCollection<TreeNodeViewModel> generatedChildren)
 		{
 			SortType oldSortType = SortType;
@@ -154,7 +154,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			}
 		}
 
-		public override IReadOnlyCollection<TreeNodeViewModel> VisitNode(DacGroupingNodeForCacheAttachedEventViewModel dacGroupingNode,
+		public override IReadOnlyCollection<TreeNodeViewModel> VisitNode(DacGroupingNodeForCacheAttachedEventHandlerViewModel dacGroupingNode,
 														  IReadOnlyCollection<TreeNodeViewModel> generatedChildren)
 		{
 			SortType oldSortType = SortType;
@@ -170,7 +170,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			}
 		}
 
-		public override IReadOnlyCollection<TreeNodeViewModel> VisitNode(DacFieldGroupingNodeForFieldEventViewModel dacFieldGroupingNode,
+		public override IReadOnlyCollection<TreeNodeViewModel> VisitNode(DacFieldGroupingNodeForFieldEventHandlerViewModel dacFieldGroupingNode,
 														  IReadOnlyCollection<TreeNodeViewModel> generatedChildren)
 		{
 			SortType oldSortType = SortType;

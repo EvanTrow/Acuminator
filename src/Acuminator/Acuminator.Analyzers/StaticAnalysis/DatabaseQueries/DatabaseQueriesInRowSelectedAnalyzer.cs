@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 
 using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -11,16 +12,16 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.DatabaseQueries
 {
-    public class DatabaseQueriesInRowSelectedAnalyzer : EventHandlerAggregatedAnalyzerBase
+    public class DatabaseQueriesInRowSelectedAnalyzer : LooseEventHandlerAggregatedAnalyzerBase
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(Descriptors.PX1049_DatabaseQueriesInRowSelected);
 
-		public override bool ShouldAnalyze(PXContext pxContext, EventType eventType) =>
-			base.ShouldAnalyze(pxContext, eventType) && 
-			pxContext.CodeAnalysisSettings.IsvSpecificAnalyzersEnabled && eventType == EventType.RowSelected;
+		public override bool ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo) =>
+			base.ShouldAnalyze(pxContext, eventHandlerInfo) && 
+			pxContext.CodeAnalysisSettings.IsvSpecificAnalyzersEnabled && eventHandlerInfo.Type == EventType.RowSelected;
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 

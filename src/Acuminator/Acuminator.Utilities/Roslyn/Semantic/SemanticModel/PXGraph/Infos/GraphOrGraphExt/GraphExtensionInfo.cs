@@ -11,16 +11,22 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
-	public class GraphExtensionInfo : GraphOrGraphExtInfoBase<GraphExtensionInfo>
+	public class GraphExtensionInfo : GraphOrGraphExtInfoBase
 	{
 		public GraphInfo? Graph { get; }
 
 		protected GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
-									 int declarationOrder, GraphExtensionInfo baseInfo) :
-								this(node, graphExtension, graph, declarationOrder)
+									 int declarationOrder, GraphInfo baseGraph) :
+								base(node, graphExtension, declarationOrder, baseGraph)
 		{
-			_baseInfo = baseInfo.CheckIfNull();
-			CombineWithBaseInfo(baseInfo);
+			Graph = graph;
+		}
+
+		protected GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
+									 int declarationOrder, GraphExtensionInfo baseGraphExtension) :
+								base(node, graphExtension, declarationOrder, baseGraphExtension)
+		{
+			Graph = graph;
 		}
 
 		protected GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph, int declarationOrder) :
@@ -28,6 +34,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		{
 			Graph = graph;
 		}
+
+		protected override void CombineWithBaseInfo(GraphOrGraphExtInfoBase baseGraphOrGraphExtensionInfo) { }
 
 		public static GraphExtensionInfo? Create(INamedTypeSymbol? graphExtension, ClassDeclarationSyntax? graphExtensionNode, ITypeSymbol? graph,
 												 PXContext pxContext, int graphExtDeclarationOrder, CancellationToken cancellation)
@@ -57,11 +65,17 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				? GetAggregatedBaseExtensions(graphExtension, graphInfo, extensionFromPreviousLevels, isInSource, cancellation)
 				: null;
 
-			var graphExtensionInfo = aggregatedBaseGraphExtInfo != null
-				? new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo, graphExtDeclarationOrder, aggregatedBaseGraphExtInfo)
-				: extensionFromPreviousLevels != null
-					? new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo, graphExtDeclarationOrder, extensionFromPreviousLevels)
-					: new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo, graphExtDeclarationOrder);
+			GraphOrGraphExtInfoBase? baseInfo = aggregatedBaseGraphExtInfo ?? extensionFromPreviousLevels ?? graphInfo as GraphOrGraphExtInfoBase;
+			var graphExtensionInfo = baseInfo switch
+			{
+				GraphInfo baseGraphInfo => new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo,
+																  graphExtDeclarationOrder, baseGraphInfo),
+
+				GraphExtensionInfo baseExtensionInfo => new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo,
+																			   graphExtDeclarationOrder, baseExtensionInfo),
+
+				_ => new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo, graphExtDeclarationOrder)
+			};
 
 			return graphExtensionInfo;
 		}
@@ -109,7 +123,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				isInSource = baseGraphExtensionNode != null;
 				aggregatedBaseGraphExtensionInfo = prevGraphExtensionInfo != null
 					? new GraphExtensionInfo(baseGraphExtensionNode, baseType, graphInfo, declarationOrder: 0, prevGraphExtensionInfo)
-					: new GraphExtensionInfo(baseGraphExtensionNode, baseType, graphInfo, declarationOrder: 0);
+					: graphInfo != null 
+						? new GraphExtensionInfo(baseGraphExtensionNode, baseType, graphInfo, declarationOrder: 0, graphInfo)
+						: new GraphExtensionInfo(baseGraphExtensionNode, baseType, graphInfo, declarationOrder: 0);
 
 				prevGraphExtensionInfo = aggregatedBaseGraphExtensionInfo;
 			}

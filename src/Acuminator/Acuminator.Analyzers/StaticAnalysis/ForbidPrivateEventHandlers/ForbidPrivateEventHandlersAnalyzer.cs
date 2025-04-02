@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
 using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
 using Microsoft.CodeAnalysis;
@@ -19,14 +21,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.ForbidPrivateEventHandlers
 				Descriptors.PX1077_EventHandlersShouldNotBePrivate,
 				Descriptors.PX1077_EventHandlersShouldBeProtectedVirtual,
 				Descriptors.PX1077_EventHandlersShouldNotBeExplicitInterfaceImplementations);
-		
+
+		public override bool ShouldAnalyze(PXContext pxContext,PXGraphEventSemanticModel graph) => 
+			base.ShouldAnalyze(pxContext, graph) && graph.DeclaredEventHandlers.AllEventHandlersCount > 0;
+
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel graphOrGraphExtension)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 			
-			var declaredEventHandlers = graphOrGraphExtension.GetAllEvents()
-															 .Where(graphEvent => graphEvent.Symbol.IsDeclaredInType(graphOrGraphExtension.Symbol));
-
+			var declaredEventHandlers = graphOrGraphExtension.DeclaredEventHandlers.GetAllEventHandlers();
 			List<IMethodSymbol>? allInterfaceMethodsImplementations = GetAllInterfaceMethodsImplementations(graphOrGraphExtension.Symbol, pxContext);
 
 			foreach (var handler in declaredEventHandlers)
@@ -52,12 +55,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.ForbidPrivateEventHandlers
 			return allInterfaceMethodsImplementations;
 		}
 
-		private static void AnalyzeEventHandler(SymbolAnalysisContext context, PXContext pxContext, GraphEventInfoBase handler, 
+		private static void AnalyzeEventHandler(SymbolAnalysisContext context, PXContext pxContext, GraphEventHandlerInfoBase handler, 
 												List<IMethodSymbol>? allInterfaceMethodsImplementations)
 		{
 			var location = handler.Symbol.Locations.FirstOrDefault();
 
-			if (location == null || handler.Symbol.IsOverride)  // Do not report C# overrides of event handlers because their signature cannot be changed
+			// Do not report C# overrides and Acumatica PXOverrides of event handlers because their signature cannot be changed
+			if (location == null || handler.IsCSharpOverride || handler.IsPXOverride)  
 				return;
 
 			if (handler.Symbol.MethodKind == MethodKind.ExplicitInterfaceImplementation)

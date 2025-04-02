@@ -13,7 +13,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXActionExecution
 	public class PXActionExecutionInEventHandlersNonISVTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new EventHandlerAnalyzer(CodeAnalysisSettings.Default
+			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 					.WithRecursiveAnalysisEnabled()
 					.WithIsvSpecificAnalyzersDisabled(),
 				new PXActionExecutionInEventHandlersAnalyzer());

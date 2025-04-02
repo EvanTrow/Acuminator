@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 
 using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
-using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -14,17 +14,16 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.UiPresentationLogic
 {
-	public class UiPresentationLogicInEventHandlersAnalyzer : EventHandlerAggregatedAnalyzerBase
+	public class UiPresentationLogicInEventHandlersAnalyzer : LooseEventHandlerAggregatedAnalyzerBase
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => 
 			ImmutableArray.Create(Descriptors.PX1070_UiPresentationLogicInEventHandlers);
 
-		public override bool ShouldAnalyze(PXContext pxContext, EventType eventType) =>
-			base.ShouldAnalyze(pxContext, eventType) &&
-			eventType != EventType.RowSelected && 
-			eventType != EventType.CacheAttached;
+		public override bool ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo) =>
+			base.ShouldAnalyze(pxContext, eventHandlerInfo) &&
+			eventHandlerInfo.Type is not (EventType.RowSelected or EventType.CacheAttached);
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 

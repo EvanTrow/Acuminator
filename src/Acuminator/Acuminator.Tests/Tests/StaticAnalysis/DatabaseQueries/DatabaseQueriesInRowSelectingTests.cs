@@ -9,6 +9,7 @@ using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -24,8 +25,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DatabaseQueries
 		/// </summary>
 		private class DatabaseQueriesInRowSelectingAnalyzerInTests : DatabaseQueriesInRowSelectingAnalyzer
 		{
-			public override bool ShouldAnalyze(PXContext pxContext, EventType eventType) =>
-				eventType == EventType.RowSelecting;
+			public override bool ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo) =>
+				eventHandlerInfo.Type == EventType.RowSelecting;
 		}
 
 		/// <summary>
@@ -39,7 +40,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DatabaseQueries
 		protected override CodeFixProvider GetCSharpCodeFixProvider() => new DatabaseQueriesInRowSelectingFixInTests();
 
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => 
-			new EventHandlerAnalyzer(CodeAnalysisSettings.Default
+			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 														 .WithRecursiveAnalysisEnabled()
 														 .WithStaticAnalysisEnabled()
 														 .WithSuppressionMechanismDisabled(),

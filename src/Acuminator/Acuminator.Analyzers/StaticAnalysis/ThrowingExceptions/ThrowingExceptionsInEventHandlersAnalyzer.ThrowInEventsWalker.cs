@@ -7,6 +7,7 @@ using System.Linq;
 using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
 using Microsoft.CodeAnalysis;
@@ -16,7 +17,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 {
-	public partial class ThrowingExceptionsInEventHandlersAnalyzer : IEventHandlerAnalyzer, IPXGraphAnalyzer
+	public partial class ThrowingExceptionsInEventHandlersAnalyzer : ILooseEventHandlerAggregatedAnalyzer, IPXGraphAnalyzer
 	{
 		private class ThrowInGraphEventsWalker : ThrowInEventsWalker
 		{

@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 
+using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -8,15 +10,25 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
-	public class GraphInfo : GraphOrGraphExtInfoBase<GraphInfo>
+	public class GraphInfo : GraphOrGraphExtInfoBase, IOverridableItem<GraphInfo>
 	{
+		public new GraphInfo? Base => base.Base as GraphInfo;
+
 		protected GraphInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graph, int declarationOrder, GraphInfo baseInfo) :
 					   base(node, graph, declarationOrder, baseInfo)
-		{
-		}
+		{ }
 
 		protected GraphInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graph, int declarationOrder) :
 					   base(node, graph, declarationOrder)
+		{ }
+
+		protected sealed override void CombineWithBaseInfo(GraphOrGraphExtInfoBase baseInfo) 
+		{
+			if (baseInfo is GraphInfo graphInfo)
+				CombineWithBaseInfo(graphInfo);
+		}
+
+		protected virtual void CombineWithBaseInfo(GraphInfo baseInfo)
 		{
 		}
 

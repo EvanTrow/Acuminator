@@ -8,7 +8,7 @@ using System.Threading;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
-using Acuminator.Utilities.Roslyn.Syntax;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -129,54 +129,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private static bool IsGraphWithPrimaryDacBaseGenericType(INamedTypeSymbol type) =>
 			type.TypeArguments.Length >= 2 && type.Name == TypeNames.PXGraph;
-
-		/// <summary>
-		/// Check if <paramref name="eventType"/> is DAC field event.
-		/// </summary>
-		/// <param name="eventType">The eventType to check.</param>
-		/// <returns/>
-		public static bool IsDacFieldEvent(this EventType eventType)
-		{
-			switch (eventType)
-			{
-				case EventType.FieldSelecting:
-				case EventType.FieldDefaulting:
-				case EventType.FieldVerifying:
-				case EventType.FieldUpdating:
-				case EventType.FieldUpdated:
-				case EventType.CacheAttached:
-				case EventType.CommandPreparing:
-				case EventType.ExceptionHandling:
-					return true;
-				default:
-					return false;
-			}
-		}
-
-		/// <summary>
-		/// Check if <paramref name="eventType"/> is DAC row event.
-		/// </summary>
-		/// <param name="eventType">The eventType to check.</param>
-		/// <returns/>
-		public static bool IsDacRowEvent(this EventType eventType)
-		{
-			switch (eventType)
-			{
-				case EventType.RowSelecting:
-				case EventType.RowSelected:
-				case EventType.RowInserting:
-				case EventType.RowInserted:
-				case EventType.RowUpdating:
-				case EventType.RowUpdated:
-				case EventType.RowDeleting:
-				case EventType.RowDeleted:
-				case EventType.RowPersisting:
-				case EventType.RowPersisted:
-					return true;
-				default:
-					return false;
-			}
-		}
 
 		internal static IMethodSymbol? GetConfigureMethodFromBaseGraphOrGraphExtension(this INamedTypeSymbol pxGraphOrPXGraphExtension, PXContext pxContext)
 		{

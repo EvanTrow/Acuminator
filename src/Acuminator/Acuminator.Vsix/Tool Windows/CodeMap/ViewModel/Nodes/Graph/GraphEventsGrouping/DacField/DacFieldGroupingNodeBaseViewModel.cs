@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Vsix.ToolWindows.CodeMap.Filter;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
@@ -18,7 +18,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override TreeNodeFilterBehavior FilterBehavior => TreeNodeFilterBehavior.DisplayedIfChildrenMeetFilter;
 
-		public GraphEventCategoryNodeViewModel GraphEventsCategoryVM => DacVM.GraphEventsCategoryVM;
+		public GraphEventHandlerCategoryNodeViewModel GraphEventHandlersCategoryVM => DacVM.GraphEventHandlersCategoryVM;
 
 		public DacGroupingNodeBaseViewModel DacVM { get; }
 
@@ -38,16 +38,16 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		IList<TreeNodeViewModel> IGroupNodeWithCyclingNavigation.DisplayedChildren => DisplayedChildren;
 
-		public ImmutableArray<GraphFieldEventInfo> FieldEvents { get; }
+		public ImmutableArray<GraphFieldEventHandlerInfo> FieldEventHandlers { get; }
 
-		protected DacFieldGroupingNodeBaseViewModel(DacGroupingNodeBaseViewModel dacVM, string dacFieldName, IEnumerable<GraphFieldEventInfo> dacFieldEvents,
-													bool isExpanded) :
+		protected DacFieldGroupingNodeBaseViewModel(DacGroupingNodeBaseViewModel dacVM, string dacFieldName,
+													IEnumerable<GraphFieldEventHandlerInfo> dacFieldEventHandlers, bool isExpanded) :
 												base(dacVM?.Tree!, dacVM, isExpanded)
 		{
 			DacVM = dacVM!;
 			DacFieldName = dacFieldName.CheckIfNullOrWhiteSpace();
 			_dacAndDacFieldNameForSearch = $"{DacVM.DacName}#{dacFieldName}";
-			FieldEvents = dacFieldEvents?.ToImmutableArray() ?? ImmutableArray.Create<GraphFieldEventInfo>();
+			FieldEventHandlers = dacFieldEventHandlers?.ToImmutableArray() ?? ImmutableArray.Create<GraphFieldEventHandlerInfo>();
 		}
 
 		public async override Task NavigateToItemAsync()

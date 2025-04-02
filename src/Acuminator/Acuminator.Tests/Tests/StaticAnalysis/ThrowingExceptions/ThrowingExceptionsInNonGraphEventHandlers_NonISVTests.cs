@@ -5,8 +5,10 @@ using Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
-using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
+
 using Microsoft.CodeAnalysis.Diagnostics;
+
 using Xunit;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.ThrowingExceptions
@@ -14,7 +16,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ThrowingExceptions
 	public class ThrowingExceptionsInNonGraphEventHandlers_NonISVTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new EventHandlerAnalyzer(CodeAnalysisSettings.Default
+			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 														 .WithIsvSpecificAnalyzersDisabled()
 														 .WithRecursiveAnalysisEnabled()
 														 .WithSuppressionMechanismDisabled(),

@@ -23,9 +23,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual TResult VisitNode(CacheAttachedCategoryNodeViewModel cacheAttachedCategory) => DefaultVisit(cacheAttachedCategory);
 
-		public virtual TResult VisitNode(RowEventCategoryNodeViewModel rowEventCategory) => DefaultVisit(rowEventCategory);
+		public virtual TResult VisitNode(RowEventHandlerCategoryNodeViewModel rowEventHandlerCategory) => DefaultVisit(rowEventHandlerCategory);
 
-		public virtual TResult VisitNode(FieldEventCategoryNodeViewModel rowEventCategory) => DefaultVisit(rowEventCategory);
+		public virtual TResult VisitNode(FieldEventHandlerCategoryNodeViewModel fieldEventHandlerCategory) => DefaultVisit(fieldEventHandlerCategory);
 
 		public virtual TResult VisitNode(PXOverridesCategoryNodeViewModel pxOverridesCategory) => DefaultVisit(pxOverridesCategory);
 
@@ -40,13 +40,13 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		#endregion
 
 		#region DAC Grouping
-		public virtual TResult VisitNode(DacGroupingNodeForRowEventViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
+		public virtual TResult VisitNode(DacGroupingNodeForRowEventHandlerViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
 
-		public virtual TResult VisitNode(DacGroupingNodeForCacheAttachedEventViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
+		public virtual TResult VisitNode(DacGroupingNodeForCacheAttachedEventHandlerViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
 
-		public virtual TResult VisitNode(DacGroupingNodeForFieldEventViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
+		public virtual TResult VisitNode(DacGroupingNodeForFieldEventHandlerViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
 
-		public virtual TResult VisitNode(DacFieldGroupingNodeForFieldEventViewModel dacFieldGroupingNode) => DefaultVisit(dacFieldGroupingNode);
+		public virtual TResult VisitNode(DacFieldGroupingNodeForFieldEventHandlerViewModel dacFieldGroupingNode) => DefaultVisit(dacFieldGroupingNode);
 		#endregion
 
 		#region Leaf Nodes
@@ -58,9 +58,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual TResult VisitNode(CacheAttachedNodeViewModel cacheAttachedNode) => DefaultVisit(cacheAttachedNode);
 
-		public virtual TResult VisitNode(RowEventNodeViewModel rowEventNode) => DefaultVisit(rowEventNode);
+		public virtual TResult VisitNode(RowEventHandlerNodeViewModel rowEventHandlerNode) => DefaultVisit(rowEventHandlerNode);
 
-		public virtual TResult VisitNode(FieldEventNodeViewModel fieldEventNode) => DefaultVisit(fieldEventNode);
+		public virtual TResult VisitNode(FieldEventHandlerNodeViewModel fieldEventHandlerNode) => DefaultVisit(fieldEventHandlerNode);
 
 		public virtual TResult VisitNode(GraphMemberInfoNodeViewModel graphMemberInfo) => DefaultVisit(graphMemberInfo);
 

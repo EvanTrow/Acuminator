@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 
 using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -13,14 +14,14 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.PXActionExecution
 {
-	public class PXActionExecutionInEventHandlersAnalyzer : EventHandlerAggregatedAnalyzerBase
+	public class PXActionExecutionInEventHandlersAnalyzer : LooseEventHandlerAggregatedAnalyzerBase
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(
 				Descriptors.PX1071_PXActionExecutionInEventHandlers,
 				Descriptors.PX1071_PXActionExecutionInEventHandlers_NonISV);
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 

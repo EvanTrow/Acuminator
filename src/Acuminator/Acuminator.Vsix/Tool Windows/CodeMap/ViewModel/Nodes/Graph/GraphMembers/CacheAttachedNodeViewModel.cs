@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Vsix.ToolWindows.Common;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
@@ -24,8 +24,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			protected set;
 		}
 
-		public CacheAttachedNodeViewModel(DacGroupingNodeBaseViewModel dacVM, GraphFieldEventInfo eventInfo, bool isExpanded = false) :
-									 base(dacVM?.GraphEventsCategoryVM!, dacVM!, eventInfo, isExpanded)
+		public CacheAttachedNodeViewModel(DacGroupingNodeBaseViewModel dacVM, GraphCacheAttachedEventHandlerInfo eventInfo, bool isExpanded = false) :
+									 base(dacVM?.GraphEventHandlersCategoryVM!, dacVM!, eventInfo, isExpanded)
 		{
 			DacVM = dacVM!;
 			Name = eventInfo.DacFieldName;

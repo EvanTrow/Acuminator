@@ -23,9 +23,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual TResult VisitNode(CacheAttachedCategoryNodeViewModel cacheAttachedCategory, TInput input) => DefaultVisit(cacheAttachedCategory, input);
 
-		public virtual TResult VisitNode(RowEventCategoryNodeViewModel rowEventCategory, TInput input) => DefaultVisit(rowEventCategory, input);
+		public virtual TResult VisitNode(RowEventHandlerCategoryNodeViewModel rowEventHandlerCategory, TInput input) => DefaultVisit(rowEventHandlerCategory, input);
 
-		public virtual TResult VisitNode(FieldEventCategoryNodeViewModel rowEventCategory, TInput input) => DefaultVisit(rowEventCategory, input);
+		public virtual TResult VisitNode(FieldEventHandlerCategoryNodeViewModel fieldEventHandlerCategory, TInput input) => DefaultVisit(fieldEventHandlerCategory, input);
 
 		public virtual TResult VisitNode(PXOverridesCategoryNodeViewModel pxOverridesCategory, TInput input) => DefaultVisit(pxOverridesCategory, input);
 
@@ -40,13 +40,13 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		#endregion
 
 		#region DAC Grouping
-		public virtual TResult VisitNode(DacGroupingNodeForRowEventViewModel dacGroupingNode, TInput input) => DefaultVisit(dacGroupingNode, input);
+		public virtual TResult VisitNode(DacGroupingNodeForRowEventHandlerViewModel dacGroupingNode, TInput input) => DefaultVisit(dacGroupingNode, input);
 
-		public virtual TResult VisitNode(DacGroupingNodeForCacheAttachedEventViewModel dacGroupingNode, TInput input) => DefaultVisit(dacGroupingNode, input);
+		public virtual TResult VisitNode(DacGroupingNodeForCacheAttachedEventHandlerViewModel dacGroupingNode, TInput input) => DefaultVisit(dacGroupingNode, input);
 
-		public virtual TResult VisitNode(DacGroupingNodeForFieldEventViewModel dacGroupingNode, TInput input) => DefaultVisit(dacGroupingNode, input);
+		public virtual TResult VisitNode(DacGroupingNodeForFieldEventHandlerViewModel dacGroupingNode, TInput input) => DefaultVisit(dacGroupingNode, input);
 
-		public virtual TResult VisitNode(DacFieldGroupingNodeForFieldEventViewModel dacFieldGroupingNode, TInput input) => DefaultVisit(dacFieldGroupingNode, input);
+		public virtual TResult VisitNode(DacFieldGroupingNodeForFieldEventHandlerViewModel dacFieldGroupingNode, TInput input) => DefaultVisit(dacFieldGroupingNode, input);
 		#endregion
 
 		#region Leaf Nodes
@@ -58,9 +58,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual TResult VisitNode(CacheAttachedNodeViewModel cacheAttachedNode, TInput input) => DefaultVisit(cacheAttachedNode, input);
 
-		public virtual TResult VisitNode(RowEventNodeViewModel rowEventNode, TInput input) => DefaultVisit(rowEventNode, input);
+		public virtual TResult VisitNode(RowEventHandlerNodeViewModel rowEventNode, TInput input) => DefaultVisit(rowEventNode, input);
 
-		public virtual TResult VisitNode(FieldEventNodeViewModel fieldEventNode, TInput input) => DefaultVisit(fieldEventNode, input);
+		public virtual TResult VisitNode(FieldEventHandlerNodeViewModel fieldEventNode, TInput input) => DefaultVisit(fieldEventNode, input);
 
 		public virtual TResult VisitNode(GraphMemberInfoNodeViewModel graphMemberInfo, TInput input) => DefaultVisit(graphMemberInfo, input);
 

@@ -9,14 +9,14 @@ using Acuminator.Vsix.ToolWindows.CodeMap.Graph;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class CacheAttachedCategoryNodeViewModel : GraphEventCategoryNodeViewModel
+	public class CacheAttachedCategoryNodeViewModel : GraphEventHandlerCategoryNodeViewModel
 	{
 		public CacheAttachedCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) :
 											 base(graphViewModel, parent, GraphMemberCategory.CacheAttached, isExpanded)
 		{
 		}
 
-		public override IEnumerable<SymbolItem> GetCategoryGraphNodeSymbols() => GraphSemanticModel.CacheAttachedEvents;
+		public override IEnumerable<SymbolItem> GetCategoryGraphNodeSymbols() => GraphSemanticModel.DeclaredEventHandlers.CacheAttachedEventHandlers;
 
 		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => treeVisitor.VisitNode(this, input);
 

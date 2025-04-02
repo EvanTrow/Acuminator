@@ -12,7 +12,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
     public class LongOperationInEventHandlersTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new EventHandlerAnalyzer(CodeAnalysisSettings.Default.WithRecursiveAnalysisEnabled(),
+			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default.WithRecursiveAnalysisEnabled(),
 				new LongOperationInEventHandlersAnalyzer());
 
 		[Theory]

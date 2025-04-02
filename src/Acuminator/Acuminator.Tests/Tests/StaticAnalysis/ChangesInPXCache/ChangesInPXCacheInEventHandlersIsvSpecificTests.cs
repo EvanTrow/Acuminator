@@ -5,7 +5,7 @@ using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
-using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Xunit;
 
@@ -14,7 +14,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ChangesInPXCache
 	public class ChangesInPXCacheInEventHandlersIsvSpecificTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new EventHandlerAnalyzer(
+			new LooseEventHandlerAggregatorAnalyzer(
 				CodeAnalysisSettings.Default
 					.WithRecursiveAnalysisEnabled()
 					.WithIsvSpecificAnalyzersEnabled(), 

@@ -13,7 +13,7 @@ using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.Semantic;
-using Acuminator.Utilities.Roslyn.Semantic.Symbols;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -104,9 +104,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 				return Task.FromResult(document);
 
 			// Get a corresponding generic event args symbol
-			var genericEventInfoKey = new EventInfo(eventType, EventHandlerSignatureType.Generic);
+			var genericEventHandlerInfoKey = new EventHandlerLooseInfo(eventType, EventHandlerSignatureType.Generic);
 
-			if (!pxContext.Events.EventHandlerSignatureTypeMap.TryGetValue(genericEventInfoKey, out INamedTypeSymbol genericArgsSymbol))
+			if (!pxContext.Events.EventHandlerSignatureTypeMap.TryGetValue(genericEventHandlerInfoKey, out INamedTypeSymbol genericArgsSymbol))
 				return Task.FromResult(document);
 
 			IParameterSymbol cacheParameterSymbol = methodSymbol.Parameters[0];
