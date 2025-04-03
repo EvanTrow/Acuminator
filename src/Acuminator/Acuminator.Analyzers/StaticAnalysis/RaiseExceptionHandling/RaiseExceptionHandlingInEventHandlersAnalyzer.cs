@@ -18,10 +18,17 @@ namespace Acuminator.Analyzers.StaticAnalysis.RaiseExceptionHandling
 {
 	public class RaiseExceptionHandlingInEventHandlersAnalyzer : LooseEventHandlerAggregatedAnalyzerBase
 	{
-		private static readonly List<EventType> _analyzedEventTypes =
+		private static readonly List<EventType> _analyzedEventTypesNonIsvMode =
+		[
+			EventType.FieldSelecting,
+			EventType.FieldUpdating,
+		];
+
+		private static readonly List<EventType> _analyzedEventTypesIsvMode =
 		[
 			EventType.FieldDefaulting,
 			EventType.FieldSelecting,
+			EventType.FieldUpdating,
 			EventType.RowSelecting,
 			EventType.RowPersisted
 		];
@@ -32,8 +39,17 @@ namespace Acuminator.Analyzers.StaticAnalysis.RaiseExceptionHandling
 				Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers_NonISV
 			);
 
-		public override bool ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo) =>
-			base.ShouldAnalyze(pxContext, eventHandlerInfo) && _analyzedEventTypes.Contains(eventHandlerInfo.Type);
+		public override bool ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
+		{
+			if (!base.ShouldAnalyze(pxContext, eventHandlerInfo))
+				return false;
+
+			var supportedEventTypes = pxContext.CodeAnalysisSettings.IsvSpecificAnalyzersEnabled
+				? _analyzedEventTypesIsvMode
+				: _analyzedEventTypesNonIsvMode;
+
+			return supportedEventTypes.Contains(eventHandlerInfo.Type);
+		}
 
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
@@ -53,13 +69,17 @@ namespace Acuminator.Analyzers.StaticAnalysis.RaiseExceptionHandling
 		private class Walker : NestedInvocationWalker
 		{
 			private readonly SymbolAnalysisContext _context;
-			private readonly EventType _eventType;
+			private readonly string _eventTypeName;
+			private readonly DiagnosticDescriptor _px1075DiagnosticDescriptor;
 
 			public Walker(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
 				: base(pxContext, context.CancellationToken)
 			{
 				_context = context;
-				_eventType= eventType;
+				_eventTypeName = eventType.ToString();
+				_px1075DiagnosticDescriptor = pxContext.CodeAnalysisSettings.IsvSpecificAnalyzersEnabled
+					? Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers
+					: Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers_NonISV;
 			}
 
 			public override void VisitInvocationExpression(InvocationExpressionSyntax node)
@@ -75,16 +95,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.RaiseExceptionHandling
 					return;
 				}
 
-				if (!Settings.IsvSpecificAnalyzersEnabled && _eventType == EventType.FieldSelecting)
-				{
-					ReportDiagnostic(_context.ReportDiagnostic, Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers_NonISV,
-									  node, _eventType);
-				}
-				else
-				{
-					ReportDiagnostic(_context.ReportDiagnostic, Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers,
-									 node, _eventType);
-				}
+				ReportDiagnostic(_context.ReportDiagnostic, _px1075DiagnosticDescriptor, node, _eventTypeName);
 			}
 		}
 	}
