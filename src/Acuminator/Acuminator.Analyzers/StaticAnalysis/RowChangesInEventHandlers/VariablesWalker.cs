@@ -50,9 +50,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 					if (dataFlow?.Succeeded == true)
 					{
 						_variables = dataFlow.WrittenInside
-							.Intersect(dataFlow.VariablesDeclared, SymbolEqualityComparer.Default)
-							.OfType<ILocalSymbol>()
-							.ToHashSet<ILocalSymbol>(SymbolEqualityComparer.Default);
+											 .OfType<ILocalSymbol>()
+											 .ToHashSet<ILocalSymbol>(SymbolEqualityComparer.Default);
 					}
 				}
 			}
