@@ -32,7 +32,9 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.RaiseExceptionHandling
 			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(14, 4, EventType.FieldDefaulting),
 			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(19, 4, EventType.FieldSelecting),
 			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(24, 4, EventType.RowSelecting),
-			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(29, 4, EventType.RowPersisted));
+			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(29, 4, EventType.RowPersisted),
+			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(34, 4, EventType.FieldUpdating),
+			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(39, 4, EventType.FieldUpdating));
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\EventHandlersWithExternalMethod.cs")]
@@ -40,7 +42,9 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.RaiseExceptionHandling
 			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(14, 4, EventType.FieldDefaulting),
 			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(19, 4, EventType.FieldSelecting),
 			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(24, 4, EventType.RowSelecting),
-			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(29, 4, EventType.RowPersisted));
+			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(29, 4, EventType.RowPersisted),
+			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(34, 4, EventType.FieldUpdating),
+			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(39, 4, EventType.FieldUpdating));
 		
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\ValidEventHandlers.cs")]
