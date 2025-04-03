@@ -84,6 +84,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 					isReported = true;
 				}
 
+				if (_eventType == EventType.FieldUpdating)
+				{
+					ReportDiagnostic(_context.ReportDiagnostic, Descriptors.PX1073_ThrowingExceptionsInFieldUpdating, throwNodeToReport);
+					isReported = true;
+				}
+
 				if (_eventType != EventType.RowSelected && IsPXSetupNotEnteredException(expressionAfterThrowkeyword))
 				{
 					ReportDiagnostic(_context.ReportDiagnostic,

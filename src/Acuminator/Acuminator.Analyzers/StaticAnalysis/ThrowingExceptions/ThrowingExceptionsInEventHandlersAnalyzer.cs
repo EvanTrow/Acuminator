@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -22,13 +21,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 		public ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
 			Descriptors.PX1073_ThrowingExceptionsInRowPersisted,
 			Descriptors.PX1073_ThrowingExceptionsInRowPersisted_NonISV,
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating,
 			Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers);
 
 		bool ILooseEventHandlerAggregatedAnalyzer.ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo) => 
 			eventHandlerInfo.Type != EventType.None;
-
-		bool IPXGraphAnalyzer.ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graphOrGraphExtension) => 
-			graphOrGraphExtension?.IsInSource == true && !graphOrGraphExtension.Symbol.IsStatic;
 
 		/// <summary>
 		/// Analyze events outside graphs and graph extensions.
@@ -56,6 +53,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 				methodSyntax.Accept(walker);
 			}
 		}
+
+		bool IPXGraphAnalyzer.ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graphOrGraphExtension) =>
+			graphOrGraphExtension?.IsInSource == true && !graphOrGraphExtension.Symbol.IsStatic && 
+			graphOrGraphExtension.DeclaredEventHandlers.AllEventHandlersCount > 0;
 
 		/// <summary>
 		/// Analyzes events in graph or graph extension.
