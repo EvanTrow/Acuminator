@@ -28,6 +28,13 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ThrowingExceptions
 			Descriptors.PX1073_ThrowingExceptionsInRowPersisted_NonISV.CreateFor(25, 6));
 
 		[Theory]
+		[EmbeddedFileData(@"EventHandlers\NonGraph\ExceptionInFieldUpdating.cs")]
+		public async Task ExceptionInFieldUpdating(string actual) => await VerifyCSharpDiagnosticAsync(actual,
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(17, 6),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(19, 6),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(21, 6));
+
+		[Theory]
 		[EmbeddedFileData(@"EventHandlers\NonGraph\ExceptionInValidEventHandlers.cs")]
 		public async Task ExceptionInValidEventHandlers_ShouldNotReportDiagnostic(string actual) =>
 			await VerifyCSharpDiagnosticAsync(actual);
