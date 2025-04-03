@@ -26,9 +26,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 			private readonly HashSet<ILocalSymbol>? _variables;
 			private readonly EventArgsRowWalker _eventArgsRowWalker;
 
-			private readonly HashSet<ILocalSymbol> _result = new(SymbolEqualityComparer.Default);
+			private readonly HashSet<ILocalSymbol> _foundRowVariables = new(SymbolEqualityComparer.Default);
 
-			public ImmutableArray<ILocalSymbol> Result => _result.ToImmutableArray();
+			public ImmutableArray<ILocalSymbol> FoundRowVariables => _foundRowVariables.ToImmutableArray();
 
 			public VariablesWalker(MethodDeclarationSyntax methodSyntax, SemanticModel semanticModel, PXContext pxContext,
 				CancellationToken cancellationToken)
@@ -106,7 +106,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 				variableInitializerExpression.Accept(_eventArgsRowWalker);
 
 				if (_eventArgsRowWalker.Success)
-					_result.Add(variableSymbol);
+					_foundRowVariables.Add(variableSymbol);
 			}
 		}
 	}
