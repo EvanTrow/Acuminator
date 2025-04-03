@@ -33,6 +33,16 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ThrowingExceptions
 			Descriptors.PX1073_ThrowingExceptionsInRowPersisted.CreateFor(50, 6));
 
 		[Theory]
+		[EmbeddedFileData(@"EventHandlers\Graph\ExceptionInFieldUpdating.cs")]
+		public async Task ExceptionInFieldUpdating(string actual) => await VerifyCSharpDiagnosticAsync(actual,
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(19, 6),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(21, 6),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(23, 6),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(42, 6),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(44, 6),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(46, 6));
+
+		[Theory]
 		[EmbeddedFileData(@"EventHandlers\Graph\ExceptionInRowPersisted_ProcessingGraph.cs")]
 		public async Task ExceptionInRowPersisted_ProcessingGraph_ShouldNotReportDiagnostic(string actual) => 
 			await VerifyCSharpDiagnosticAsync(actual);
