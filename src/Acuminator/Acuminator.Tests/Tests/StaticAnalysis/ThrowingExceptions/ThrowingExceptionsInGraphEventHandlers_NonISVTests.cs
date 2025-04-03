@@ -81,6 +81,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ThrowingExceptions
 				Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(69, 4, EventType.ExceptionHandling),
 				Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(72, 4, EventType.CommandPreparing),
 				Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(75, 4, EventType.FieldSelecting),
+				Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(78, 4, EventType.FieldUpdating),
 				Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(78, 4, EventType.FieldUpdating),
 				Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(81, 4, EventType.FieldUpdated));
 
