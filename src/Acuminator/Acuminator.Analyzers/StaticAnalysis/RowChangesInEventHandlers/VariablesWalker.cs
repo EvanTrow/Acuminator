@@ -100,8 +100,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 
 					var variableSymbol = _semanticModel.GetDeclaredSymbol(variableDesignation, _cancellationToken) as ILocalSymbol;
 
-					if (variableSymbol?.Type == null || !_variables.Contains(variableSymbol) ||
-						!variableSymbol.Type.Equals(rowProperty.Type, SymbolEqualityComparer.Default))  // Filter out variables with types different from the found property type
+					if (variableSymbol?.Type == null || !_variables.Contains(variableSymbol))
+						continue;
+
+					// Filter out variables with types different from the found property type when the property type is not object
+					if (rowProperty.Type.SpecialType != SpecialType.System_Object && 
+						!variableSymbol.Type.Equals(rowProperty.Type, SymbolEqualityComparer.Default) &&
+						!variableSymbol.Type.InheritsFrom(rowProperty.Type) && !rowProperty.Type.InheritsFrom(variableSymbol.Type))
 					{
 						continue;
 					}
