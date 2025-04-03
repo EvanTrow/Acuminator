@@ -101,30 +101,35 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.RowChangesInEventHandlers
 		[EmbeddedFileData(@"Reversed\DirectAssignment.cs")]
 		public Task Reversed_DirectAssignment(string actual) => VerifyCSharpDiagnosticAsync(actual,
 			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(17, 4, EventType.RowInserting),
-			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(23, 4, EventType.RowSelecting));
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(23, 4, EventType.RowSelecting),
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(29, 4, EventType.FieldUpdating));
 
 		[Theory]
 		[EmbeddedFileData(@"Reversed\IndirectAssignment.cs")]
 		public Task Reversed_IndirectAssignment(string actual) => VerifyCSharpDiagnosticAsync(actual,
 			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(18, 4, EventType.RowInserting),
-			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(25, 4, EventType.RowSelecting));
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(25, 4, EventType.RowSelecting),
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(32, 4, EventType.FieldUpdating));
 
 		[Theory]
 		[EmbeddedFileData(@"Reversed\SetValue.cs")]
 		public Task Reversed_SetValue(string actual) => VerifyCSharpDiagnosticAsync(actual,
 			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(17, 4, EventType.RowInserting),
-			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(23, 4, EventType.RowSelecting));
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(23, 4, EventType.RowSelecting),
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(29, 4, EventType.FieldUpdating));
 
 		[Theory]
 		[EmbeddedFileData(@"Reversed\SetValueExt.cs")]
 		public Task Reversed_SetValueExt(string actual) => VerifyCSharpDiagnosticAsync(actual,
 			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(17, 4, EventType.RowInserting),
-			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(23, 4, EventType.RowSelecting));
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(23, 4, EventType.RowSelecting),
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(29, 4, EventType.FieldUpdating));
 
 		[Theory]
 		[EmbeddedFileData(@"Reversed\IndirectSetValue.cs")]
 		public Task Reversed_IndirectSetValue(string actual) => VerifyCSharpDiagnosticAsync(actual,
 			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(19, 4, EventType.RowInserting),
-			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(27, 4, EventType.RowSelecting));
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(27, 4, EventType.RowSelecting),
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(35, 4, EventType.FieldUpdating));
 	}
 }
