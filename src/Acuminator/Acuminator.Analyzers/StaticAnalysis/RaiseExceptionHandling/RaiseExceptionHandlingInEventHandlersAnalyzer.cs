@@ -18,13 +18,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.RaiseExceptionHandling
 {
 	public class RaiseExceptionHandlingInEventHandlersAnalyzer : LooseEventHandlerAggregatedAnalyzerBase
 	{
-		private static readonly ISet<EventType> AnalyzedEventTypes = new HashSet<EventType>()
-		{
+		private static readonly List<EventType> _analyzedEventTypes =
+		[
 			EventType.FieldDefaulting,
 			EventType.FieldSelecting,
 			EventType.RowSelecting,
 			EventType.RowPersisted
-		};
+		];
 
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(
@@ -33,17 +33,20 @@ namespace Acuminator.Analyzers.StaticAnalysis.RaiseExceptionHandling
 			);
 
 		public override bool ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo) =>
-			base.ShouldAnalyze(pxContext, eventHandlerInfo) && AnalyzedEventTypes.Contains(eventHandlerInfo.Type);
+			base.ShouldAnalyze(pxContext, eventHandlerInfo) && _analyzedEventTypes.Contains(eventHandlerInfo.Type);
 
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			var methodSymbol = (IMethodSymbol) context.Symbol;
-			var methodSyntax = methodSymbol.GetSyntax(context.CancellationToken) as CSharpSyntaxNode;
-			var walker = new Walker(context, pxContext, eventHandlerInfo.Type);
+			if (context.Symbol is not IMethodSymbol methodSymbol ||
+				methodSymbol.GetSyntax(context.CancellationToken) is not CSharpSyntaxNode methodSyntax)
+			{
+				return;
+			}
 
-			methodSyntax?.Accept(walker);
+			var walker = new Walker(context, pxContext, eventHandlerInfo.Type);
+			methodSyntax.Accept(walker);
 		}
 
 
@@ -66,24 +69,21 @@ namespace Acuminator.Analyzers.StaticAnalysis.RaiseExceptionHandling
 				var methodSymbol = GetSymbol<IMethodSymbol>(node);
 				methodSymbol = methodSymbol?.OriginalDefinition?.OverriddenMethod ?? methodSymbol?.OriginalDefinition;
 
-				if (methodSymbol != null && PxContext.PXCache.RaiseExceptionHandling.Contains(methodSymbol, SymbolEqualityComparer.Default))
+				if (methodSymbol == null || !PxContext.PXCache.RaiseExceptionHandling.Contains(methodSymbol, SymbolEqualityComparer.Default))
 				{
-					if (!Settings.IsvSpecificAnalyzersEnabled && _eventType == EventType.FieldSelecting)
-					{
-						ReportDiagnostic(_context.ReportDiagnostic,
-							Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers_NonISV,
-							node, _eventType);
-					}
-					else
-					{
-						ReportDiagnostic(_context.ReportDiagnostic,
-							Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers,
-							node, _eventType);
-					}
+					base.VisitInvocationExpression(node);
+					return;
+				}
+
+				if (!Settings.IsvSpecificAnalyzersEnabled && _eventType == EventType.FieldSelecting)
+				{
+					ReportDiagnostic(_context.ReportDiagnostic, Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers_NonISV,
+									  node, _eventType);
 				}
 				else
 				{
-					base.VisitInvocationExpression(node);
+					ReportDiagnostic(_context.ReportDiagnostic, Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers,
+									 node, _eventType);
 				}
 			}
 		}
