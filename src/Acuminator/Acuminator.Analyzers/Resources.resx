@@ -657,8 +657,11 @@ public virtual int? SomeDacField{ get; set; }</value>
   <data name="PX1072Title_ReuseExistingGraphVariable" xml:space="preserve">
     <value>BQL queries must be executed within the context of an existing PXGraph instance</value>
   </data>
-  <data name="PX1073Title" xml:space="preserve">
+  <data name="PX1073TitleRowPersisted" xml:space="preserve">
     <value>Exceptions cannot be thrown in the RowPersisted event handler</value>
+  </data>
+  <data name="PX1073TitleFieldUpdating" xml:space="preserve">
+    <value>Exceptions cannot be thrown in the FieldUpdating event handler</value>
   </data>
   <data name="PX1074MessageFormat" xml:space="preserve">
     <value>PXSetupNotEnteredException cannot be thrown in the {0} event handler. Use the RowSelected event handler instead.</value>
@@ -689,6 +692,18 @@ public virtual int? SomeDacField{ get; set; }</value>
   </data>
   <data name="PX1077Title_ExplicitInterfaceImplementation" xml:space="preserve">
     <value>Event handlers should not be explicit interface implementations</value>
+  </data>
+  <data name="PX1078MessageFormat_TypesOfDacFieldAndReferencedFieldHaveDifferentSize" xml:space="preserve">
+    <value>The "{0}" DAC field and the "{1}" referenced field have different sizes specified in the data type attribute. The expected size of the DAC field is {2}.</value>
+  </data>
+  <data name="PX1078MessageFormat_TypesOfDacFieldAndReferencedFieldMismatch" xml:space="preserve">
+    <value>The "{0}" DAC field and the "{1}" referenced field have different types. The expected type for the DAC field is {2}.</value>
+  </data>
+  <data name="PX1078Title_TypesOfDacFieldAndReferencedFieldHaveDifferentSize" xml:space="preserve">
+    <value>DAC field and referenced field have different sizes</value>
+  </data>
+  <data name="PX1078Title_TypesOfDacFieldAndReferencedFieldMismatch" xml:space="preserve">
+    <value>DAC field and referenced field have different types</value>
   </data>
   <data name="PX1080Title" xml:space="preserve">
     <value>Data view delegates should not start long-running operations</value>
@@ -798,17 +813,5 @@ Reason: {2}</value>
   </data>
   <data name="SuppressDiagnosticWithCommentNonNestedCodeActionTitle" xml:space="preserve">
     <value>Suppress the {0} diagnostic with Acuminator in a comment</value>
-  </data>
-  <data name="PX1078MessageFormat_TypesOfDacFieldAndReferencedFieldMismatch" xml:space="preserve">
-    <value>The "{0}" DAC field and the "{1}" referenced field have different types. The expected type for the DAC field is {2}.</value>
-  </data>
-  <data name="PX1078MessageFormat_TypesOfDacFieldAndReferencedFieldHaveDifferentSize" xml:space="preserve">
-    <value>The "{0}" DAC field and the "{1}" referenced field have different sizes specified in the data type attribute. The expected size of the DAC field is {2}.</value>
-  </data>
-  <data name="PX1078Title_TypesOfDacFieldAndReferencedFieldHaveDifferentSize" xml:space="preserve">
-    <value>DAC field and referenced field have different sizes</value>
-  </data>
-  <data name="PX1078Title_TypesOfDacFieldAndReferencedFieldMismatch" xml:space="preserve">
-    <value>DAC field and referenced field have different types</value>
   </data>
 </root>

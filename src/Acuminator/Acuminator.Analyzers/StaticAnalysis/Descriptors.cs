@@ -395,10 +395,13 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			Rule("PX1072", nameof(Resources.PX1072Title_CreateSharedGraphVariable).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1072);
 
 		public static DiagnosticDescriptor PX1073_ThrowingExceptionsInRowPersisted { get; } =
-			Rule("PX1073", nameof(Resources.PX1073Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1073);
+			Rule("PX1073", nameof(Resources.PX1073TitleRowPersisted).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1073RowPersisted);
 
 		public static DiagnosticDescriptor PX1073_ThrowingExceptionsInRowPersisted_NonISV { get; } =
-			Rule("PX1073", nameof(Resources.PX1073Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1073);
+			Rule("PX1073", nameof(Resources.PX1073TitleRowPersisted).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1073RowPersisted);
+
+		public static DiagnosticDescriptor PX1073_ThrowingExceptionsInFieldUpdating { get; } =
+			Rule("PX1073", nameof(Resources.PX1073TitleFieldUpdating).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1073FieldUpdating);
 
 		public static DiagnosticDescriptor PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers { get; } =
 			Rule("PX1074", nameof(Resources.PX1074Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning,

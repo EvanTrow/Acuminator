@@ -763,11 +763,20 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ExceptionsInFieldUpdating.
+        /// </summary>
+        public static string PX1073FieldUpdating {
+            get {
+                return ResourceManager.GetString("PX1073FieldUpdating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ExceptionsInRowPersisted.
         /// </summary>
-        public static string PX1073 {
+        public static string PX1073RowPersisted {
             get {
-                return ResourceManager.GetString("PX1073", resourceCulture);
+                return ResourceManager.GetString("PX1073RowPersisted", resourceCulture);
             }
         }
         
