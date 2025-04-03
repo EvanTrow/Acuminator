@@ -1,11 +1,11 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -83,17 +83,31 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 			{
 				_cancellationToken.ThrowIfCancellationRequested();
 
-				VariableDesignationSyntax? designation = isPatternExpression.Pattern switch
-				{
-					DeclarationPatternSyntax declarationPattern => declarationPattern.Designation,
-					RecursivePatternSyntax recursivePattern => recursivePattern.Designation,
-					_ => null
-				};
+				if (_variables == null)
+					return;
 
-				if (designation != null)
+				_eventArgsRowWalker.Reset();
+				isPatternExpression.Expression.Accept(_eventArgsRowWalker);
+
+				if (_eventArgsRowWalker.FoundRowProperty == null)
+					return;
+
+				IPropertySymbol rowProperty = _eventArgsRowWalker.FoundRowProperty;
+				var variableDesignations	= isPatternExpression.Pattern.GetAllVariableDesignations();
+
+				foreach (SingleVariableDesignationSyntax variableDesignation in variableDesignations)
 				{
-					var variableSymbol = _semanticModel.GetDeclaredSymbol(designation, _cancellationToken) as ILocalSymbol;
-					ValidateThatVariableIsSetToDacFromEvent(variableSymbol, isPatternExpression.Expression);
+					_cancellationToken.ThrowIfCancellationRequested();
+
+					var variableSymbol = _semanticModel.GetDeclaredSymbol(variableDesignation, _cancellationToken) as ILocalSymbol;
+
+					if (variableSymbol?.Type == null || !_variables.Contains(variableSymbol) ||
+						!variableSymbol.Type.Equals(rowProperty.Type, SymbolEqualityComparer.Default))  // Filter out variables with types different from the found property type
+					{
+						continue;
+					}
+
+					_foundRowVariables.Add(variableSymbol);
 				}
 			}
 
