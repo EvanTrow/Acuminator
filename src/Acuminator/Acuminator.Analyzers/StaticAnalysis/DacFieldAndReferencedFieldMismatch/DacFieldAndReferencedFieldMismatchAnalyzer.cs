@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
+
 using Acuminator.Analyzers.StaticAnalysis.Dac;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression;
@@ -12,6 +13,7 @@ using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 using Acuminator.Utilities.Roslyn.Syntax;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -19,16 +21,22 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 {
 	public class DacFieldAndReferencedFieldMismatchAnalyzer : DacAggregatedAnalyzerBase
 	{
-		private readonly Dictionary<INamedTypeSymbol, DacSemanticModel?> _modelsCache = new(SymbolEqualityComparer.Default);
+		private readonly Dictionary<INamedTypeSymbol, DacSemanticModel?> _dacModelsCache = new(SymbolEqualityComparer.Default);
 
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(
 				Descriptors.PX1078_TypesOfDacFieldAndReferencedFieldMismatch,
 				Descriptors.PX1078_TypesOfDacFieldAndReferencedFieldHaveDifferentSize);
 
-		private static readonly SpecialType[] TypesToExcludeFromAnalysis = {
-			SpecialType.System_Boolean, SpecialType.System_Decimal, SpecialType.System_DateTime,
-			SpecialType.System_Double, SpecialType.System_Single, SpecialType.System_Array, SpecialType.System_Object
+		private static readonly SpecialType[] TypesToExcludeFromAnalysis = 
+		{
+			SpecialType.System_Boolean, 
+			SpecialType.System_Decimal, 
+			SpecialType.System_DateTime,
+			SpecialType.System_Double, 
+			SpecialType.System_Single, 
+			SpecialType.System_Array, 
+			SpecialType.System_Object
 		};
 
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dac)
@@ -36,42 +44,43 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 			context.CancellationToken.ThrowIfCancellationRequested();
 
 			var propertiesToCheck = dac.DeclaredDacFieldPropertiesWithAcumaticaAttributes
-				.Where(x => !TypesToExcludeFromAnalysis.Contains(x.PropertyTypeUnwrappedNullable.SpecialType))
-				.Select(p => (p, TryGetForeignReferenceAttribute(pxContext, p)))
-				.Where(p => p.Item2 is not null);
+									   .Where(propertyInfo => !TypesToExcludeFromAnalysis.Contains(propertyInfo.PropertyTypeUnwrappedNullable.SpecialType))
+									   .Select(propertyInfo => (Property: propertyInfo, ForeignRefAttribute: TryGetForeignReferenceAttribute(pxContext, propertyInfo)))
+									   .Where(p => p.ForeignRefAttribute is not null);
 
-			var fieldTypeAttributesMetadataProvider = new FieldTypeAttributesMetadataProvider(pxContext);
+			FieldTypeAttributesMetadataProvider? fieldTypeAttributesMetadataProvider = null;
 
 			foreach (var (property, foreignReferenceAttribute) in propertiesToCheck)
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
 
-				CheckProperty(context, property, foreignReferenceAttribute!, dac, pxContext, fieldTypeAttributesMetadataProvider);
+				fieldTypeAttributesMetadataProvider ??= new FieldTypeAttributesMetadataProvider(pxContext);
+				CheckPropertyWithForeignAttribute(context, property, foreignReferenceAttribute!, dac, pxContext, fieldTypeAttributesMetadataProvider);
 			}
 		}
 
 		private static DacFieldAttributeInfo? TryGetForeignReferenceAttribute(PXContext pxContext, DacPropertyInfo property) =>
 			property.Attributes.FirstOrDefault(x => ContainsAttributeMatching(x, pxContext.AttributeTypes.PXSelectorAttribute.Type));
 
-		private void CheckProperty(SymbolAnalysisContext context, DacPropertyInfo property, DacFieldAttributeInfo foreignReferenceAttribute,
-			DacSemanticModel dac, PXContext pxContext, FieldTypeAttributesMetadataProvider fieldTypeAttributesMetadataProvider)
+		private void CheckPropertyWithForeignAttribute(SymbolAnalysisContext context, DacPropertyInfo property, DacFieldAttributeInfo foreignReferenceAttribute,
+													   DacSemanticModel dac, PXContext pxContext, 
+													   FieldTypeAttributesMetadataProvider fieldTypeAttributesMetadataProvider)
 		{
-			var foreignField = ExtractForeignFieldSymbol(foreignReferenceAttribute, pxContext);
+			var foreignDacField = ExtractForeignFieldSymbol(foreignReferenceAttribute, pxContext);
 
-			if (foreignField is null)
+			if (foreignDacField is null)
 				return;
 
-			var parentType = foreignField.ContainingType!;
+			var foreignDacType  = foreignDacField.ContainingType!;
+			var foreignDacModel = GetOrInferModel(foreignDacType, pxContext, cancellation: context.CancellationToken);
 
-			var foreignDac = GetOrInferModel(parentType, pxContext, cancellation: context.CancellationToken);
-
-			if (foreignDac?.PropertiesByNames.TryGetValue(foreignField.Name, out var foreignProperty) != true)
+			if (foreignDacModel?.PropertiesByNames.TryGetValue(foreignDacField.Name, out var foreignDacProperty) != true)
 				return;
 
-			var foreignCLRType = foreignProperty!.PropertyType;
+			var foreignDacPropertyType = foreignDacProperty!.PropertyType;
 
-			if (HaveDifferentUnderlyingType(property, foreignCLRType))
-				ReportTypeMismatch(context, pxContext, property, foreignProperty);
+			if (HaveDifferentUnderlyingType(property, foreignDacPropertyType))
+				ReportTypeMismatch(context, pxContext, property, foreignDacProperty);
 			else
 			{
 				var localTypeAttributes = property.Attributes.Where(
@@ -83,10 +92,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 					return;
 
 				if (PropertyTypesAreIncompatible(property)
-					|| PropertyTypesAreIncompatible(foreignProperty))
+					|| PropertyTypesAreIncompatible(foreignDacProperty))
 					return;
 
-				var foreignFieldSizes = foreignProperty!.Attributes
+				var foreignFieldSizes = foreignDacProperty!.Attributes
 					.Where(
 						x => ContainsAttributeMatching(x, pxContext.FieldAttributes.PXDBFieldAttribute)
 						|| ContainsAttributeMatchingOneOf(x, fieldTypeAttributesMetadataProvider.UnboundDacFieldTypeAttributesWithFieldType.Keys))
@@ -107,7 +116,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 				{
 					ReportTypeSizeMismatch(
 						context, pxContext, attribute, property.Name,
-						foreignProperty.Name, foreignFieldSize);
+						foreignDacProperty.Name, foreignFieldSize);
 				}
 			}
 		}
@@ -128,19 +137,27 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 			return compatibility != TypesCompatibility.CompatibleTypes;
 		}
 
-		private DacSemanticModel? GetOrInferModel(INamedTypeSymbol type, PXContext pxContext, CancellationToken cancellation)
+		private DacSemanticModel? GetOrInferModel(INamedTypeSymbol dacType, PXContext pxContext, CancellationToken cancellation)
 		{
-			return _modelsCache.TryGetValue(type, out var model)
-				? model
-				: _modelsCache[type] = DacSemanticModel.InferModel(pxContext, type, cancellation: cancellation);
+			if (_dacModelsCache.TryGetValue(dacType, out DacSemanticModel? existingDacModel))
+				return existingDacModel;
+			else
+			{
+				var newDacModel = DacSemanticModel.InferModel(pxContext, dacType, cancellation: cancellation);
+				_dacModelsCache.Add(dacType, newDacModel);
+				return newDacModel;
+			}
 		}
 
 		private static bool HaveDifferentUnderlyingType(DacPropertyInfo localProperty, ITypeSymbol foreignPropertyType) =>
 			!SymbolEqualityComparer.Default.Equals(localProperty.PropertyType, foreignPropertyType);
 
-		private static INamedTypeSymbol? ExtractForeignFieldSymbol(DacFieldAttributeInfo referenceAttribute, PXContext pxContext)
+		private static INamedTypeSymbol? ExtractForeignFieldSymbol(DacFieldAttributeInfo foreignReferenceAttribute, PXContext pxContext)
 		{
-			var argument = referenceAttribute.AttributeData.ConstructorArguments.FirstOrDefault();
+			if (foreignReferenceAttribute.AttributeData.ConstructorArguments.IsDefaultOrEmpty)
+				return null;
+
+			TypedConstant argument = foreignReferenceAttribute.AttributeData.ConstructorArguments.FirstOrDefault();
 			INamedTypeSymbol? result;
 
 			if (argument.Value is INamedTypeSymbol { IsGenericType: true } symbol)
@@ -151,16 +168,25 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 			return result?.ContainingSymbol is INamedTypeSymbol ? result : null;
 		}
 
-		private static INamedTypeSymbol? ExtractForeignFieldSymbolFromBqlSearch(INamedTypeSymbol searchType, PXContext pxContext)
+		private static INamedTypeSymbol? ExtractForeignFieldSymbolFromBqlSearch(INamedTypeSymbol bqlSearchType, PXContext pxContext)
 		{
-			return searchType.GetBaseTypesAndThis()
-							 .TakeWhile(x => x.SpecialType != SpecialType.System_Object)
-							 .OfType<INamedTypeSymbol>()
-							 .Reverse()
-							 .Where(x => x.IsGenericType && x.ImplementsInterface(pxContext.BQL.IBqlSearch))
-							 .Select(type => type.TypeArguments.FirstOrDefault(arg => arg.IsDacBqlField(pxContext)))
-							 .OfType<INamedTypeSymbol>()
-							 .FirstOrDefault();
+			var typeHierarchy = bqlSearchType.GetBaseTypesAndThis()
+											 .TakeWhile(x => x.SpecialType != SpecialType.System_Object)
+											 .OfType<INamedTypeSymbol>()
+											 .Reverse();
+
+			foreach (var bqlBaseType in typeHierarchy)
+			{
+				if (bqlBaseType.TypeArguments.IsDefaultOrEmpty || !bqlBaseType.ImplementsInterface(pxContext.BQL.IBqlSearch)) 
+					continue;
+
+				var bqlField = bqlBaseType.TypeArguments.FirstOrDefault(typeArg => typeArg.IsDacBqlField(pxContext));
+
+				if (bqlField is INamedTypeSymbol foundBqlField)
+					return foundBqlField;
+			}
+
+			return null;
 		}
 
 		private static int? GetFieldSize(DacFieldAttributeInfo attrInfo, PXContext pxContext)
