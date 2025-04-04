@@ -21,8 +21,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 {
 	public class DacFieldAndReferencedFieldMismatchAnalyzer : DacAggregatedAnalyzerBase
 	{
-		private readonly Dictionary<INamedTypeSymbol, DacSemanticModel?> _dacModelsCache = new(SymbolEqualityComparer.Default);
-
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(
 				Descriptors.PX1078_TypesOfDacFieldAndReferencedFieldMismatch,
@@ -49,13 +47,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 									   .Where(p => p.ForeignRefAttribute is not null);
 
 			FieldTypeAttributesMetadataProvider? fieldTypeAttributesMetadataProvider = null;
+			var foreignDacPropertyInfoRetriever = new ForeignDacPropertyInfoRetriever(pxContext, context.CancellationToken);
 
 			foreach (var (property, foreignReferenceAttribute) in propertiesToCheck)
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
 
 				fieldTypeAttributesMetadataProvider ??= new FieldTypeAttributesMetadataProvider(pxContext);
-				CheckPropertyWithForeignAttribute(context, property, foreignReferenceAttribute!, dac, pxContext, fieldTypeAttributesMetadataProvider);
+				CheckPropertyWithForeignAttribute(context, property, foreignReferenceAttribute!, dac, pxContext, 
+												  foreignDacPropertyInfoRetriever, fieldTypeAttributesMetadataProvider);
 			}
 		}
 
@@ -63,21 +63,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 			property.Attributes.FirstOrDefault(x => ContainsAttributeMatching(x, pxContext.AttributeTypes.PXSelectorAttribute.Type));
 
 		private void CheckPropertyWithForeignAttribute(SymbolAnalysisContext context, DacPropertyInfo property, DacFieldAttributeInfo foreignReferenceAttribute,
-													   DacSemanticModel dac, PXContext pxContext, 
+													   DacSemanticModel dac, PXContext pxContext, ForeignDacPropertyInfoRetriever foreignDacPropertyInfoRetriever,
 													   FieldTypeAttributesMetadataProvider fieldTypeAttributesMetadataProvider)
 		{
-			var foreignDacField = ExtractForeignFieldSymbol(foreignReferenceAttribute, pxContext);
+			var foreignDacProperty = foreignDacPropertyInfoRetriever.GetForeignDacPropertyInfo(foreignReferenceAttribute);
 
-			if (foreignDacField is null)
+			if (foreignDacProperty is null)
 				return;
 
-			var foreignDacType  = foreignDacField.ContainingType!;
-			var foreignDacModel = GetOrInferModel(foreignDacType, pxContext, cancellation: context.CancellationToken);
-
-			if (foreignDacModel?.PropertiesByNames.TryGetValue(foreignDacField.Name, out var foreignDacProperty) != true)
-				return;
-
-			var foreignDacPropertyType = foreignDacProperty!.PropertyType;
+			var foreignDacPropertyType = foreignDacProperty.PropertyType;
 
 			if (HaveDifferentUnderlyingType(property, foreignDacPropertyType))
 				ReportTypeMismatch(context, pxContext, property, foreignDacProperty);
@@ -137,57 +131,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 			return compatibility != TypesCompatibility.CompatibleTypes;
 		}
 
-		private DacSemanticModel? GetOrInferModel(INamedTypeSymbol dacType, PXContext pxContext, CancellationToken cancellation)
-		{
-			if (_dacModelsCache.TryGetValue(dacType, out DacSemanticModel? existingDacModel))
-				return existingDacModel;
-			else
-			{
-				var newDacModel = DacSemanticModel.InferModel(pxContext, dacType, cancellation: cancellation);
-				_dacModelsCache.Add(dacType, newDacModel);
-				return newDacModel;
-			}
-		}
-
 		private static bool HaveDifferentUnderlyingType(DacPropertyInfo localProperty, ITypeSymbol foreignPropertyType) =>
 			!SymbolEqualityComparer.Default.Equals(localProperty.PropertyType, foreignPropertyType);
-
-		private static INamedTypeSymbol? ExtractForeignFieldSymbol(DacFieldAttributeInfo foreignReferenceAttribute, PXContext pxContext)
-		{
-			if (foreignReferenceAttribute.AttributeData.ConstructorArguments.IsDefaultOrEmpty)
-				return null;
-
-			TypedConstant argument = foreignReferenceAttribute.AttributeData.ConstructorArguments.FirstOrDefault();
-			INamedTypeSymbol? result;
-
-			if (argument.Value is INamedTypeSymbol { IsGenericType: true } symbol)
-				result = ExtractForeignFieldSymbolFromBqlSearch(symbol, pxContext);
-			else
-				result = argument.Value as INamedTypeSymbol;
-
-			return result?.ContainingSymbol is INamedTypeSymbol ? result : null;
-		}
-
-		private static INamedTypeSymbol? ExtractForeignFieldSymbolFromBqlSearch(INamedTypeSymbol bqlSearchType, PXContext pxContext)
-		{
-			var typeHierarchy = bqlSearchType.GetBaseTypesAndThis()
-											 .TakeWhile(x => x.SpecialType != SpecialType.System_Object)
-											 .OfType<INamedTypeSymbol>()
-											 .Reverse();
-
-			foreach (var bqlBaseType in typeHierarchy)
-			{
-				if (bqlBaseType.TypeArguments.IsDefaultOrEmpty || !bqlBaseType.ImplementsInterface(pxContext.BQL.IBqlSearch)) 
-					continue;
-
-				var bqlField = bqlBaseType.TypeArguments.FirstOrDefault(typeArg => typeArg.IsDacBqlField(pxContext));
-
-				if (bqlField is INamedTypeSymbol foundBqlField)
-					return foundBqlField;
-			}
-
-			return null;
-		}
 
 		private static int? GetFieldSize(DacFieldAttributeInfo attrInfo, PXContext pxContext)
 		{
