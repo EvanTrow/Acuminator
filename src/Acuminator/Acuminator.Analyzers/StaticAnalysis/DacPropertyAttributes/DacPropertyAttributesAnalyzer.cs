@@ -213,16 +213,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacPropertyAttributes
 		}
 
 		private static void CheckAttributeAndPropertyTypesForCompatibility(DacPropertyInfo property, DacFieldAttributeInfo dataTypeAttribute, 
-																		   TypesCompatibility compatibility, PXContext pxContext, 
+																		   CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes compatibility, PXContext pxContext, 
 																		   SymbolAnalysisContext symbolContext)
 		{
-			if (compatibility == TypesCompatibility.MissingTypeAnnotation)
+			if (compatibility == CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.NoDataTypeAttributes)
 			{
 				ReportIncompatibleTypesDiagnostics(property, dataTypeAttribute, symbolContext, pxContext, registerCodeFix: false);
 				return;
 			}
 
-			if (compatibility == TypesCompatibility.IncompatibleTypes)
+			if (compatibility == CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.IncompatibleTypes)
 			{
 				ReportIncompatibleTypesDiagnostics(property, dataTypeAttribute, symbolContext, pxContext, registerCodeFix: true);
 			}

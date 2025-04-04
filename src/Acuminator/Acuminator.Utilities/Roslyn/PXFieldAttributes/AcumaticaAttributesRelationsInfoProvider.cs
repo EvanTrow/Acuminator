@@ -392,7 +392,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			return new(typeAttributesOnDacProperty, typeAttributesWithDifferentDataTypesOnAggregator, hasNonNullDataType);
 		}
 
-		public static TypesCompatibility CheckCompatibility(this DacPropertyInfo property, DacFieldAttributeInfo dataTypeAttribute)
+		public static CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes CheckCompatibility(this DacPropertyInfo property, DacFieldAttributeInfo dataTypeAttribute)
 		{
 			var distinctClrTypesFromDataTypeAttributes =
 				dataTypeAttribute.AggregatedAttributeMetadata
@@ -404,19 +404,19 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			{
 				case 0:
 					//PXDBFieldAttribute and PXEntityAttribute without data type case
-					return TypesCompatibility.MissingTypeAnnotation;
+					return CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.NoDataTypeAttributes;
 
 				case 1:
 					var dataTypeFromAttributes = distinctClrTypesFromDataTypeAttributes.FirstOrDefault();
 
 					if (dataTypeFromAttributes.Equals(property.PropertyTypeUnwrappedNullable, SymbolEqualityComparer.Default))
-						return TypesCompatibility.CompatibleTypes;
+						return CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.CompatibleTypes;
 						
-					return TypesCompatibility.IncompatibleTypes;
+					return CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.IncompatibleTypes;
 
 				default:
 					// Data type attributes correspond to more than one CLR type 
-					return TypesCompatibility.IncompatibleTypes;
+					return CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.IncompatibleTypes;
 			}
 		}
 	}

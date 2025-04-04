@@ -128,7 +128,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 
 			var compatibility = property.CheckCompatibility(typeAttributesOnDacProperty![0]);
 
-			return compatibility != TypesCompatibility.CompatibleTypes;
+			return compatibility != CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.CompatibleTypes;
 		}
 
 		private static bool HaveDifferentUnderlyingType(DacPropertyInfo localProperty, ITypeSymbol foreignPropertyType) =>
