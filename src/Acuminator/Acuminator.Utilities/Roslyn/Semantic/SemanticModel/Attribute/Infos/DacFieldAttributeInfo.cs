@@ -62,6 +62,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Attribute
 			IsAcumaticaAttribute         = isAcumaticaAttribute;
 		}
 
+		public bool AggregatesAttribute(ITypeSymbol? attributeTypeToCheck) =>
+			FlattenedAcumaticaAttributes.Any(attr => attr.Type.Equals(attributeTypeToCheck, SymbolEqualityComparer.Default));
+
+		public bool AggregatesOneOfAttributes(IEnumerable<ITypeSymbol> attributeTypesToCheck) =>
+			attributeTypesToCheck.CheckIfNull().Any(AggregatesAttribute);		
+
 		public static DacFieldAttributeInfo Create(AttributeData attribute, DbBoundnessCalculator dbBoundnessCalculator, int declarationOrder) =>
 			CreateUnsafe(attribute.CheckIfNull(), dbBoundnessCalculator.CheckIfNull(), declarationOrder);
 

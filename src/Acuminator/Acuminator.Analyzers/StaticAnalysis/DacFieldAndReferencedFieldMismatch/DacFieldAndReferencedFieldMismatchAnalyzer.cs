@@ -184,12 +184,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 				attribute.AttributeClass!,
 				SymbolEqualityComparer.Default);
 
-		private static bool ContainsAttributeMatching(DacFieldAttributeInfo attrInfo, ITypeSymbol expectedType) =>
-			attrInfo.FlattenedAcumaticaAttributes.Any(attr => attr.Type.Equals(expectedType, SymbolEqualityComparer.Default));
-
-		private static bool ContainsAttributeMatchingOneOf(DacFieldAttributeInfo attrInfo, IEnumerable<ITypeSymbol> types) =>
-			attrInfo.FlattenedAcumaticaAttributes.Select(x => x.Type).Intersect(types, SymbolEqualityComparer.Default).Any();
-
 		private static void ReportTypeMismatch(SymbolAnalysisContext context, PXContext pxContext, DacPropertyInfo property,
 			DacPropertyInfo referencedProperty)
 		{
