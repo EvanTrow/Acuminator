@@ -1,49 +1,16 @@
-﻿#nullable enable
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+
+using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Constants;
 
 using Microsoft.CodeAnalysis;
-using Acuminator.Utilities.Roslyn.Constants;
-using System.Collections.Immutable;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 {
 	public class DataTypeAttributeSymbols : SymbolsSetBase
 	{
-		internal DataTypeAttributeSymbols(Compilation compilation) : base(compilation)
-		{
-			var types = new List<INamedTypeSymbol?>() {
-				PXDBStringAttribute,
-				PXStringAttribute,
-				PXDBBinaryAttribute,
-				PXDBDecimalAttribute,
-				PXDecimalAttribute,
-				PXDBDoubleAttribute,
-				PXDoubleAttribute,
-				PXDBFloatAttribute,
-				PXFloatAttribute,
-			};
-
-			DataAttributesWithLength = types.ToImmutableArray()!;
-
-			DataAttributesWithHardcodedLength = new[]
-			{
-				(Compilation.GetTypeByMetadataName(TypeFullNames.PXDBBaseScreenIDAttribute), 8),
-				(Compilation.GetTypeByMetadataName(TypeFullNames.PXDBWeblinkAttribute), 255),
-				(Compilation.GetTypeByMetadataName(TypeFullNames.PXDBEmailAttribute), 255),
-				(Compilation.GetTypeByMetadataName(TypeFullNames.PersonDisplayNameAttribute), 255),
-				(Compilation.GetTypeByMetadataName(TypeFullNames.RMColorAttribute), 8),
-				(Compilation.GetTypeByMetadataName(TypeFullNames.RMFontNameAttribute), 30),
-				(Compilation.GetTypeByMetadataName(TypeFullNames.ContactDisplayNameAttribute), 255),
-				(Compilation.GetTypeByMetadataName(TypeFullNames.PXAttributeValueAttribute), 255),
-				(Compilation.GetTypeByMetadataName(TypeFullNames.CuryIDStringAttribute), 5),
-				(Compilation.GetTypeByMetadataName(TypeFullNames.TaxIDAttribute), 60),
-			}
-			.Where(x => x.Item1 is not null)
-			.ToImmutableDictionary<(INamedTypeSymbol?, int), INamedTypeSymbol, int>(x => x.Item1!, x => x.Item2, SymbolEqualityComparer.Default);
-		}
-
 		#region Field Unbound Attributes
 		public INamedTypeSymbol PXLongAttribute => Compilation.GetTypeByMetadataName(TypeFullNames.PXLongAttribute)!;
 		public INamedTypeSymbol PXIntAttribute => Compilation.GetTypeByMetadataName(TypeFullNames.PXIntAttribute)!;
@@ -110,5 +77,39 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 		public ImmutableArray<INamedTypeSymbol> DataAttributesWithLength { get; }
 
 		public ImmutableDictionary<INamedTypeSymbol, int> DataAttributesWithHardcodedLength { get; }
+
+		internal DataTypeAttributeSymbols(Compilation compilation) : base(compilation)
+		{
+			DataAttributesWithLength = new[]
+			{
+				PXDBStringAttribute,
+				PXStringAttribute,
+				PXDBBinaryAttribute,
+				PXDBDecimalAttribute,
+				PXDecimalAttribute,
+				PXDBDoubleAttribute,
+				PXDoubleAttribute,
+				PXDBFloatAttribute,
+				PXFloatAttribute
+			}
+			.ToImmutableArray();
+
+			DataAttributesWithHardcodedLength = new (INamedTypeSymbol? AttributeType, int Size)[]
+			{
+				(Compilation.GetTypeByMetadataName(TypeFullNames.AttributesWithHardCodedLength.PXDBBaseScreenIDAttribute), 8),
+				(Compilation.GetTypeByMetadataName(TypeFullNames.AttributesWithHardCodedLength.PXDBWeblinkAttribute), 255),
+				(Compilation.GetTypeByMetadataName(TypeFullNames.AttributesWithHardCodedLength.PXDBEmailAttribute), 255),
+				(Compilation.GetTypeByMetadataName(TypeFullNames.AttributesWithHardCodedLength.PersonDisplayNameAttribute), 255),
+				(Compilation.GetTypeByMetadataName(TypeFullNames.AttributesWithHardCodedLength.RMColorAttribute), 8),
+				(Compilation.GetTypeByMetadataName(TypeFullNames.AttributesWithHardCodedLength.RMFontNameAttribute), 30),
+				(Compilation.GetTypeByMetadataName(TypeFullNames.AttributesWithHardCodedLength.ContactDisplayNameAttribute), 255),
+				(Compilation.GetTypeByMetadataName(TypeFullNames.AttributesWithHardCodedLength.PXAttributeValueAttribute), 255),
+				(Compilation.GetTypeByMetadataName(TypeFullNames.AttributesWithHardCodedLength.CuryIDStringAttribute), 5),
+				(Compilation.GetTypeByMetadataName(TypeFullNames.AttributesWithHardCodedLength.TaxIDAttribute), 60),
+			}
+			.Where(p => p.AttributeType is not null)
+			.Select(p => KeyValuePair.Create(p.AttributeType!, p.Size))
+			.ToImmutableDictionary(SymbolEqualityComparer.Default);
+		}
 	}
 }

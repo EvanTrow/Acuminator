@@ -46,17 +46,20 @@
 		internal const string PXGuidAttribute = "PX.Data.PXGuidAttribute";
 		internal const string PXBoolAttribute = "PX.Data.PXBoolAttribute";
 		internal const string PXVariantAttribute = "PX.Data.PXVariantAttribute";
-		internal const string PXDBBaseScreenIDAttribute = "PX.Data.PXDBBaseScreenIDAttribute";
-		internal const string PXDBWeblinkAttribute = "PX.Data.PXDBWeblinkAttribute";
-		internal const string PXDBEmailAttribute = "PX.Data.PXDBEmailAttribute";
-		internal const string PersonDisplayNameAttribute = "PX.SM.PersonDisplayNameAttribute";
-		internal const string RMColorAttribute = "PX.CS.RMColorAttribute";
-		internal const string RMFontNameAttribute = "PX.CS.RMFontNameAttribute";
-		internal const string ContactDisplayNameAttribute = "PX.Objects.CR.ContactDisplayNameAttribute";
-		internal const string PXAttributeValueAttribute = "PX.Objects.CS.PXAttributeValueAttribute";
-		internal const string CuryIDStringAttribute = "PX.Objects.CM.Extensions.CurrencyInfo.CuryIDStringAttribute";
-		internal const string TaxIDAttribute = "PX.Objects.TX.TaxIDAttribute";
 
+		internal static class AttributesWithHardCodedLength
+		{
+			public const string PXDBBaseScreenIDAttribute = "PX.Data.PXDBBaseScreenIDAttribute";
+			public const string PXDBWeblinkAttribute = "PX.Data.PXDBWeblinkAttribute";
+			public const string PXDBEmailAttribute = "PX.Data.PXDBEmailAttribute";
+			public const string PersonDisplayNameAttribute = "PX.SM.PersonDisplayNameAttribute";
+			public const string RMColorAttribute = "PX.CS.RMColorAttribute";
+			public const string RMFontNameAttribute = "PX.CS.RMFontNameAttribute";
+			public const string ContactDisplayNameAttribute = "PX.Objects.CR.ContactDisplayNameAttribute";
+			public const string PXAttributeValueAttribute = "PX.Objects.CS.PXAttributeValueAttribute";
+			public const string CuryIDStringAttribute = "PX.Objects.CM.Extensions.CurrencyInfo.CuryIDStringAttribute";
+			public const string TaxIDAttribute = "PX.Objects.TX.TaxIDAttribute";
+		}
 
 		internal const string PXDBFieldAttribute = "PX.Data.PXDBFieldAttribute";
 
