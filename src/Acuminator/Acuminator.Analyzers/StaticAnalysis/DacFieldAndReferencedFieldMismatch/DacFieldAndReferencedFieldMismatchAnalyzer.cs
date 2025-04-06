@@ -43,28 +43,26 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 
 			var propertiesToCheck = dac.DeclaredDacFieldPropertiesWithAcumaticaAttributes
 									   .Where(propertyInfo => !TypesToExcludeFromAnalysis.Contains(propertyInfo.PropertyTypeUnwrappedNullable.SpecialType))
-									   .Select(propertyInfo => (Property: propertyInfo, ForeignRefAttribute: TryGetForeignReferenceAttribute(pxContext, propertyInfo)))
+									   .Select(propertyInfo => (Property: propertyInfo, 
+																ForeignRefAttribute: TryGetForeignReferenceAttribute(pxContext, propertyInfo)))
 									   .Where(p => p.ForeignRefAttribute is not null);
 
-			FieldTypeAttributesMetadataProvider? fieldTypeAttributesMetadataProvider = null;
 			var foreignDacPropertyInfoRetriever = new ForeignDacPropertyInfoRetriever(pxContext, context.CancellationToken);
 
 			foreach (var (property, foreignReferenceAttribute) in propertiesToCheck)
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
-
-				fieldTypeAttributesMetadataProvider ??= new FieldTypeAttributesMetadataProvider(pxContext);
 				CheckPropertyWithForeignAttribute(context, property, foreignReferenceAttribute!, dac, pxContext, 
-												  foreignDacPropertyInfoRetriever, fieldTypeAttributesMetadataProvider);
+												  foreignDacPropertyInfoRetriever);
 			}
 		}
 
 		private static DacFieldAttributeInfo? TryGetForeignReferenceAttribute(PXContext pxContext, DacPropertyInfo property) =>
-			property.Attributes.FirstOrDefault(x => ContainsAttributeMatching(x, pxContext.AttributeTypes.PXSelectorAttribute.Type));
+			property.Attributes.FirstOrDefault(attrInfo => attrInfo.AggregatesAttribute(pxContext.AttributeTypes.PXSelectorAttribute.Type));
 
-		private void CheckPropertyWithForeignAttribute(SymbolAnalysisContext context, DacPropertyInfo property, DacFieldAttributeInfo foreignReferenceAttribute,
-													   DacSemanticModel dac, PXContext pxContext, ForeignDacPropertyInfoRetriever foreignDacPropertyInfoRetriever,
-													   FieldTypeAttributesMetadataProvider fieldTypeAttributesMetadataProvider)
+		private void CheckPropertyWithForeignAttribute(SymbolAnalysisContext context, DacPropertyInfo localDacProperty,
+													   DacFieldAttributeInfo foreignReferenceAttribute, DacSemanticModel dac, PXContext pxContext,
+													   ForeignDacPropertyInfoRetriever foreignDacPropertyInfoRetriever)
 		{
 			var foreignDacProperty = foreignDacPropertyInfoRetriever.GetForeignDacPropertyInfo(foreignReferenceAttribute);
 
@@ -73,75 +71,63 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 
 			var foreignDacPropertyType = foreignDacProperty.PropertyType;
 
-			if (HaveDifferentUnderlyingType(property, foreignDacPropertyType))
-				ReportTypeMismatch(context, pxContext, property, foreignDacProperty);
-			else
+			if (ArePropertyTypesDifferent(localDacProperty, foreignDacPropertyType))
 			{
-				var localTypeAttributes = property.Attributes.Where(
-					x => ContainsAttributeMatching(x, pxContext.FieldAttributes.PXDBFieldAttribute)
-					|| ContainsAttributeMatchingOneOf(x, fieldTypeAttributesMetadataProvider.UnboundDacFieldTypeAttributesWithFieldType.Keys))
-					.ToList(property.Attributes.Length);
+				ReportTypeMismatch(context, pxContext, localDacProperty, foreignDacProperty);
+				return;
+			}
 
-				if (localTypeAttributes.Count == 0)
-					return;
+			if (!localDacProperty.HasNonNullDataType ||
+				!IsPropertyTypeCompatibleWithDataTypeAttributes(localDacProperty) ||
+				!IsPropertyTypeCompatibleWithDataTypeAttributes(foreignDacProperty))
+			{
+				return;
+			}
 
-				if (PropertyTypesAreIncompatible(property)
-					|| PropertyTypesAreIncompatible(foreignDacProperty))
-					return;
+			var foreignFieldSizes = foreignDacProperty!.DeclaredDataTypeAttributes
+													   .AllDeclaredDatatypeAttributesOnDacProperty
+													   .Select(dataTypeAttr => GetFieldSize(dataTypeAttr, pxContext))
+													   .OfType<int>()
+													   .ToList();
 
-				var foreignFieldSizes = foreignDacProperty!.Attributes
-					.Where(
-						x => ContainsAttributeMatching(x, pxContext.FieldAttributes.PXDBFieldAttribute)
-						|| ContainsAttributeMatchingOneOf(x, fieldTypeAttributesMetadataProvider.UnboundDacFieldTypeAttributesWithFieldType.Keys))
-					.Select(x => GetFieldSize(x, pxContext))
-					.OfType<int>()
-					.ToList();
+			// agreed to stop checking property here as the code may be incomplete at this point
+			if (foreignFieldSizes.Count != 1)
+				return;
 
-				// agreed to stop checking property here as the code may be incomplete at this point
-				if (foreignFieldSizes.Count != 1)
-					return;
+			var foreignFieldSize = foreignFieldSizes[0];
 
-				var foreignFieldSize = foreignFieldSizes[0];
+			var attributesWithSizeMismatch = foreignDacProperty!.DeclaredDataTypeAttributes
+													   .AllDeclaredDatatypeAttributesOnDacProperty.Select(x => (x, GetFieldSize(x, pxContext)))
+																				  .Where(x => x.Item2 is not null && x.Item2 != foreignFieldSize);
 
-				var attributesWithSizeMismatch = localTypeAttributes.Select(x => (x, GetFieldSize(x, pxContext)))
-																	.Where(x => x.Item2 is not null && x.Item2 != foreignFieldSize);
-
-				foreach (var (attribute, size) in attributesWithSizeMismatch)
-				{
-					ReportTypeSizeMismatch(
-						context, pxContext, attribute, property.Name,
-						foreignDacProperty.Name, foreignFieldSize);
-				}
+			foreach (var (attribute, size) in attributesWithSizeMismatch)
+			{
+				ReportTypeSizeMismatch(
+					context, pxContext, attribute, localDacProperty.Name,
+					foreignDacProperty.Name, foreignFieldSize);
 			}
 		}
 
-		private static bool PropertyTypesAreIncompatible(DacPropertyInfo property)
+		private static bool ArePropertyTypesDifferent(DacPropertyInfo localDacProperty, ITypeSymbol foreignPropertyType) =>
+			!SymbolEqualityComparer.Default.Equals(localDacProperty.PropertyType, foreignPropertyType);
+
+		private static bool IsPropertyTypeCompatibleWithDataTypeAttributes(DacPropertyInfo property)
 		{
-			var attributesWithFieldTypeMetadata = property.Attributes
-														  .Where(aInfo => !aInfo.AggregatedAttributeMetadata.IsDefaultOrEmpty)
-														  .ToList(capacity: property.Attributes.Length);
-			var (typeAttributesOnDacProperty, typeAttributesWithDifferentDataTypesOnAggregator, _) =
-				attributesWithFieldTypeMetadata.FilterTypeAttributes();
-
-			if (typeAttributesWithDifferentDataTypesOnAggregator?.Count > 0)
+			if (!property.DeclaredDataTypeAttributes.DeclaredDataTypeAttributesWithMultipleAggregatedDataTypes.IsDefaultOrEmpty)
 				return false;
-
-			var compatibility = property.CheckCompatibility(typeAttributesOnDacProperty![0]);
-
-			return compatibility != CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.CompatibleTypes;
+			
+			return property.EffectivePropertyAndDataTypeAttributeTypesCompatibility == 
+				   CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.CompatibleTypes;
 		}
 
-		private static bool HaveDifferentUnderlyingType(DacPropertyInfo localProperty, ITypeSymbol foreignPropertyType) =>
-			!SymbolEqualityComparer.Default.Equals(localProperty.PropertyType, foreignPropertyType);
-
-		private static int? GetFieldSize(DacFieldAttributeInfo attrInfo, PXContext pxContext)
+		private static int? GetFieldSize(DacFieldAttributeInfo declaredDataTypeAttribute, PXContext pxContext)
 		{
-			var lengthCtorArguments = attrInfo.FlattenedAcumaticaAttributes
-					.Select(x => x.Application)
-					.Select(attr => GetLengthConstructorArgument(attr, pxContext))
-					.OfType<int>()
-					.Distinct()
-					.ToList(attrInfo.FlattenedAcumaticaAttributes.Count);
+			var lengthCtorArguments = 
+				declaredDataTypeAttribute.FlattenedAcumaticaAttributes
+										 .Select(aggregatedAttr => GetLengthConstructorArgument(aggregatedAttr.Application, pxContext))
+										.OfType<int>()
+										.Distinct()
+										.ToList(declaredDataTypeAttribute.FlattenedAcumaticaAttributes.Count);
 
 			bool hasLength = lengthCtorArguments?.Count > 0;
 
