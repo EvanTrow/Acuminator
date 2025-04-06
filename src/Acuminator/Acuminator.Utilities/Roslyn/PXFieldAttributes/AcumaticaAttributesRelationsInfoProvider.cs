@@ -352,35 +352,5 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		private static IEnumerable<ITypeSymbol> GetAllDeclaredAcumaticaAttributesOnClassHierarchy(ITypeSymbol type, PXContext pxContext) =>
 			type.GetAllAttributesDefinedOnThisAndBaseTypes()
 				.Where(attribute => attribute.IsDerivedFromPXEventSubscriberAttribute(pxContext));
-
-		
-
-		public static CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes CheckCompatibility(this DacPropertyInfo property, DacFieldAttributeInfo dataTypeAttribute)
-		{
-			var distinctClrTypesFromDataTypeAttributes =
-				dataTypeAttribute.AggregatedAttributeMetadata
-								 .Where(atrMetadata => atrMetadata.IsFieldAttribute && atrMetadata.DataType != null)
-								 .Select(atrMetadata => atrMetadata.DataType!)
-								 .ToHashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
-
-			switch (distinctClrTypesFromDataTypeAttributes.Count)
-			{
-				case 0:
-					//PXDBFieldAttribute and PXEntityAttribute without data type case
-					return CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.NoDataTypeAttributes;
-
-				case 1:
-					var dataTypeFromAttributes = distinctClrTypesFromDataTypeAttributes.FirstOrDefault();
-
-					if (dataTypeFromAttributes.Equals(property.PropertyTypeUnwrappedNullable, SymbolEqualityComparer.Default))
-						return CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.CompatibleTypes;
-						
-					return CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.IncompatibleTypes;
-
-				default:
-					// Data type attributes correspond to more than one CLR type 
-					return CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.IncompatibleTypes;
-			}
-		}
 	}
 }
