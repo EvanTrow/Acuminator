@@ -41,7 +41,7 @@ public sealed class DataTypeAttributesOnDacProperty
 		DeclaredDataTypeAttributesWithMultipleAggregatedDataTypes = declaredDataTypeAttributesWithMultipleAggregatedDataTypes?.ToImmutableArray() ?? 
 																	ImmutableArray<DacFieldAttributeInfo>.Empty;
 
-		PropertyAndDataTypeAttributeTypesCompatibility = GetPropertyAndDataTypeAttributesTypesCompatibility();
+		PropertyAndDataTypeAttributeTypesCompatibility = _property.GetPropertyAndDataTypeAttributesTypesCompatibility(DataTypesFromDataTypeAttributes);
 	}
 
 	public static DataTypeAttributesOnDacProperty CollectDataTypeAttributesFromDacProperty(DacPropertyInfo property)
@@ -101,27 +101,5 @@ public sealed class DataTypeAttributesOnDacProperty
 
 		return new DataTypeAttributesOnDacProperty(property, allDataTypesFromDataTypeAttributes, allDeclaredDatatypeAttributesOnDacProperty, 
 												   declaredDataTypeAttributesWithMultipleAggregatedDataTypes);
-	}
-
-	private CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes GetPropertyAndDataTypeAttributesTypesCompatibility()
-	{
-		switch (DataTypesFromDataTypeAttributes.Length)
-		{
-			case 0:
-				//PXDBFieldAttribute and PXEntityAttribute without data type case
-				return CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.NoDataTypeAttributes;
-
-			case 1:
-				var dataTypeFromAttributes = DataTypesFromDataTypeAttributes[0];
-
-				if (dataTypeFromAttributes.Equals(_property.PropertyTypeUnwrappedNullable, SymbolEqualityComparer.Default))
-					return CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.CompatibleTypes;
-				else
-					return CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.IncompatibleTypes;
-
-			default:
-				// Data type attributes configure more than one CLR type for a DAC field
-				return CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.IncompatibleTypes;
-		}
 	}
 }
