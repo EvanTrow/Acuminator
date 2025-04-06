@@ -61,7 +61,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacPropertyAttributes
 				return;
 
 			CheckForCalcedOnDbSideAndUnboundTypeAttributes(symbolContext, pxContext, property, attributesWithFieldTypeMetadata);
-			CheckForFieldTypeAttributes(property, symbolContext, pxContext, attributesWithFieldTypeMetadata);
+			CheckDacFieldDataTypeAttributes(property, symbolContext, pxContext, attributesWithFieldTypeMetadata);
 		}
 	
 		private static bool CheckForMultipleAttributesCalcedOnDbSide(SymbolAnalysisContext symbolContext, PXContext pxContext,
@@ -180,51 +180,49 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacPropertyAttributes
 			}
 		}
 
-		private static void CheckForFieldTypeAttributes(DacPropertyInfo property, SymbolAnalysisContext symbolContext, PXContext pxContext,
-														List<DacFieldAttributeInfo> attributesWithFieldTypeMetadata)
+		private static void CheckDacFieldDataTypeAttributes(DacPropertyInfo property, SymbolAnalysisContext symbolContext, PXContext pxContext,
+															List<DacFieldAttributeInfo> attributesWithFieldTypeMetadata)
 		{
-			if (property.EffectiveDbBoundness == DbBoundnessType.NotDefined)
-				return;
-
-			var (typeAttributesOnDacProperty, typeAttributesWithDifferentDataTypesOnAggregator, hasNonNullDataType) = 
-				attributesWithFieldTypeMetadata.FilterTypeAttributes();
-
-			if (typeAttributesOnDacProperty.IsNullOrEmpty() || !hasNonNullDataType)
-				return;
-
-			if (typeAttributesWithDifferentDataTypesOnAggregator?.Count > 0)
+			if (property.EffectiveDbBoundness == DbBoundnessType.NotDefined ||
+				property.DeclaredDataTypeAttributes.AllDeclaredDatatypeAttributesOnDacProperty.IsDefaultOrEmpty || !property.HasNonNullDataType)
 			{
-				RegisterDiagnosticForAttributes(symbolContext, pxContext, typeAttributesWithDifferentDataTypesOnAggregator,
+				return;
+			}
+
+			var dataTypeAttributesWithDifferentDataTypesOnAggregator = 
+				property.DeclaredDataTypeAttributes.DeclaredDataTypeAttributesWithMultipleAggregatedDataTypes;
+
+			if (!dataTypeAttributesWithDifferentDataTypesOnAggregator.IsDefaultOrEmpty)
+			{
+				RegisterDiagnosticForAttributes(symbolContext, pxContext, dataTypeAttributesWithDifferentDataTypesOnAggregator,
 												Descriptors.PX1023_MultipleTypeAttributesOnAggregators);
 			}
 
-			if (typeAttributesOnDacProperty.Count > 1)					
+			if (property.DeclaredDataTypeAttributes.AllDeclaredDatatypeAttributesOnDacProperty.Length > 1)
 			{
-				RegisterDiagnosticForAttributes(symbolContext, pxContext, typeAttributesOnDacProperty,
+				RegisterDiagnosticForAttributes(symbolContext, pxContext, 
+												property.DeclaredDataTypeAttributes.AllDeclaredDatatypeAttributesOnDacProperty,
 												Descriptors.PX1023_MultipleTypeAttributesOnProperty);
 			} 
-			else if (typeAttributesWithDifferentDataTypesOnAggregator?.Count is null or 0)
-			{
-				var compatibility = property.CheckCompatibility(typeAttributesOnDacProperty[0]);
-		
-				CheckAttributeAndPropertyTypesForCompatibility(property, typeAttributesOnDacProperty[0], compatibility, 
-					pxContext, symbolContext);
+			else if (dataTypeAttributesWithDifferentDataTypesOnAggregator.IsDefaultOrEmpty)
+			{		
+				CheckDataTypeAttributeAndPropertyTypeForCompatibility(property, pxContext, symbolContext);
 			}			
 		}
 
-		private static void CheckAttributeAndPropertyTypesForCompatibility(DacPropertyInfo property, DacFieldAttributeInfo dataTypeAttribute, 
-																		   CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes compatibility, PXContext pxContext, 
-																		   SymbolAnalysisContext symbolContext)
+		private static void CheckDataTypeAttributeAndPropertyTypeForCompatibility(DacPropertyInfo property, PXContext pxContext, 
+																				 SymbolAnalysisContext symbolContext)
 		{
-			if (compatibility == CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.NoDataTypeAttributes)
-			{
-				ReportIncompatibleTypesDiagnostics(property, dataTypeAttribute, symbolContext, pxContext, registerCodeFix: false);
-				return;
-			}
+			var dataTypeAttribute = property.DeclaredDataTypeAttributes.AllDeclaredDatatypeAttributesOnDacProperty[0];
 
-			if (compatibility == CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.IncompatibleTypes)
+			switch (property.EffectivePropertyAndDataTypeAttributeTypesCompatibility)
 			{
-				ReportIncompatibleTypesDiagnostics(property, dataTypeAttribute, symbolContext, pxContext, registerCodeFix: true);
+				case CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.NoDataTypeAttributes:
+					ReportIncompatibleTypesDiagnostics(property, dataTypeAttribute, symbolContext, pxContext, registerCodeFix: false);
+					return;
+				case CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.IncompatibleTypes:
+					ReportIncompatibleTypesDiagnostics(property, dataTypeAttribute, symbolContext, pxContext, registerCodeFix: true);
+					return;
 			}
 		}
 
@@ -257,15 +255,30 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacPropertyAttributes
 		}
 
 		private static void RegisterDiagnosticForAttributes(SymbolAnalysisContext symbolContext, PXContext pxContext,
-															IEnumerable<DacFieldAttributeInfo> attributesToReport, DiagnosticDescriptor diagnosticDescriptor)
+															IEnumerable<DacFieldAttributeInfo> attributesToReport, DiagnosticDescriptor diagnosticDescriptor) =>
+			RegisterDiagnosticForAttributes(symbolContext, pxContext,
+											attributesToReport.Select(a => a.AttributeData.GetLocation(symbolContext.CancellationToken)
+																						  .NullIfLocationKindIsNone()),
+											diagnosticDescriptor);
+
+		// Second oveload to prevent the boxing of immutable array
+		private static void RegisterDiagnosticForAttributes(SymbolAnalysisContext symbolContext, PXContext pxContext,
+															ImmutableArray<DacFieldAttributeInfo> attributesToReport, DiagnosticDescriptor diagnosticDescriptor) =>
+			RegisterDiagnosticForAttributes(symbolContext, pxContext, 
+											attributesToReport.Select(a => a.AttributeData.GetLocation(symbolContext.CancellationToken)
+																						  .NullIfLocationKindIsNone()), 
+											diagnosticDescriptor);
+		
+
+		private static void RegisterDiagnosticForAttributes(SymbolAnalysisContext symbolContext, PXContext pxContext,
+															IEnumerable<Location?> attributeLocations, DiagnosticDescriptor diagnosticDescriptor)
 		{
-			Location[] attributeLocations = attributesToReport.Select(a => a.AttributeData.GetLocation(symbolContext.CancellationToken))
-															  .Where(location => location != null)
-															  .ToArray()!;
-			foreach (Location location in attributeLocations)
+			IEnumerable<Location> attributeLocationsToReport = attributeLocations.Where(location => location != null)!;
+
+			foreach (Location location in attributeLocationsToReport)
 			{
 				symbolContext.ReportDiagnosticWithSuppressionCheck(
-					Diagnostic.Create(diagnosticDescriptor, location), 
+					Diagnostic.Create(diagnosticDescriptor, location),
 					pxContext.CodeAnalysisSettings);
 			}
 		}
