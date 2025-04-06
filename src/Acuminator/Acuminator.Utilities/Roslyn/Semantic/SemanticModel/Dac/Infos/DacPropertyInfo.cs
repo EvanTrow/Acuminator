@@ -71,11 +71,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 		public bool IsAutoNumbering { get; }
 
-		public DataTypeAttributesOnDacProperty DeclaredTypesFromDataTypeAttributes { get; }
+		public DataTypeAttributesOnDacProperty DeclaredDataTypeAttributes { get; }
 
 		/// <inheritdoc cref="DataTypeAttributesOnDacProperty.DataTypesFromDataTypeAttributes"/>
 		public ImmutableArray<ITypeSymbol> DeclaredDataTypesFromDataTypeAttributes => 
-			DeclaredTypesFromDataTypeAttributes.DataTypesFromDataTypeAttributes;
+			DeclaredDataTypeAttributes.DataTypesFromDataTypeAttributes;
 
 		/// <summary>
 		/// Data types configured from data type attributes declared on this DAC field property and its base properties.
@@ -131,9 +131,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			HasAcumaticaAttributesDeclared  = hasAcumaticaAttributes;
 			HasAcumaticaAttributesEffective = hasAcumaticaAttributes;
 
-			DeclaredTypesFromDataTypeAttributes		 = DataTypeAttributesOnDacProperty.CollectDataTypeAttributesFromDacProperty(this);
-			EffectiveDataTypesFromDataTypeAttributes = DeclaredTypesFromDataTypeAttributes.DataTypesFromDataTypeAttributes;
-			EffectivePropertyAndDataTypeAttributeTypesCompatibility = DeclaredTypesFromDataTypeAttributes.PropertyAndDataTypeAttributeTypesCompatibility;
+			DeclaredDataTypeAttributes = DataTypeAttributesOnDacProperty.CollectDataTypeAttributesFromDacProperty(this);
+			EffectiveDataTypesFromDataTypeAttributes = DeclaredDataTypeAttributes.DataTypesFromDataTypeAttributes;
+			EffectivePropertyAndDataTypeAttributeTypesCompatibility = DeclaredDataTypeAttributes.PropertyAndDataTypeAttributeTypesCompatibility;
 		}
 
 		public static DacPropertyInfo Create(PXContext context, PropertyDeclarationSyntax? node, IPropertySymbol property, int declarationOrder,
@@ -179,7 +179,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			if (baseProperty.HasNonNullDataType)
 			{
 				EffectiveDataTypesFromDataTypeAttributes = baseProperty.EffectiveDataTypesFromDataTypeAttributes
-																	   .Concat(DeclaredTypesFromDataTypeAttributes.DataTypesFromDataTypeAttributes)
+																	   .Concat(DeclaredDataTypeAttributes.DataTypesFromDataTypeAttributes)
 																	   .Distinct<ITypeSymbol>(SymbolEqualityComparer.Default)
 																	   .ToImmutableArray();
 			}
