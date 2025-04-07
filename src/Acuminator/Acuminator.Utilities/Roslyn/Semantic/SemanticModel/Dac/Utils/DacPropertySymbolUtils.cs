@@ -1,12 +1,12 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.PXFieldAttributes;
+using Acuminator.Utilities.Roslyn.Semantic.Attribute;
+using Acuminator.Utilities.Roslyn.Semantic.SharedInfo;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -189,6 +189,30 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			}
 
 			return propertiesByName;
+		}
+
+		public static DacFieldSize GetFieldSize(this DacPropertyInfo dacProperty, PXContext pxContext)
+		{
+			var foreignFieldSizes = dacProperty.CheckIfNull().DeclaredDataTypeAttributes
+															 .AllDeclaredDatatypeAttributesOnDacProperty
+															 .Select(dataTypeAttr => dataTypeAttr.GetFieldSize(pxContext));
+
+			DacFieldSize consolidatedFieldSize = DacFieldSize.NotDefined;
+
+			foreach (DacFieldSize fieldSize in foreignFieldSizes)
+			{
+				if (fieldSize.IsNotDefined)
+					continue;
+				else if (fieldSize.IsInconsistent)
+					return DacFieldSize.MultipleSizesDeclared;			// Size is inconsistent
+
+				if (consolidatedFieldSize.IsNotDefined)
+					consolidatedFieldSize = fieldSize;
+				else if (!consolidatedFieldSize.Equals(fieldSize))
+					return DacFieldSize.MultipleSizesDeclared;			// Size is inconsistent
+			}
+
+			return consolidatedFieldSize;
 		}
 	}
 }

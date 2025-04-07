@@ -84,11 +84,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 				return;
 			}
 
-			var foreignFieldSizes = foreignDacProperty!.DeclaredDataTypeAttributes
-													   .AllDeclaredDatatypeAttributesOnDacProperty
-													   .Select(dataTypeAttr => GetFieldSize(dataTypeAttr, pxContext))
-													   .OfType<int>()
-													   .ToList();
+			context.CancellationToken.ThrowIfCancellationRequested();
+
+			DacFieldSize foreignFieldSize = foreignDacProperty.GetFieldSize(pxContext);
 
 			// agreed to stop checking property here as the code may be incomplete at this point
 			if (foreignFieldSizes.Count != 1)
@@ -119,8 +117,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 			return property.EffectivePropertyAndDataTypeAttributeTypesCompatibility == 
 				   CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.CompatibleTypes;
 		}
-
-		
 
 		private static void ReportTypeMismatch(SymbolAnalysisContext context, PXContext pxContext, DacPropertyInfo property,
 			DacPropertyInfo referencedProperty)
