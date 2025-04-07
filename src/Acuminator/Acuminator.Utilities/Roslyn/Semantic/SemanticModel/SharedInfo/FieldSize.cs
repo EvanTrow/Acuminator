@@ -19,5 +19,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.SharedInfo
 
 		[MemberNotNullWhen(returnValue: false, nameof(Value))]
 		public bool IsInconsistent => Value is null;
+
+		public override string ToString() => Value switch
+		{
+			NotDefinedValue => "not defined",
+			null 			=> "inconsistent",
+			_ 				=> Value.ToString()
+		};
 	}
 }
