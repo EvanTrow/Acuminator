@@ -120,55 +120,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 				   CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.CompatibleTypes;
 		}
 
-		private static int? GetFieldSize(DacFieldAttributeInfo declaredDataTypeAttribute, PXContext pxContext)
-		{
-			var lengthCtorArguments = 
-				declaredDataTypeAttribute.FlattenedAcumaticaAttributes
-										 .Select(aggregatedAttr => GetLengthConstructorArgument(aggregatedAttr.Application, pxContext))
-										.OfType<int>()
-										.Distinct()
-										.ToList(declaredDataTypeAttribute.FlattenedAcumaticaAttributes.Count);
-
-			bool hasLength = lengthCtorArguments?.Count > 0;
-
-			return lengthCtorArguments?.Count switch
-			{
-				0 or null => -1,
-				1 => lengthCtorArguments[0],
-				_ => null
-			};
-		}
-
-		private static int? GetLengthConstructorArgument(AttributeData attributeData, PXContext pxContext)
-		{
-			if (attributeData.AttributeClass is null)
-				return null;
-
-			if (pxContext.FieldAttributes.DataAttributesWithHardcodedLength
-					.TryGetValue(attributeData.AttributeClass, out var length))
-				return length;
-
-			if (!IsTypeWithLength(attributeData, pxContext))
-				return null;
-
-			if (attributeData.AttributeConstructor?.Parameters.Length is null or 0)
-				return null;
-
-			var index = attributeData.AttributeConstructor.Parameters
-				.FindIndex(parameter =>
-					parameter.Type.SpecialType == SpecialType.System_Int32
-					&& (parameter.Name.Equals("length", StringComparison.OrdinalIgnoreCase)
-					|| parameter.Name.Equals("size", StringComparison.OrdinalIgnoreCase)));
-
-			if (index == -1 || attributeData.ConstructorArguments.Length <= index) return null;
-
-			return attributeData.ConstructorArguments[index].Value is int i ? i : null;
-		}
-
-		private static bool IsTypeWithLength(AttributeData attribute, PXContext pxContext) =>
-			pxContext.FieldAttributes.DataAttributesWithLength.Contains<INamedTypeSymbol>(
-				attribute.AttributeClass!,
-				SymbolEqualityComparer.Default);
+		
 
 		private static void ReportTypeMismatch(SymbolAnalysisContext context, PXContext pxContext, DacPropertyInfo property,
 			DacPropertyInfo referencedProperty)
