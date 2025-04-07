@@ -25,7 +25,7 @@ namespace PX.Objects.HackathonDemo.DAC.InconsistentTypesOfDeclaredFieldAndRefere
 		#endregion
 
 		#region ConnectViaSearchWithFilter
-		public abstract class connectViaSearchWithFilter : BqlString.Field<connectViaSearchWithFilter> { }
+		public abstract class connectViaSearchWithFilter : BqlInt.Field<connectViaSearchWithFilter> { }
 
 		[PXInt]
 		[PXUIField(DisplayName = "Connect Via Search With Filter")]

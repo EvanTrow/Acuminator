@@ -20,7 +20,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacFieldAndReferencedFieldMismat
 
 		[Theory]
 		[EmbeddedFileData("MismatchedLengthDac.cs")]
-		public Task PropertiesWithWrongLengthAreMarkedAsErroneous(string source) =>
+		public Task DacProperty_HasDifferentLength_FromItsForeignDacProperty(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
 				PX1078_TypesOfDacFieldAndReferencedFieldHaveDifferentSize.CreateFor(46, 4, "PaymentTermsListID", "SubstitutionID", "25"),
 				PX1078_TypesOfDacFieldAndReferencedFieldHaveDifferentSize.CreateFor(59, 4, "PaymentTermsListID2", "SubstitutionID", "25"),
@@ -30,7 +30,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacFieldAndReferencedFieldMismat
 
 		[Theory]
 		[EmbeddedFileData("MismatchedTypeDac.cs")]
-		public Task PropertyWithWrongTypeIsMarkedAsErroneous(string source) =>
+		public Task DacProperty_HasDifferentType_FromItsForeignDacProperty(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
 				PX1078_TypesOfDacFieldAndReferencedFieldMismatch.CreateFor(22, 23, "PaymentTermsListID3", "SubstitutionID", "String"),
 				PX1078_TypesOfDacFieldAndReferencedFieldMismatch.CreateFor(33, 23, "ConnectViaSearchWithFilter", "SubstitutionID", "String"));
