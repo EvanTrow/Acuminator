@@ -34,5 +34,13 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacFieldAndReferencedFieldMismat
 			VerifyCSharpDiagnosticAsync(source,
 				PX1078_TypesOfDacFieldAndReferencedFieldMismatch.CreateFor(22, 23, "PaymentTermsListID3", "SubstitutionID", "String"),
 				PX1078_TypesOfDacFieldAndReferencedFieldMismatch.CreateFor(33, 23, "ConnectViaSearchWithFilter", "SubstitutionID", "String"));
+
+		[Theory]
+		[EmbeddedFileData("DacWithSMDBRecipientAttribute.cs")]
+		public Task DacProperty_WithSMDBRecipientAttribute_HasDifferentLength_FromItsForeignDacProperty(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
+				PX1078_TypesOfDacFieldAndReferencedFieldHaveDifferentSize.CreateFor(46, 4, "PaymentTermsListID", "PaymentTermsListID", "3000"),
+				PX1078_TypesOfDacFieldAndReferencedFieldHaveDifferentSize.CreateFor(56, 4, "PaymentTermsListID2", "PaymentTermsListID2", "500"),
+				PX1078_TypesOfDacFieldAndReferencedFieldHaveDifferentSize.CreateFor(66, 4, "PaymentTermsListID4", "PaymentTermsListID4", "3000"));
 	}
 }
