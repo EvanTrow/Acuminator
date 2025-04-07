@@ -78,6 +78,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 
 		public ImmutableDictionary<INamedTypeSymbol, int> DataAttributesWithHardcodedLength { get; }
 
+		public INamedTypeSymbol? SMDBRecipientAttribute => 
+			Compilation.GetTypeByMetadataName(TypeFullNames.AttributesWithHardCodedLength.SMDBRecipientAttribute);
+
 		internal DataTypeAttributeSymbols(Compilation compilation) : base(compilation)
 		{
 			DataAttributesWithLength = new[]

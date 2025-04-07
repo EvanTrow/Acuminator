@@ -16,6 +16,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Attribute
 	/// </summary>
 	public static class FieldSizeGetter
 	{
+		private const int SMDBRecipientAttribute_SingleRecipientFieldLength = 500;
+		private const int SMDBRecipientAttribute_MultipleRecipientsFieldLength = 3000;
+
 		public static DacFieldSize GetFieldSize(this DacFieldAttributeInfo dataTypeAttribute, PXContext pxContext)
 		{
 			pxContext.ThrowOnNull();
@@ -52,12 +55,70 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Attribute
 			if (aggregatedAttribute.AttributeClass is null)
 				return null;
 
+			var attributesWithHardCodedSize = GetSizeFromAttributesWithHardCodedSize(aggregatedAttribute, pxContext);
+			return attributesWithHardCodedSize ?? 
+				   GetLengthArgumentFromConstructor(aggregatedAttribute, pxContext);
+		}
+
+		private static int? GetSizeFromAttributesWithHardCodedSize(AttributeData aggregatedAttribute, PXContext pxContext)
+		{
 			var attributesWithHardCodedLength = pxContext.FieldAttributes.DataAttributesWithHardcodedLength;
 
-			if (attributesWithHardCodedLength.TryGetValue(aggregatedAttribute.AttributeClass, out int hardCodedSize))
+			if (attributesWithHardCodedLength.TryGetValue(aggregatedAttribute.AttributeClass!, out int hardCodedSize))
 				return hardCodedSize;
 
-			return GetLengthArgumentFromConstructor(aggregatedAttribute, pxContext);
+			int? hardCodedSizeFromSMDBRecipientAttribute = 
+				GetHardCodedSizeFromSMDBRecipientAttribute(aggregatedAttribute, pxContext);
+
+			return hardCodedSizeFromSMDBRecipientAttribute;
+		}
+
+		private static int? GetHardCodedSizeFromSMDBRecipientAttribute(AttributeData aggregatedAttribute, PXContext pxContext)
+		{
+			var smDBRecipientAttribute = pxContext.FieldAttributes.SMDBRecipientAttribute;
+
+			if (smDBRecipientAttribute is null ||
+				!smDBRecipientAttribute.Equals(aggregatedAttribute.AttributeClass, SymbolEqualityComparer.Default))
+			{
+				return null;
+			}
+
+			var smDBRecipientAttributeConstructor = aggregatedAttribute.AttributeConstructor;
+
+			if (smDBRecipientAttributeConstructor is null || smDBRecipientAttributeConstructor.Parameters.IsDefaultOrEmpty)
+				return null;
+
+			var isMultipleConstructorParameter = smDBRecipientAttributeConstructor.Parameters[0];
+
+			if (isMultipleConstructorParameter.Type.SpecialType != SpecialType.System_Boolean)
+				return null;
+
+			bool? isMultipleCalcedValue = TryGetIsMultipleValue();
+
+			return isMultipleCalcedValue switch
+			{
+				true  => SMDBRecipientAttribute_MultipleRecipientsFieldLength,
+				false => SMDBRecipientAttribute_SingleRecipientFieldLength,
+				_ 	  => null
+			};
+
+			//-----------------------------------------------Local Function----------------------------------------
+			bool? TryGetIsMultipleValue()
+			{
+				if (aggregatedAttribute.ConstructorArguments.IsDefaultOrEmpty)
+				{
+					return isMultipleConstructorParameter.HasExplicitDefaultValue && isMultipleConstructorParameter.ExplicitDefaultValue is bool isMultiple
+						? isMultiple
+						: null;
+				}	
+				else
+				{
+					var constructorArg = aggregatedAttribute.ConstructorArguments[0];
+					return constructorArg.Value is bool isMultiple
+						? isMultiple
+						: null;
+				}
+			}
 		}
 
 		private static int? GetLengthArgumentFromConstructor(AttributeData aggregatedAttribute, PXContext pxContext)

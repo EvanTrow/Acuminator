@@ -59,6 +59,8 @@
 			public const string PXAttributeValueAttribute = "PX.Objects.CS.PXAttributeValueAttribute";
 			public const string CuryIDStringAttribute = "PX.Objects.CM.Extensions.CurrencyInfo.CuryIDStringAttribute";
 			public const string TaxIDAttribute = "PX.Objects.TX.TaxIDAttribute";
+
+			public const string SMDBRecipientAttribute = "PX.SM.Email.SMDBRecipientAttribute";
 		}
 
 		internal const string PXDBFieldAttribute = "PX.Data.PXDBFieldAttribute";
