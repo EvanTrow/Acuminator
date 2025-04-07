@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Threading;
 
 using Acuminator.Analyzers.StaticAnalysis.Dac;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression;
-using Acuminator.Utilities.Roslyn.PXFieldAttributes;
 using Acuminator.Utilities.Roslyn.PXFieldAttributes.Enum;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
+using Acuminator.Utilities.Roslyn.Semantic.SharedInfo;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -77,7 +76,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 				return;
 			}
 
-			if (!localDacProperty.HasNonNullDataType ||
+			if (!localDacProperty.HasNonNullDataType || !foreignDacProperty.HasNonNullDataType ||
 				!IsPropertyTypeCompatibleWithDataTypeAttributes(localDacProperty) ||
 				!IsPropertyTypeCompatibleWithDataTypeAttributes(foreignDacProperty))
 			{
@@ -88,21 +87,21 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 
 			DacFieldSize foreignFieldSize = foreignDacProperty.GetFieldSize(pxContext);
 
-			// agreed to stop checking property here as the code may be incomplete at this point
-			if (foreignFieldSizes.Count != 1)
+			// Stop checking the current DAC field, since we fail to determine the size of its corresponding foreign DAC field
+			if (foreignFieldSize.IsInconsistent)
 				return;
 
-			var foreignFieldSize = foreignFieldSizes[0];
+			var attributesWithSizeMismatch = 
+				localDacProperty!.DeclaredDataTypeAttributes
+								 .AllDeclaredDatatypeAttributesOnDacProperty
+								 .Select(attr => (Attribute: attr, FieldSize: attr.GetFieldSize(pxContext)))
+								 .Where(pair => !pair.FieldSize.IsInconsistent &&			//Do not check attributes with inconsistent sizes, they should be checked by PX1023
+												!pair.FieldSize.Equals(foreignFieldSize));
 
-			var attributesWithSizeMismatch = foreignDacProperty!.DeclaredDataTypeAttributes
-													   .AllDeclaredDatatypeAttributesOnDacProperty.Select(x => (x, GetFieldSize(x, pxContext)))
-																				  .Where(x => x.Item2 is not null && x.Item2 != foreignFieldSize);
-
-			foreach (var (attribute, size) in attributesWithSizeMismatch)
+			foreach (var (dataTypeAttribute, localFieldSize) in attributesWithSizeMismatch)
 			{
-				ReportTypeSizeMismatch(
-					context, pxContext, attribute, localDacProperty.Name,
-					foreignDacProperty.Name, foreignFieldSize);
+				ReportTypeSizeMismatch(context, pxContext, dataTypeAttribute, localDacProperty.Name,
+									   foreignDacProperty.Name, foreignFieldSize);
 			}
 		}
 
@@ -131,13 +130,22 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 
-		private static void ReportTypeSizeMismatch(SymbolAnalysisContext context, PXContext pxContext, DacFieldAttributeInfo localDeclaration,
-			string localName, string externalName, int expectedLength)
+		private static void ReportTypeSizeMismatch(SymbolAnalysisContext context, PXContext pxContext, 
+												   DacFieldAttributeInfo localDataTypeAtributeToReport,
+												   string localDacPropertyName, string foreignDacPropertyName, 
+												   DacFieldSize foreignDacFieldSize)
 		{
-			var location = localDeclaration.AttributeData.GetLocation(context.CancellationToken);
-			var diagnostic = Diagnostic.Create(
-				Descriptors.PX1078_TypesOfDacFieldAndReferencedFieldHaveDifferentSize,
-				location, localName, externalName, expectedLength);
+			var location = localDataTypeAtributeToReport.AttributeData.GetLocation(context.CancellationToken)
+																	  .NullIfLocationKindIsNone();
+			if (location is null)
+				return;
+
+			string expectedFieldSize = foreignDacFieldSize.IsNotDefined
+				? "not defined"
+				: foreignDacFieldSize.Value.ToString();
+
+			var diagnostic = Diagnostic.Create(Descriptors.PX1078_TypesOfDacFieldAndReferencedFieldHaveDifferentSize,
+											   location, localDacPropertyName, foreignDacPropertyName, expectedFieldSize);
 
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
