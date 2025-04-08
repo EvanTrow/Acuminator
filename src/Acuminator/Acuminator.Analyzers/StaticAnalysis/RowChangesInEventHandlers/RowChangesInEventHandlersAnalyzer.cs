@@ -57,7 +57,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 					methodSyntax.Accept(variablesWalker);
 
 					// Perform analysis
-					var diagnosticWalker = new DiagnosticWalker(context, semanticModel, pxContext, variablesWalker.Result,
+					var diagnosticWalker = new DiagnosticWalker(context, semanticModel, pxContext, variablesWalker.FoundRowVariables,
 						analysisMode, eventHandlerInfo.Type);
 					methodSyntax.Accept(diagnosticWalker);
 				}

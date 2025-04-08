@@ -1,12 +1,11 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -24,11 +23,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 			private readonly SemanticModel _semanticModel;
 			private readonly PXContext _pxContext;
 			private CancellationToken _cancellationToken;
-			private readonly ImmutableHashSet<ILocalSymbol>? _variables;
+			private readonly HashSet<ILocalSymbol>? _variables;
 			private readonly EventArgsRowWalker _eventArgsRowWalker;
 
-			private readonly ISet<ILocalSymbol> _result = new HashSet<ILocalSymbol>(SymbolEqualityComparer.Default);
-			public ImmutableArray<ILocalSymbol> Result => _result.ToImmutableArray();
+			private readonly HashSet<ILocalSymbol> _foundRowVariables = new(SymbolEqualityComparer.Default);
+
+			public ImmutableArray<ILocalSymbol> FoundRowVariables => _foundRowVariables.ToImmutableArray();
 
 			public VariablesWalker(MethodDeclarationSyntax methodSyntax, SemanticModel semanticModel, PXContext pxContext,
 				CancellationToken cancellationToken)
@@ -50,12 +50,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 					if (dataFlow?.Succeeded == true)
 					{
 						_variables = dataFlow.WrittenInside
-							.Intersect(dataFlow.VariablesDeclared, SymbolEqualityComparer.Default)
-							.OfType<ILocalSymbol>()
-							.ToImmutableHashSet<ILocalSymbol>(SymbolEqualityComparer.Default);
+											 .OfType<ILocalSymbol>()
+											 .ToHashSet<ILocalSymbol>(SymbolEqualityComparer.Default);
 					}
 				}
-
 			}
 
 			public override void VisitAssignmentExpression(AssignmentExpressionSyntax assignment)
@@ -84,30 +82,44 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 			{
 				_cancellationToken.ThrowIfCancellationRequested();
 
-				VariableDesignationSyntax? designation = isPatternExpression.Pattern switch
-				{
-					DeclarationPatternSyntax declarationPattern => declarationPattern.Designation,
-					RecursivePatternSyntax recursivePattern => recursivePattern.Designation,
-					_ => null
-				};
+				if (_variables == null)
+					return;
 
-				if (designation != null)
+				_eventArgsRowWalker.Reset();
+				isPatternExpression.Expression.Accept(_eventArgsRowWalker);
+
+				if (_eventArgsRowWalker.FoundRowProperty == null)
+					return;
+
+				IPropertySymbol rowProperty = _eventArgsRowWalker.FoundRowProperty;
+				var variableDesignations	= isPatternExpression.Pattern.GetAllVariableDesignations();
+
+				foreach (SingleVariableDesignationSyntax variableDesignation in variableDesignations)
 				{
-					var variableSymbol = _semanticModel.GetDeclaredSymbol(designation, _cancellationToken) as ILocalSymbol;
-					ValidateThatVariableIsSetToDacFromEvent(variableSymbol, isPatternExpression.Expression);
+					_cancellationToken.ThrowIfCancellationRequested();
+
+					var variableSymbol = _semanticModel.GetDeclaredSymbol(variableDesignation, _cancellationToken) as ILocalSymbol;
+
+					if (variableSymbol?.Type == null || !_variables.Contains(variableSymbol) ||
+						!variableSymbol.Type.Equals(rowProperty.Type, SymbolEqualityComparer.Default))  // Filter out variables with types different from the found property type
+					{
+						continue;
+					}
+
+					_foundRowVariables.Add(variableSymbol);
 				}
 			}
 
 			private void ValidateThatVariableIsSetToDacFromEvent(ILocalSymbol? variableSymbol, ExpressionSyntax variableInitializerExpression)
 			{
-				if (variableSymbol == null || !_variables?.Contains(variableSymbol) == true)
+				if (variableSymbol == null || _variables == null || !_variables.Contains(variableSymbol))
 					return;
 
 				_eventArgsRowWalker.Reset();
 				variableInitializerExpression.Accept(_eventArgsRowWalker);
 
 				if (_eventArgsRowWalker.Success)
-					_result.Add(variableSymbol);
+					_foundRowVariables.Add(variableSymbol);
 			}
 		}
 	}

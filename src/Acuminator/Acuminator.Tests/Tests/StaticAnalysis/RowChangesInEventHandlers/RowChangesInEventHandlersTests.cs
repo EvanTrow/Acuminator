@@ -28,12 +28,20 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.RowChangesInEventHandlers
 		[Theory]
 		[EmbeddedFileData("IsPatternAssignment.cs")]
 		public Task IsPatternAssignment(string actual) => VerifyCSharpDiagnosticAsync(actual,
-			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(17, 4, EventType.RowSelected),
-			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(25, 4, EventType.FieldDefaulting),
-			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(33, 4, EventType.FieldVerifying),
-			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(41, 4, EventType.RowSelected),
-			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(49, 4, EventType.FieldDefaulting),
-			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(57, 4, EventType.FieldVerifying));
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(18, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(24, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(30, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(36, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(42, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(50, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(56, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(61, 5, EventType.RowSelected),
+
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(71, 4, EventType.FieldDefaulting),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(79, 4, EventType.FieldVerifying),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(87, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(95, 4, EventType.FieldDefaulting),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(103, 4, EventType.FieldVerifying));
 
 		[Theory]
 		[EmbeddedFileData("DirectAssignment.cs")]

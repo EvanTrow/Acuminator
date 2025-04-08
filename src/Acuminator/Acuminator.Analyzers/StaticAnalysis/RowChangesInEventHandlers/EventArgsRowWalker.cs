@@ -1,4 +1,5 @@
-﻿
+﻿using System.Diagnostics.CodeAnalysis;
+
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.Semantic;
@@ -16,12 +17,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 		/// </summary>
 		private class EventArgsRowWalker : CSharpSyntaxWalker
 		{
-			private static readonly string RowPropertyName = "Row";
+			private const string RowPropertyName = "Row";
 
 			private readonly SemanticModel _semanticModel;
 			private readonly PXContext _pxContext;
 
-			public bool Success { get; private set; }
+			[MemberNotNullWhen(returnValue: true, nameof(FoundRowProperty))]
+			public bool Success => FoundRowProperty != null;
+
+			public IPropertySymbol? FoundRowProperty { get; private set; }
 
 			public EventArgsRowWalker(SemanticModel semanticModel, PXContext pxContext)
 			{
@@ -31,7 +35,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 
 			public void Reset()
 			{
-				Success = false;
+				FoundRowProperty = null;
 			}
 
 			public override void Visit(SyntaxNode? node)
@@ -49,7 +53,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 
 					if (containingType != null && _pxContext.Events.EventArgTypeToEventTypeMap.ContainsKey(containingType))
 					{
-						Success = true;
+						FoundRowProperty = propertySymbol;
 					}
 				}
 			}

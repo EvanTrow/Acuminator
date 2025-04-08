@@ -118,15 +118,10 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		/// </returns>
 		public static Task<SyntaxNode?> GetSyntaxAsync(this ISymbol? symbol, CancellationToken cancellationToken = default)
 		{
-			if (symbol == null)
+			if (symbol == null || !symbol.IsInSourceCode())
 				return Task.FromResult<SyntaxNode?>(null);
 
-			var declarations = symbol.DeclaringSyntaxReferences;
-
-			if (declarations.Length == 0)
-				return Task.FromResult<SyntaxNode?>(null);
-
-			return declarations[0].GetSyntaxAsync(cancellationToken)!;
+			return symbol.DeclaringSyntaxReferences[0].GetSyntaxAsync(cancellationToken)!;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -357,6 +352,120 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 			}
 
 			return regionTrivias;
+		}
+
+		public static IEnumerable<SingleVariableDesignationSyntax> GetAllVariableDesignations(this PatternSyntax? pattern)
+		{
+			switch (pattern)
+			{
+				case DeclarationPatternSyntax declarationPattern:
+					return declarationPattern.Designation.GetSingleVariableDesignations();
+
+				case UnaryPatternSyntax unaryPattern:
+					return unaryPattern.Pattern.GetAllVariableDesignations();
+
+				case VarPatternSyntax varPattern:
+					return varPattern.Designation.GetSingleVariableDesignations();
+
+				case ParenthesizedPatternSyntax parenthesizedPattern:
+					return parenthesizedPattern.Pattern.GetAllVariableDesignations();
+
+				case RecursivePatternSyntax recursivePattern:
+					IEnumerable<SingleVariableDesignationSyntax>? allSingleVariableDesignations = null;
+
+					if (recursivePattern.PositionalPatternClause?.Subpatterns.Count > 0)
+					{
+						var positionalPatternDesignations =
+							recursivePattern.PositionalPatternClause.Subpatterns
+																	.SelectMany(subpattern => subpattern.Pattern.GetAllVariableDesignations());
+						allSingleVariableDesignations = positionalPatternDesignations;
+					}
+
+					if (recursivePattern.PropertyPatternClause?.Subpatterns.Count > 0)
+					{
+						var propertyPatternDesignations =
+							recursivePattern.PropertyPatternClause.Subpatterns
+																  .SelectMany(subpattern => subpattern.Pattern.GetAllVariableDesignations());
+						allSingleVariableDesignations = allSingleVariableDesignations?.Concat(propertyPatternDesignations) ?? propertyPatternDesignations;
+					}
+					
+					var ownRecursivePatternDesignations = recursivePattern.Designation.GetSingleVariableDesignations();
+					allSingleVariableDesignations = allSingleVariableDesignations?.Concat(ownRecursivePatternDesignations) ?? ownRecursivePatternDesignations;
+					return allSingleVariableDesignations;
+
+				case BinaryPatternSyntax binaryPattern:
+					var designationsFromLeftPattern = binaryPattern.Left.GetAllVariableDesignations();
+					var designationsFromRightPattern = binaryPattern.Right.GetAllVariableDesignations();
+
+					return designationsFromLeftPattern.Concat(designationsFromRightPattern);
+
+				case ConstantPatternSyntax constantPattern:
+				case DiscardPatternSyntax discardPattern:
+				case RelationalPatternSyntax relationalPattern:
+				case TypePatternSyntax typePattern:
+					return [];
+
+				// List patterns are not supported by this version of Roslyn. After upgrade to a new Roslyn version we will need to support them.
+				//case Microsoft.CodeAnalysis.CSharp.Syntax.ListPatternSyntax:
+				//case Microsoft.CodeAnalysis.CSharp.Syntax.SlicePatternSyntax:
+				default:
+					return [];
+			}			
+		}
+
+		public static IEnumerable<SingleVariableDesignationSyntax> GetSingleVariableDesignations(this VariableDesignationSyntax? variableDesignation)
+		{
+			switch (variableDesignation)
+			{
+				case SingleVariableDesignationSyntax singleVariableDesignation:
+					return [singleVariableDesignation];
+				
+				case ParenthesizedVariableDesignationSyntax multipleVariablesDesignation:
+					return multipleVariablesDesignation.Variables.Count switch
+					{
+						0 => [],
+						1 => GetSingleVariableDesignations(multipleVariablesDesignation.Variables[0]),
+						_ => GetSingleVariablesFromMultipleVariablesDesignation(multipleVariablesDesignation, recursionLevel: 0)
+					};
+
+				case DiscardDesignationSyntax:
+				default:
+					return [];
+			}
+
+			//----------------------------------------------------Local Function---------------------------------------------------------------
+			static IEnumerable<SingleVariableDesignationSyntax> GetSingleVariablesFromMultipleVariablesDesignation(
+																			ParenthesizedVariableDesignationSyntax multipleVariablesDesignation,
+																			int recursionLevel)
+			{
+				const int maxRecursionLevel = 100;
+				var variables = multipleVariablesDesignation.Variables;
+
+				for (int i = 0; i < variables.Count; i++)
+				{
+					var variable = variables[i];
+
+					switch (variable)
+					{
+						case SingleVariableDesignationSyntax singleVariable:
+							yield return singleVariable;
+							continue;
+
+						case ParenthesizedVariableDesignationSyntax nestedMultipleVariablesDesignation
+						when recursionLevel <= maxRecursionLevel:
+							var singleVariables = GetSingleVariablesFromMultipleVariablesDesignation(nestedMultipleVariablesDesignation, recursionLevel + 1);
+
+							foreach (SingleVariableDesignationSyntax nestedSingleVariable in singleVariables)
+								yield return nestedSingleVariable;
+
+							continue;
+
+						case DiscardDesignationSyntax:
+						default:
+							continue;
+					}
+				}
+			}
 		}
 	}
 }
