@@ -7,6 +7,8 @@ using System.Linq;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.PXFieldAttributes;
+using Acuminator.Utilities.Roslyn.PXFieldAttributes.Enum;
+using Acuminator.Utilities.Roslyn.PXFieldAttributes.Infos;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
 
 using Microsoft.CodeAnalysis;
@@ -69,6 +71,25 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 		public bool IsAutoNumbering { get; }
 
+		public DataTypeAttributesOnDacProperty DeclaredDataTypeAttributes { get; }
+
+		/// <inheritdoc cref="DataTypeAttributesOnDacProperty.DataTypesFromDataTypeAttributes"/>
+		public ImmutableArray<ITypeSymbol> DeclaredDataTypesFromDataTypeAttributes => 
+			DeclaredDataTypeAttributes.DataTypesFromDataTypeAttributes;
+
+		/// <summary>
+		/// Data types configured from data type attributes declared on this DAC field property and its base properties.
+		/// </summary>
+		public ImmutableArray<ITypeSymbol> EffectiveDataTypesFromDataTypeAttributes { get; private set; }
+
+		public bool HasNonNullDataType => !EffectiveDataTypesFromDataTypeAttributes.IsDefaultOrEmpty;
+
+		/// <summary>
+		/// The compatibility of property type and data types from <see cref="EffectiveDataTypesFromDataTypeAttributes"/> that are configured<br/>
+		/// from data type attributes declared on this property and its base properties.
+		/// </summary>
+		public CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes EffectivePropertyAndDataTypeAttributeTypesCompatibility { get; private set; }
+
 		protected DacPropertyInfo(PropertyDeclarationSyntax? node, IPropertySymbol symbol, ITypeSymbol propertyTypeUnwrappedNullable,
 								  int declarationOrder, bool hasBqlField, IEnumerable<DacFieldAttributeInfo> attributeInfos, 
 								  DacPropertyInfo baseInfo) :
@@ -109,6 +130,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 			HasAcumaticaAttributesDeclared  = hasAcumaticaAttributes;
 			HasAcumaticaAttributesEffective = hasAcumaticaAttributes;
+
+			DeclaredDataTypeAttributes = DataTypeAttributesOnDacProperty.CollectDataTypeAttributesFromDacProperty(this);
+			EffectiveDataTypesFromDataTypeAttributes = DeclaredDataTypeAttributes.DataTypesFromDataTypeAttributes;
+			EffectivePropertyAndDataTypeAttributeTypesCompatibility = DeclaredDataTypeAttributes.PropertyAndDataTypeAttributeTypesCompatibility;
 		}
 
 		public static DacPropertyInfo Create(PXContext context, PropertyDeclarationSyntax? node, IPropertySymbol property, int declarationOrder,
@@ -150,6 +175,17 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			EffectiveDbBoundness 			= DeclaredDbBoundness.Combine(baseProperty.EffectiveDbBoundness);
 			HasBqlFieldEffective 			= HasBqlFieldDeclared || baseProperty.HasBqlFieldEffective;
 			HasAcumaticaAttributesEffective = HasAcumaticaAttributesDeclared || baseProperty.HasAcumaticaAttributesEffective;
+
+			if (baseProperty.HasNonNullDataType)
+			{
+				EffectiveDataTypesFromDataTypeAttributes = baseProperty.EffectiveDataTypesFromDataTypeAttributes
+																	   .Concat(DeclaredDataTypeAttributes.DataTypesFromDataTypeAttributes)
+																	   .Distinct<ITypeSymbol>(SymbolEqualityComparer.Default)
+																	   .ToImmutableArray();
+			}
+
+			EffectivePropertyAndDataTypeAttributeTypesCompatibility = 
+				this.GetPropertyAndDataTypeAttributesTypesCompatibility(EffectiveDataTypesFromDataTypeAttributes);
 		}
 	}
 }

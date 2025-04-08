@@ -102,6 +102,7 @@
     <Compile Include="Tests\StaticAnalysis\DacFieldAndReferencedFieldMismatch\DacFieldAndReferencedFieldMismatchTests.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\DacFieldAndReferencedFieldMismatch\Sources\MismatchedLengthDac.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\DacFieldAndReferencedFieldMismatch\Sources\MismatchedTypeDac.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\DacFieldAndReferencedFieldMismatch\Sources\DacWithSMDBRecipientAttribute.cs" />
     <Compile Include="Tests\StaticAnalysis\ForbidPrivateEventHandlers\ForbidPrivateEventHandlersFixerTests.cs" />
     <Compile Include="Tests\StaticAnalysis\ForbidPrivateEventHandlers\ForbidPrivateEventHandlersTests.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\ForbidPrivateEventHandlers\Sources\PrivateModifier.cs" />

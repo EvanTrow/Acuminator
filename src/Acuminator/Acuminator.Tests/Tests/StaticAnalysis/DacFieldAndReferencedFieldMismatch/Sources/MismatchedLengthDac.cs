@@ -1,7 +1,7 @@
 ﻿using System;
-using System.ComponentModel;
 using PX.Api;
 using PX.Data;
+using PX.Data.BQL;
 
 namespace PX.Objects.HackathonDemo.DAC.InconsistentTypesOfDeclaredFieldAndReferencedDacFields
 {

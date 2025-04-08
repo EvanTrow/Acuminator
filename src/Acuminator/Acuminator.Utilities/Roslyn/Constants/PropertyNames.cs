@@ -9,6 +9,9 @@ namespace Acuminator.Utilities.Roslyn.Constants
 			public const string IsKey 	 = "IsKey";
 			public const string BqlTable = "BqlTable";
 			public const string BqlField = "BqlField";
+
+			public const string Length = "Length";
+			public const string Size = "Size";
 		}
 
 		public static class Exception

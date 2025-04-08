@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -62,19 +60,26 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Attribute
 			IsAcumaticaAttribute         = isAcumaticaAttribute;
 		}
 
+		public bool AggregatesAttribute(ITypeSymbol? attributeTypeToCheck) =>
+			FlattenedAcumaticaAttributes.Any(attr => attr.Type.Equals(attributeTypeToCheck, SymbolEqualityComparer.Default));
+
+		public bool AggregatesOneOfAttributes(IEnumerable<ITypeSymbol> attributeTypesToCheck) =>
+			attributeTypesToCheck.CheckIfNull().Any(AggregatesAttribute);
+
 		public static DacFieldAttributeInfo Create(AttributeData attribute, DbBoundnessCalculator dbBoundnessCalculator, int declarationOrder) =>
 			CreateUnsafe(attribute.CheckIfNull(), dbBoundnessCalculator.CheckIfNull(), declarationOrder);
 
 		public static DacFieldAttributeInfo CreateUnsafe(AttributeData attribute, DbBoundnessCalculator dbBoundnessCalculator, int declarationOrder)
 		{
-			var flattenedAttributeApplications = attribute.GetThisAndAllAggregatedAttributesWithApplications(dbBoundnessCalculator.Context, includeBaseTypes: true);
+			var flattenedAttributeApplications = attribute.GetThisAndAllAggregatedAttributesWithApplications(
+																dbBoundnessCalculator.Context, includeBaseTypes: true);
 			var flattenedAttributeTypes = flattenedAttributeApplications.Count > 0
 				? flattenedAttributeApplications.Select(attributeWithApplication => attributeWithApplication.Type)
 												.ToImmutableHashSet<ITypeSymbol>(SymbolEqualityComparer.Default)
 				: ImmutableHashSet<ITypeSymbol>.Empty;
 
-			var aggregatedMetadata	    = dbBoundnessCalculator.AttributesMetadataProvider
-															   .GetDacFieldTypeAttributeInfos(attribute.AttributeClass, flattenedAttributeTypes);
+			var aggregatedMetadata = dbBoundnessCalculator.AttributesMetadataProvider
+														  .GetDacFieldTypeAttributeInfos(attribute.AttributeClass, flattenedAttributeTypes);
 			DbBoundnessType dbBoundness = dbBoundnessCalculator.GetAttributeApplicationDbBoundnessType(attribute, flattenedAttributeApplications, 
 																										flattenedAttributeTypes, aggregatedMetadata);
 
