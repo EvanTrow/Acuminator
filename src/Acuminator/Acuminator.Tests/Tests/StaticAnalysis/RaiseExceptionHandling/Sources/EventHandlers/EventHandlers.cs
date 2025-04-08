@@ -28,6 +28,16 @@ namespace PX.Objects
 		{
 			e.Cache.RaiseExceptionHandling<SOInvoice.refNbr>(null, null, new PXSetPropertyException("Something bad happened"));
 		}
+
+		protected virtual void _(Events.FieldUpdating<SOInvoice.refNbr> e)
+		{
+			e.Cache.RaiseExceptionHandling<SOInvoice.refNbr>(null, null, new PXSetPropertyException("Something bad happened"));
+		}
+
+		protected virtual void _(Events.FieldUpdating<SOInvoice, SOInvoice.refNbr> e)
+		{
+			e.Cache.RaiseExceptionHandling<SOInvoice.refNbr>(null, null, new PXSetPropertyException("Something bad happened"));
+		}
 	}
 
 	public class SOInvoice : IBqlTable

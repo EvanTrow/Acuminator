@@ -29,6 +29,16 @@ namespace PX.Objects
 			ShowErrors(e.Cache);
 		}
 
+		protected virtual void _(Events.FieldUpdating<SOInvoice.refNbr> e)
+		{
+			ShowErrors(e.Cache);
+		}
+
+		protected virtual void _(Events.FieldUpdating<SOInvoice, SOInvoice.refNbr> e)
+		{
+			ShowErrors(e.Cache);
+		}
+
 		private void ShowErrors(PXCache cache)
 		{
 			cache.RaiseExceptionHandling<SOInvoice.refNbr>(null, null, new PXSetPropertyException("Something bad happened"));
