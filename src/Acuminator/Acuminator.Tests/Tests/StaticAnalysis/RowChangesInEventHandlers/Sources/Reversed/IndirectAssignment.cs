@@ -24,6 +24,13 @@ namespace PX.Objects
 			row.RefNbr = "<NEW>"; // OK
 			Documents.Current.RefNbr = "<NEW>"; // not OK
 		}
+
+		protected virtual void _(Events.FieldUpdating<SOInvoice, SOInvoice.refNbr> e)
+		{
+			var row = e.Row;
+			row.RefNbr = "<NEW>"; // OK
+			Documents.Current.RefNbr = "<NEW>"; // not OK
+		}
 	}
 
 	public class SOInvoice : IBqlTable

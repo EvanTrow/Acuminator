@@ -46,13 +46,13 @@ namespace PX.Objects
 			// positional pattern
 			bool flag2 = true;
 
-			if ((e.Row, flag2) is ({ } invoice6 , true ) { Row.RefNbr: { } })
+			if ((e.Row, flag2) is ({ } invoice6, true) { Row.RefNbr: { } })
 				return;
 
 			invoice6.RefNbr = "<NEW>"; // should be OK
 
 			// binary and relation patterns
-			if (e.Row is not ({RefNbr.Length: > 2 } and { RefNbr.Length: < 5 } invoice7))
+			if (e.Row is not ({ RefNbr.Length: > 2 } and { RefNbr.Length: < 5 } invoice7))
 				return;
 
 			invoice7.RefNbr = "<NEW>"; // should be OK
@@ -84,6 +84,14 @@ namespace PX.Objects
 		protected virtual void _(Events.RowSelecting<SOLine> e)
 		{
 			if (!(e.Row is { RefNbr: { } } row))
+				return;
+
+			row.RefNbr = "<NEW>"; // should be OK
+		}
+
+		protected virtual void _(Events.FieldUpdating<SOInvoice.refNbr> e)
+		{
+			if (e.Row is not SOInvoice row)
 				return;
 
 			row.RefNbr = "<NEW>"; // should be OK

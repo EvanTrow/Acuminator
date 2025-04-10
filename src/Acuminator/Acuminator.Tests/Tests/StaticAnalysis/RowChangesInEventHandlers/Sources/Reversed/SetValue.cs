@@ -22,6 +22,12 @@ namespace PX.Objects
 			e.Cache.SetValue<SOInvoice.refNbr>(e.Row, "<NEW>"); // OK
 			e.Cache.SetValue<SOInvoice.refNbr>(Documents.Current, "<NEW>"); // not OK
 		}
+
+		protected virtual void _(Events.FieldUpdating<SOInvoice, SOInvoice.refNbr> e)
+		{
+			e.Cache.SetValue<SOInvoice.refNbr>(e.Row, "<NEW>"); // OK
+			e.Cache.SetValue<SOInvoice.refNbr>(Documents.Current, "<NEW>"); // not OK
+		}
 	}
 
 	public class SOInvoice : IBqlTable
