@@ -241,7 +241,12 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Incorrect XML documentation of the projection DAC field property. The &lt;inheritdoc/&gt; tag with `cref` attribute should be used for a mapped DAC field property of the projection DAC.The `cref` attribute should reference the original DAC field property from the projection field&apos;s mapping:/// &lt;inheritdoc cref=&quot;OriginalDac.SomeDacField&quot;/&gt;[PXDBInt(BqlField = typeof(OriginalDac.someDacField))]public virtual int? SomeDacField{ get; set; }.
+        ///   Looks up a localized string similar to Incorrect XML documentation of the projection DAC field property. The &lt;inheritdoc/&gt; tag with `cref` attribute should be used for a mapped DAC field property of the projection DAC.
+        ///The `cref` attribute should reference the original DAC field property from the projection field&apos;s mapping:
+        ///
+        ////// &lt;inheritdoc cref=&quot;OriginalDac.SomeDacField&quot;/&gt;
+        ///[PXDBInt(BqlField = typeof(OriginalDac.someDacField))]
+        ///public virtual int? SomeDacField{ get; set; }.
         /// </summary>
         public static string PX1007Title_IncorrectProjectionDacFieldDescription {
             get {
@@ -871,7 +876,11 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to public class ReferencedDacFK : CompositeKey&lt;											   Field&lt;joinField1&gt;.IsRelatedTo&lt;ReferencedDAC.keyField1&gt;,											   Field&lt;joinField2&gt;.IsRelatedTo&lt;ReferencedDAC.keyField2&gt;,											  ...											  &gt;.WithTablesOf&lt;SOOrder, SOOrder&gt; {{ }}.
+        ///   Looks up a localized string similar to public class ReferencedDacFK : CompositeKey&lt;
+        ///											   Field&lt;joinField1&gt;.IsRelatedTo&lt;ReferencedDAC.keyField1&gt;,
+        ///											   Field&lt;joinField2&gt;.IsRelatedTo&lt;ReferencedDAC.keyField2&gt;,
+        ///											  ...
+        ///											  &gt;.WithTablesOf&lt;SOOrder, SOOrder&gt; {{ }}.
         /// </summary>
         public static string PX1034FixTemplateLine6 {
             get {
@@ -1654,11 +1663,20 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Exceptions cannot be thrown in the FieldUpdating event handler.
+        /// </summary>
+        public static string PX1073TitleFieldUpdating {
+            get {
+                return ResourceManager.GetString("PX1073TitleFieldUpdating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Exceptions cannot be thrown in the RowPersisted event handler.
         /// </summary>
-        public static string PX1073Title {
+        public static string PX1073TitleRowPersisted {
             get {
-                return ResourceManager.GetString("PX1073Title", resourceCulture);
+                return ResourceManager.GetString("PX1073TitleRowPersisted", resourceCulture);
             }
         }
         
@@ -1753,17 +1771,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DAC field &quot;{0}&quot; have data type attribute(s) incompatible with type &quot;{1}&quot; of referenced field &quot;{2}&quot;.
-        /// </summary>
-        public static string PX1078MessageFormat_TypeOfReferencedFieldIsIncompatibleWithDataTypeAnnotationsOfDacField {
-            get {
-                return ResourceManager.GetString("PX1078MessageFormat_TypeOfReferencedFieldIsIncompatibleWithDataTypeAnnotationsOfD" +
-                        "acField", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to DAC field &quot;{0}&quot; and referenced field &quot;{1}&quot; have different length specified in data type attribute. Expected length for DAC field is {2}..
+        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC field and the &quot;{1}&quot; referenced field have different sizes specified in the data type attribute. The expected size of the DAC field is {2}..
         /// </summary>
         public static string PX1078MessageFormat_TypesOfDacFieldAndReferencedFieldHaveDifferentSize {
             get {
@@ -1772,7 +1780,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DAC field &quot;{0}&quot; and referenced field &quot;{1}&quot; have different types. Expected type for the DAC field is {2}..
+        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC field and the &quot;{1}&quot; referenced field have different types. The expected type for the DAC field is {2}..
         /// </summary>
         public static string PX1078MessageFormat_TypesOfDacFieldAndReferencedFieldMismatch {
             get {
@@ -1781,16 +1789,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DAC field has at least one data type attribute which is incompatible with type of referenced field.
-        /// </summary>
-        public static string PX1078Title_TypeOfReferencedFieldIsIncompatibleWithDataTypeAnnotationsOfDacField {
-            get {
-                return ResourceManager.GetString("PX1078Title_TypeOfReferencedFieldIsIncompatibleWithDataTypeAnnotationsOfDacField", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to DAC field and referenced field have different size.
+        ///   Looks up a localized string similar to DAC field and referenced field have different sizes.
         /// </summary>
         public static string PX1078Title_TypesOfDacFieldAndReferencedFieldHaveDifferentSize {
             get {
@@ -2087,7 +2086,8 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The forbidden {0} &quot;{1}&quot; is used.Reason: {2}.
+        ///   Looks up a localized string similar to The forbidden {0} &quot;{1}&quot; is used.
+        ///Reason: {2}.
         /// </summary>
         public static string PX1099TitleFormatWithReason {
             get {

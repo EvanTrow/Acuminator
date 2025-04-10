@@ -351,7 +351,10 @@
   <data name="PX1072" xml:space="preserve">
     <value>PXGraphCreationForBqlQueries</value>
   </data>
-  <data name="PX1073" xml:space="preserve">
+  <data name="PX1073FieldUpdating" xml:space="preserve">
+    <value>ExceptionsInFieldUpdating</value>
+  </data>
+  <data name="PX1073RowPersisted" xml:space="preserve">
     <value>ExceptionsInRowPersisted</value>
   </data>
   <data name="PX1074" xml:space="preserve">
@@ -365,6 +368,12 @@
   </data>
   <data name="PX1077" xml:space="preserve">
     <value>EventHandlersShouldBeProtectedVirtual</value>
+  </data>
+  <data name="PX1078_DifferentType" xml:space="preserve">
+    <value>TypesOfDacFieldAndReferencedFieldMismatch</value>
+  </data>
+  <data name="PX1078_DifferentTypeSize" xml:space="preserve">
+    <value>TypesOfDacFieldAndReferencedFieldHaveDifferentSize</value>
   </data>
   <data name="PX1080" xml:space="preserve">
     <value>LongRunOperationInDataViewDelegate</value>
@@ -422,11 +431,5 @@
   </data>
   <data name="PX1099" xml:space="preserve">
     <value>UsageOfForbiddenApi</value>
-  </data>
-  <data name="PX1078_DifferentType" xml:space="preserve">
-    <value>TypesOfDacFieldAndReferencedFieldMismatch</value>
-  </data>
-  <data name="PX1078_DifferentTypeSize" xml:space="preserve">
-    <value>TypesOfDacFieldAndReferencedFieldHaveDifferentSize</value>
   </data>
 </root>

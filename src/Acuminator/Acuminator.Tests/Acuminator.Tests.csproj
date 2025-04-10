@@ -595,6 +595,8 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\ThrowingExceptions\Sources\EventHandlers\NonGraph\ExceptionInValidEventHandlers.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\ThrowingExceptions\Sources\EventHandlers\NonGraph\SetupNotEnteredExceptionInInvalidEventHandlers.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\ThrowingExceptions\Sources\EventHandlers\NonGraph\SetupNotEnteredExceptionInRowSelected.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\ThrowingExceptions\Sources\EventHandlers\Graph\ExceptionInFieldUpdating.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\ThrowingExceptions\Sources\EventHandlers\NonGraph\ExceptionInFieldUpdating.cs" />
     <Compile Include="Tests\StaticAnalysis\ThrowingExceptions\ThrowingExceptionsInActionHandlersTests.cs" />
     <Compile Include="Tests\StaticAnalysis\ThrowingExceptions\ThrowingExceptionsInNonGraphEventHandlersTests.cs" />
     <Compile Include="Tests\StaticAnalysis\ThrowingExceptions\ThrowingExceptionsInGraphEventHandlers_NonISVTests.cs" />
