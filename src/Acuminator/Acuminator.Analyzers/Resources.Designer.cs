@@ -1015,6 +1015,15 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Async void methods are forbidden in Acumatica.
+        /// </summary>
+        public static string PX1038Title {
+            get {
+                return ResourceManager.GetString("PX1038Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Move the code to the Initialize() method.
         /// </summary>
         public static string PX1040Fix {
