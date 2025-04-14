@@ -44,9 +44,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.AsyncVoidMethods
 				return;
 			}
 
-			if (!methodDeclaration.IsPartial())
-				return;
+			if (methodDeclaration.IsPartial())
+				AnalyzePartialMethod(syntaxContext, pxContext, methodDeclaration);
+		}
 
+		private static void AnalyzePartialMethod(SyntaxNodeAnalysisContext syntaxContext, PXContext pxContext, MethodDeclarationSyntax methodDeclaration)
+		{
 			// For partial methods one of the declarations may be async and the other not.
 			// So, both declarations need to be checked.
 			// Thus, we need to resort to a bit more expensive symbol analysis.
@@ -54,7 +57,20 @@ namespace Acuminator.Analyzers.StaticAnalysis.AsyncVoidMethods
 
 			var methodSymbol = syntaxContext.SemanticModel.GetDeclaredSymbol(methodDeclaration, syntaxContext.CancellationToken);
 
-			if (methodSymbol?.IsAsync == true)
+			if (methodSymbol == null)
+				return;
+
+			if (methodSymbol.IsAsync)
+			{
+				ReportAsyncVoidMethod(syntaxContext, pxContext, methodDeclaration);
+				return;
+			}
+
+			var otherPartOfPartialMethod = methodSymbol.IsPartialDefinition
+				? methodSymbol.PartialImplementationPart
+				: methodSymbol.PartialDefinitionPart;
+
+			if (otherPartOfPartialMethod != null && otherPartOfPartialMethod.IsAsync)
 				ReportAsyncVoidMethod(syntaxContext, pxContext, methodDeclaration);
 		}
 
