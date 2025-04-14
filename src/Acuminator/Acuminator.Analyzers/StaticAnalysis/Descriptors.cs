@@ -251,7 +251,11 @@ namespace Acuminator.Analyzers.StaticAnalysis
 				DiagnosticsShortName.PX1037);
 
 		public static DiagnosticDescriptor PX1038_AsyncVoidMethod { get; } =
-			Rule("PX1038", nameof(Resources.PX1038Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error,
+			Rule("PX1038", nameof(Resources.PX1038TitleMethods).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error,
+				DiagnosticsShortName.PX1038);
+
+		public static DiagnosticDescriptor PX1038_AsyncVoidLambdasAndAnonymousDelegates { get; } =
+			Rule("PX1038", nameof(Resources.PX1038TitleLambdas).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error,
 				DiagnosticsShortName.PX1038);
 
 		public static DiagnosticDescriptor PX1040_ConstructorInGraphExtension { get; } =

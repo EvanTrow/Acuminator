@@ -466,7 +466,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AsyncVoidMethod.
+        ///   Looks up a localized string similar to AsyncVoidMethodsAndLambdas.
         /// </summary>
         public static string PX1038 {
             get {

@@ -1015,11 +1015,20 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Async void lambdas and anonymous methods are forbidden in Acumatica.
+        /// </summary>
+        public static string PX1038TitleLambdas {
+            get {
+                return ResourceManager.GetString("PX1038TitleLambdas", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Async void methods are forbidden in Acumatica.
         /// </summary>
-        public static string PX1038Title {
+        public static string PX1038TitleMethods {
             get {
-                return ResourceManager.GetString("PX1038Title", resourceCulture);
+                return ResourceManager.GetString("PX1038TitleMethods", resourceCulture);
             }
         }
         
