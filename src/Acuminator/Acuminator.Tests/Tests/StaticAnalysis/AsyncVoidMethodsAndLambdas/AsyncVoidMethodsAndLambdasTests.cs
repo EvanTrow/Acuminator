@@ -10,9 +10,9 @@ using Acuminator.Utilities;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Xunit;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.AsyncVoidMethods
+namespace Acuminator.Tests.Tests.StaticAnalysis.AsyncVoidMethodsAndLambdas
 {
-	public class AsyncVoidMethodsTests : DiagnosticVerifier
+	public class AsyncVoidMethodsAndLambdasTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => 
 			new AsyncVoidMethodsAnalyzer(

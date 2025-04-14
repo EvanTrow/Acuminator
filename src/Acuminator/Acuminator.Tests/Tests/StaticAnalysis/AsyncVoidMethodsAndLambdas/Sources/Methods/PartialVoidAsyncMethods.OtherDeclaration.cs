@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.AsyncVoidMethods.Sources
+namespace Acuminator.Tests.Tests.StaticAnalysis.AsyncVoidMethodsAndLambdas.Sources
 {
 	public partial class MyService
 	{

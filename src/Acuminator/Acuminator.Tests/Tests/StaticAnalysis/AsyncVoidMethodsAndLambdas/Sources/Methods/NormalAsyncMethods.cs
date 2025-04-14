@@ -3,7 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PX.Data;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.AsyncVoidMethods.Sources
+namespace Acuminator.Tests.Tests.StaticAnalysis.AsyncVoidMethodsAndLambdas.Sources
 {
 	public class MyGraph : PXGraph<MyGraph>
 	{
