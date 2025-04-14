@@ -28,14 +28,31 @@ namespace Acuminator.Analyzers.StaticAnalysis.AsyncVoidMethods
 
 		protected override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, PXContext pxContext)
 		{
-			compilationStartContext.RegisterSyntaxNodeAction(c => AnalyzeMethodNode(c, pxContext), SyntaxKind.MethodDeclaration);
+			compilationStartContext.RegisterSyntaxNodeAction(c => AnalyzeMethodOrLambdaDeclarationNode(c, pxContext), 
+										SyntaxKind.MethodDeclaration, SyntaxKind.ParenthesizedLambdaExpression,
+										SyntaxKind.AnonymousMethodExpression);
 		}
 
-		private static void AnalyzeMethodNode(SyntaxNodeAnalysisContext syntaxContext, PXContext pxContext)
+		private static void AnalyzeMethodOrLambdaDeclarationNode(SyntaxNodeAnalysisContext syntaxContext, PXContext pxContext)
 		{
 			syntaxContext.CancellationToken.ThrowIfCancellationRequested();
 
-			if (syntaxContext.Node is not MethodDeclarationSyntax methodDeclaration || !methodDeclaration.IsVoidMethod())
+			switch (syntaxContext.Node)
+			{
+				case MethodDeclarationSyntax methodDeclaration:
+					AnalyzeMethodDeclaration(syntaxContext, methodDeclaration, pxContext);
+					return;
+
+				// common base class for lambdas and anonymous methods
+				case AnonymousFunctionExpressionSyntax anonymousFunctionExpression:
+					AnalyzeLambdaDeclaration(syntaxContext, pxContext, anonymousFunctionExpression);
+					return;
+			}
+		}
+
+		private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext syntaxContext, MethodDeclarationSyntax methodDeclaration, PXContext pxContext)
+		{
+			if (!methodDeclaration.IsVoidMethod())
 				return;
 
 			if (methodDeclaration.IsAsync())
@@ -82,6 +99,32 @@ namespace Acuminator.Analyzers.StaticAnalysis.AsyncVoidMethods
 			syntaxContext.ReportDiagnosticWithSuppressionCheck(
 								Diagnostic.Create(Descriptors.PX1038_AsyncVoidMethod, location),
 								pxContext.CodeAnalysisSettings);
+		}
+
+		private static void AnalyzeLambdaDeclaration(SyntaxNodeAnalysisContext syntaxContext, PXContext pxContext,
+													 AnonymousFunctionExpressionSyntax lambdaOrAnonymousDelegateDeclaration)
+		{
+			if (lambdaOrAnonymousDelegateDeclaration.AsyncKeyword == default ||
+				!lambdaOrAnonymousDelegateDeclaration.AsyncKeyword.IsKind(SyntaxKind.AsyncKeyword))
+			{
+				return;
+			}
+
+			if (syntaxContext.SemanticModel.GetDeclaredSymbol(lambdaOrAnonymousDelegateDeclaration, 
+																syntaxContext.CancellationToken) is not IMethodSymbol lambdaMethodSymbol)
+			{
+				return;
+			}
+
+			if (lambdaMethodSymbol.ReturnsVoid)
+			{
+				var location = lambdaOrAnonymousDelegateDeclaration.AsyncKeyword.GetLocation().NullIfLocationKindIsNone() ??
+							   lambdaOrAnonymousDelegateDeclaration.GetLocation();
+
+				syntaxContext.ReportDiagnosticWithSuppressionCheck(
+									Diagnostic.Create(Descriptors.PX1038_AsyncVoidLambdasAndAnonymousDelegates, location),
+									pxContext.CodeAnalysisSettings);
+			}
 		}
 	}
 }
