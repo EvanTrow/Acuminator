@@ -29,7 +29,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.AsyncVoidMethodsAndLambdas
 		protected override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, PXContext pxContext)
 		{
 			compilationStartContext.RegisterSyntaxNodeAction(c => AnalyzeMethodOrLambdaDeclarationNode(c, pxContext), 
-										SyntaxKind.MethodDeclaration, SyntaxKind.ParenthesizedLambdaExpression,
+										SyntaxKind.MethodDeclaration, 
+										SyntaxKind.ParenthesizedLambdaExpression, SyntaxKind.SimpleLambdaExpression,
 										SyntaxKind.AnonymousMethodExpression);
 		}
 
@@ -104,27 +105,20 @@ namespace Acuminator.Analyzers.StaticAnalysis.AsyncVoidMethodsAndLambdas
 		private static void AnalyzeLambdaDeclaration(SyntaxNodeAnalysisContext syntaxContext, PXContext pxContext,
 													 AnonymousFunctionExpressionSyntax lambdaOrAnonymousDelegateDeclaration)
 		{
-			if (lambdaOrAnonymousDelegateDeclaration.AsyncKeyword == default ||
-				!lambdaOrAnonymousDelegateDeclaration.AsyncKeyword.IsKind(SyntaxKind.AsyncKeyword))
-			{
+			if (!lambdaOrAnonymousDelegateDeclaration.AsyncKeyword.IsKind(SyntaxKind.AsyncKeyword))
 				return;
-			}
 
-			if (syntaxContext.SemanticModel.GetDeclaredSymbol(lambdaOrAnonymousDelegateDeclaration, 
-																syntaxContext.CancellationToken) is not IMethodSymbol lambdaMethodSymbol)
-			{
+			var lambdaMethodSymbol = syntaxContext.SemanticModel.GetSymbolOrFirstCandidate(lambdaOrAnonymousDelegateDeclaration, 
+																						   syntaxContext.CancellationToken) as IMethodSymbol;
+			if (lambdaMethodSymbol == null || !lambdaMethodSymbol.ReturnsVoid)
 				return;
-			}
 
-			if (lambdaMethodSymbol.ReturnsVoid)
-			{
-				var location = lambdaOrAnonymousDelegateDeclaration.AsyncKeyword.GetLocation().NullIfLocationKindIsNone() ??
+			var location = lambdaOrAnonymousDelegateDeclaration.AsyncKeyword.GetLocation().NullIfLocationKindIsNone() ??
 							   lambdaOrAnonymousDelegateDeclaration.GetLocation();
 
-				syntaxContext.ReportDiagnosticWithSuppressionCheck(
-									Diagnostic.Create(Descriptors.PX1038_AsyncVoidLambdasAndAnonymousDelegates, location),
-									pxContext.CodeAnalysisSettings);
-			}
+			syntaxContext.ReportDiagnosticWithSuppressionCheck(
+								Diagnostic.Create(Descriptors.PX1038_AsyncVoidLambdasAndAnonymousDelegates, location),
+								pxContext.CodeAnalysisSettings);
 		}
 	}
 }
