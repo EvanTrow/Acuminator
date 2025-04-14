@@ -1,0 +1,71 @@
+﻿using System;
+using System.Collections.Immutable;
+using System.Linq;
+
+using Acuminator.Utilities;
+using Acuminator.Utilities.DiagnosticSuppression;
+using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Syntax;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+namespace Acuminator.Analyzers.StaticAnalysis.AsyncVoidMethods
+{
+	[DiagnosticAnalyzer(LanguageNames.CSharp)]
+	public partial class AsyncVoidMethodsAnalyzer : PXDiagnosticAnalyzer
+	{
+		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+			ImmutableArray.Create(Descriptors.PX1038_AsyncVoidMethod);
+
+		public AsyncVoidMethodsAnalyzer() : this(null)
+		{ }
+
+		public AsyncVoidMethodsAnalyzer(CodeAnalysisSettings? codeAnalysisSettings) : base(codeAnalysisSettings)
+		{ }
+
+		protected override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, PXContext pxContext)
+		{
+			compilationStartContext.RegisterSyntaxNodeAction(c => AnalyzeMethodNode(c, pxContext), SyntaxKind.MethodDeclaration);
+		}
+
+		private static void AnalyzeMethodNode(SyntaxNodeAnalysisContext syntaxContext, PXContext pxContext)
+		{
+			syntaxContext.CancellationToken.ThrowIfCancellationRequested();
+
+			if (syntaxContext.Node is not MethodDeclarationSyntax methodDeclaration || !methodDeclaration.IsVoidMethod())
+				return;
+
+			if (methodDeclaration.IsAsync())
+			{
+				ReportAsyncVoidMethod(syntaxContext, pxContext, methodDeclaration);
+				return;
+			}
+
+			if (!methodDeclaration.IsPartial())
+				return;
+
+			// For partial methods one of the declarations may be async and the other not.
+			// So, both declarations need to be checked.
+			// Thus, we need to resort to a bit more expensive symbol analysis.
+			syntaxContext.CancellationToken.ThrowIfCancellationRequested();
+
+			var methodSymbol = syntaxContext.SemanticModel.GetDeclaredSymbol(methodDeclaration, syntaxContext.CancellationToken);
+
+			if (methodSymbol?.IsAsync == true)
+				ReportAsyncVoidMethod(syntaxContext, pxContext, methodDeclaration);
+		}
+
+		private static void ReportAsyncVoidMethod(SyntaxNodeAnalysisContext syntaxContext, PXContext pxContext, 
+												  MethodDeclarationSyntax methodDeclaration)
+		{
+			var location = methodDeclaration.ReturnType.GetLocation();
+
+			syntaxContext.ReportDiagnosticWithSuppressionCheck(
+								Diagnostic.Create(Descriptors.PX1038_AsyncVoidMethod, location),
+								pxContext.CodeAnalysisSettings);
+		}
+	}
+}
