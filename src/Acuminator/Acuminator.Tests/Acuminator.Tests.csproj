@@ -95,6 +95,8 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\AsyncVoidMethodsAndLambdas\Sources\Methods\PartialVoidAsyncMethods.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\AsyncVoidMethodsAndLambdas\Sources\Methods\RegularVoidAsyncMethods.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\AsyncVoidMethodsAndLambdas\Sources\Methods\NormalAsyncMethods.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\AsyncVoidMethodsAndLambdas\Sources\Lambdas\NormalAsyncLambdas.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\AsyncVoidMethodsAndLambdas\Sources\Lambdas\AsyncVoidLambdas.cs" />
     <Compile Include="Tests\StaticAnalysis\BannedApi\BannedApiTestsIsv.cs" />
     <Compile Include="Tests\StaticAnalysis\BannedApi\BannedApiAnalysisDisabledTests.cs" />
     <Compile Include="Tests\StaticAnalysis\BannedApi\BannedApiTestsIsvWithExternalFiles.cs" />

@@ -19,6 +19,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.AsyncVoidMethodsAndLambdas
 				CodeAnalysisSettings.Default.WithStaticAnalysisEnabled()
 											.WithSuppressionMechanismDisabled());
 
+		#region Method Tests
 		[Theory]
 		[EmbeddedFileData(@"Methods\NormalAsyncMethods.cs")]
 		public async virtual Task NormalAsyncMethods_ShouldNotShowDiagnostic(string source) =>
@@ -39,7 +40,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.AsyncVoidMethodsAndLambdas
 				Descriptors.PX1038_AsyncVoidMethod.CreateFor(7, 18),
 				Descriptors.PX1038_AsyncVoidMethod.CreateFor(9, 18),
 				Descriptors.PX1038_AsyncVoidMethod.CreateFor(11, 18));
-		
+
 		[Theory]
 		[EmbeddedFileData(@"Methods\PartialVoidAsyncMethods.OtherDeclaration.cs", @"Methods\PartialVoidAsyncMethods.cs")]
 		public async virtual Task AsyncVoid_PartialMethodsWithBody(string source, string otherDeclaration) =>
@@ -47,5 +48,28 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.AsyncVoidMethodsAndLambdas
 				Descriptors.PX1038_AsyncVoidMethod.CreateFor(7, 24),
 				Descriptors.PX1038_AsyncVoidMethod.CreateFor(12, 24),
 				Descriptors.PX1038_AsyncVoidMethod.CreateFor(16, 24));
+		#endregion
+
+		#region Lambda Tests
+		[Theory]
+		[EmbeddedFileData(@"Lambdas\NormalAsyncLambdas.cs")]
+		public async virtual Task NormalAsyncLambdas_ShouldNotShowDiagnostic(string source) =>
+			await VerifyCSharpDiagnosticAsync(source);
+
+		[Theory]
+		[EmbeddedFileData(@"Lambdas\AsyncVoidLambdas.cs")]
+		public async virtual Task AsyncVoid_RegularLambdas(string source) =>
+			await VerifyCSharpDiagnosticAsync(source,
+				Descriptors.PX1038_AsyncVoidLambdasAndAnonymousDelegates.CreateFor(10, 21),
+				Descriptors.PX1038_AsyncVoidLambdasAndAnonymousDelegates.CreateFor(11, 26),
+				Descriptors.PX1038_AsyncVoidLambdasAndAnonymousDelegates.CreateFor(12, 26),
+				Descriptors.PX1038_AsyncVoidLambdasAndAnonymousDelegates.CreateFor(13, 26),
+
+				Descriptors.PX1038_AsyncVoidLambdasAndAnonymousDelegates.CreateFor(15, 27),
+				Descriptors.PX1038_AsyncVoidLambdasAndAnonymousDelegates.CreateFor(16, 32),
+
+				Descriptors.PX1038_AsyncVoidLambdasAndAnonymousDelegates.CreateFor(18, 12),
+				Descriptors.PX1038_AsyncVoidLambdasAndAnonymousDelegates.CreateFor(19, 12));
+		#endregion
 	}
 }
