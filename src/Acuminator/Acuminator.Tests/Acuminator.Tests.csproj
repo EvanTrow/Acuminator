@@ -91,10 +91,10 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\BqlParameterMismatch\Sources\BqlWithGenericDacFieldCall.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\ForbiddenFieldsInDac\Sources\DacFieldsWithCompanyPrefix.cs" />
     <Compile Include="Tests\StaticAnalysis\AsyncVoidMethods\AsyncVoidMethodsTests.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\AsyncVoidMethods\Sources\PartialVoidAsyncMethods.OtherDeclaration.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\AsyncVoidMethods\Sources\PartialVoidAsyncMethods.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\AsyncVoidMethods\Sources\RegularVoidAsyncMethods.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\AsyncVoidMethods\Sources\NormalAsyncMethods.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\AsyncVoidMethods\Sources\Methods\PartialVoidAsyncMethods.OtherDeclaration.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\AsyncVoidMethods\Sources\Methods\PartialVoidAsyncMethods.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\AsyncVoidMethods\Sources\Methods\RegularVoidAsyncMethods.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\AsyncVoidMethods\Sources\Methods\NormalAsyncMethods.cs" />
     <Compile Include="Tests\StaticAnalysis\BannedApi\BannedApiTestsIsv.cs" />
     <Compile Include="Tests\StaticAnalysis\BannedApi\BannedApiAnalysisDisabledTests.cs" />
     <Compile Include="Tests\StaticAnalysis\BannedApi\BannedApiTestsIsvWithExternalFiles.cs" />

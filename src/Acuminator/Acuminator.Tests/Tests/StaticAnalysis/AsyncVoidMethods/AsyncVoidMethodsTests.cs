@@ -20,12 +20,12 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.AsyncVoidMethods
 											.WithSuppressionMechanismDisabled());
 
 		[Theory]
-		[EmbeddedFileData("NormalAsyncMethods.cs")]
+		[EmbeddedFileData(@"Methods\NormalAsyncMethods.cs")]
 		public async virtual Task NormalAsyncMethods_ShouldNotShowDiagnostic(string source) =>
 			await VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData("RegularVoidAsyncMethods.cs")]
+		[EmbeddedFileData(@"Methods\RegularVoidAsyncMethods.cs")]
 		public async virtual Task AsyncVoid_RegularMethods(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1038_AsyncVoidMethod.CreateFor(10, 16),
@@ -33,7 +33,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.AsyncVoidMethods
 				Descriptors.PX1038_AsyncVoidMethod.CreateFor(19, 16));
 
 		[Theory]
-		[EmbeddedFileData("PartialVoidAsyncMethods.cs", "PartialVoidAsyncMethods.OtherDeclaration.cs")]
+		[EmbeddedFileData(@"Methods\PartialVoidAsyncMethods.cs", @"Methods\PartialVoidAsyncMethods.OtherDeclaration.cs")]
 		public async virtual Task AsyncVoid_PartialMethodsWithoutBody(string source, string otherDeclaration) =>
 			await VerifyCSharpDiagnosticAsync(source, otherDeclaration,
 				Descriptors.PX1038_AsyncVoidMethod.CreateFor(7, 18),
@@ -41,7 +41,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.AsyncVoidMethods
 				Descriptors.PX1038_AsyncVoidMethod.CreateFor(11, 18));
 		
 		[Theory]
-		[EmbeddedFileData("PartialVoidAsyncMethods.OtherDeclaration.cs", "PartialVoidAsyncMethods.cs")]
+		[EmbeddedFileData(@"Methods\PartialVoidAsyncMethods.OtherDeclaration.cs", @"Methods\PartialVoidAsyncMethods.cs")]
 		public async virtual Task AsyncVoid_PartialMethodsWithBody(string source, string otherDeclaration) =>
 			await VerifyCSharpDiagnosticAsync(source, otherDeclaration,
 				Descriptors.PX1038_AsyncVoidMethod.CreateFor(7, 24),
