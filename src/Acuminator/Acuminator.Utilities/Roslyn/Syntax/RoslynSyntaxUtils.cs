@@ -238,6 +238,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 				BaseFieldDeclarationSyntax baseFieldDeclaration 	  => baseFieldDeclaration.Modifiers,
 				DelegateDeclarationSyntax delegateDeclaration 		  => delegateDeclaration.Modifiers,
 				LocalFunctionStatementSyntax localFunctionStatement   => localFunctionStatement.Modifiers,
+				AnonymousFunctionExpressionSyntax anonymousFunction   => anonymousFunction.Modifiers,
 				_ 													  => SyntaxFactory.TokenList()
 			};
 
