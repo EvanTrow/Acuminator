@@ -3,7 +3,7 @@
 using System;
 using System.Threading.Tasks;
 using Acuminator.Analyzers.StaticAnalysis;
-using Acuminator.Analyzers.StaticAnalysis.AsyncVoidMethods;
+using Acuminator.Analyzers.StaticAnalysis.AsyncVoidMethodsAndLambdas;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
@@ -15,7 +15,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.AsyncVoidMethodsAndLambdas
 	public class AsyncVoidMethodsAndLambdasTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => 
-			new AsyncVoidMethodsAnalyzer(
+			new AsyncVoidMethodsAndLambdasAnalyzer(
 				CodeAnalysisSettings.Default.WithStaticAnalysisEnabled()
 											.WithSuppressionMechanismDisabled());
 

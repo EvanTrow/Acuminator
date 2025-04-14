@@ -12,18 +12,18 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Acuminator.Analyzers.StaticAnalysis.AsyncVoidMethods
+namespace Acuminator.Analyzers.StaticAnalysis.AsyncVoidMethodsAndLambdas
 {
 	[DiagnosticAnalyzer(LanguageNames.CSharp)]
-	public partial class AsyncVoidMethodsAnalyzer : PXDiagnosticAnalyzer
+	public partial class AsyncVoidMethodsAndLambdasAnalyzer : PXDiagnosticAnalyzer
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
 			ImmutableArray.Create(Descriptors.PX1038_AsyncVoidMethod);
 
-		public AsyncVoidMethodsAnalyzer() : this(null)
+		public AsyncVoidMethodsAndLambdasAnalyzer() : this(null)
 		{ }
 
-		public AsyncVoidMethodsAnalyzer(CodeAnalysisSettings? codeAnalysisSettings) : base(codeAnalysisSettings)
+		public AsyncVoidMethodsAndLambdasAnalyzer(CodeAnalysisSettings? codeAnalysisSettings) : base(codeAnalysisSettings)
 		{ }
 
 		protected override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, PXContext pxContext)
