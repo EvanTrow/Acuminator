@@ -442,10 +442,10 @@ public virtual int? SomeDacField{ get; set; }</value>
     <value>Unbound DAC field cannot be used in the declaration of a key</value>
   </data>
   <data name="PX1038TitleLambdas" xml:space="preserve">
-    <value>Async void lambdas and anonymous methods are forbidden in Acumatica</value>
+    <value>Async void lambdas, and anonymous methods are forbidden in Acumatica Framework</value>
   </data>
   <data name="PX1038TitleMethods" xml:space="preserve">
-    <value>Async void methods are forbidden in Acumatica</value>
+    <value>Async void methods are forbidden in Acumatica Framework</value>
   </data>
   <data name="PX1040Fix" xml:space="preserve">
     <value>Move the code to the Initialize() method</value>
