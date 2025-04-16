@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+
 using Acuminator.Utilities.Common;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -8,34 +10,16 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	/// <summary>
 	/// Information about the action's handler in graph.
 	/// </summary>
-	public class ActionHandlerInfo : NodeSymbolItem<MethodDeclarationSyntax, IMethodSymbol>, IWriteableBaseItem<ActionHandlerInfo>
+	public class ActionHandlerInfo : OverridableNodeSymbolItem<ActionHandlerInfo, MethodDeclarationSyntax, IMethodSymbol>
 	{
-		/// <summary>
-		/// The overriden handler if any
-		/// </summary>
-		public ActionHandlerInfo Base
-		{
-			get;
-			internal set;
-		}
-
-		ActionHandlerInfo IWriteableBaseItem<ActionHandlerInfo>.Base
-		{
-			get => Base;
-			set => Base = value;
-		}
-
-
-		public ActionHandlerInfo(MethodDeclarationSyntax node, IMethodSymbol symbol, int declarationOrder) :
+		public ActionHandlerInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder) :
 							base(node, symbol, declarationOrder)
 		{
 		}
 
-		public ActionHandlerInfo(MethodDeclarationSyntax node, IMethodSymbol symbol, int declarationOrder, ActionHandlerInfo baseInfo) :
-							this(node, symbol, declarationOrder)
+		public ActionHandlerInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder, ActionHandlerInfo baseInfo) :
+							base(node, symbol, declarationOrder, baseInfo)
 		{
-			baseInfo.ThrowOnNull(nameof(baseInfo));
-			Base = baseInfo;
 		}
 	}
 }

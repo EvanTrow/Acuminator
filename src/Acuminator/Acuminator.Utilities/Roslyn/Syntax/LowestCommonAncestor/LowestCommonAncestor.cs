@@ -16,8 +16,8 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 	{
 		public static LCAResultForTwoStatements GetCommonAncestorForSyntaxStatements(StatementSyntax x, StatementSyntax y)
 		{
-			x.ThrowOnNull(nameof(x));
-			y.ThrowOnNull(nameof(y));
+			x.ThrowOnNull();
+			y.ThrowOnNull();
 
 			//Depth is average O(log n) operation, worst case is O(n) but it isn't the case for the syntax tree which is wide but not very deep.
 			//For statements we could consider depth constrained by BaseMethodDeclarationSyntax
@@ -43,7 +43,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 				}
 			}
 
-			while (currentX != currentY)          //Then move up the branches until nodes coincide
+			while (!Equals(currentX, currentY))          //Then move up the branches until nodes coincide
 			{
 				prevX = currentX;
 				prevY = currentY;
@@ -56,8 +56,8 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 
 		public static LCAResultForTwoNodes GetCommonAncestorForSyntaxNodesInsideMethods(SyntaxNode x, SyntaxNode y)
 		{
-			x.ThrowOnNull(nameof(x));
-			y.ThrowOnNull(nameof(y));
+			x.ThrowOnNull();
+			y.ThrowOnNull();
 
 			//Depth is average O(log n) operation, worst case is O(n) but it isn't the case for the syntax tree which is wide but not very deep.
 			//For nodes inside methods we could consider depth constrained by BaseMethodDeclarationSyntax
@@ -72,23 +72,23 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 				if (depthX > depthY)
 				{
 					prevX = currentX;
-					currentX = currentX.Parent;
+					currentX = currentX?.Parent;
 					depthX--;
 				}
 				else
 				{
 					prevY = currentY;
-					currentY = currentY.Parent;
+					currentY = currentY?.Parent;
 					depthY--;
 				}
 			}
 
-			while (currentX != currentY)          //Then move up the branches until nodes coincide
+			while (!Equals(currentX, currentY))          //Then move up the branches until nodes coincide
 			{
 				prevX = currentX;
 				prevY = currentY;
-				currentX = currentX.Parent;
-				currentY = currentY.Parent;
+				currentX = currentX?.Parent;
+				currentY = currentY?.Parent;
 			}
 
 			return new LCAResultForTwoNodes(currentX, prevX, prevY);

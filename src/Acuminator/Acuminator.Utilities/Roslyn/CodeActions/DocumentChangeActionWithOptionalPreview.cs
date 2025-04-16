@@ -15,15 +15,13 @@ namespace Acuminator.Utilities.Roslyn.CodeActions
 		private readonly Func<CancellationToken, Task<Document>> _createChangedDocument;
 
 		public DocumentChangeActionWithOptionalPreview(string title, Func<CancellationToken, Task<Document>> createChangedDocument, bool displayPreview, 
-													   string equivalenceKey = null) :
+													   string? equivalenceKey = null) :
 												  base(title, equivalenceKey, displayPreview)
 		{
-			_createChangedDocument = createChangedDocument.CheckIfNull(nameof(createChangedDocument));
+			_createChangedDocument = createChangedDocument.CheckIfNull();
 		}
 
-		protected override Task<Document> GetChangedDocumentAsync(CancellationToken cancellationToken)
-		{
-			return _createChangedDocument(cancellationToken);
-		}
+		protected override Task<Document> GetChangedDocumentAsync(CancellationToken cancellationToken) =>
+			_createChangedDocument(cancellationToken);
 	}
 }

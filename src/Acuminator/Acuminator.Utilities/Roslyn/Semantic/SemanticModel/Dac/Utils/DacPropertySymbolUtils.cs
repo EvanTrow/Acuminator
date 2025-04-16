@@ -1,12 +1,13 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.PXFieldAttributes;
+using Acuminator.Utilities.Roslyn.Semantic.Attribute;
+using Acuminator.Utilities.Roslyn.Semantic.SharedInfo;
+using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -42,12 +43,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// The DAC property symbols with nodes from DAC.
 		/// </returns>
 		public static OverridableItemsCollection<DacPropertyInfo> GetDacPropertiesFromDac(this ITypeSymbol dac, PXContext pxContext,
-																						  IDictionary<string, DacFieldInfo> dacFields,
-																						  bool includeFromInheritanceChain = true,																					  
+																						  IDictionary<string, DacBqlFieldInfo> dacFields,
+																						  bool includeFromInheritanceChain = true,
 																						  CancellationToken cancellation = default)
 		{
-			pxContext.ThrowOnNull(nameof(pxContext));
-			dacFields.ThrowOnNull(nameof(dacFields));
+			pxContext.ThrowOnNull();
+			dacFields.ThrowOnNull();
 
 			if (!dac.IsDAC(pxContext))
 				return new OverridableItemsCollection<DacPropertyInfo>();
@@ -58,7 +59,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			var dbBoundnessCalculator = new DbBoundnessCalculator(pxContext);
 
 			propertiesByName.AddRangeWithDeclarationOrder(dacProperties, startingOrder: 0, 
-												(rawData, order) => DacPropertyInfo.Create(pxContext, rawData.Node, rawData.Symbol, order, dbBoundnessCalculator, dacFields));
+												(rawData, order) => DacPropertyInfo.CreateUnsafe(pxContext, rawData.Node, rawData.Symbol, order, 
+																								 dbBoundnessCalculator, dacFields));
 			return propertiesByName;
 		}
 
@@ -74,10 +76,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// </returns>
 		public static OverridableItemsCollection<DacPropertyInfo> GetPropertiesFromDacOrDacExtensionAndBaseDac(this ITypeSymbol dacOrExtension,
 																											   PXContext pxContext,
-																											   IDictionary<string, DacFieldInfo> dacFields,
+																											   IDictionary<string, DacBqlFieldInfo> dacFields,
 																											   CancellationToken cancellation = default)
 		{
-			pxContext.ThrowOnNull(nameof(pxContext));
+			pxContext.ThrowOnNull();
 
 			bool isDac = dacOrExtension.IsDAC(pxContext);
 
@@ -100,11 +102,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// The properties from DAC extension and base DAC.
 		/// </returns>
 		public static OverridableItemsCollection<DacPropertyInfo> GetPropertiesFromDacExtensionAndBaseDac(this ITypeSymbol dacExtension, PXContext pxContext,
-																										  IDictionary<string, DacFieldInfo> dacFields,
+																										  IDictionary<string, DacBqlFieldInfo> dacFields,
 																										  CancellationToken cancellation = default)
 		{
-			dacExtension.ThrowOnNull(nameof(dacExtension));
-			pxContext.ThrowOnNull(nameof(pxContext));
+			dacExtension.ThrowOnNull();
+			pxContext.ThrowOnNull();
 
 			var dbBoundnessCalculator = new DbBoundnessCalculator(pxContext);
 			return GetPropertiesOrFieldsInfoFromDacExtension<DacPropertyInfo>(dacExtension, pxContext, AddPropertiesFromDac, AddPropertiesFromDacExtension);
@@ -114,18 +116,20 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			{
 				var rawDacProperties = dac.GetRawPropertiesFromDacImpl(pxContext, includeFromInheritanceChain: true, cancellation);
 				return propertiesCollection.AddRangeWithDeclarationOrder(rawDacProperties, startingOrder,
-													(dacProperty, order) => DacPropertyInfo.Create(pxContext, dacProperty.Node, dacProperty.Symbol, order, dbBoundnessCalculator, dacFields));
+													(dacProperty, order) => DacPropertyInfo.CreateUnsafe(pxContext, dacProperty.Node, dacProperty.Symbol, order, 
+																										 dbBoundnessCalculator, dacFields));
 			}
 
 			int AddPropertiesFromDacExtension(OverridableItemsCollection<DacPropertyInfo> propertiesCollection, ITypeSymbol dacExt, int startingOrder)
 			{
 				var rawDacExtensionProperties = GetRawPropertiesFromDacOrDacExtensionImpl(dacExt, pxContext, cancellation);
 				return propertiesCollection.AddRangeWithDeclarationOrder(rawDacExtensionProperties, startingOrder,
-													(dacProperty, order) => DacPropertyInfo.Create(pxContext, dacProperty.Node, dacProperty.Symbol, order, dbBoundnessCalculator, dacFields));
+													(dacProperty, order) => DacPropertyInfo.CreateUnsafe(pxContext, dacProperty.Node, dacProperty.Symbol, order, 
+																										 dbBoundnessCalculator, dacFields));
 			}
 		}
 
-		private static IEnumerable<(PropertyDeclarationSyntax Node, IPropertySymbol Symbol)> GetRawPropertiesFromDacImpl(this ITypeSymbol dac, PXContext pxContext,
+		private static IEnumerable<(PropertyDeclarationSyntax? Node, IPropertySymbol Symbol)> GetRawPropertiesFromDacImpl(this ITypeSymbol dac, PXContext pxContext,
 																														 bool includeFromInheritanceChain,
 																														 CancellationToken cancellation)
 		{
@@ -141,9 +145,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			}
 		}
 
-		private static IEnumerable<(PropertyDeclarationSyntax Node, IPropertySymbol Symbol)> GetRawPropertiesFromDacOrDacExtensionImpl(this ITypeSymbol dacOrExtension,
-																																	   PXContext pxContext,
-																																	   CancellationToken cancellation)
+		private static IEnumerable<(PropertyDeclarationSyntax? Node, IPropertySymbol Symbol)> GetRawPropertiesFromDacOrDacExtensionImpl(this ITypeSymbol dacOrExtension,
+																																		PXContext pxContext,
+																																		CancellationToken cancellation)
 		{
 			var dacProperties = dacOrExtension.GetMembers().OfType<IPropertySymbol>()
 														   .Where(p => p.DeclaredAccessibility == Accessibility.Public && !p.IsStatic);
@@ -152,10 +156,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			{
 				cancellation.ThrowIfCancellationRequested();
 
-				if (property.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(cancellation) is PropertyDeclarationSyntax node)
-				{
-					yield return (node, property);
-				}
+				var propertyNode = property.GetSyntax(cancellation) as PropertyDeclarationSyntax;
+				yield return (propertyNode, property);
 			}
 		}
 
@@ -187,6 +189,30 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			}
 
 			return propertiesByName;
+		}
+
+		public static DacFieldSize GetFieldSize(this DacPropertyInfo dacProperty, PXContext pxContext)
+		{
+			var foreignFieldSizes = dacProperty.CheckIfNull().DeclaredDataTypeAttributes
+															 .AllDeclaredDatatypeAttributesOnDacProperty
+															 .Select(dataTypeAttr => dataTypeAttr.GetFieldSize(pxContext));
+
+			DacFieldSize consolidatedFieldSize = DacFieldSize.NotDefined;
+
+			foreach (DacFieldSize fieldSize in foreignFieldSizes)
+			{
+				if (fieldSize.IsNotDefined)
+					continue;
+				else if (fieldSize.IsInconsistent)
+					return DacFieldSize.MultipleSizesDeclared;			// Size is inconsistent
+
+				if (consolidatedFieldSize.IsNotDefined)
+					consolidatedFieldSize = fieldSize;
+				else if (!consolidatedFieldSize.Equals(fieldSize))
+					return DacFieldSize.MultipleSizesDeclared;			// Size is inconsistent
+			}
+
+			return consolidatedFieldSize;
 		}
 	}
 }

@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 using System.Collections.Immutable;
 
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
@@ -26,7 +25,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreationInGraphInWrongPlace
 
 				Descriptors.PX1084_GraphCreationInDataViewDelegate);
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphSemanticModel graphOrGraphExtension)
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel graphOrGraphExtension)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -52,7 +51,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreationInGraphInWrongPlace
 				graphViewDelegateWalker.Visit(del.Node);
 			}
 
-			if (graphOrGraphExtension.Type == GraphType.PXGraphExtension)
+			if (graphOrGraphExtension.GraphType == GraphType.PXGraphExtension)
 			{
 				CheckIsActiveMethod(context, pxContext, Descriptors.PX1056_PXGraphCreationInIsActiveMethod, graphOrGraphExtension.IsActiveMethodInfo);
 				CheckIsActiveMethod(context, pxContext, Descriptors.PX1056_PXGraphCreationInIsActiveForGraphMethod, 

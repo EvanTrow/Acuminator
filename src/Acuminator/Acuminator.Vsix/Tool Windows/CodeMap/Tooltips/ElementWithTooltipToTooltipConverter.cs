@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -8,7 +10,6 @@ using Acuminator.Utilities.Common;
 using Acuminator.Vsix.Utilities;
 using Acuminator.Vsix.ToolWindows.Common;
 
-
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	/// <summary>
@@ -17,15 +18,15 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	[ValueConversion(sourceType: typeof(IElementWithTooltip), targetType: typeof(string))]
 	public class ElementWithTooltipToTooltipConverter : IValueConverter
 	{
-		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			if (!(value is IElementWithTooltip elementWithTooltip))
-				return Binding.DoNothing;
+			if (value is not IElementWithTooltip elementWithTooltip)
+				return null;
 
-			TooltipInfo tooltipInfo = elementWithTooltip.CalculateTooltip();
+			TooltipInfo? tooltipInfo = elementWithTooltip.CalculateTooltip();
 
 			if (tooltipInfo == null)
-				return Binding.DoNothing;
+				return null;
 
 			if (tooltipInfo.TrimExcess)
 				return tooltipInfo.Tooltip.TrimExcess(tooltipInfo.MaxLength, tooltipInfo.OverflowSuffix);		

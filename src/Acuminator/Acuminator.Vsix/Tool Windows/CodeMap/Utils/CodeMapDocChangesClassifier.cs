@@ -1,18 +1,20 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Semantic.Dac;
+using Acuminator.Utilities.Roslyn.Syntax;
+using Acuminator.Vsix.ToolWindows.CodeMap.Dac;
+using Acuminator.Vsix.ChangesClassification;
+
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Syntax;
-using Acuminator.Vsix.Utilities;
-using Acuminator.Vsix.ChangesClassification;
-using Acuminator.Utilities.Roslyn.Semantic.Dac;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
@@ -25,7 +27,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public CodeMapDocChangesClassifier(CodeMapWindowViewModel codeMapWindowViewModel)
 		{
-			_codeMapViewModel = codeMapWindowViewModel.CheckIfNull(nameof(codeMapWindowViewModel));
+			_codeMapViewModel = codeMapWindowViewModel.CheckIfNull();
 		}
 
 		public async Task<CodeMapRefreshMode> ShouldRefreshCodeMapAsync(Document oldDocument, SyntaxNode newRoot, Document newDocument,
@@ -72,7 +74,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		{
 			var changeScope = base.GetChangeScopeFromMethodBaseSyntaxNode(methodNodeBase, textChange, containingModeChange);
 
-			if (changeScope != ChangeInfluenceScope.Attributes || !(methodNodeBase is MethodDeclarationSyntax))
+			if (changeScope != ChangeInfluenceScope.Attributes || methodNodeBase is not MethodDeclarationSyntax)
 			{
 				return changeScope;
 			}
@@ -96,12 +98,12 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		/// <param name="containingModeChange">The containing mode change.</param>
 		/// <returns/>
 		protected override ChangeInfluenceScope? GetChangeScopeFromPropertyBaseSyntaxNode(BasePropertyDeclarationSyntax propertyNodeBase, 
-																					      in TextChange textChange, ContainmentModeChange containingModeChange)
+																						  in TextChange textChange, ContainmentModeChange containingModeChange)
 		{
 			var changeScope = base.GetChangeScopeFromPropertyBaseSyntaxNode(propertyNodeBase, textChange, containingModeChange);
 
 			//We look for changes in DAC property attributes
-			if (changeScope != ChangeInfluenceScope.Attributes || !(propertyNodeBase is PropertyDeclarationSyntax changedProperty) ||
+			if (changeScope != ChangeInfluenceScope.Attributes || propertyNodeBase is not PropertyDeclarationSyntax changedProperty ||
 				_codeMapViewModel.DocumentModel?.CodeMapSemanticModels == null)
 			{
 				return changeScope;
@@ -109,7 +111,14 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 			for (int i = 0; i < _codeMapViewModel.DocumentModel.CodeMapSemanticModels.Count; i++)
 			{
-				if (!(_codeMapViewModel.DocumentModel.CodeMapSemanticModels[i] is DacSemanticModel dacSemanticModel))
+				DacSemanticModel? dacSemanticModel = _codeMapViewModel.DocumentModel.CodeMapSemanticModels[i] switch
+				{
+					DacSemanticModelForCodeMap dacModelForCodeMap => dacModelForCodeMap.DacModel,
+					DacSemanticModel dacModel					  => dacModel,
+					_ 											  => null
+				};
+
+				if (dacSemanticModel == null)
 					continue;
 				else if (IsPropertyFromDAC(changedProperty, dacSemanticModel))
 					return ChangeInfluenceScope.Class;
@@ -120,18 +129,22 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		private bool IsPropertyFromDAC(PropertyDeclarationSyntax changedProperty, DacSemanticModel dacCandidate)
 		{
+			if (dacCandidate.IsInMetadata)
+				return false;
+
 			//basic fast check for bounds and file
 			if (!dacCandidate.Node.Span.Contains(changedProperty.Span) || dacCandidate.Node.SyntaxTree.FilePath != changedProperty.SyntaxTree.FilePath)
 				return false;
 
 			//Check that declaring type is the same
-			if (!(changedProperty.Parent is ClassDeclarationSyntax changedDac) || changedDac.Identifier.Text != dacCandidate.Node.Identifier.Text)
+			if (changedProperty.Parent is not ClassDeclarationSyntax changedDac || changedDac.Identifier.Text != dacCandidate.Node.Identifier.Text)
 				return false;
 
-			if (!dacCandidate.PropertiesByNames.TryGetValue(changedProperty.Identifier.Text, out var dacPropertyInfoCandidate))
+			if (!dacCandidate.PropertiesByNames.TryGetValue(changedProperty.Identifier.Text, out DacPropertyInfo? dacPropertyInfoCandidate))
 				return false;
 
-			return dacPropertyInfoCandidate.Node.ExplicitInterfaceSpecifier == changedProperty.ExplicitInterfaceSpecifier;
+			return dacPropertyInfoCandidate.IsInSource && 
+				   Equals(dacPropertyInfoCandidate.Node.ExplicitInterfaceSpecifier, changedProperty.ExplicitInterfaceSpecifier);
 		}
 	}
 }

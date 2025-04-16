@@ -1,12 +1,11 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.Semantic;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -26,10 +25,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.SavingChanges
 		public static SaveOperationKind GetSaveOperationKind(IMethodSymbol symbol, InvocationExpressionSyntax syntaxNode, 
 			SemanticModel semanticModel, PXContext pxContext)
 		{
-			symbol.ThrowOnNull(nameof (symbol));
-			syntaxNode.ThrowOnNull(nameof (syntaxNode));
-			semanticModel.ThrowOnNull(nameof (semanticModel));
-			pxContext.ThrowOnNull(nameof (pxContext));
+			symbol.ThrowOnNull();
+			syntaxNode.ThrowOnNull();
+			semanticModel.ThrowOnNull();
+			pxContext.ThrowOnNull();
 
 			var containingType = symbol.ContainingType?.OriginalDefinition;
 
@@ -64,23 +63,24 @@ namespace Acuminator.Analyzers.StaticAnalysis.SavingChanges
 
 		public static PXDBOperationKind GetPXDatabaseSaveOperationKind(IMethodSymbol symbol, PXContext pxContext)
 		{
-			symbol.ThrowOnNull(nameof(symbol));
-			pxContext.ThrowOnNull(nameof(pxContext));
+			symbol.ThrowOnNull();
+			pxContext.ThrowOnNull();
 
 			var containingType = symbol.ContainingType?.OriginalDefinition;
 
 			if (containingType != null && 
 			    containingType.InheritsFromOrEquals(pxContext.PXDatabase.Type))
 			{
-				if (string.Equals(symbol.Name, DelegateNames.Insert))
-					return PXDBOperationKind.Insert;
-				else if (string.Equals(symbol.Name, DelegateNames.Delete))
-					return PXDBOperationKind.Delete;
-				else if (string.Equals(symbol.Name, DelegateNames.Update))
-					return PXDBOperationKind.Update;
-				else if (string.Equals(symbol.Name, DelegateNames.Ensure))
-					return PXDBOperationKind.Ensure;
+				return symbol.Name switch
+				{
+					DelegateNames.Insert => PXDBOperationKind.Insert,
+					DelegateNames.Delete => PXDBOperationKind.Delete,
+					DelegateNames.Update => PXDBOperationKind.Update,
+					DelegateNames.Ensure => PXDBOperationKind.Ensure,
+					_					 => PXDBOperationKind.None
+				};
 			}
+
 			return PXDBOperationKind.None;
 		}
 
@@ -91,11 +91,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.SavingChanges
 
 			public SavePressWalker(SemanticModel semanticModel, PXContext pxContext)
 			{
-				semanticModel.ThrowOnNull(nameof (semanticModel));
-				pxContext.ThrowOnNull(nameof (pxContext));
-
-				_semanticModel = semanticModel;
-				_pxContext = pxContext;
+				_semanticModel = semanticModel.CheckIfNull();
+				_pxContext	   = pxContext.CheckIfNull();
 			}
 
 			public bool Found { get; private set; }

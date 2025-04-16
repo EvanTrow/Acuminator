@@ -11,6 +11,7 @@
     * [Indentation Depth](#indentation-depth)
     * [Control Flow Statements](#control-flow-statements)
     * [Local Functions](#local-functions)
+    * [Nullable Reference Types Analysis](#nullable-reference-types-analysis)
 * [Best Practices](#best-practices)
     * [Diagnostic and Code Fix Messages Style](#diagnostic-and-code-fix-messages-style) 
     * [Analyzers](#analyzers)
@@ -25,8 +26,9 @@
     * [Parametrized Diagnostic Messages](#parametrized-diagnostic-messages)
     * [Test Methods](#test-methods)
     * [Async Anonymous Delegates](#async-anonymous-delegates)
-    * [Value Tuples](#value-tuples)
+    * [Value Tuples (Obsolete)](#value-tuples-obsolete)
     * [Debugging Hints](#debugging-hints)
+    * [Checking Acumatica DLL Version](#checking-acumatica-dll-version)
 
 ## Code Style
 
@@ -173,6 +175,23 @@ The local functions can be used in the following three cases:
 
 * If you implement an async method with the argument check.
 * If you need better grouping of the public method with the private methods that only this public method uses. The general .NET convention recommends that you put all public methods above the private ones. However, you can improve readability by grouping private methods that are related to only one public method as its local functions. The number of these local functions should be no more than three.
+
+### Nullable Reference Types Analysis
+
+Acuminator actively uses [nullable reference types analysis](https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references) from C# 8. This feature is enabled by default in the Acuminator codebase except unit tests. 
+The nullable reference types analysis helps to avoid null reference exceptions and improve the overall code quality. Thus, it is mandatory to use it. 
+
+The nullability analysis will work by default in `Acuminator.Analyzers` and `Acuminator.Utilities` projects. New code added to these projects will be checked automaically. 
+
+However, the analysis is disabled in the unit tests projects, and it works strange in the `Acuminator.Vsix` project probably because it is a special VS SDK project and it adds some unusual specifics. 
+Nullable analysis warnings are not displayed in the code editor in the `Acuminator.Vsix` project unless there is an explicit pragrma directive enabling nullability analysis. 
+However, the analysis errors are still displayed in the *Output* tool window.
+
+Due to the reasons explained above, you must add nullable pragma directive as a first line to every new code file in these projects:
+
+```C#
+#nullable enable
+```
 
 ## Best Practices
 
@@ -425,7 +444,7 @@ https://docs.microsoft.com/ru-ru/dotnet/framework/configure-apps/file-schema/run
 
 Overall, the passing of asynchronous methods to `analyzer.RegisterXXX `is an unwanted scenario that should be avoided at all costs.
 
-### Value Tuples
+### Value Tuples (Obsolete)
 
 There is an issue with value tuples in Visual Studio 2017. There is a dependency conflict between some packages depending on different versions of `System.ValueTuple` which proved to be impossible to fix.
 The issue appear as a `MissingMethod` exception being thrown on attempt to call public API method with signature containing value tuples if the caller and callee are declared in different assemblies.
@@ -446,3 +465,12 @@ You need to do one of the following:
 * Perform a multiprocess debugging by attaching your debugger to a second process with loaded Roslyn analyzers. The name of the process should look like the following: *ServiceHub.RoslynCodeAnalysisService.exe*.
 
 The first option is much simpler but you have to check that your diagnostic works correctly when the out of process analysis is enabled for Visual Studio.
+
+### Checking Acumatica DLL Version
+
+You can find flags indicating the version of analyzed Acumatica DLLs in the `Acuminator.Utilities.Roslyn.Semantic.PXContext` type.
+
+If you need to add a new flag indicating the version of Acumatica DLLs, you should add it to the `PXContext` class. The check for Acumatica version has to be based on the presense of some new API
+added in the specific version of Acumatica DLLs. We can't rely on standard .Net assembly version attributes because Acumatica assemblies don't have them or they are not updated properly.
+
+*Remember! Only public API can be used to check the version of Acumatica DLLs because Roslyn does not load private and internal metadata of the external dependencies of the analyzed code.*

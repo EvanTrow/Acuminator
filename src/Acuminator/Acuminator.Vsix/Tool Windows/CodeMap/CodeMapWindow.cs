@@ -3,17 +3,13 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using System.Windows;
 
 using Acuminator.Vsix.Utilities;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
-
-using Community.VisualStudio.Toolkit;
 
 using ThreadHelper = Microsoft.VisualStudio.Shell.ThreadHelper;
 
@@ -60,6 +56,11 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			// Set the text that will appear in the title bar of the tool window. Note that because we need access to the package for localization,
 			// we have to wait to do this here. If we used a constant string, we could do this in the constructor.
 			this.Caption = VSIXResource.CodeMap_WindowTitle;
+			this.BitmapImageMoniker = new Microsoft.VisualStudio.Imaging.Interop.ImageMoniker()
+			{
+				Guid = Constants.Images.CodeMapIconGuid,
+				Id   = Constants.Images.CodeMapIconID
+			};
 
 			if (CodeMapWPFControl == null)
 				return;
@@ -69,7 +70,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			if (serviceProvider == null)
 				return;
 
-			Workspace? workspace = await AcuminatorVSPackage.Instance.GetVSWorkspaceAsync();
+			Workspace? workspace = await AcuminatorVSPackage.Instance!.GetVSWorkspaceAsync();
 
 			if (workspace == null)
 				return;

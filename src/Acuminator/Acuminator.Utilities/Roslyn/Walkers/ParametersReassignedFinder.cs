@@ -42,9 +42,9 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 																	  IReadOnlyCollection<string> parametersToCheck, SemanticModel semanticModel,
 																	  CancellationToken cancellation)
 		{
-			declarationNode.ThrowOnNull(nameof(declarationNode));
-			parametersToCheck.ThrowOnNull(nameof(parametersToCheck));
-			semanticModel.ThrowOnNull(nameof(semanticModel));
+			declarationNode.ThrowOnNull();
+			parametersToCheck.ThrowOnNull();
+			semanticModel.ThrowOnNull();
 
 			if (callSite != null && !declarationNode.Contains(callSite))
 				throw new ArgumentOutOfRangeException(nameof(callSite), "The call site node must be a descendant of the declaration node");
@@ -335,7 +335,8 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 					return null;
 
 				return localMethodDFA.AlwaysAssigned
-									 .Where(symbol => containingMethodsWithReassignableParameters.Contains(symbol.ContainingSymbol))
+									 .Where(symbol => containingMethodsWithReassignableParameters.Contains(symbol.ContainingSymbol, 
+																											SymbolEqualityComparer.Default))
 									 .ToList();
 			}
 
@@ -425,7 +426,7 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 			[MemberNotNull(nameof(_checkedLocalFunctions))]
 			private void AddToCheckedLocalFunctions(IMethodSymbol localFunction)
 			{
-				_checkedLocalFunctions = _checkedLocalFunctions ?? new HashSet<IMethodSymbol>();
+				_checkedLocalFunctions = _checkedLocalFunctions ?? new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
 				_checkedLocalFunctions.Add(localFunction);
 			}
 			#endregion

@@ -82,10 +82,10 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int Depth(this SyntaxNode node)
 		{
-			node.ThrowOnNull(nameof(node));
+			node.ThrowOnNull();
 
 			int depth = 0;
-			SyntaxNode curNode = node.Parent;
+			SyntaxNode? curNode = node.Parent;
 
 			while (curNode != null)
 			{
@@ -107,15 +107,15 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		public static int Depth<TRoot>(this SyntaxNode node)
 		where TRoot : SyntaxNode
 		{
-			node.ThrowOnNull(nameof(node));
+			node.ThrowOnNull();
 
 			if (node is TRoot)
 				return 0;
 
 			int depth = 0;
-			SyntaxNode curNode = node.Parent;
+			SyntaxNode? curNode = node.Parent;
 
-			while (curNode != null && !(curNode is TRoot))
+			while (curNode != null && curNode is not TRoot)
 			{
 				depth++;
 				curNode = curNode.Parent;
@@ -138,7 +138,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		where TRoot : SyntaxNode
 		where TNode : SyntaxNode
 		{
-			node.ThrowOnNull(nameof(node));
+			node.ThrowOnNull();
 
 			if (node is TRoot)
 				return 0;
@@ -146,7 +146,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 			int depth = 0;
 			TNode? curNode = node.Parent<TNode>();
 
-			while (curNode != null && !(curNode is TRoot))
+			while (curNode != null && curNode is not TRoot)
 			{
 				depth++;
 				curNode = curNode.Parent<TNode>();
@@ -155,35 +155,32 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 			return depth;
 		}
 
-		public static SyntaxNode LowestCommonAncestor(SyntaxNode nodeX, SyntaxNode nodeY)
+		public static SyntaxNode? LowestCommonAncestor(SyntaxNode nodeX, SyntaxNode nodeY)
 		{
-			nodeX.ThrowOnNull(nameof(nodeX));
-			nodeY.ThrowOnNull(nameof(nodeY));
-
 			int depthX = nodeX.Depth();            //Depth is average O(log n) operation, worst case is O(n) but it isn't the case for the syntax tree which is wide but not very deep
 			int depthY = nodeY.Depth();
 
-			SyntaxNode currentX = nodeX;
-			SyntaxNode currentY = nodeY;
+			SyntaxNode? currentX = nodeX;
+			SyntaxNode? currentY = nodeY;
 
 			while (depthX != depthY)                //First get nodes on the equal levels of depth
 			{
 				if (depthX > depthY)
 				{
-					currentX = currentX.Parent;
+					currentX = currentX?.Parent;
 					depthX--;
 				}
 				else
 				{
-					currentY = currentY.Parent;
+					currentY = currentY?.Parent;
 					depthY--;
 				}
 			}
 
-			while (currentX != currentY)          //Then move up the branches until nodes coincide
+			while (!Equals(currentX, currentY))          //Then move up the branches until nodes coincide
 			{
-				currentX = currentX.Parent;
-				currentY = currentY.Parent;
+				currentX = currentX?.Parent;
+				currentY = currentY?.Parent;
 			}
 
 			return currentX;

@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Linq;
 
 using Acuminator.Analyzers.StaticAnalysis.Dac;
@@ -31,7 +29,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.AutoNumberAttribute
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacOrDacExt)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
-			var autoNumberProperties = dacOrDacExt.DeclaredDacProperties.Where(property => property.IsAutoNumbering);
+			var autoNumberProperties = dacOrDacExt.DeclaredDacFieldPropertiesWithBqlFields.Where(property => property.IsAutoNumbering);
 
 			foreach (DacPropertyInfo dacProperty in autoNumberProperties)
 			{
@@ -54,7 +52,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.AutoNumberAttribute
 		private void ReportDacPropertyTypeIsNotString(SymbolAnalysisContext context, PXContext pxContext, DacPropertyInfo dacProperty)
 		{
 			var autoNumberingAttribute = dacProperty.Attributes.FirstOrDefault(a => a.IsAutoNumberAttribute);
-			var propertyTypeLocation = dacProperty.Node.Type.GetLocation();
+
+			// Node not null here because aggregated DAC analysers by default run only on DACs in source 
+			// and these properties are declared in the DAC type itself
+			var propertyTypeLocation = dacProperty.Node!.Type.GetLocation();
 
 			if (propertyTypeLocation != null)
 			{
@@ -83,7 +84,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.AutoNumberAttribute
 			if (stringAttributes.Count != 1)
 				return;
 
-			AttributeInfo stringAttribute = stringAttributes[0];
+			DacFieldAttributeInfo stringAttribute = stringAttributes[0];
 			int? stringLength = GetStringLengthFromStringAttribute(stringAttribute);
 			int minAllowedLength = pxContext.AttributeTypes.AutoNumberAttribute.MinAutoNumberLength;
 
@@ -99,13 +100,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.AutoNumberAttribute
 			}
 		}
 
-		private bool IsStringAttribute(AttributeInfo attribute, PXContext pxContext, 
+		private bool IsStringAttribute(DacFieldAttributeInfo attribute, PXContext pxContext, 
 									   INamedTypeSymbol dbBoundStringAttribute, INamedTypeSymbol unboundStringAttribute) =>
-			attribute.DbBoundness != DbBoundnessType.NotDefined &&
+			attribute.DbBoundness != DbBoundnessType.NotDefined && attribute.AttributeType != null &&
 			(attribute.AttributeType.IsDerivedFromOrAggregatesAttribute(dbBoundStringAttribute, pxContext) ||
 			 attribute.AttributeType.IsDerivedFromOrAggregatesAttribute(unboundStringAttribute, pxContext));
 
-		private int? GetStringLengthFromStringAttribute(AttributeInfo stringAttribute)
+		private int? GetStringLengthFromStringAttribute(DacFieldAttributeInfo stringAttribute)
 		{
 			if (stringAttribute.AttributeData.ConstructorArguments.IsDefaultOrEmpty)
 				return null;
@@ -129,18 +130,21 @@ namespace Acuminator.Analyzers.StaticAnalysis.AutoNumberAttribute
 			return stringLength;
 		}
 
-		private static Location? GetLocationToReportInsufficientStringLength(SymbolAnalysisContext context, AttributeInfo stringAttribute, int stringLength)
+		private static Location? GetLocationToReportInsufficientStringLength(SymbolAnalysisContext context, DacFieldAttributeInfo stringAttribute, int stringLength)
 		{
 			var syntaxNode = stringAttribute.AttributeData.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken);
 
-			if (!(syntaxNode is AttributeSyntax attributeSyntaxNode))
+			if (syntaxNode is not AttributeSyntax attributeSyntaxNode)
 				return stringAttribute.AttributeData.GetLocation(context.CancellationToken);
 
-			var argumentsList = attributeSyntaxNode.ArgumentList.Arguments;
-			
-			for (int i = 0; i < argumentsList.Count; i++)
+			var argumentsList = attributeSyntaxNode.ArgumentList?.Arguments;
+
+			if (argumentsList == null || argumentsList.Value.Count == 0)
+				return stringAttribute.AttributeData.GetLocation(context.CancellationToken);
+
+			for (int i = 0; i < argumentsList.Value.Count; i++)
 			{
-				AttributeArgumentSyntax argumenNode = argumentsList[i];
+				AttributeArgumentSyntax argumenNode = argumentsList.Value[i];
 
 				if (argumenNode.NameEquals != null)		//filter out attribute property argument setters like "IsDirty = true"
 					continue;

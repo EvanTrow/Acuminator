@@ -42,14 +42,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 		private static IEnumerable<ITypeSymbol> GetBaseTypesImplementation(this ITypeSymbol type, bool includeThis)
 		{
-			type.ThrowOnNull(nameof(type));
+			type.ThrowOnNull();
 
 			if (type is ITypeParameterSymbol typeParameter)
 			{
 				// for a type parameter we can consider its generic constraints like "where T : SomeClass" as its base types
 				IEnumerable<ITypeSymbol> constraintTypes = typeParameter.GetAllConstraintTypes(includeInterfaces: false)
 																	    .SelectMany(constraint => constraint.GetBaseTypesIterator(includeThis: true))
-																	    .Distinct();
+																	    .Distinct<ITypeSymbol>(SymbolEqualityComparer.Default);
 				return includeThis 
 					? constraintTypes.PrependItem(typeParameter)
 					: constraintTypes;
@@ -71,7 +71,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 		public static IEnumerable<INamedTypeSymbol> GetFlattenedNestedTypes(this ITypeSymbol type, CancellationToken cancellationToken)
 		{
-			type.ThrowOnNull(nameof(type));
+			type.ThrowOnNull();
 			cancellationToken.ThrowIfCancellationRequested();
 			return type.GetFlattenedNestedTypesImplementation(shouldWalkThroughNestedTypesPredicate: null, cancellationToken);			
 		}
@@ -79,9 +79,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		public static IEnumerable<INamedTypeSymbol> GetFlattenedNestedTypes(this ITypeSymbol type, Func<ITypeSymbol, bool>? shouldWalkThroughNestedTypesPredicate, 
 																			CancellationToken cancellationToken)
 		{
-			type.ThrowOnNull(nameof(type));
+			type.ThrowOnNull();
 			cancellationToken.ThrowIfCancellationRequested();
-			shouldWalkThroughNestedTypesPredicate.ThrowOnNull(nameof(shouldWalkThroughNestedTypesPredicate));
+			shouldWalkThroughNestedTypesPredicate.ThrowOnNull();
 
 			return type.GetFlattenedNestedTypesImplementation(shouldWalkThroughNestedTypesPredicate, cancellationToken);
 		}
@@ -131,9 +131,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 			}
 		}
 
-		public static IEnumerable<INamedTypeSymbol> GetContainingTypes(this ITypeSymbol type)
+		public static IEnumerable<INamedTypeSymbol> GetContainingTypes(this ISymbol symbol)
 		{
-			var current = type.ContainingType;
+			var current = symbol.CheckIfNull().ContainingType;
 
 			while (current != null)
 			{
@@ -144,7 +144,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 		public static INamedTypeSymbol? TopMostContainingType(this ITypeSymbol type)
 		{
-			INamedTypeSymbol current = type.CheckIfNull(nameof(type)).ContainingType;
+			INamedTypeSymbol current = type.CheckIfNull().ContainingType;
 
 			while (current != null)
 			{
@@ -187,8 +187,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// <returns/>
 		public static bool InheritsFromOrEquals(this ITypeSymbol type, ITypeSymbol baseType, bool includeInterfaces)
 		{
-			type.ThrowOnNull(nameof(type));
-			baseType.ThrowOnNull(nameof(baseType));
+			type.ThrowOnNull();
+			baseType.ThrowOnNull();
 
 			var typeList = type.GetBaseTypesAndThis();
 
@@ -197,7 +197,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				typeList = typeList.ConcatStructList(type.AllInterfaces);
 			}
 
-			return typeList.Any(t => t.Equals(baseType));
+			return typeList.Any(t => t.Equals(baseType, SymbolEqualityComparer.Default));
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -206,8 +206,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 		public static bool InheritsFromOrEqualsGeneric(this ITypeSymbol type, ITypeSymbol baseType, bool includeInterfaces)
 		{
-			type.ThrowOnNull(nameof(type));
-			baseType.ThrowOnNull(nameof(baseType));
+			type.ThrowOnNull();
+			baseType.ThrowOnNull();
 
 			var typeList = type.GetBaseTypesAndThis();
 
@@ -215,13 +215,13 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				typeList = typeList.ConcatStructList(type.AllInterfaces);
 
 			return typeList.Select(t => t.OriginalDefinition)
-						   .Any(t => t.Equals(baseType.OriginalDefinition));
+						   .Any(t => t.Equals(baseType.OriginalDefinition, SymbolEqualityComparer.Default));
 		}
 
 		public static bool InheritsFrom(this ITypeSymbol type, ITypeSymbol baseType, bool includeInterfaces = false)
 		{
-			type.ThrowOnNull(nameof(type));
-			baseType.ThrowOnNull(nameof(baseType));
+			type.ThrowOnNull();
+			baseType.ThrowOnNull();
 
 			IEnumerable<ITypeSymbol> baseTypes = type.GetBaseTypes();
 
@@ -230,14 +230,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				baseTypes = baseTypes.ConcatStructList(type.AllInterfaces);
 			}
 			
-			return baseTypes.Any(t => t.Equals(baseType));
+			return baseTypes.Any(t => t.Equals(baseType, SymbolEqualityComparer.Default));
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool ImplementsInterface(this ITypeSymbol type, ITypeSymbol interfaceType)
 		{
-			type.ThrowOnNull(nameof(type));
-			interfaceType.ThrowOnNull(nameof(interfaceType));
+			type.ThrowOnNull();
+			interfaceType.ThrowOnNull();
 
 			if (interfaceType.TypeKind != TypeKind.Interface)
 			{
@@ -247,17 +247,17 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 			// Interface types themselves are not included into AllInterfaces set, they do not implement themselves from Roslyn POV.
 			// However, for simplicity in Acuminator analysis we can assume equality of type and interfaceType as a special case of type implementing interfaceType interface.
 			// Therefore, we need to check type if it's an interface if it equals to the interfaceType
-			if (type.TypeKind == TypeKind.Interface && type.Equals(interfaceType))
+			if (type.TypeKind == TypeKind.Interface && type.Equals(interfaceType, SymbolEqualityComparer.Default))
 				return true;
 
-			return type.AllInterfaces.Any(t => t.Equals(interfaceType));
+			return type.AllInterfaces.Any(t => t.Equals(interfaceType, SymbolEqualityComparer.Default));
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool InheritsFrom(this ITypeSymbol symbol, string baseType)
 		{
-			symbol.ThrowOnNull(nameof(symbol));
-			baseType.ThrowOnNullOrWhiteSpace(nameof(baseType));
+			symbol.ThrowOnNull();
+			baseType.ThrowOnNullOrWhiteSpace();
 
 			return symbol.GetBaseTypesAndThis()
 						 .Any(t => t.Name == baseType);
@@ -320,14 +320,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// <returns/>
 		public static IEnumerable<ITypeSymbol> GetAllConstraintTypes(this ITypeParameterSymbol typeParameterSymbol, bool includeInterfaces = true)
 		{
-			typeParameterSymbol.ThrowOnNull(nameof(typeParameterSymbol));
+			typeParameterSymbol.ThrowOnNull();
 			
 			var constraintTypes = includeInterfaces
 				? GetAllConstraintTypesImplementation(typeParameterSymbol)
 				: GetAllConstraintTypesImplementation(typeParameterSymbol)
 							.Where(type => type.TypeKind != TypeKind.Interface);
 
-			return constraintTypes.Distinct();
+			return constraintTypes.Distinct<ITypeSymbol>(SymbolEqualityComparer.Default);
 
 			//---------------------------------Local Functions--------------------------------------------------------
 			IEnumerable<ITypeSymbol> GetAllConstraintTypesImplementation(ITypeParameterSymbol typeParameter, int recursionLevel = 0)
@@ -367,30 +367,31 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// </returns>
 		public static int? GetInheritanceDepth(this ITypeSymbol type, ITypeSymbol baseType)
 		{
-			type.ThrowOnNull(nameof(type));
-			baseType.ThrowOnNull(nameof(type));
+			type.ThrowOnNull();
+			baseType.ThrowOnNull();
 
-			ITypeSymbol current = type;
+			ITypeSymbol? current = type;
 			int depth = 0;
 
-			while (current != null && !current.Equals(baseType))
+			while (current != null && !current.Equals(baseType, SymbolEqualityComparer.Default))
 			{
 				current = current.BaseType;
 				depth++;
 			}
 
-			return current != null ? depth : (int?)null;
+			return current != null ? depth : null;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<ITypeSymbol> GetAllAttributesDefinedOnThisAndBaseTypes(this ITypeSymbol typeSymbol) =>
 			typeSymbol.GetAllAttributesApplicationsDefinedOnThisAndBaseTypes()
-					  .Select(a => a.AttributeClass);
+					  .Select(a => a.AttributeClass)
+					  .Where(attrType => attrType != null)!;
 		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<AttributeData> GetAllAttributesApplicationsDefinedOnThisAndBaseTypes(this ITypeSymbol typeSymbol)
 		{
-			typeSymbol.ThrowOnNull(nameof(typeSymbol));
+			typeSymbol.ThrowOnNull();
 			return typeSymbol.GetBaseTypesAndThis()
 							 .SelectMany(t => t.GetAttributes());
 		}
@@ -410,12 +411,44 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsNullable(this ITypeSymbol? typeSymbol, PXContext pxContext)
 		{
-			pxContext.ThrowOnNull(nameof(pxContext));
-			return typeSymbol?.OriginalDefinition?.Equals(pxContext.SystemTypes.Nullable) ?? false;
+			pxContext.ThrowOnNull();
+			return typeSymbol?.OriginalDefinition?.Equals(pxContext.SystemTypes.Nullable, SymbolEqualityComparer.Default) ?? false;
 		}
 
 		/// <summary>
-		/// An INamedTypeSymbol extension method that gets CLR-style full type name from type.
+		/// A <see cref="String"/> extension method that removes the empty spaces in array type names described by dataTypeName.
+		/// </summary>
+		/// <exception cref="ArgumentException">Thrown when one or more arguments have unsupported or illegal values.</exception>
+		/// <param name="dataTypeName">The dataTypeName to act on.</param>
+		/// <returns>
+		/// A string.
+		/// </returns>
+		public static string RemoveEmptySpacesInArrayTypeNames(this string dataTypeName)
+		{
+			dataTypeName.ThrowOnNullOrWhiteSpace();
+
+			bool isArrayTypeName = dataTypeName[^1] == ']';
+
+			if (!isArrayTypeName)
+				return dataTypeName;
+			else if (dataTypeName.Length <= 2)
+				throw new ArgumentException($"Invalid data type name \"{dataTypeName}\"", nameof(dataTypeName));
+
+			// if there is no empty spaces in array, return the original string
+			if (dataTypeName[^2] == '[' && !char.IsWhiteSpace(dataTypeName[^3]))
+				return dataTypeName;
+
+			int indexOfOpeningSquareBracket = dataTypeName.LastIndexOf('[');
+
+			if (indexOfOpeningSquareBracket < 0)
+				throw new ArgumentException($"Invalid data type name \"{dataTypeName}\"", nameof(dataTypeName));
+
+			var elementTypeName = dataTypeName[..indexOfOpeningSquareBracket].Trim();
+			return $"{elementTypeName}[]";
+		}
+
+		/// <summary>
+		/// An <see cref="INamedTypeSymbol"/> extension method that gets CLR-style full type name from type.
 		/// </summary>
 		/// <param name="typeSymbol">The typeSymbol to act on.</param>
 		/// <returns/>
@@ -469,7 +502,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		internal static IEnumerable<(ConstructorDeclarationSyntax Node, IMethodSymbol Symbol)> GetDeclaredInstanceConstructors(
 			this INamedTypeSymbol typeSymbol, CancellationToken cancellation = default)
 		{
-			typeSymbol.ThrowOnNull(nameof(typeSymbol));
+			typeSymbol.ThrowOnNull();
 
 			List<(ConstructorDeclarationSyntax, IMethodSymbol)> initializers = new List<(ConstructorDeclarationSyntax, IMethodSymbol)>();
 
@@ -480,7 +513,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				if (!ctr.IsDefinition)
 					continue;
 
-				SyntaxReference reference = ctr.DeclaringSyntaxReferences.FirstOrDefault();
+				SyntaxReference? reference = ctr.DeclaringSyntaxReferences.FirstOrDefault();
 				if (reference == null)
 					continue;
 
@@ -496,7 +529,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		public static ImmutableArray<StaticConstructorInfo> GetStaticConstructors(this INamedTypeSymbol typeSymbol,
 																				  CancellationToken cancellation = default)
 		{
-			typeSymbol.ThrowOnNull(nameof(typeSymbol));
+			typeSymbol.ThrowOnNull();
 
 			int order = 0;
 			List<StaticConstructorInfo> staticCtrs = new List<StaticConstructorInfo>();
@@ -505,7 +538,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 			{
 				cancellation.ThrowIfCancellationRequested();
 
-				SyntaxReference reference = ctr.DeclaringSyntaxReferences.FirstOrDefault();
+				SyntaxReference? reference = ctr.DeclaringSyntaxReferences.FirstOrDefault();
 
 				if (reference?.GetSyntax(cancellation) is not ConstructorDeclarationSyntax node)
 					continue;
@@ -561,7 +594,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				: type.GetMembers();
 
 			return members.IsDefaultOrEmpty
-				? Array.Empty<TSymbol>()
+				? []
 				: members.OfType<TSymbol>();
 		}
 
@@ -573,7 +606,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsInAcumaticaRootNamespace(this ITypeSymbol type)
 		{
-			type.ThrowOnNull(nameof(type));
+			type.ThrowOnNull();
 
 			var typeRootNamespace = type
 				.GetContainingNamespaces()
@@ -585,13 +618,13 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 
 		/// <summary>
-		/// An ITypeSymbol extension method that gets a simplified name for type if it is a primitive type.
+		/// Gets a simplified name for type if it is a primitive type.
 		/// </summary>
 		/// <param name="type">The type to act on.</param>
 		/// <returns/>
 		public static string GetSimplifiedName(this ITypeSymbol type)
 		{
-			type.ThrowOnNull(nameof(type));
+			type.ThrowOnNull();
 
 			switch (type.SpecialType)
 			{
@@ -614,10 +647,34 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				case SpecialType.System_String:
 				case SpecialType.System_Array:
 				case SpecialType.System_Nullable_T:
-					return type.ToString();				
+					return type.ToString();
 				default:
 					return type.Name;
 			}
 		}
+
+		/// <summary>
+		/// Check if <paramref name="typeSymbol"/> and all its containing types are <see langword="public"/>.
+		/// </summary>
+		/// <param name="typeSymbol">The typeSymbol to act on.</param>
+		/// <returns>
+		/// True if <paramref name="typeSymbol"/> is public with all its containing types, false if not.
+		/// </returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsPublicWithAllContainingTypes(this ITypeSymbol typeSymbol) =>
+			typeSymbol.CheckIfNull(nameof(typeSymbol))
+					  .GetContainingTypesAndThis()
+					  .All(type => type.DeclaredAccessibility == Accessibility.Public);
+
+		/// <summary>
+		/// Check if <paramref name="typeSymbol"/> type is one dimensional string array.
+		/// </summary>
+		/// <param name="typeSymbol">The type to act on.</param>
+		/// <returns>
+		/// True if one dimensional string array, false if not.
+		/// </returns>
+		public static bool IsOneDimensionalStringArray(this ITypeSymbol? typeSymbol) =>
+			typeSymbol is IArrayTypeSymbol arrayType && arrayType.Rank == 1 && 
+			arrayType.ElementType.SpecialType == SpecialType.System_String;
 	}
 }

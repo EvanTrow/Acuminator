@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 using Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator;
 using Acuminator.Utilities;
 using Acuminator.Utilities.Roslyn.Semantic;
@@ -17,7 +16,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 		/// <param name="context">Symbol analysis context.</param>
 		/// <param name="pxContext">Acumatica context.</param>
 		/// <param name="pxGraph">The graph semantic model.</param>
-		void Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphSemanticModel pxGraph);
+		void Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel pxGraph);
 
 		/// <summary>
 		/// Determine if the analyzer should run on graph.
@@ -25,6 +24,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 		/// <param name="pxContext">Acumatica context.</param>
 		/// <param name="pxGraph">The graph semantic model.</param>
 		/// <returns/>
-		bool ShouldAnalyze(PXContext pxContext, PXGraphSemanticModel graph);
+		bool ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graph);
 	}
 }

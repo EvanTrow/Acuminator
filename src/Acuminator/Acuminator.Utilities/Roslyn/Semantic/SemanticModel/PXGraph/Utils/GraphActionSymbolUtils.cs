@@ -1,10 +1,15 @@
-﻿using Acuminator.Utilities.Common;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+
+using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Syntax;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using ActionSymbolWithTypeCollection = System.Collections.Generic.IEnumerable<(Microsoft.CodeAnalysis.ISymbol ActionSymbol, Microsoft.CodeAnalysis.INamedTypeSymbol ActionType)>;
 
@@ -40,8 +45,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public static OverridableItemsCollection<ActionInfo> GetActionSymbolsWithTypesFromGraph(this ITypeSymbol graph, PXContext pxContext,
 																								bool includeActionsFromInheritanceChain = true)
 		{
-			pxContext.ThrowOnNull(nameof(pxContext));
-
 			if (!graph.IsPXGraph(pxContext))
 				return new OverridableItemsCollection<ActionInfo>();
 
@@ -64,9 +67,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public static OverridableItemsCollection<ActionInfo> GetActionsFromGraphOrGraphExtensionAndBaseGraph(this ITypeSymbol graphOrExtension,
 																											 PXContext pxContext)
 		{
-			pxContext.ThrowOnNull(nameof(pxContext));
-			graphOrExtension.ThrowOnNull(nameof(graphOrExtension));
-
 			bool isGraph = graphOrExtension.IsPXGraph(pxContext);
 
 			if (!isGraph && !graphOrExtension.IsPXGraphExtension(pxContext))
@@ -85,8 +85,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <returns/>
 		public static OverridableItemsCollection<ActionInfo> GetActionsFromGraphExtensionAndBaseGraph(this ITypeSymbol graphExtension, PXContext pxContext)
 		{
-			graphExtension.ThrowOnNull(nameof(graphExtension));
-			pxContext.ThrowOnNull(nameof(pxContext));
+			graphExtension.ThrowOnNull();
 
 			var systemActionsRegister = new PXSystemActions.PXSystemActionsRegister(pxContext);
 			return GetActionInfoFromGraphExtension<ActionInfo>(graphExtension, pxContext, AddActionsFromGraph, AddActionsFromGraphExtension);
@@ -153,9 +152,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 																							   PXContext pxContext, bool inheritance = true, 
 																							   CancellationToken cancellation = default)
 		{
-			graph.ThrowOnNull(nameof(graph));
-			actionsByName.ThrowOnNull(nameof(actionsByName));
-			pxContext.ThrowOnNull(nameof(pxContext));
+			actionsByName.ThrowOnNull();
 
 			if (!graph.IsPXGraph(pxContext))
 			{
@@ -183,9 +180,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 																							IDictionary<string, ActionInfo> actionsByName, PXContext pxContext,
 																							CancellationToken cancellation)
 		{
-			graphExtension.ThrowOnNull(nameof(graphExtension));
-			actionsByName.ThrowOnNull(nameof(actionsByName));
-			pxContext.ThrowOnNull(nameof(pxContext));
+			graphExtension.ThrowOnNull();
+			actionsByName.ThrowOnNull();
+			pxContext.ThrowOnNull();
 
 			return GetActionInfoFromGraphExtension<ActionHandlerInfo>(graphExtension, pxContext, AddHandlersFromGraph, AddHandlersFromGraphExtension);
 
@@ -206,7 +203,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			}
 		}
 
-		private static IEnumerable<(MethodDeclarationSyntax Node, IMethodSymbol Symbol)> GetRawActionHandlersFromGraphImpl(
+		private static IEnumerable<(MethodDeclarationSyntax? Node, IMethodSymbol Symbol)> GetRawActionHandlersFromGraphImpl(
 																this ITypeSymbol graph, IDictionary<string, ActionInfo> actionsByName,
 																PXContext pxContext, CancellationToken cancellation, bool inheritance)
 		{
@@ -222,7 +219,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			}
 		}
 
-		private static IEnumerable<(MethodDeclarationSyntax Node, IMethodSymbol Symbol)> GetRawActionHandlersFromGraphOrGraphExtension(
+		private static IEnumerable<(MethodDeclarationSyntax? Node, IMethodSymbol Symbol)> GetRawActionHandlersFromGraphOrGraphExtension(
 															this ITypeSymbol graphOrExtension, IDictionary<string, ActionInfo> actionsByName,
 															PXContext pxContext, CancellationToken cancellation)
 		{
@@ -234,12 +231,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			{
 				cancellation.ThrowIfCancellationRequested();
 
-				SyntaxReference reference = handler.DeclaringSyntaxReferences.FirstOrDefault();
-
-				if (reference?.GetSyntax(cancellation) is MethodDeclarationSyntax declaration)
-				{
-					yield return (declaration, handler);
-				}
+				var declaration = handler.GetSyntax(cancellation) as MethodDeclarationSyntax;
+				yield return (declaration, handler);
 			}
 		}
 		#endregion

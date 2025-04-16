@@ -1,23 +1,27 @@
-﻿using System.Collections.Generic;
+﻿
+using System.Collections.Generic;
 using System.Collections.Immutable;
+
 using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Syntax;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 {
-	public partial class RowChangesInEventHandlersAnalyzer : EventHandlerAggregatedAnalyzerBase
+	public partial class RowChangesInEventHandlersAnalyzer : LooseEventHandlerAggregatedAnalyzerBase
 	{
-		private enum RowChangesAnalysisMode
+		private enum RowChangesAnalysisMode : byte
 		{
 			ChangesForbiddenForRowFromEventArgs,
 			ChangesAllowedOnlyForRowFromEventArgs,
 		}
 
-		private static readonly IReadOnlyDictionary<EventType, RowChangesAnalysisMode> AnalyzedEventTypes = 
+		private static readonly IReadOnlyDictionary<EventType, RowChangesAnalysisMode> _analyzedEventTypes = 
 			new Dictionary<EventType, RowChangesAnalysisMode>
 			{
 				// Changes to e.Row are not allowed
@@ -25,6 +29,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 				{ EventType.FieldVerifying, RowChangesAnalysisMode.ChangesForbiddenForRowFromEventArgs },
 				{ EventType.RowSelected, RowChangesAnalysisMode.ChangesForbiddenForRowFromEventArgs },
 				// Changes are allowed for e.Row only
+				{ EventType.FieldUpdating, RowChangesAnalysisMode.ChangesAllowedOnlyForRowFromEventArgs },
 				{ EventType.RowInserting, RowChangesAnalysisMode.ChangesAllowedOnlyForRowFromEventArgs },
 				{ EventType.RowSelecting, RowChangesAnalysisMode.ChangesAllowedOnlyForRowFromEventArgs },
 			};
@@ -34,11 +39,14 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs_NonISV,
 			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly);
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+		public override bool ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo) => 
+			base.ShouldAnalyze(pxContext, eventHandlerInfo) && _analyzedEventTypes.ContainsKey(eventHandlerInfo.Type);
+
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			if (AnalyzedEventTypes.TryGetValue(eventType, out RowChangesAnalysisMode analysisMode))
+			if (_analyzedEventTypes.TryGetValue(eventHandlerInfo.Type, out RowChangesAnalysisMode analysisMode))
 			{
 				var methodSymbol = (IMethodSymbol) context.Symbol;
 				var methodSyntax = methodSymbol.GetSyntax(context.CancellationToken) as MethodDeclarationSyntax;
@@ -53,8 +61,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 					methodSyntax.Accept(variablesWalker);
 
 					// Perform analysis
-					var diagnosticWalker = new DiagnosticWalker(context, semanticModel, pxContext, variablesWalker.Result,
-						analysisMode, eventType);
+					var diagnosticWalker = new DiagnosticWalker(context, semanticModel, pxContext, variablesWalker.FoundRowVariables,
+						analysisMode, eventHandlerInfo.Type);
 					methodSyntax.Accept(diagnosticWalker);
 				}
 			}

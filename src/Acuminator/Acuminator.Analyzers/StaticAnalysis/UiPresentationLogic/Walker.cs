@@ -1,6 +1,8 @@
-﻿using Acuminator.Utilities.Common;
+﻿
+using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.Semantic;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -17,10 +19,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.UiPresentationLogic
 			params object[] messageArgs)
 			: base(pxContext, context.CancellationToken)
 		{
-			diagnosticDescriptor.ThrowOnNull(nameof (diagnosticDescriptor));
-
 			_context = context;
-			_diagnosticDescriptor = diagnosticDescriptor;
+			_diagnosticDescriptor = diagnosticDescriptor.CheckIfNull();
 			_messageArgs = messageArgs;
 		}
 

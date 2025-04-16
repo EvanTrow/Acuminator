@@ -1,5 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿
 using Acuminator.Utilities.Common;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,10 +19,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 			public bool Success { get; private set; }
 
 			protected AccessWalkerBase(SemanticModel semanticModel)
-			{
-				semanticModel.ThrowOnNull(nameof (semanticModel));
-				
-				SemanticModel = semanticModel;
+			{				
+				SemanticModel = semanticModel.CheckIfNull();
 			}
 
 			public void Reset()
@@ -29,7 +28,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 				Success = false;
 			}
 
-			public override void Visit(SyntaxNode node)
+			public override void Visit(SyntaxNode? node)
 			{
 				if (!Success)
 					base.Visit(node);
@@ -49,6 +48,5 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 
 			protected abstract bool Predicate(ExpressionSyntax node);
 		}
-
 	}
 }

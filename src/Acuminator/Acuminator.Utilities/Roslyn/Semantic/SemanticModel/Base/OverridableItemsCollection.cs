@@ -4,7 +4,7 @@ using Acuminator.Utilities.Common;
 
 namespace Acuminator.Utilities.Roslyn.Semantic
 {
-	public class OverridableItemsCollection<TInfo> : Dictionary<string, TInfo>
+	public sealed class OverridableItemsCollection<TInfo> : Dictionary<string, TInfo>
 	where TInfo : IOverridableItem<TInfo>
 	{
 		public IEnumerable<TInfo> Items => Values;
@@ -26,11 +26,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// <param name="startingOrder">The starting order.</param>
 		/// <param name="infoConstructor">The DTO info constructor.</param>
 		/// <returns/>
-		internal virtual int AddRangeWithDeclarationOrder<TRawData, TWriteableInfo>(IEnumerable<TRawData> itemsToAdd, int startingOrder, 
-																					Func<TRawData, int, TWriteableInfo> infoConstructor)
+		internal int AddRangeWithDeclarationOrder<TRawData, TWriteableInfo>(IEnumerable<TRawData> itemsToAdd, int startingOrder, 
+																			Func<TRawData, int, TWriteableInfo> infoConstructor)
 		where TWriteableInfo : TInfo, IWriteableBaseItem<TInfo>
 		{
-			itemsToAdd.ThrowOnNull(nameof(itemsToAdd));
+			itemsToAdd.ThrowOnNull();
 
 			int order = startingOrder;
 
@@ -43,15 +43,15 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 			return order;
 		}
 
-		internal virtual void Add<TRawData, TWriteableInfo>(TRawData rawData, int declarationOrder, Func<TRawData, int, TWriteableInfo> infoConstructor)
+		internal void Add<TRawData, TWriteableInfo>(TRawData rawData, int declarationOrder, Func<TRawData, int, TWriteableInfo> infoConstructor)
 		where TWriteableInfo : TInfo, IWriteableBaseItem<TInfo>
 		{
-			infoConstructor.ThrowOnNull(nameof(infoConstructor));
+			infoConstructor.ThrowOnNull();
 			TWriteableInfo info = infoConstructor(rawData, declarationOrder);
 			Add(info);
 		}
 
-		internal virtual void Add<TWriteableInfo>(TWriteableInfo info)
+		internal void Add<TWriteableInfo>(TWriteableInfo info)
 		where TWriteableInfo : TInfo, IWriteableBaseItem<TInfo>
 		{
 			if (info?.Name == null)
@@ -61,7 +61,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 			if (TryGetValue(info.Name, out TInfo existingValue))
 			{
-				if (!existingValue.Equals(info))
+				if (!ReferenceEquals(existingValue, info))
 				{
 					// HACK the assignment below is required due to the issue with C# compiler, see details here:
 					// https://developercommunity.visualstudio.com/t/False-compiler-Error-CS0229-with-intende/10560802

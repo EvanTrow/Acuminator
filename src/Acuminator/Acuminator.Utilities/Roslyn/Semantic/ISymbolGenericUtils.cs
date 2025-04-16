@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Acuminator.Utilities.Common;
@@ -19,17 +20,17 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 	public static class ISymbolGenericUtils
 	{
 		public static bool IsReadOnly(this ISymbol symbol) =>
-			symbol.CheckIfNull(nameof(symbol)) switch
+			symbol.CheckIfNull() switch
 			{
-				IFieldSymbol field       => field.IsReadOnly,
-				IPropertySymbol property => property.IsReadOnly, 
-				ITypeSymbol type         => type.IsReadOnly(),
-				_                        => false
+				IFieldSymbol field 		 => field.IsReadOnly,
+				IPropertySymbol property => property.IsReadOnly,
+				ITypeSymbol type 		 => type.IsReadOnly(),
+				_ 						 => false
 			};
 
 		public static bool IsReadOnly(this ITypeSymbol typeSymbol)
 		{
-			typeSymbol.ThrowOnNull(nameof(typeSymbol));
+			typeSymbol.ThrowOnNull();
 
 			var readonlyProperty = typeSymbol.GetType().GetProperty("IsReadOnly");
 
@@ -57,16 +58,17 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// </returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsExplicitlyDeclared(this ISymbol symbol) =>
-			!symbol.CheckIfNull(nameof(symbol)).IsImplicitlyDeclared && symbol.CanBeReferencedByName;
+			!symbol.CheckIfNull().IsImplicitlyDeclared && symbol.CanBeReferencedByName;
 
 		public static bool IsDeclaredInType(this ISymbol symbol, ITypeSymbol? type)
 		{
-			symbol.ThrowOnNull(nameof(symbol));
+			symbol.ThrowOnNull();
 		
 			if (type == null || symbol.ContainingType == null)
 				return false;
 
-			return symbol.ContainingType.Equals(type) || symbol.ContainingType.Equals(type.OriginalDefinition);
+			return symbol.ContainingType.Equals(type, SymbolEqualityComparer.Default) || 
+				   symbol.ContainingType.Equals(type.OriginalDefinition, SymbolEqualityComparer.Default);
 		}
 
 		/// <summary>
@@ -83,8 +85,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 												 bool checkForDerivedAttributes = true)
 		where TSymbol : class, ISymbol
 		{
-			symbol.ThrowOnNull(nameof(symbol));
-			attributeType.ThrowOnNull(nameof(attributeType));
+			symbol.ThrowOnNull();
+			attributeType.ThrowOnNull();
 
 			Func<TSymbol, bool> attributeCheck = checkForDerivedAttributes
 				? HasDerivedAttribute
@@ -107,7 +109,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				var attributes = symbolToCheck.GetAttributes();
 				return attributes.IsDefaultOrEmpty
 					? false
-					: attributes.Any(a => a.AttributeClass.Equals(attributeType));
+					: attributes.Any(a => a.AttributeClass?.Equals(attributeType, SymbolEqualityComparer.Default) ?? false);
 			}
 
 			bool HasDerivedAttribute(TSymbol symbolToCheck)
@@ -115,7 +117,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				var attributes = symbolToCheck.GetAttributes();
 				return attributes.IsDefaultOrEmpty
 					? false
-					: attributes.Any(a => a.AttributeClass.InheritsFromOrEquals(attributeType));
+					: attributes.Any(a => a.AttributeClass?.InheritsFromOrEquals(attributeType) ?? false);
 			}
 		}
 
@@ -129,10 +131,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		public static IEnumerable<TSymbol> GetOverriddenAndThis<TSymbol>(this TSymbol symbol)
 		where TSymbol : class, ISymbol
 		{
-			if (symbol.CheckIfNull(nameof(symbol)).IsOverride)
+			if (symbol.CheckIfNull().IsOverride)
 				return GetOverriddenImpl(symbol, includeThis: true);
 			else
-				return new[] { symbol };
+				return [symbol];
 		}
 
 		/// <summary>
@@ -145,10 +147,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		public static IEnumerable<TSymbol> GetOverridden<TSymbol>(this TSymbol symbol)
 		where TSymbol : class, ISymbol
 		{
-			if (symbol.CheckIfNull(nameof(symbol)).IsOverride)
+			if (symbol.CheckIfNull().IsOverride)
 				return GetOverriddenImpl(symbol, includeThis: false);
 			else
-				return Enumerable.Empty<TSymbol>();
+				return [];
 		}
 
 		private static IEnumerable<TSymbol> GetOverriddenImpl<TSymbol>(TSymbol symbol, bool includeThis)
@@ -175,5 +177,36 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				_						 => null
 			};
 		}
+
+		/// <summary>
+		/// Query if <paramref name="symbol"/> is declared in source code.
+		/// </summary>
+		/// <param name="symbol">The symbol to check.</param>
+		/// <returns>
+		/// True if <paramref name="symbol"/> is in source code, false if not.
+		/// </returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsInSourceCode(this ISymbol symbol) =>
+			!symbol.DeclaringSyntaxReferences.IsDefaultOrEmpty;
+
+		/// <summary>
+		/// A <see cref="Location"/> extension method that returns <see langword="null"/> if location's <see cref="Location.Kind"/> is <see cref="LocationKind.None"/>.
+		/// </summary>
+		/// <param name="location">The location to act on.</param>
+		/// <returns>
+		/// The location or <see langword="null"/> if location's kind is <see cref="LocationKind.None"/>.
+		/// </returns>
+		/// <remarks>
+		/// This method is a safety wrapper for locations that are obtained from <see cref="SyntaxToken.GetLocation"/> tokens.<br/>
+		/// Syntax tokens may return a special null-object location with <see cref="LocationKind.None"/> kind.<br/>
+		/// Such "null-object" location will prevent the usage of any fallback location that could have been obtained from coalesce chainings if the location was null.<br/>
+		/// This helper allows to use coalsesce chaining with fallback locations in a safe manner.<br/><br/>
+		/// Note, that locations obtained from <see cref="CSharpSyntaxNode.GetLocation"/> do not need to be checked this way.
+		/// </remarks>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Location? NullIfLocationKindIsNone(this Location? location) =>
+			location?.Kind == LocationKind.None
+				? null
+				: location;
 	}
 }

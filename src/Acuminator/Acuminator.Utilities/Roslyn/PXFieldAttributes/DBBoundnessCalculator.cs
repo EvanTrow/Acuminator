@@ -31,7 +31,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 		public DbBoundnessCalculator(PXContext pxContext)
 		{
-			Context = pxContext.CheckIfNull(nameof(pxContext));
+			Context = pxContext.CheckIfNull();
 			AttributesMetadataProvider = new FieldTypeAttributesMetadataProvider(pxContext);
 		}
 
@@ -68,9 +68,9 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 																		ImmutableHashSet<ITypeSymbol>? preparedFlattenedAttributesSet,
 																		IReadOnlyCollection<DataTypeAttributeInfo>? preparedAttributesMetadata)
 		{
-			attributeApplication.ThrowOnNull(nameof(attributeApplication));
+			attributeApplication.ThrowOnNull();
 
-			if (!attributeApplication.AttributeClass.IsAcumaticaAttribute(Context))
+			if (attributeApplication.AttributeClass == null || !attributeApplication.AttributeClass.IsAcumaticaAttribute(Context))
 				return DbBoundnessType.NotDefined;
 
 			// First, check if the attribute is present in the set of known non-data-type attributes or is derived from them
@@ -85,7 +85,8 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 			// Check combined information from attribute applications and metadata
 			var flattenedAttributesSet = preparedFlattenedAttributesSet ?? 
-										 flattenedAttributesWithApplications.Select(atrWithApp => atrWithApp.Type).ToImmutableHashSet();
+										 flattenedAttributesWithApplications.Select(atrWithApp => atrWithApp.Type)
+																			.ToImmutableHashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
 			var attributesMetadata = 
 				preparedAttributesMetadata ?? 
 				AttributesMetadataProvider.GetDacFieldTypeAttributeInfos_NoWellKnownNonDataTypeAttributesCheck(attributeApplication.AttributeClass,
@@ -108,7 +109,9 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 							.Combine();
 			}
 
-			var applicationsByAttribute = flattenedAttributesWithApplications.ToLookup(attrAppl => attrAppl.Type);
+			var applicationsByAttribute = flattenedAttributesWithApplications
+											.ToLookup(attrAppl => attrAppl.Type,
+													  SymbolEqualityComparer.Default as IEqualityComparer<ITypeSymbol>);
 			var combinedBoundness =
 				attributesMetadata.Select(attributeInfo => GetDbBoundnessFromMetadataAndApplications(attributeInfo, applicationsByAttribute))
 								  .Combine();

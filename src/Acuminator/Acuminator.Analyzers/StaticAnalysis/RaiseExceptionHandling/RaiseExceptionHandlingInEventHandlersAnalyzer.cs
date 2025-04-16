@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 
 using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
@@ -8,6 +6,7 @@ using Acuminator.Utilities;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -17,15 +16,22 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.RaiseExceptionHandling
 {
-	public class RaiseExceptionHandlingInEventHandlersAnalyzer : EventHandlerAggregatedAnalyzerBase
+	public class RaiseExceptionHandlingInEventHandlersAnalyzer : LooseEventHandlerAggregatedAnalyzerBase
 	{
-		private static readonly ISet<EventType> AnalyzedEventTypes = new HashSet<EventType>()
-		{
+		private static readonly List<EventType> _analyzedEventTypesNonIsvMode =
+		[
+			EventType.FieldSelecting,
+			EventType.FieldUpdating,
+		];
+
+		private static readonly List<EventType> _analyzedEventTypesIsvMode =
+		[
 			EventType.FieldDefaulting,
 			EventType.FieldSelecting,
+			EventType.FieldUpdating,
 			EventType.RowSelecting,
 			EventType.RowPersisted
-		};
+		];
 
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(
@@ -33,31 +39,47 @@ namespace Acuminator.Analyzers.StaticAnalysis.RaiseExceptionHandling
 				Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers_NonISV
 			);
 
-		public override bool ShouldAnalyze(PXContext pxContext, EventType eventType) =>
-			AnalyzedEventTypes.Contains(eventType);
+		public override bool ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
+		{
+			if (!base.ShouldAnalyze(pxContext, eventHandlerInfo))
+				return false;
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+			var supportedEventTypes = pxContext.CodeAnalysisSettings.IsvSpecificAnalyzersEnabled
+				? _analyzedEventTypesIsvMode
+				: _analyzedEventTypesNonIsvMode;
+
+			return supportedEventTypes.Contains(eventHandlerInfo.Type);
+		}
+
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			var methodSymbol = (IMethodSymbol) context.Symbol;
-			var methodSyntax = methodSymbol.GetSyntax(context.CancellationToken) as CSharpSyntaxNode;
-			var walker = new Walker(context, pxContext, eventType);
+			if (context.Symbol is not IMethodSymbol methodSymbol ||
+				methodSymbol.GetSyntax(context.CancellationToken) is not CSharpSyntaxNode methodSyntax)
+			{
+				return;
+			}
 
-			methodSyntax?.Accept(walker);
+			var walker = new Walker(context, pxContext, eventHandlerInfo.Type);
+			methodSyntax.Accept(walker);
 		}
 
 
 		private class Walker : NestedInvocationWalker
 		{
 			private readonly SymbolAnalysisContext _context;
-			private readonly EventType _eventType;
+			private readonly string _eventTypeName;
+			private readonly DiagnosticDescriptor _px1075DiagnosticDescriptor;
 
 			public Walker(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
 				: base(pxContext, context.CancellationToken)
 			{
 				_context = context;
-				_eventType= eventType;
+				_eventTypeName = eventType.ToString();
+				_px1075DiagnosticDescriptor = pxContext.CodeAnalysisSettings.IsvSpecificAnalyzersEnabled
+					? Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers
+					: Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers_NonISV;
 			}
 
 			public override void VisitInvocationExpression(InvocationExpressionSyntax node)
@@ -67,25 +89,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.RaiseExceptionHandling
 				var methodSymbol = GetSymbol<IMethodSymbol>(node);
 				methodSymbol = methodSymbol?.OriginalDefinition?.OverriddenMethod ?? methodSymbol?.OriginalDefinition;
 
-				if (methodSymbol != null && PxContext.PXCache.RaiseExceptionHandling.Contains(methodSymbol))
-				{
-					if (!Settings.IsvSpecificAnalyzersEnabled && _eventType == EventType.FieldSelecting)
-					{
-						ReportDiagnostic(_context.ReportDiagnostic,
-							Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers_NonISV,
-							node, _eventType);
-					}
-					else
-					{
-						ReportDiagnostic(_context.ReportDiagnostic,
-							Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers,
-							node, _eventType);
-					}
-				}
-				else
+				if (methodSymbol == null || !PxContext.PXCache.RaiseExceptionHandling.Contains(methodSymbol, SymbolEqualityComparer.Default))
 				{
 					base.VisitInvocationExpression(node);
+					return;
 				}
+
+				ReportDiagnostic(_context.ReportDiagnostic, _px1075DiagnosticDescriptor, node, _eventTypeName);
 			}
 		}
 	}

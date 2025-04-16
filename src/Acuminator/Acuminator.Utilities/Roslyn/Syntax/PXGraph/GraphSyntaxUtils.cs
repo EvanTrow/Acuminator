@@ -19,9 +19,9 @@ namespace Acuminator.Utilities.Roslyn.Syntax.PXGraph
 		public static GraphInstantiationType GetGraphInstantiationType(this SyntaxNode node, SemanticModel semanticModel, 
 			PXContext pxContext)
 		{
-			node.ThrowOnNull(nameof (node));
-			semanticModel.ThrowOnNull(nameof (semanticModel));
-			pxContext.ThrowOnNull(nameof (pxContext));
+			node.ThrowOnNull();
+			semanticModel.ThrowOnNull();
+			pxContext.ThrowOnNull();
 
 			// new PXGraph()
 			if (node is ObjectCreationExpressionSyntax objCreationSyntax && objCreationSyntax.Type != null
@@ -30,7 +30,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax.PXGraph
 				                                                             .Symbol is ITypeSymbol typeSymbol
 			                                                             && typeSymbol.IsPXGraph(pxContext))
 			{
-				return typeSymbol.Equals(pxContext.PXGraph.Type)
+				return typeSymbol.Equals(pxContext.PXGraph.Type, SymbolEqualityComparer.Default)
 					? GraphInstantiationType.ConstructorOfBaseType
 					: GraphInstantiationType.ConstructorOfSpecificType;
 			}
@@ -42,7 +42,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax.PXGraph
 				var methodSymbol = (symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault()) as IMethodSymbol;
 				methodSymbol = methodSymbol?.OverriddenMethod?.OriginalDefinition ?? methodSymbol?.OriginalDefinition;
 
-				if (methodSymbol != null && pxContext.PXGraph.CreateInstance.Contains(methodSymbol))
+				if (methodSymbol != null && pxContext.PXGraph.CreateInstance.Contains<IMethodSymbol>(methodSymbol, SymbolEqualityComparer.Default))
 				{
 					return GraphInstantiationType.CreateInstance;
 				}
@@ -55,14 +55,14 @@ namespace Acuminator.Utilities.Roslyn.Syntax.PXGraph
 																						this SyntaxNode root, SemanticModel semanticModel,
 																						PXContext context, CancellationToken cancellationToken = default)
 		{
-			root.ThrowOnNull(nameof(root));
-			context.ThrowOnNull(nameof(context));
-			semanticModel.ThrowOnNull(nameof(semanticModel));
+			root.ThrowOnNull();
+			context.ThrowOnNull();
+			semanticModel.ThrowOnNull();
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return context.IsPlatformReferenced 
 				? GetDeclaredGraphsAndExtensionsImpl()
-				: Enumerable.Empty<(ITypeSymbol, SyntaxNode)>();
+				: [];
 
 
 			IEnumerable<(ITypeSymbol GraphSymbol, SyntaxNode GraphNode)> GetDeclaredGraphsAndExtensionsImpl()
@@ -71,7 +71,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax.PXGraph
 
 				foreach (ClassDeclarationSyntax classNode in declaredClasses)
 				{
-					ITypeSymbol classTypeSymbol = classNode.GetTypeSymbolFromClassDeclaration(semanticModel, cancellationToken);
+					ITypeSymbol? classTypeSymbol = classNode.GetTypeSymbolFromClassDeclaration(semanticModel, cancellationToken);
 
 					if (classTypeSymbol != null && classTypeSymbol.IsPXGraphOrExtension(context))
 					{
@@ -81,11 +81,11 @@ namespace Acuminator.Utilities.Roslyn.Syntax.PXGraph
 			}
 		}
 
-		public static ITypeSymbol GetTypeSymbolFromClassDeclaration(this ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel,
-																	CancellationToken cancellationToken = default)
+		public static ITypeSymbol? GetTypeSymbolFromClassDeclaration(this ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel,
+																	 CancellationToken cancellationToken = default)
 		{
-			classDeclaration.ThrowOnNull(nameof(classDeclaration));
-			semanticModel.ThrowOnNull(nameof(semanticModel));
+			classDeclaration.ThrowOnNull();
+			semanticModel.ThrowOnNull();
 			cancellationToken.ThrowIfCancellationRequested();
 
 			var typeSymbol = semanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken) as ITypeSymbol;

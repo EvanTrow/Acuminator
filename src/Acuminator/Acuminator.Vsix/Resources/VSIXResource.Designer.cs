@@ -223,6 +223,15 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Banned API.
+        /// </summary>
+        public static string Category_BannedAPI {
+            get {
+                return ResourceManager.GetString("Category_BannedAPI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Code Analysis.
         /// </summary>
         public static string Category_CodeAnalysis {
@@ -255,6 +264,60 @@ namespace Acuminator.Vsix {
         public static string CodeMap_ConstructorNodeName {
             get {
                 return ResourceManager.GetString("CodeMap_ConstructorNodeName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bound.
+        /// </summary>
+        public static string CodeMap_DbBoundnessIndicator_Bound {
+            get {
+                return ResourceManager.GetString("CodeMap_DbBoundnessIndicator_Bound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Inconsistent.
+        /// </summary>
+        public static string CodeMap_DbBoundnessIndicator_Inconsistent {
+            get {
+                return ResourceManager.GetString("CodeMap_DbBoundnessIndicator_Inconsistent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PXDBCalced.
+        /// </summary>
+        public static string CodeMap_DbBoundnessIndicator_PXDBCalced {
+            get {
+                return ResourceManager.GetString("CodeMap_DbBoundnessIndicator_PXDBCalced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PXDBScalar.
+        /// </summary>
+        public static string CodeMap_DbBoundnessIndicator_PXDBScalar {
+            get {
+                return ResourceManager.GetString("CodeMap_DbBoundnessIndicator_PXDBScalar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unbound.
+        /// </summary>
+        public static string CodeMap_DbBoundnessIndicator_Unbound {
+            get {
+                return ResourceManager.GetString("CodeMap_DbBoundnessIndicator_Unbound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown.
+        /// </summary>
+        public static string CodeMap_DbBoundnessIndicator_Unknown {
+            get {
+                return ResourceManager.GetString("CodeMap_DbBoundnessIndicator_Unknown", resourceCulture);
             }
         }
         
@@ -331,6 +394,15 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This graph extension adds a processing view.
+        /// </summary>
+        public static string CodeMap_ExtraInfo_ProcessingGraphExtensionIconTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_ExtraInfo_ProcessingGraphExtensionIconTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This is a processing graph.
         /// </summary>
         public static string CodeMap_ExtraInfo_ProcessingGraphIconTooltip {
@@ -345,6 +417,15 @@ namespace Acuminator.Vsix {
         public static string CodeMap_ExtraInfo_ProcessingViewIconTooltip {
             get {
                 return ResourceManager.GetString("CodeMap_ExtraInfo_ProcessingViewIconTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is a projection DAC.
+        /// </summary>
+        public static string CodeMap_ExtraInfo_ProjectionDacIndicatorTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_ExtraInfo_ProjectionDacIndicatorTooltip", resourceCulture);
             }
         }
         
@@ -367,7 +448,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Uncached.
+        ///   Looks up a localized string similar to ReadOnly.
         /// </summary>
         public static string CodeMap_ExtraInfo_PXSelectReadOnlyViewLabel {
             get {
@@ -408,6 +489,33 @@ namespace Acuminator.Vsix {
         public static string CodeMap_FailedToUnsubscribeFromVsEvents_ErrorMessage {
             get {
                 return ResourceManager.GetString("CodeMap_FailedToUnsubscribeFromVsEvents_ErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is a projection attribute.
+        /// </summary>
+        public static string CodeMap_Icon_ProjectionAttributeTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_Icon_ProjectionAttributeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DAC Attributes.
+        /// </summary>
+        public static string CodeMap_Node_DacAttributes {
+            get {
+                return ResourceManager.GetString("CodeMap_Node_DacAttributes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Graph Attributes.
+        /// </summary>
+        public static string CodeMap_Node_GraphAttributes {
+            get {
+                return ResourceManager.GetString("CodeMap_Node_GraphAttributes", resourceCulture);
             }
         }
         
@@ -484,6 +592,15 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Deploying Acumatica Banned API files shipped with Acuminator.
+        /// </summary>
+        public static string PackageLoad_DeployBannedApiFiles {
+            get {
+                return ResourceManager.GetString("PackageLoad_DeployBannedApiFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Acuminator package loaded.
         /// </summary>
         public static string PackageLoad_Done {
@@ -502,7 +619,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Initializing Acumatica Code Snippets shipped with Acuminator.
+        ///   Looks up a localized string similar to Deploying Acumatica Code Snippets shipped with Acuminator.
         /// </summary>
         public static string PackageLoad_InitCodeSnippets {
             get {
@@ -565,6 +682,61 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A path to the file with allowed APIs that will not be reported by Acuminator even if their containing namespaces or types are listed in the &quot;Banned API File&quot; as banned.
+        ///This option should be used together with the &quot;Banned API File&quot; setting..
+        /// </summary>
+        public static string Setting_BannedAPI_AllowedApiFilePath_Description {
+            get {
+                return ResourceManager.GetString("Setting_BannedAPI_AllowedApiFilePath_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Allowed APIs File.
+        /// </summary>
+        public static string Setting_BannedAPI_AllowedApiFilePath_Title {
+            get {
+                return ResourceManager.GetString("Setting_BannedAPI_AllowedApiFilePath_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable Acuminator PX1099 diagnostic which reports calls to API that should not be used with Acumatica Framework. .
+        /// </summary>
+        public static string Setting_BannedAPI_BannedApiAnalysisEnabled_Description {
+            get {
+                return ResourceManager.GetString("Setting_BannedAPI_BannedApiAnalysisEnabled_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable PX1099 diagnostic for banned APIs.
+        /// </summary>
+        public static string Setting_BannedAPI_BannedApiAnalysisEnabled_Title {
+            get {
+                return ResourceManager.GetString("Setting_BannedAPI_BannedApiAnalysisEnabled_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A path to the file with a list of banned APIs that will be reported by Acuminator..
+        /// </summary>
+        public static string Setting_BannedAPI_BannedApiFilePath_Description {
+            get {
+                return ResourceManager.GetString("Setting_BannedAPI_BannedApiFilePath_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Banned APIs File.
+        /// </summary>
+        public static string Setting_BannedAPI_BannedApiFilePath_Title {
+            get {
+                return ResourceManager.GetString("Setting_BannedAPI_BannedApiFilePath_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Display the diagnostics that are necessary only for ISV Solution Certification. For non-ISV solutions, these diagnostics are informational..
         /// </summary>
         public static string Setting_CodeAnalysis_IsvSpecificAnalyzersEnabled_Description {
@@ -583,7 +755,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable Acuminator PX1007 diagnostic that checks DACs, DAC extensions and DAC field properties for the presence of valid XML documentation comments..
+        ///   Looks up a localized string similar to Enable Acuminator PX1007 diagnostic which checks DACs, DAC extensions, and DAC field properties for the valid XML documentation comments..
         /// </summary>
         public static string Setting_CodeAnalysis_PX1007DiagnosticEnabled_Description {
             get {
@@ -637,7 +809,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do not display the diagnostics specified in the suppression file. If set to false, Acuminator ignores the suppression file and displays all found diagnostics..
+        ///   Looks up a localized string similar to Enables Acuminator diagnostics suppression with suppression comments and Acuminator suppression files. If this setting is set to false, Acuminator will ignore suppression comments in the source code and Acuminator suppression files and display all found diagnostics..
         /// </summary>
         public static string Setting_CodeAnalysis_SuppressionMechanismEnabled_Description {
             get {
@@ -646,7 +818,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Suppress selected diagnostics.
+        ///   Looks up a localized string similar to Enable Acuminator diagnostics suppression.
         /// </summary>
         public static string Setting_CodeAnalysis_SuppressionMechanismEnabled_Title {
             get {
@@ -777,6 +949,24 @@ namespace Acuminator.Vsix {
         public static string Setting_UseRegexColoring_Title {
             get {
                 return ResourceManager.GetString("Setting_UseRegexColoring_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid or not existing file.
+        /// </summary>
+        public static string Settings_InvalidFileErrorCaption {
+            get {
+                return ResourceManager.GetString("Settings_InvalidFileErrorCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid or not existing file is specified for the setting &quot;{0}&quot;. .
+        /// </summary>
+        public static string Settings_InvalidFileErrorFormat {
+            get {
+                return ResourceManager.GetString("Settings_InvalidFileErrorFormat", resourceCulture);
             }
         }
     }

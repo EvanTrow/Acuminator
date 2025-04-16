@@ -1,8 +1,8 @@
-﻿#nullable enable
+﻿
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.CodeAnalysis;
@@ -28,7 +28,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
             SupportedDiagnostics = ImmutableArray.CreateRange(innerAnalyzers.SelectMany(a => a.SupportedDiagnostics));
         }
 
-		internal override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, PXContext pxContext)
+		protected override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, PXContext pxContext)
         {
             compilationStartContext.RegisterSymbolAction(c => AnalyzeSymbolHandleAggregateException(c, pxContext), SymbolKind);
             // TODO: Enable this operation action after migration to Roslyn v2
@@ -58,21 +58,34 @@ namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 
 		protected abstract void AnalyzeSymbol(SymbolAnalysisContext context, PXContext pxContext);
 
-		protected virtual void RunAggregatedAnalyzersInParallel(SymbolAnalysisContext context, Action<int> aggregatedAnalyserAction, ParallelOptions? parallelOptions = null)
+		protected virtual void RunAggregatedAnalyzersInParallel(List<T> effectiveAnalyzers, SymbolAnalysisContext context, 
+																Action<int> aggregatedAnalyserAction, ParallelOptions? parallelOptions = null)
 		{
+			switch (effectiveAnalyzers.Count)
+			{
+				case 0:
+					return;
+				case 1:
+					aggregatedAnalyserAction(0);
+					return;
+				default:
+				{
 #if DEBUG
-			for (int innerAnalyzerIndex = 0; innerAnalyzerIndex < _innerAnalyzers.Length; innerAnalyzerIndex++)
-			{
-				aggregatedAnalyserAction(innerAnalyzerIndex);
-			}
+					for (int analyzerIndex = 0; analyzerIndex < effectiveAnalyzers.Count; analyzerIndex++)
+					{
+						aggregatedAnalyserAction(analyzerIndex);
+					}
 #else
-			parallelOptions = parallelOptions ?? new ParallelOptions
-			{
-				CancellationToken = context.CancellationToken
-			};
+					parallelOptions = parallelOptions ?? new ParallelOptions
+					{
+						CancellationToken = context.CancellationToken
+					};
 
-			Parallel.For(0, _innerAnalyzers.Length, parallelOptions, aggregatedAnalyserAction);
+					Parallel.For(0, effectiveAnalyzers.Count, parallelOptions, aggregatedAnalyserAction);
 #endif
+					return;
+				}
+			}
 		}
 	}
 }

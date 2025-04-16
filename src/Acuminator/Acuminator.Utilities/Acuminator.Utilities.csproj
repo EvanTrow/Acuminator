@@ -14,6 +14,8 @@
     <AssemblyOriginatorKeyFile>..\..\key.snk</AssemblyOriginatorKeyFile>
     <LangVersion>12.0</LangVersion>
     <RestorePackagesPath>../../packages</RestorePackagesPath>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
     <PackageLicenseUrl>https://github.com/Acumatica/Acuminator/blob/dev/LICENSE</PackageLicenseUrl>
@@ -26,11 +28,21 @@
     <WarningLevel>9999</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="BannedApi\Data\AllowedApis.txt" />
+    <None Remove="BannedApi\Data\BannedApis.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="BannedApi\Data\BannedApis.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BannedApi\Data\AllowedApis.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="DiagnosticSuppression\IO\Validation\XmlSchema\SuppressionFileSchema.xsd" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.9.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.10.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" PrivateAssets="all" />
     <PackageReference Include="PolySharp" Version="1.14.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

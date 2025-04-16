@@ -1,26 +1,22 @@
-﻿using Acuminator.Utilities.Common;
-using Microsoft.CodeAnalysis;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
-using Microsoft.CodeAnalysis.CSharp;
+
+using Acuminator.Utilities.Common;
+
+using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.DiagnosticSuppression
 {
 	public partial class SuppressionManager
 	{
-		private class SuppressionFileCreator
+		private class SuppressionFileCreator(SuppressionManager suppressionManager)
 		{
-			private readonly SuppressionManager _suppressionManager;
+			private readonly SuppressionManager _suppressionManager = suppressionManager.CheckIfNull();
 
-			public SuppressionFileCreator(SuppressionManager suppressionManager)
+			public SuppressionFile? CreateSuppressionFileForProjectFromCommand(Project project)
 			{
-				_suppressionManager = suppressionManager.CheckIfNull(nameof(suppressionManager));
-			}
-
-			public SuppressionFile CreateSuppressionFileForProjectFromCommand(Project project)
-			{
-				project.ThrowOnNull(nameof(project));
+				project.ThrowOnNull();
 
 				//First check if file already exists to dismiss threads withou acquiring the lock
 				var existingSuppressionFile =  _suppressionManager.GetSuppressionFile(project.AssemblyName);
@@ -36,22 +32,29 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				}
 			}
 
-			private SuppressionFile AddNewSuppressionFileAndApplyChangesToWorkspace(Project project)
+			private SuppressionFile? AddNewSuppressionFileAndApplyChangesToWorkspace(Project project)
 			{
-				TextDocument roslynSuppressionFile = AddAdditionalSuppressionDocumentToProject(project);
+				TextDocument? roslynSuppressionFile = AddAdditionalSuppressionDocumentToProject(project);
 
-				if (roslynSuppressionFile == null || !project.Solution.Workspace.TryApplyChanges(roslynSuppressionFile.Project.Solution))
+				if (roslynSuppressionFile?.FilePath == null || !project.Solution.Workspace.TryApplyChanges(roslynSuppressionFile.Project.Solution))
 					return null;
 
-				return Instance.LoadSuppressionFileFrom(roslynSuppressionFile.FilePath);
+				return Instance?.LoadSuppressionFileFrom(roslynSuppressionFile.FilePath);
 			}
 
-			public TextDocument AddAdditionalSuppressionDocumentToProject(Project project)
+			public TextDocument? AddAdditionalSuppressionDocumentToProject(Project project)
 			{
-				project.ThrowOnNull(nameof(project));
+				project.ThrowOnNull();
+
+				if (project.FilePath.IsNullOrWhiteSpace())
+					return null;
 
 				string suppressionFileName = project.AssemblyName + SuppressionFile.SuppressionFileExtension;
-				string projectDir = Instance._fileSystemService.GetFileDirectory(project.FilePath);
+				string? projectDir = Instance?._fileSystemService.GetFileDirectory(project.FilePath);
+
+				if (projectDir == null)
+					return null;
+
 				string suppressionFilePath = Path.Combine(projectDir, suppressionFileName);
 
 				//Create new xml document and get its text

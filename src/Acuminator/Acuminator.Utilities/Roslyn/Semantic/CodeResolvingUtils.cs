@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.CompilerServices;
+
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Constants;
+using Acuminator.Utilities.Roslyn.Semantic.Symbols;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using Acuminator.Utilities.Roslyn.Constants;
-using Acuminator.Utilities.Roslyn.Semantic.Symbols;
 
 namespace Acuminator.Utilities.Roslyn.Semantic
 {
@@ -23,15 +25,15 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// </returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsAccessibleOutsideOfAssembly(this ISymbol symbol) =>
-			symbol.CheckIfNull(nameof(symbol)).DeclaredAccessibility switch
+			symbol.CheckIfNull().DeclaredAccessibility switch
 			{
-				Accessibility.Private => false,
-				Accessibility.Internal => false,
+				Accessibility.Private 			   => false,
+				Accessibility.Internal 			   => false,
 				Accessibility.ProtectedAndInternal => false,
-				Accessibility.Protected => true,
-				Accessibility.ProtectedOrInternal => true,
-				Accessibility.Public => true,
-				_ => true,
+				Accessibility.Protected 		   => true,
+				Accessibility.ProtectedOrInternal  => true,
+				Accessibility.Public 			   => true,
+				_ 								   => true,
 			};
 
 		/// <summary>
@@ -168,7 +170,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				   typeHierarchyNames.Contains(TypeNames.BqlCommand);
 		}
 
-		public static bool IsBqlCommand(this ITypeSymbol typeSymbol, PXContext pxContext)
+		public static bool IsBqlCommand(this ITypeSymbol typeSymbol, PXContext? pxContext)
 		{
 			if (!typeSymbol.IsValidForColoring(checkForNotColoredTypes: false))
 				return false;
@@ -179,14 +181,15 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				return true;
 
 			List<ITypeSymbol> typeHierarchy = typeSymbol.GetBaseTypesAndThis().ToList();
-			return typeHierarchy.Contains(pxContext.PXSelectBase.Type) || typeHierarchy.Contains(pxContext.BQL.BqlCommand);
+			return typeHierarchy.Contains(pxContext.PXSelectBase.Type, SymbolEqualityComparer.Default) || 
+				   typeHierarchy.Contains(pxContext.BQL.BqlCommand, SymbolEqualityComparer.Default);
 		}
 
 		public static bool IsFbqlView(this ITypeSymbol typeSymbol, PXContext pxContext)
 		{
 			if (pxContext.BQL.PXViewOf_BasedOn == null || pxContext.BQL.PXViewOf == null || typeSymbol?.BaseType == null)
 				return false;
-			else if (!typeSymbol.BaseType.OriginalDefinition.Equals(pxContext.BQL.PXViewOf_BasedOn))
+			else if (!typeSymbol.BaseType.OriginalDefinition.Equals(pxContext.BQL.PXViewOf_BasedOn, SymbolEqualityComparer.Default))
 			{
 				return false;
 			}
@@ -275,8 +278,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsPXGraph(this ITypeSymbol typeSymbol, PXContext pxContext)
         {
-            typeSymbol.ThrowOnNull(nameof(typeSymbol));
-            pxContext.ThrowOnNull(nameof(pxContext));
+            typeSymbol.ThrowOnNull();
+            pxContext.ThrowOnNull();
 
 			if (typeSymbol is ITypeParameterSymbol typeParameterSymbol)
 			{
@@ -292,8 +295,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsPXGraphExtension(this ITypeSymbol typeSymbol, PXContext pxContext)
         {
-            typeSymbol.ThrowOnNull(nameof(typeSymbol));
-            pxContext.ThrowOnNull(nameof(pxContext));
+            typeSymbol.ThrowOnNull();
+            pxContext.ThrowOnNull();
 
             return typeSymbol.InheritsFromOrEquals(pxContext.PXGraphExtension.Type);
         }
@@ -313,12 +316,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsPXAction(this ITypeSymbol typeSymbol, PXContext pxContext) =>
-			typeSymbol.InheritsFrom(pxContext?.PXAction.Type);
+			typeSymbol.InheritsFrom(pxContext.CheckIfNull().PXAction.Type);
 
 		public static bool IsCustomBqlCommand(this ITypeSymbol bqlTypeSymbol, PXContext context)
 		{
-			bqlTypeSymbol.ThrowOnNull(nameof(bqlTypeSymbol));
-			context.ThrowOnNull(nameof(context));
+			bqlTypeSymbol.ThrowOnNull();
+			context.ThrowOnNull();
 
 			int pxSelectBaseStandartDepth = context.IsAcumatica2018R2_OrGreater ? 3 : 2;
 			int? pxSelectBaseDepth = bqlTypeSymbol.GetInheritanceDepth(context.PXSelectBase.Type);
@@ -333,7 +336,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 		public static bool IsPXSelectReadOnlyCommand(this ITypeSymbol bqlTypeSymbol)
 		{
-			bqlTypeSymbol.ThrowOnNull(nameof(bqlTypeSymbol));
+			bqlTypeSymbol.ThrowOnNull();
 
 			if (!bqlTypeSymbol.IsBqlCommand())
 				return false;
@@ -354,8 +357,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 		public static bool IsPXNonUpdateableBqlCommand(this ITypeSymbol bqlTypeSymbol, PXContext context)
 		{
-			bqlTypeSymbol.ThrowOnNull(nameof(bqlTypeSymbol));
-			context.ThrowOnNull(nameof(context));
+			bqlTypeSymbol.ThrowOnNull();
+			context.ThrowOnNull();
 
 			if (!bqlTypeSymbol.IsBqlCommand(context))
 				return false;
@@ -365,12 +368,13 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 		public static bool IsPXSetupBqlCommand(this ITypeSymbol bqlTypeSymbol, PXContext context)
 		{
-			bqlTypeSymbol.ThrowOnNull(nameof(bqlTypeSymbol));
-			context.ThrowOnNull(nameof(context));
+			bqlTypeSymbol.ThrowOnNull();
+			context.ThrowOnNull();
 
-			ImmutableArray<INamedTypeSymbol> setupTypes = context.BQL.PXSetupTypes;
+			var setupTypes = ImmutableArray<ITypeSymbol>.CastUp(context.BQL.PXSetupTypes);
 			return bqlTypeSymbol.GetBaseTypesAndThis()
-								.Any(type => setupTypes.Contains(type.OriginalDefinition));
+								.Any(type => EnumerableExtensions.ImmutableArrayContains(setupTypes, type.OriginalDefinition, 
+																						 SymbolEqualityComparer.Default));
 		}
 
 		public static TextSpan? GetBqlOperatorOutliningTextSpan(this ITypeSymbol typeSymbol, GenericNameSyntax bqlOperatorNode)
@@ -475,52 +479,5 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		public static bool IsFBQLJoin(this ITypeSymbol typeSymbol) =>
 			typeSymbol is INamedTypeSymbol namedType && namedType.IsStatic && namedType.TypeArguments.Length == 1 &&
 			TypeNames.FBqlJoins.Contains(namedType.Name);
-
-		/// <summary>
-		/// Returns event handler type for the provided method symbol.
-		/// </summary>
-		/// <param name="symbol">Method symbol for the event handler</param>
-		/// <param name="pxContext">PXContext instance</param>
-		/// <returns>Event Type (e.g. RowSelecting). If method is not an event handler, returns <code>EventType.None</code>.</returns>
-		public static EventType GetEventHandlerType(this IMethodSymbol symbol, PXContext pxContext)
-		{
-			return symbol.GetEventHandlerInfo(pxContext).Type;
-		}
-
-		/// <summary>
-		/// Returns information about an event handler for the provided method symbol.
-		/// </summary>
-		/// <param name="symbol">Method symbol for the event handler</param>
-		/// <param name="pxContext">PXContext instance</param>
-		/// <returns>Event Type (e.g. RowSelecting) and Event Signature Type (default or generic).
-		/// If method is not an event handler, returns <code>(EventType.None, EventHandlerSignatureType.None)</code>.</returns>
-		public static EventInfo GetEventHandlerInfo(this IMethodSymbol symbol, PXContext pxContext)
-		{
-			if (symbol.ReturnsVoid && symbol.TypeParameters.IsEmpty && !symbol.Parameters.IsEmpty)
-			{
-				// Loosely check method signature because sometimes business logic 
-				// is extracted from event handler calls to a separate method
-
-				// Old non-generic syntax
-				if (symbol.Parameters[0].Type.OriginalDefinition.InheritsFromOrEquals(pxContext.PXCache.Type))
-				{
-					if (symbol.Name.EndsWith("CacheAttached", StringComparison.Ordinal))
-						return new EventInfo(EventType.CacheAttached, EventHandlerSignatureType.Default);
-
-					if (symbol.Parameters.Length >= 2 && pxContext.Events.EventTypeMap.TryGetValue(
-						    symbol.Parameters[1].Type.OriginalDefinition, out EventType eventType))
-					{
-						return new EventInfo(eventType, EventHandlerSignatureType.Default);
-					}
-				}
-				else if (pxContext.Events.EventTypeMap.TryGetValue(
-					symbol.Parameters[0].Type.OriginalDefinition, out EventType eventType)) // New generic event handler syntax
-				{
-					return new EventInfo(eventType, EventHandlerSignatureType.Generic);
-				}
-			}
-
-			return EventInfo.None();
-		}
 	}
 }

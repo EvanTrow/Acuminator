@@ -1,12 +1,13 @@
-﻿#nullable enable
+﻿
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
 using Microsoft.CodeAnalysis;
@@ -16,7 +17,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 {
-	public partial class ThrowingExceptionsInEventHandlersAnalyzer : IEventHandlerAnalyzer, IPXGraphWithGraphEventsAnalyzer
+	public partial class ThrowingExceptionsInEventHandlersAnalyzer : ILooseEventHandlerAggregatedAnalyzer, IPXGraphAnalyzer
 	{
 		private class ThrowInGraphEventsWalker : ThrowInEventsWalker
 		{
@@ -40,11 +41,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 		{
 			private readonly EventType _eventType;
 			private readonly List<ITypeSymbol> _exceptionTypesAllowedInRowPersisted;
+			private readonly List<ITypeSymbol> _exceptionTypesAllowedInFieldUpdating;
 
 			public ThrowInEventsWalker(SymbolAnalysisContext context, PXContext pxContext, EventType eventType) : base(context, pxContext)
 			{
 				_eventType = eventType;
-				_exceptionTypesAllowedInRowPersisted = GetExceptionTypesAllowdInRowPersisted(pxContext);
+				_exceptionTypesAllowedInRowPersisted = GetExceptionTypesAllowedInRowPersisted(pxContext);
+				_exceptionTypesAllowedInFieldUpdating = GetExceptionTypesAllowedInFieldUpdating(pxContext);
 			}
 
 			public override void VisitThrowExpression(ThrowExpressionSyntax throwExpression)
@@ -67,7 +70,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 				}
 			}
 
-			private bool CheckThrowExpression(ExpressionSyntax expressionAfterThrowkeyword, SyntaxNode throwNodeToReport)
+			private bool CheckThrowExpression(ExpressionSyntax? expressionAfterThrowkeyword, SyntaxNode throwNodeToReport)
 			{
 				ThrowIfCancellationRequested();
 
@@ -83,6 +86,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 					isReported = true;
 				}
 
+				if (_eventType == EventType.FieldUpdating && !IsThrowingOfThisExceptionInFieldUpdatingAllowed(expressionAfterThrowkeyword))
+				{
+					ReportDiagnostic(_context.ReportDiagnostic, Descriptors.PX1073_ThrowingExceptionsInFieldUpdating, throwNodeToReport);
+					isReported = true;
+				}
+
 				if (_eventType != EventType.RowSelected && IsPXSetupNotEnteredException(expressionAfterThrowkeyword))
 				{
 					ReportDiagnostic(_context.ReportDiagnostic,
@@ -94,22 +103,34 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 				return isReported;
 			}
 
-			protected virtual bool IsThrowingOfThisExceptionInRowPersistedAllowed(ExpressionSyntax? expressionAfterThrowkeyword)
+			protected virtual bool IsThrowingOfThisExceptionInRowPersistedAllowed(
+																	[NotNullWhen(returnValue: true)] ExpressionSyntax? expressionAfterThrowkeyword)
+			{
+				return IsExceptionTypeAllowed(expressionAfterThrowkeyword, _exceptionTypesAllowedInRowPersisted);
+			}
+
+			protected virtual bool IsThrowingOfThisExceptionInFieldUpdatingAllowed(
+																	[NotNullWhen(returnValue: true)] ExpressionSyntax? expressionAfterThrowkeyword)
+			{
+				return IsExceptionTypeAllowed(expressionAfterThrowkeyword, _exceptionTypesAllowedInFieldUpdating);
+			}
+
+			protected bool IsExceptionTypeAllowed([NotNullWhen(returnValue: true)] ExpressionSyntax? expressionAfterThrowkeyword,
+												  List<ITypeSymbol> allowedExceptionTypes)
 			{
 				if (expressionAfterThrowkeyword?.SyntaxTree == null)
-					return false;                                     // It's better to be conservative here and report thrown exception if we can't verify its type
+					return false;                               // It's better to be conservative here and report thrown exception if we can't verify its type
 
 				SemanticModel? semanticModel = GetSemanticModel(expressionAfterThrowkeyword.SyntaxTree);
 				ITypeSymbol? exceptiontype = semanticModel?.GetTypeInfo(expressionAfterThrowkeyword).Type;
 
-				bool isAllowed = exceptiontype != null &&             // It's better to be conservative here and report thrown exception if we can't verify its type
-								 _exceptionTypesAllowedInRowPersisted.Any(allowedExceptionType => exceptiontype.InheritsFromOrEquals(allowedExceptionType));
+				bool isAllowed = exceptiontype != null &&      // It's better to be conservative here and report thrown exception if we can't verify its type
+								 allowedExceptionTypes.Any(allowedType => exceptiontype.InheritsFromOrEquals(allowedType));
 				return isAllowed;
 			}
 
-			private List<ITypeSymbol> GetExceptionTypesAllowdInRowPersisted(PXContext pxContext) =>
-				new List<ITypeSymbol>
-				{
+			private List<ITypeSymbol> GetExceptionTypesAllowedInRowPersisted(PXContext pxContext) =>
+				[
 					// Acumatica exceptions
 					PxContext.Exceptions.PXRowPersistedException,
 					PxContext.Exceptions.PXLockViolationException,
@@ -117,8 +138,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 					// .Net exceptions
 					PxContext.Exceptions.ArgumentException,
 					PxContext.Exceptions.NotImplementedException,
-					PxContext.Exceptions.NotSupportedException		
-				};
+					PxContext.Exceptions.NotSupportedException
+				];
+
+			private List<ITypeSymbol> GetExceptionTypesAllowedInFieldUpdating(PXContext pxContext) =>
+				[
+				 // .Net exceptions
+				 PxContext.Exceptions.ArgumentException,
+				 PxContext.Exceptions.NotImplementedException, 
+				 PxContext.Exceptions.NotSupportedException
+				];
 		}
 	}
 }

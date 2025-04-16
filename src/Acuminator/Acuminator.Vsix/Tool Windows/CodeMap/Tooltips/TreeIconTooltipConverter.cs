@@ -1,11 +1,10 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Windows.Data;
-using Acuminator.Utilities.Common;
-
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
@@ -15,19 +14,24 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	[ValueConversion(sourceType: typeof(TreeNodeViewModel), targetType: typeof(string))]
 	public class TreeIconTooltipConverter : IValueConverter
 	{
-		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
 			Icon icon = GetIcon(value);
 			var node = GetNode(value);
 
 			return icon switch
 			{
-				Icon.DacKeyProperty                             => VSIXResource.CodeMap_ExtraInfo_DacKeyIconTooltip,
-				Icon.Settings                                   => VSIXResource.CodeMap_ExtraInfo_PXSetupViewIconTooltip,
-				Icon.Filter                                     => VSIXResource.CodeMap_ExtraInfo_PXFilterViewIconTooltip,
-				Icon.Processing when node is ViewNodeViewModel  => VSIXResource.CodeMap_ExtraInfo_ProcessingViewIconTooltip,
-				Icon.Processing when node is GraphNodeViewModel => VSIXResource.CodeMap_ExtraInfo_ProcessingGraphIconTooltip,
-				_                                               => Binding.DoNothing
+				Icon.DacKeyField 								=> VSIXResource.CodeMap_ExtraInfo_DacKeyIconTooltip,
+				Icon.Settings 									=> VSIXResource.CodeMap_ExtraInfo_PXSetupViewIconTooltip,
+				Icon.Filter 									=> VSIXResource.CodeMap_ExtraInfo_PXFilterViewIconTooltip,
+				Icon.Processing when node is ViewNodeViewModel	=> VSIXResource.CodeMap_ExtraInfo_ProcessingViewIconTooltip,
+				Icon.Processing 
+				when node is GraphNodeViewModel graphVM			=> graphVM.IsGraph 
+																	? VSIXResource.CodeMap_ExtraInfo_ProcessingGraphIconTooltip
+																	: VSIXResource.CodeMap_ExtraInfo_ProcessingGraphExtensionIconTooltip,
+				Icon.ProjectionDac 								=> VSIXResource.CodeMap_ExtraInfo_ProjectionDacIndicatorTooltip,
+				Icon.ProjectionAttribute 						=> VSIXResource.CodeMap_Icon_ProjectionAttributeTooltip,
+				_ 												=> null
 			};
 		}
 
@@ -36,12 +40,12 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		private Icon GetIcon(object viewModel) =>
 			viewModel switch
 			{
-				TreeNodeViewModel treeNode => treeNode.NodeIcon,
+				TreeNodeViewModel treeNode 	=> treeNode.NodeIcon,
 				IconViewModel iconViewModel => iconViewModel.IconType,
-				_ => Icon.None,
+				_ 							=> Icon.None,
 			};
 
-		private TreeNodeViewModel GetNode(object viewModel) =>
+		private TreeNodeViewModel? GetNode(object viewModel) =>
 			viewModel is IconViewModel iconViewModel
 				? iconViewModel.Node
 				: viewModel as TreeNodeViewModel;

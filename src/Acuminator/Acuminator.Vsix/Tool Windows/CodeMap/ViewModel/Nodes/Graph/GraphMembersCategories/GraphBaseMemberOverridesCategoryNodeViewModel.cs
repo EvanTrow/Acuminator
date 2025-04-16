@@ -4,10 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
-using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
-using Acuminator.Vsix.Utilities;
+using Acuminator.Vsix.ToolWindows.CodeMap.Graph;
 
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
@@ -18,8 +16,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override Icon NodeIcon => Icon.BaseMemberOverrideGraphCategory;
 
-		public GraphBaseMemberOverridesCategoryNodeViewModel(GraphNodeViewModel graphViewModel, bool isExpanded) : 
-														base(graphViewModel, GraphMemberType.BaseMemberOverride, isExpanded)
+		public GraphBaseMemberOverridesCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) : 
+														base(graphViewModel, parent, GraphMemberCategory.BaseMemberOverride, isExpanded)
 		{		
 		}
 

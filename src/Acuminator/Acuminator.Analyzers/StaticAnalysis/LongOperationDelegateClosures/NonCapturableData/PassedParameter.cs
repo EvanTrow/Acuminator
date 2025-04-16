@@ -1,10 +1,5 @@
-﻿#nullable enable
-
+﻿
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
 
 using Acuminator.Utilities.Common;
 
@@ -44,7 +39,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 
 		public PassedParameter(string name, CapturedInstancesTypes capturedInstanceTypes)
 		{
-			Name = name.CheckIfNullOrWhiteSpace(nameof(name));
+			Name = name.CheckIfNullOrWhiteSpace();
 			CapturedTypes = capturedInstanceTypes;
 		}
 

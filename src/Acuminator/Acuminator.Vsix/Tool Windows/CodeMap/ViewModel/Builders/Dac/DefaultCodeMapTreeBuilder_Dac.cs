@@ -1,24 +1,29 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
-using Acuminator.Utilities.Roslyn.Semantic.SharedInfo;
-using Acuminator.Vsix.Utilities;
-
+using Acuminator.Vsix.ToolWindows.CodeMap.Dac;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public partial class DefaultCodeMapTreeBuilder : TreeBuilderBase
 	{
-		protected virtual DacNodeViewModel CreateDacNode(DacSemanticModel dacSemanticModel, TreeViewModel tree) =>
-			new DacNodeViewModel(dacSemanticModel, tree, ExpandCreatedNodes);
+		protected virtual DacNodeViewModel CreateDacNode(DacSemanticModelForCodeMap dacSemanticModel, TreeNodeViewModel? parent, 
+														 TreeViewModel tree) =>
+			new DacNodeViewModel(dacSemanticModel, tree, parent, ExpandCreatedNodes);
 
-		public override IEnumerable<TreeNodeViewModel> VisitNode(DacNodeViewModel dac)
+		public override IEnumerable<TreeNodeViewModel>? VisitNode(DacNodeViewModel dac)
 		{
+			var dacAttributesGroup = GetDacAttributesGroupNode(dac);
+
+			if (dacAttributesGroup != null)
+				yield return dacAttributesGroup;
+
 			foreach (DacMemberCategory dacMemberCategory in GetDacMemberCategoriesInOrder())
 			{
 				Cancellation.ThrowIfCancellationRequested();
@@ -31,71 +36,108 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			}
 		}
 
+		protected virtual DacAttributesGroupNodeViewModel GetDacAttributesGroupNode(DacNodeViewModel dac) =>
+			new DacAttributesGroupNodeViewModel(dac.DacModelForCodeMap.DacModel, dac, ExpandCreatedNodes);
+
 		protected virtual IEnumerable<DacMemberCategory> GetDacMemberCategoriesInOrder()
 		{
+			yield return DacMemberCategory.BaseTypes;
 			yield return DacMemberCategory.InitializationAndActivation;
 			yield return DacMemberCategory.Keys;
 			yield return DacMemberCategory.Property;
 			yield return DacMemberCategory.FieldsWithoutProperty;
 		}
 
-		protected virtual DacMemberCategoryNodeViewModel CreateCategory(DacNodeViewModel dac, DacMemberCategory dacMemberCategory) =>
+		protected virtual DacMemberCategoryNodeViewModel? CreateCategory(DacNodeViewModel dac, DacMemberCategory dacMemberCategory) =>
 			dacMemberCategory switch
 			{
-				DacMemberCategory.InitializationAndActivation => new DacInitializationAndActivationCategoryNodeViewModel(dac, ExpandCreatedNodes),
-				DacMemberCategory.Keys                        => new DacKeysCategoryNodeViewModel(dac, ExpandCreatedNodes),
-				DacMemberCategory.Property                    => new DacPropertiesCategoryNodeViewModel(dac, ExpandCreatedNodes),
-				_                                             => null,
+				DacMemberCategory.BaseTypes					  => new DacBaseTypesCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
+				DacMemberCategory.InitializationAndActivation => new DacInitializationAndActivationCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
+				DacMemberCategory.Keys 						  => new KeyDacFieldsCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
+				DacMemberCategory.Property 					  => new AllDacFieldsDacCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
+				_ 											  => null,
 			};
 
-		public override IEnumerable<TreeNodeViewModel> VisitNode(DacInitializationAndActivationCategoryNodeViewModel dacInitializationAndActivationCategory)
+		public override IEnumerable<TreeNodeViewModel> VisitNode(DacAttributesGroupNodeViewModel attributeGroupNode) =>
+			attributeGroupNode.AttributeInfos()
+							  .Select(attrInfo => new DacAttributeNodeViewModel(attributeGroupNode, attrInfo, ExpandCreatedNodes));
+
+		public override IEnumerable<TreeNodeViewModel> VisitNode(DacBaseTypesCategoryNodeViewModel dacBaseTypesCategory)
 		{
-			return CreateDacMemberCategoryChildren<IsActiveMethodInfo>(dacInitializationAndActivationCategory,
-						constructor: isActiveMethodInfo => new IsActiveDacMethodNodeViewModel(dacInitializationAndActivationCategory,
-																							  isActiveMethodInfo, ExpandCreatedNodes));
+			Cancellation.ThrowIfCancellationRequested();
+
+			if (dacBaseTypesCategory.BaseDacInfo != null)
+			{
+				yield return new BaseDacPlaceholderNodeViewModel(dacBaseTypesCategory.BaseDacInfo, dacBaseTypesCategory.DacViewModel,
+													  dacBaseTypesCategory, ExpandCreatedNodes);
+			}
+
+			if (dacBaseTypesCategory.BaseDacExtensionInfo != null)
+			{
+				yield return new BaseDacPlaceholderNodeViewModel(dacBaseTypesCategory.BaseDacExtensionInfo, dacBaseTypesCategory.DacViewModel, 
+													  dacBaseTypesCategory, ExpandCreatedNodes);
+			}
 		}
 
-		public override IEnumerable<TreeNodeViewModel> VisitNode(DacKeysCategoryNodeViewModel dacKeysCategory)
+		public override IEnumerable<TreeNodeViewModel>? VisitNode(DacInitializationAndActivationCategoryNodeViewModel dacInitializationAndActivationCategory)
 		{
-			dacKeysCategory.ThrowOnNull(nameof(dacKeysCategory));
-			return CreateDacMemberCategoryChildren<DacPropertyInfo>(dacKeysCategory,
-																	propertyInfo => new PropertyNodeViewModel(dacKeysCategory, propertyInfo, ExpandCreatedNodes));
+			Cancellation.ThrowIfCancellationRequested();
+
+			if (dacInitializationAndActivationCategory?.DacModel.IsActiveMethodInfo != null)
+			{
+				var isActiveNode = new IsActiveDacMethodNodeViewModel(dacInitializationAndActivationCategory,
+																	  dacInitializationAndActivationCategory.DacModel.IsActiveMethodInfo, 
+																	  ExpandCreatedNodes);
+				return [isActiveNode];
+			}
+			else
+				return [];
 		}
 
-		public override IEnumerable<TreeNodeViewModel> VisitNode(DacPropertiesCategoryNodeViewModel dacPropertiesCategory)
-		{
-			dacPropertiesCategory.ThrowOnNull(nameof(dacPropertiesCategory));
-			return CreateDacMemberCategoryChildren<DacPropertyInfo>(dacPropertiesCategory, 
-																	propertyInfo => new PropertyNodeViewModel(dacPropertiesCategory, propertyInfo, ExpandCreatedNodes));
-		}
+		public override IEnumerable<TreeNodeViewModel>? VisitNode(KeyDacFieldsCategoryNodeViewModel dacKeyFieldsCategory) =>
+			CreateDacFieldsCategoryChildren(dacKeyFieldsCategory);
 
-		protected virtual IEnumerable<TreeNodeViewModel> CreateDacMemberCategoryChildren<TInfo>(DacMemberCategoryNodeViewModel dacMemberCategory,
-																								Func<TInfo, TreeNodeViewModel> constructor)
-		where TInfo : SymbolItem
+		public override IEnumerable<TreeNodeViewModel>? VisitNode(AllDacFieldsDacCategoryNodeViewModel allDacFieldsCategory) =>
+			CreateDacFieldsCategoryChildren(allDacFieldsCategory);
+
+		protected virtual IEnumerable<TreeNodeViewModel> CreateDacFieldsCategoryChildren(DacFieldCategoryNodeViewModel dacFieldCategory)
 		{
-			var categorySymbols = dacMemberCategory?.GetCategoryDacNodeSymbols();
+			var categorySymbols = dacFieldCategory.CheckIfNull().GetCategoryDacFields();
 
 			if (categorySymbols == null)
-			{
 				yield break;
-			}
 
-			foreach (TInfo info in categorySymbols)
+			foreach (DacFieldInfo fieldInfo in categorySymbols)
 			{
 				Cancellation.ThrowIfCancellationRequested();
-				TreeNodeViewModel childNode = constructor(info);
-
+				TreeNodeViewModel childNode = new DacFieldNodeViewModel(dacFieldCategory, parent: dacFieldCategory, 
+																		fieldInfo, ExpandCreatedNodes);
 				if (childNode != null)
-				{
 					yield return childNode;
-				}
 			}
 		}
 
-		public override IEnumerable<TreeNodeViewModel> VisitNode(PropertyNodeViewModel property)
+		public override IEnumerable<TreeNodeViewModel>? VisitNode(DacFieldNodeViewModel dacField)
 		{
-			property.ThrowOnNull(nameof(property));
-			return property.PropertyInfo.Attributes.Select(a => new AttributeNodeViewModel(property, a.AttributeData, ExpandCreatedNodes));
+			if (dacField.FieldInfo.PropertyInfo != null)
+			{
+				yield return new DacFieldPropertyNodeViewModel(dacField.MemberCategory, parent: dacField, 
+															   dacField.FieldInfo.PropertyInfo, ExpandCreatedNodes);
+			}
+
+			if (dacField.FieldInfo.BqlFieldInfo != null)
+			{
+				yield return new DacBqlFieldNodeViewModel(dacField.MemberCategory, parent: dacField, 
+														   dacField.FieldInfo.BqlFieldInfo, ExpandCreatedNodes);
+			}
+		}
+
+		public override IEnumerable<TreeNodeViewModel> VisitNode(DacFieldPropertyNodeViewModel dacFieldProperty)
+		{
+			var attributes = dacFieldProperty.CheckIfNull().PropertyInfo.Attributes;
+			return !attributes.IsDefaultOrEmpty
+				? attributes.Select(attrInfo => new DacFieldAttributeNodeViewModel(dacFieldProperty, attrInfo, ExpandCreatedNodes))
+				: [];
 		}
 	}
 }

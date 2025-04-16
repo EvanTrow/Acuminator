@@ -1,17 +1,14 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Syntax;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Roslyn.Semantic
 {
@@ -19,7 +16,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 	{
 		public static bool IsInstanceConstructor(this IMethodSymbol methodSymbol)
 		{
-			methodSymbol.ThrowOnNull(nameof (methodSymbol));
+			methodSymbol.ThrowOnNull();
 
 			return !methodSymbol.IsStatic && methodSymbol.MethodKind == MethodKind.Constructor;
 		}
@@ -48,7 +45,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		private static IMethodSymbol? GetStaticOrNonLocalContainingMethod(IMethodSymbol localFunction, bool stopOnStaticMethod,
 																		  CancellationToken cancellation)
 		{
-			localFunction.ThrowOnNull(nameof(localFunction));
+			localFunction.ThrowOnNull();
 
 			if (localFunction.MethodKind != MethodKind.LocalFunction)
 				return localFunction;
@@ -62,12 +59,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		}
 
 		public static IEnumerable<IMethodSymbol> GetContainingMethodsAndThis(this IMethodSymbol localFunction) =>
-			localFunction.CheckIfNull(nameof(localFunction)).MethodKind == MethodKind.LocalFunction
+			localFunction.CheckIfNull().MethodKind == MethodKind.LocalFunction
 				? localFunction.GetContainingMethods(includeThis: true)
 				: new[] { localFunction };
 
 		public static IEnumerable<IMethodSymbol> GetContainingMethods(this IMethodSymbol localFunction) =>
-			localFunction.CheckIfNull(nameof(localFunction)).MethodKind == MethodKind.LocalFunction
+			localFunction.CheckIfNull().MethodKind == MethodKind.LocalFunction
 				? localFunction.GetContainingMethods(includeThis: false)
 				: Enumerable.Empty<IMethodSymbol>();
 
@@ -95,7 +92,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		public static ImmutableArray<IParameterSymbol> GetAllParametersAvailableForLocalFunction(this IMethodSymbol localFunction, bool includeOwnParameters,
 																								 CancellationToken cancellation)
 		{
-			if (localFunction.CheckIfNull(nameof(localFunction)).MethodKind != MethodKind.LocalFunction)
+			if (localFunction.CheckIfNull().MethodKind != MethodKind.LocalFunction)
 				return localFunction.Parameters;
 
 			ImmutableArray<IParameterSymbol>.Builder parametersBuilder;
@@ -149,7 +146,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// </returns>
 		public static bool IsNonLocalMethodParameterRedefined(this IMethodSymbol localMethod, string parameterName, CancellationToken cancellation)
 		{
-			localMethod.ThrowOnNull(nameof(localMethod));
+			localMethod.ThrowOnNull();
 
 			if (parameterName.IsNullOrWhiteSpace() || localMethod.MethodKind != MethodKind.LocalFunction)
 				return false;
@@ -206,8 +203,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// </returns>
 		public static bool IsDefinitelyStatic(this IMethodSymbol method, SyntaxNode methodDeclaration)
 		{
-			method.ThrowOnNull(nameof(method));
-			methodDeclaration.ThrowOnNull(nameof(methodDeclaration));
+			method.ThrowOnNull();
+			methodDeclaration.ThrowOnNull();
 
 			if (method.MethodKind != MethodKind.LocalFunction)
 				return method.IsStatic;
@@ -222,10 +219,104 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// <returns>True if <paramref name="method"/> </returns>
 		public static bool CanBeOverriden(this IMethodSymbol method)
 		{
-			method.ThrowOnNull(nameof(method));
+			method.ThrowOnNull();
 
 			return method.IsVirtual || method.IsOverride || method.IsAbstract;
 		}
 
+		/// <summary>
+		/// Check if <paramref name="method"/> signature equals the signature of <paramref name="methodToCheck"/>.
+		/// </summary>
+		/// <param name="method">The method to act on.</param>
+		/// <param name="methodToCheck">The method with signature to check.</param>
+		/// <returns>
+		/// True if signatures are equal.
+		/// </returns>
+		/// <remarks>
+		/// This method does not check constraints on type parameters.
+		/// </remarks>
+		public static bool SignatureEquals(this IMethodSymbol method, [NotNullWhen(returnValue: true)] IMethodSymbol? methodToCheck)
+		{
+			if (!method.AreParametersEqual(methodToCheck) || !method.ReturnType.Equals(methodToCheck.ReturnType, SymbolEqualityComparer.Default) ||
+				method.IsGenericMethod != methodToCheck.IsGenericMethod)
+			{
+				return false;
+			}
+
+			if (method.IsGenericMethod)
+				return method.TypeParameters.Length == methodToCheck.TypeParameters.Length;		// TODO no constraints check on type parameters currently
+
+			return true;
+		}
+
+		/// <summary>
+		/// Check if <paramref name="method"/> parameters are equal to the parameters of <paramref name="methodToCheck"/>.
+		/// </summary>
+		/// <param name="method">The method to act on.</param>
+		/// <param name="methodToCheck">The method with parameters to check.</param>
+		/// <returns>
+		/// True if parameters are equal.
+		/// </returns>
+		public static bool AreParametersEqual(this IMethodSymbol method, [NotNullWhen(returnValue: true)] IMethodSymbol? methodToCheck)
+		{
+			method.ThrowOnNull();
+
+			if (methodToCheck == null || method.Parameters.Length != methodToCheck.Parameters.Length)
+				return false;
+
+			return method.Parameters.EqualsParameterRange(methodToCheck.Parameters, rangeStart: 0, rangeEnd: method.Parameters.Length);
+		}
+
+		/// <summary>
+		/// Check if parameters in the range from <paramref name="rangeStart"/> to <paramref name="rangeEnd"/> are equal.<br/>
+		/// If one of the lists does not contain the entire range, then an exception will be thrown.
+		/// </summary>
+		/// <param name="sourceParameters">The source parameters to act on.</param>
+		/// <param name="parametersToCheck">Parameters to check.</param>
+		/// <param name="rangeStart">The range start. The range start is inclusive, all indexes greater than it will be taken.</param>
+		/// <param name="rangeEnd">The range end. The range end is exclusive to the list of parameters, all indexes lower than it will be taken.</param>
+		/// <returns>
+		/// True if parameters in the specified range are equal, false if not.
+		/// </returns>
+		internal static bool EqualsParameterRange(this ImmutableArray<IParameterSymbol> sourceParameters, ImmutableArray<IParameterSymbol> parametersToCheck,
+												  int rangeStart, int rangeEnd)
+		{
+			int minParamsCount = Math.Min(sourceParameters.Length, parametersToCheck.Length);
+
+			if (rangeStart > rangeEnd || rangeStart < 0 || rangeEnd > minParamsCount)
+				throw new ArgumentOutOfRangeException($"Invalid range - start: {rangeStart}, end: {rangeEnd}");
+			else if (rangeStart == rangeEnd)
+				return true;
+
+			for (var i = rangeStart; i < rangeEnd; i++)
+			{
+				if (!sourceParameters[i].Type.Equals(parametersToCheck[i].Type, SymbolEqualityComparer.Default))
+					return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Check if the <paramref name="method"/> has PXOverrideAttribute declared on the overrides chain.
+		/// </summary>
+		/// <param name="method">The method to act on.</param>
+		/// <param name="pxContext">The context.</param>
+		/// <returns>
+		/// True the <paramref name="method"/> has PXOverrideAttribute declared on the overrides chain, false if not.
+		/// </returns>
+		public static bool HasPXOverrideAttribute(this IMethodSymbol method, PXContext pxContext) =>
+			method.CheckIfNull().HasPXOverrideAttribute(pxContext.CheckIfNull().AttributeTypes.PXOverrideAttribute);
+
+		/// <summary>
+		/// Check if the <paramref name="method"/> has PXOverrideAttribute declared on the overrides chain.
+		/// </summary>
+		/// <param name="method">The method to act on.</param>
+		/// <param name="pxContext">The context.</param>
+		/// <returns>
+		/// True the <paramref name="method"/> has PXOverrideAttribute declared on the overrides chain, false if not.
+		/// </returns>
+		internal static bool HasPXOverrideAttribute(this IMethodSymbol method, INamedTypeSymbol pxOverrideAttribute) =>
+			method.HasAttribute(pxOverrideAttribute, checkOverrides: true, checkForDerivedAttributes: false);
 	}
 }

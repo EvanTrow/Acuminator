@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Acuminator.Utilities.Common;
@@ -18,12 +16,12 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 				return null;
 
 			if (invocationNode.Expression is MemberAccessExpressionSyntax memberAccessNode &&
-				memberAccessNode.OperatorToken.Kind() == SyntaxKind.DotToken)
+				memberAccessNode.OperatorToken.IsKind(SyntaxKind.DotToken))
 			{
 				return memberAccessNode.Expression;
 			}
 			else if (invocationNode.Expression is MemberBindingExpressionSyntax memberBindingNode &&
-					 memberBindingNode.OperatorToken.Kind() == SyntaxKind.DotToken &&
+					 memberBindingNode.OperatorToken.IsKind(SyntaxKind.DotToken) &&
 					 invocationNode.Parent is ConditionalAccessExpressionSyntax conditionalAccessNode)
 			{
 				return conditionalAccessNode.Expression;
@@ -41,7 +39,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		/// </returns>
 		public static Location GetMethodNameLocation(this InvocationExpressionSyntax invocation)
 		{
-			invocation.ThrowOnNull(nameof(invocation));
+			invocation.ThrowOnNull();
 
 			if (invocation.Expression is MemberAccessExpressionSyntax memberAccessNode)
 			{
@@ -58,7 +56,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool DoesArgumentsContainIdentifier(this InvocationExpressionSyntax invocation, string? identifier)
 		{
-			invocation.ThrowOnNull(nameof(invocation));
+			invocation.ThrowOnNull();
 
 			if (identifier.IsNullOrWhiteSpace())
 				return false;
@@ -75,7 +73,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 
 		public static IEnumerable<ArgumentSyntax> GetArgumentsContainingIdentifier(this InvocationExpressionSyntax invocation, string? identifier)
 		{
-			invocation.ThrowOnNull(nameof(invocation));
+			invocation.ThrowOnNull();
 
 			if (identifier.IsNullOrWhiteSpace())
 				yield break;
@@ -100,7 +98,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 			if (node == null)
 				return null;
 
-			SyntaxNode current = node;
+			SyntaxNode? current = node;
 
 			while (current != null && current is not StatementSyntax)
 			{
@@ -132,7 +130,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 
 		public static StatementSyntax? GetNextStatement(this StatementSyntax? statement)
 		{
-			if (statement == null)
+			if (statement?.Parent == null)
 				return null;
 
 			using var enumerator = statement.Parent.ChildNodes()
@@ -150,7 +148,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 					}
 					else
 					{
-						switch (curStatement.Parent.Parent.Kind())
+						switch (curStatement.Parent?.Parent?.Kind())
 						{
 							case SyntaxKind.MethodDeclaration:
 							case SyntaxKind.OperatorDeclaration:
@@ -179,13 +177,13 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsStatic(this BaseMethodDeclarationSyntax node) =>
-			node.CheckIfNull(nameof(node))
+			node.CheckIfNull()
 				.Modifiers
 				.Any(m => m.IsKind(SyntaxKind.StaticKeyword));
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsStatic(this LocalFunctionStatementSyntax node) =>
-			node.CheckIfNull(nameof(node))
+			node.CheckIfNull()
 				.Modifiers
 				.Any(m => m.IsKind(SyntaxKind.StaticKeyword));
 	}

@@ -1,15 +1,17 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Constants;
+using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Simplification;
+
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Acuminator.Utilities.Roslyn.CodeGeneration
 {
@@ -29,8 +31,8 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 		/// </returns>
 		public static CompilationUnitSyntax AddMissingUsingDirectiveForNamespace(this CompilationUnitSyntax root, string namespaceName)
 		{
-			root.ThrowOnNull(nameof(root));
-			namespaceName.ThrowOnNullOrWhiteSpace(nameof(namespaceName));
+			root.ThrowOnNull();
+			namespaceName.ThrowOnNullOrWhiteSpace();
 
 			bool alreadyHasUsing = root.Usings.Any(usingDirective => namespaceName == usingDirective.Name?.ToString());
 
@@ -38,8 +40,86 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 				return root;
 
 			return root.AddUsings(
-					SyntaxFactory.UsingDirective(
-						SyntaxFactory.ParseName(namespaceName)));
+							UsingDirective(
+								ParseName(namespaceName)));
+		}
+
+		/// <summary>
+		/// Create attribute list of the supplied type
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		public static AttributeListSyntax GetAttributeList(this INamedTypeSymbol type, AttributeArgumentListSyntax? argumentList = null)
+		{
+			type.ThrowOnNull();
+
+			var node = Attribute(
+						IdentifierName(
+							type.Name))
+						.WithAdditionalAnnotations(Simplifier.Annotation);
+
+			if (argumentList != null)
+			{
+				node = node.WithArgumentList(argumentList);
+			}
+
+			var list = AttributeList(
+						SingletonSeparatedList(
+							node));
+
+			return list;
+		}
+
+		public static TNode CopyRegionsFromTrivia<TNode>(TNode nodeToCopyTrivia, in SyntaxTriviaList leadingTrivia)
+		where TNode : SyntaxNode
+		{
+			nodeToCopyTrivia.ThrowOnNull();
+
+			var regionTrivias = leadingTrivia.GetRegionDirectiveLinesFromTrivia();
+
+			if (regionTrivias.Count == 0)
+				return nodeToCopyTrivia;
+
+			var regionsTrivia = TriviaList(regionTrivias);
+			var bqlFieldNodeLeadingTrivia = nodeToCopyTrivia.GetLeadingTrivia();
+			var newBqlFieldNodeTrivia = bqlFieldNodeLeadingTrivia.AddRange(regionsTrivia);
+
+			return nodeToCopyTrivia.WithLeadingTrivia(newBqlFieldNodeTrivia);
+		}
+
+		/// <summary>
+		/// Removes the regions from the type member node leading trivia.
+		/// </summary>
+		/// <param name="member">The type member node.</param>
+		/// <returns>
+		/// Type member node with removed regions from leading trivia.
+		/// </returns>
+		[return: NotNullIfNotNull(nameof(member))]
+		public static MemberDeclarationSyntax? RemoveRegionsFromLeadingTrivia(MemberDeclarationSyntax? member)
+		{
+			if (member == null)
+				return member;
+
+			var leadingTrivia	 = member.GetLeadingTrivia();
+			var newLeadingTrivia = RemoveRegionsFromTrivia(leadingTrivia);
+
+			return newLeadingTrivia != null
+				? member.WithLeadingTrivia(newLeadingTrivia)
+				: member;
+		}
+
+		public static IEnumerable<SyntaxTrivia>? RemoveRegionsFromTrivia(in SyntaxTriviaList leadingTrivia)
+		{
+			if (leadingTrivia.Count == 0)
+				return null;
+
+			var regionTrivias = leadingTrivia.GetRegionDirectiveLinesFromTrivia();
+
+			if (regionTrivias.Count == 0)
+				return null;
+
+			var newLeadingTrivia = leadingTrivia.Except(regionTrivias);
+			return newLeadingTrivia;
 		}
 	}
 }

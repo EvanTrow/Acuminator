@@ -1,6 +1,6 @@
-﻿#nullable enable
-
+﻿
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis.ActionHandlerAttributes;
@@ -15,18 +15,20 @@ using Acuminator.Analyzers.StaticAnalysis.InvalidPXActionSignature;
 using Acuminator.Analyzers.StaticAnalysis.LongOperationStart;
 using Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGraphExtensions;
 using Acuminator.Analyzers.StaticAnalysis.NoIsActiveMethodForExtension;
-using Acuminator.Analyzers.StaticAnalysis.NonPublicExtensions;
+using Acuminator.Analyzers.StaticAnalysis.NonPublicGraphsDacsAndExtensions;
 using Acuminator.Analyzers.StaticAnalysis.NoPrimaryViewForPrimaryDac;
+using Acuminator.Analyzers.StaticAnalysis.ForbidPrivateEventHandlers;
 using Acuminator.Analyzers.StaticAnalysis.PXActionExecution;
 using Acuminator.Analyzers.StaticAnalysis.PXGraphCreationInGraphInWrongPlaces;
 using Acuminator.Analyzers.StaticAnalysis.PXOverrideMismatch;
 using Acuminator.Analyzers.StaticAnalysis.SavingChanges;
 using Acuminator.Analyzers.StaticAnalysis.StaticFieldOrPropertyInGraph;
 using Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions;
-using Acuminator.Analyzers.StaticAnalysis.TypoInViewDelegateName;
+using Acuminator.Analyzers.StaticAnalysis.TypoInViewAndActionHandlerName;
 using Acuminator.Analyzers.StaticAnalysis.UiPresentationLogic;
 using Acuminator.Analyzers.StaticAnalysis.ViewDeclarationOrder;
 using Acuminator.Utilities;
+using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
@@ -36,50 +38,46 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 {
 	[DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class PXGraphAnalyzer : SymbolAnalyzersAggregator<IPXGraphAnalyzer>
-    {
-        protected override SymbolKind SymbolKind => SymbolKind.NamedType;
+	public class PXGraphAnalyzer : SymbolAnalyzersAggregator<IPXGraphAnalyzer>
+	{
+		protected override SymbolKind SymbolKind => SymbolKind.NamedType;
 
-        public PXGraphAnalyzer() : this(null,
-            new PXGraphCreationInGraphInWrongPlacesGraphAnalyzer(),
+		public PXGraphAnalyzer() : this(null,
+			new PXGraphCreationInGraphInWrongPlacesGraphAnalyzer(),
 			new ConstructorInGraphExtensionAnalyzer(),
-            new SavingChangesInGraphSemanticModelAnalyzer(),
-            new ChangesInPXCacheDuringPXGraphInitializationAnalyzer(),
-            new LongOperationInPXGraphDuringInitializationAnalyzer(),
-            new LongOperationInDataViewDelegateAnalyzer(),
-            new PXActionExecutionInGraphSemanticModelAnalyzer(),
-            new DatabaseQueriesInPXGraphInitializationAnalyzer(),
-            new ThrowingExceptionsInLongRunningOperationAnalyzer(),
-            new ThrowingExceptionsInActionHandlersAnalyzer(),
-
-			new PXGraphWithGraphEventsAggregatorAnalyzer
-			(
-				new NoIsActiveMethodForExtensionAnalyzer(),
-				new NameConventionEventsInGraphsAndGraphExtensionsAnalyzer(),
-				new ThrowingExceptionsInEventHandlersAnalyzer()
-			),
-
+			new SavingChangesInGraphSemanticModelAnalyzer(),
+			new ChangesInPXCacheDuringPXGraphInitializationAnalyzer(),
+			new LongOperationInPXGraphDuringInitializationAnalyzer(),
+			new LongOperationInDataViewDelegateAnalyzer(),
+			new PXActionExecutionInGraphSemanticModelAnalyzer(),
+			new DatabaseQueriesInPXGraphInitializationAnalyzer(),
+			new ThrowingExceptionsInLongRunningOperationAnalyzer(),
+			new ThrowingExceptionsInActionHandlersAnalyzer(),
+			new NoIsActiveMethodForExtensionAnalyzer(),
+			new NameConventionEventsInGraphsAndGraphExtensionsAnalyzer(),
+			new ThrowingExceptionsInEventHandlersAnalyzer(),
 			new CallingBaseDataViewDelegateFromOverrideDelegateAnalyzer(),
-            new CallingBaseActionHandlerFromOverrideHandlerAnalyzer(),
-            new UiPresentationLogicInActionHandlersAnalyzer(),
+			new CallingBaseActionHandlerFromOverrideHandlerAnalyzer(),
+			new UiPresentationLogicInActionHandlersAnalyzer(),
 			new ViewDeclarationOrderAnalyzer(),
 			new NoPrimaryViewForPrimaryDacAnalyzer(),
 			new ActionHandlerAttributesAnalyzer(),
-            new ActionHandlerReturnTypeAnalyzer(),
-			new NonPublicGraphAndDacExtensionAnalyzer(),
+			new ActionHandlerReturnTypeAnalyzer(),
+			new NonPublicGraphAndDacAndExtensionsAnalyzer(),
 			new InvalidPXActionSignatureAnalyzer(),
 			new StaticFieldOrPropertyInGraphAnalyzer(),
-			new TypoInViewDelegateNameAnalyzer(),
-			new PXOverrideMismatchAnalyzer())
-        {
-        }
+			new TypoInViewAndActionHandlerNameAnalyzer(),
+			new PXOverrideMismatchAnalyzer(),
+			new ForbidPrivateEventHandlersAnalyzer())
+		{
+		}
 
-        /// <summary>
-        /// Constructor for the unit tests.
-        /// </summary>
-        public PXGraphAnalyzer(CodeAnalysisSettings? settings, params IPXGraphAnalyzer[] innerAnalyzers) : base(settings, innerAnalyzers)
-        {
-        }
+		/// <summary>
+		/// Constructor for the unit tests.
+		/// </summary>
+		public PXGraphAnalyzer(CodeAnalysisSettings? settings, params IPXGraphAnalyzer[] innerAnalyzers) : base(settings, innerAnalyzers)
+		{
+		}
 
 		protected override void AnalyzeSymbol(SymbolAnalysisContext context, PXContext pxContext)
 		{
@@ -93,22 +91,28 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 				CancellationToken = context.CancellationToken
 			};
 
-			var inferredGraphs = PXGraphSemanticModel.InferModels(pxContext, type, GraphSemanticModelCreationOptions.CollectAll, context.CancellationToken);
-			
-			foreach (var graph in inferredGraphs)
+			var inferredGraphs = PXGraphSemanticModel.InferModels(pxContext, type, GraphSemanticModelCreationOptions.CollectAll, 
+																  cancellation: context.CancellationToken);
+			context.CancellationToken.ThrowIfCancellationRequested();
+
+			var graphsEnrichedWithEvents = from graphOrExtension in inferredGraphs
+										   where graphOrExtension != null
+										   select PXGraphEventSemanticModel.EnrichGraphModelWithEvents(graphOrExtension, context.CancellationToken);
+
+			foreach (var graphOrExtension in graphsEnrichedWithEvents)
 			{
-				RunAggregatedAnalyzersInParallel(context, aggregatedAnalyserAction: innerAnalyzerIndex =>
+				var effectiveAnalyzers = _innerAnalyzers.Where(analyzer => analyzer.ShouldAnalyze(pxContext, graphOrExtension))
+														.ToList(capacity: _innerAnalyzers.Length);
+
+				RunAggregatedAnalyzersInParallel(effectiveAnalyzers, context, aggregatedAnalyserAction: analyzerIndex =>
 				{
 					context.CancellationToken.ThrowIfCancellationRequested();
-					var innerAnalyzer = _innerAnalyzers[innerAnalyzerIndex];
 
-					if (innerAnalyzer.ShouldAnalyze(pxContext, graph))
-					{
-						innerAnalyzer.Analyze(context, pxContext, graph);
-					}
+					var analyzer = effectiveAnalyzers[analyzerIndex];
+					analyzer.Analyze(context, pxContext, graphOrExtension);
 				},
 				parallelOptions);
 			}
 		}
-    }
+	}
 }

@@ -1,18 +1,10 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.ComponentModel.Design;
-using System.Linq;
-using EnvDTE;
-using EnvDTE80;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
-using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Editor;
+
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.TextManager.Interop;
-using Acuminator.Utilities;
+
 using Acuminator.Utilities.Common;
 using Acuminator.Vsix.Utilities;
 
@@ -44,23 +36,19 @@ namespace Acuminator.Vsix
 		/// <param name="package">Owner package, not null.</param>
 		protected VSCommandBase(AsyncPackage package, OleMenuCommandService commandService, int commandID, Guid? customCommandSet = null)
 		{
-			package.ThrowOnNull(nameof(package));
-			commandService.ThrowOnNull(nameof(commandService));
+			commandService.ThrowOnNull();
 
-			Package = package;
+			Package = package.CheckIfNull();
 			Guid commandSet = customCommandSet ?? DefaultCommandSet;
 
-			if (commandService != null)
+			var menuCommandID = new CommandID(commandSet, commandID);
+			var menuItem = new OleMenuCommand(CommandCallback, menuCommandID)
 			{
-				var menuCommandID = new CommandID(commandSet, commandID);
-				var menuItem = new OleMenuCommand(CommandCallback, menuCommandID)
-				{
-					// This defers the visibility logic back to the VisibilityConstraints in the .vsct file
-					Supported = false
-				};
+				// This defers the visibility logic back to the VisibilityConstraints in the .vsct file
+				Supported = false
+			};
 
-				commandService.AddCommand(menuItem);
-			}
+			commandService.AddCommand(menuItem);
 		}
 
 		/// <summary>

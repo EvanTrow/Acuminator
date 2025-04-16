@@ -16,7 +16,7 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1002](diagnostics/PX1002.md) | The field must have a type attribute that corresponds to the list attribute. | Error | Available |
 | [PX1003](diagnostics/PX1003.md) | Consider using a specific implementation of `PXGraph`. | Warning (ISV Level 2: Production Quality) | Unavailable |
 | [PX1004](diagnostics/PX1004.md) | The order of view declarations will cause the creation of two cache instances. | Message | Unavailable |
-| [PX1005](diagnostics/PX1005.md) | There is probably a typo in the view delegate name. | Warning (ISV Level 3: Informational) | Available |
+| [PX1005](diagnostics/PX1005.md) | There is probably a typo in the name of the view delegate or the action delegate. | Warning (ISV Level 3: Informational) | Available |
 | [PX1006](diagnostics/PX1006.md) | The order of view declarations will cause the creation of one cache instance for multiple DACs | Message | Unavailable |
 | [PX1007](diagnostics/PX1007.md) | The DAC, DAC extension, or DAC property should have a description in the "summary" XML tag or "inheritdoc" XML tag | Error | Available |
 | [PX1008](diagnostics/PX1008.md) | The reference to the screen graph or an action adapter in the long operation and processing delegates cause synchronous execution of the delegate. | Error | Unavailable |
@@ -32,11 +32,11 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1019](diagnostics/PX1019.md) | A DAC property field with the `AutoNumber` attribute must have the string type.                                  | Error | Available   |
 | [PX1020](diagnostics/PX1020.md) | For the DAC property with the `AutoNumber` attribute, the string length must be greater than or equal to PX.Objects.CS.NumberingSequence.StartNbr value.     | Error | Available   |
 | [PX1021](diagnostics/PX1021.md) | The type of the DAC field attribute does not correspond to the property type. | Error | Available |
-| [PX1022](diagnostics/PX1022.md) | The non-public graph and DAC extensions are not supported.                                                       | Error | Available   |
+| [PX1022](diagnostics/PX1022.md) | The non-public graphs, DACs, graph and DAC extensions are not supported. | Error | Available   |
 | [PX1023](diagnostics/PX1023.md) | The DAC property is marked with multiple field type attributes. | Error | Available |
 | [PX1024](diagnostics/PX1024.md) | The DAC class field must be abstract. | Error | Available |
 | [PX1026](diagnostics/PX1026.md) | Underscores cannot be used in the names of DACs and DAC fields. | Error | Available |
-| [PX1027](diagnostics/PX1027.md) | The `CompanyMask`, `CompanyID`, and `DeletedDatabaseRecord` fields cannot be declared in DACs. The name of a DAC field also cannot begin with the `Company` prefix. | Error | Available |
+| [PX1027](diagnostics/PX1027.md) | The `CompanyMask`, `CompanyID`, `Notes`, `Files`, `DatabaseRecordStatus`, and `DeletedDatabaseRecord` fields cannot be declared in DACs. The name of a DAC field also cannot begin with the `Company` prefix. | Error | Available |
 | [PX1028](diagnostics/PX1028.md) | Constructors in DACs are prohibited. | Error | Available |
 | [PX1029](diagnostics/PX1029.md) | `PXGraph` instances cannot be used inside DAC properties. | Error | Unavailable |
 | [PX1030](diagnostics/PX1030.md) | The `PXDefault` attribute of the field is used incorrectly. | Warning (ISV Level 1: Significant) or Error | Available |
@@ -55,7 +55,7 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1045](diagnostics/PX1045.md) | `PXGraph` instances cannot be created in event handlers. | Error | Unavailable |
 | [PX1046](diagnostics/PX1046.md) | Long-running operations cannot be started within event handlers. | Error | Unavailable |
 | [PX1047](diagnostics/PX1047.md) | In the `FieldDefaulting`, `FieldVerifying`, and `RowSelected` event handlers, DAC instances passed to these event handlers cannot be modified. | Error | Unavailable |
-| [PX1048](diagnostics/PX1048.md) | For the `RowInserting` and `RowSelecting` events, only the DAC instance that is passed in the event arguments can be modified in the event handler. | Error | Unavailable |
+| [PX1048](diagnostics/PX1048.md) | For the `RowInserting`, `RowSelecting`, and `FieldUpdating` events, only the DAC instance that is passed in the event arguments can be modified in the event handler. | Error | Unavailable |
 | [PX1049](diagnostics/PX1049.md) | In `RowSelected` event handlers, BQL statements and other database queries should be avoided. | Warning (ISV Level 1: Significant) | Unavailable |
 | [PX1050](diagnostics/PX1050.md) | Hardcoded strings cannot be used as parameters for localization methods, `PXException` and `PXExceptionInfo` constructors. | Error | Unavailable |
 | [PX1051](diagnostics/PX1051.md) | The strings defined in a class without the `PXLocalizable` attribute cannot be used as parameters for localization methods, `PXException` and `PXExceptionInfo` constructors. | Error | Unavailable |
@@ -72,13 +72,19 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1062](diagnostics/PX1062.md) | You cannot declare static views, actions, mutable fields, and mutable properties in graphs or graph extensions  | Error | Available |
 | [PX1063](diagnostics/PX1063.md) | The declaration of the exception class does not contain a serialization constructor. This will cause an incorrect deserialization of the exception data and will lead to runtime errors in Acumatica ERP. | Error | Available |
 | [PX1064](diagnostics/PX1064.md) | The declaration of the exception class introduces new serializable fields but does not declare an override for the `GetObjectData` method. This will cause an incorrect serialization of the exception data and will lead to runtime errors in Acumatica ERP. | Error | Available |
+| [PX1065](diagnostics/PX1065.md) | The DAC field property does not have a corresponding BQL field. | Error | Available |
+| [PX1066](diagnostics/PX1066.md) | The name of the BQL field may contain a mistake. | Warning (ISV Level 3: Informational) | Available |
+| [PX1067](diagnostics/PX1067.md) | The DAC does not contain a redeclaration of a BQL field declared in the base DAC. | Warning (ISV Level 3: Informational) | Available |
+| [PX1068](diagnostics/PX1068.md) | The type of the DAC field property does not correspond to the type of the BQL field. | Error | Available |
 | [PX1070](diagnostics/PX1070.md) | The state of fields and actions can be configured only in `RowSelected` event handlers. | Error | Unavailable |
 | [PX1071](diagnostics/PX1071.md) | Actions cannot be executed within event handlers. | Error | Unavailable |
 | [PX1072](diagnostics/PX1072.md) | BQL queries must be executed within the context of an existing `PXGraph` instance. | Warning (ISV Level 1: Significant) | Available |
-| [PX1073](diagnostics/PX1073.md) | Exceptions cannot be thrown in the `RowPersisted` event handlers. | Error | Unavailable |
+| [PX1073](diagnostics/PX1073.md) | Exceptions cannot be thrown in the `RowPersisted` and `FieldUpdating` event handlers. | Error | Unavailable |
 | [PX1074](diagnostics/PX1074.md) | `PXSetupNotEnteredException` cannot be thrown in any event handlers except for the `RowSelected` event handlers. | Warning (ISV Level 1: Significant) | Unavailable |
-| [PX1075](diagnostics/PX1075.md) | `PXCache.RaiseExceptionHandling` cannot be invoked from the `FieldDefaulting`, `FieldSelecting`, `RowSelecting`, and `RowPersisted` event handlers. | Error | Unavailable |
+| [PX1075](diagnostics/PX1075.md) | `PXCache.RaiseExceptionHandling` cannot be invoked from the `FieldDefaulting`, `FieldSelecting`, `FieldUpdating`, `RowSelecting`, and `RowPersisted` event handlers. | Error | Unavailable |
 | [PX1076](diagnostics/PX1076.md) | This code calls Acumatica internal API marked with PXInternalUseOnlyAttribute which is not intended for public use | Warning | Unavailable |
+| [PX1077](diagnostics/PX1077.md) | Event handlers in graphs and graph extensions should have the `protected` and `virtual` modifiers | Error | Available |
+| [PX1078](diagnostics/PX1078.md) | The DAC field and the referenced DAC field have different types or sizes. | Error | Unavailable |
 | [PX1080](diagnostics/PX1080.md) | Data view delegates should not start long-running operations. | Error | Unavailable |
 | [PX1081](diagnostics/PX1081.md) | Actions cannot be executed during the `PXGraph` initialization. | Error | Unavailable |
 | [PX1082](diagnostics/PX1082.md) | Actions cannot be executed within data view delegates. | Error | Unavailable |
@@ -95,3 +101,4 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1094](diagnostics/PX1094.md) | Every DAC should be decorated with the `PXHidden` or `PXCacheName` attribute. | Warning (ISV Level 3: Informational) | Available |
 | [PX1095](diagnostics/PX1095.md) | A field with the `PXDBCalced` or `PXDBScalar` attribute must have an unbound type attribute, such as `PXDate` or `PXDecimal`. | Error | Unavailable |
 | [PX1096](diagnostics/PX1096.md) | The signature of a method with the `PXOverride` attribute must match the overridden method. | Error | Unavailable |
+| [PX1099](diagnostics/PX1099.md) | The API reported by the diagnostic should not be used with the Acumatica Framework. | Warning | Unavailable |

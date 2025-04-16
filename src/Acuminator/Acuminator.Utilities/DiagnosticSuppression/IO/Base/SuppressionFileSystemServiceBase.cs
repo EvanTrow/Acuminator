@@ -3,6 +3,7 @@ using System.IO;
 using System.Security;
 using System.Xml;
 using System.Xml.Linq;
+
 using Acuminator.Utilities.Common;
 
 namespace Acuminator.Utilities.DiagnosticSuppression.IO
@@ -16,15 +17,15 @@ namespace Acuminator.Utilities.DiagnosticSuppression.IO
 
 		public SuppressionFileValidation FileValidation { get; }
 
-		protected SuppressionFileSystemServiceBase(IIOErrorProcessor errorProcessor, SuppressionFileValidation customValidation)
+		protected SuppressionFileSystemServiceBase(IIOErrorProcessor? errorProcessor, SuppressionFileValidation? customValidation)
 		{
 			ErrorProcessor = errorProcessor ?? new DefaultIOErrorProcessor();
 			FileValidation = customValidation ?? new SuppressionFileValidation(ErrorProcessor);
 		}
 
-		public virtual XDocument Load(string path)
+		public virtual XDocument? Load(string path)
 		{
-			path.ThrowOnNullOrWhiteSpace(nameof(path));
+			path.ThrowOnNullOrWhiteSpace();
 
 			try
 			{
@@ -50,8 +51,8 @@ namespace Acuminator.Utilities.DiagnosticSuppression.IO
 
 		public virtual bool Save(XDocument document, string path)
 		{
-			document.ThrowOnNull(nameof(document));
-			path.ThrowOnNullOrWhiteSpace(nameof(path));
+			document.ThrowOnNull();
+			path.ThrowOnNullOrWhiteSpace();
 			
 			try
 			{
@@ -69,18 +70,11 @@ namespace Acuminator.Utilities.DiagnosticSuppression.IO
 			return true;
 		}
 
-		public virtual string GetFileName(string path)
-		{
-			path.ThrowOnNullOrWhiteSpace(nameof(path));
+		public virtual string GetFileName(string path) =>
+			Path.GetFileNameWithoutExtension(path.CheckIfNullOrWhiteSpace());
 
-			return Path.GetFileNameWithoutExtension(path);
-		}
-
-		public virtual string GetFileDirectory(string path)
-		{
-			path.ThrowOnNullOrWhiteSpace(nameof(path));
-			return Path.GetDirectoryName(path);
-		}
+		public virtual string GetFileDirectory(string path) =>
+			Path.GetDirectoryName(path.CheckIfNullOrWhiteSpace());
 
 		public abstract ISuppressionFileWatcherService CreateWatcher(string path);
 

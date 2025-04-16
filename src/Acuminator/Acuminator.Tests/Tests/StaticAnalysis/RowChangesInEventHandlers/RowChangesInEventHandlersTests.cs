@@ -9,9 +9,10 @@ using Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
-using Acuminator.Utilities.Roslyn;
-using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
+
 using Microsoft.CodeAnalysis.Diagnostics;
+
 using Xunit;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.RowChangesInEventHandlers
@@ -19,17 +20,28 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.RowChangesInEventHandlers
 	public class RowChangesInEventHandlersTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new EventHandlerAnalyzer(CodeAnalysisSettings.Default
+			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 					.WithRecursiveAnalysisEnabled()
-					.WithIsvSpecificAnalyzersEnabled(), 
+					.WithIsvSpecificAnalyzersEnabled(),
 				new RowChangesInEventHandlersAnalyzer());
 
 		[Theory]
 		[EmbeddedFileData("IsPatternAssignment.cs")]
 		public Task IsPatternAssignment(string actual) => VerifyCSharpDiagnosticAsync(actual,
-			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(17, 4, EventType.RowSelected),
-			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(25, 4, EventType.FieldDefaulting),
-			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(33, 4, EventType.FieldVerifying));
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(18, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(24, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(30, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(36, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(42, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(50, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(56, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(61, 5, EventType.RowSelected),
+
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(71, 4, EventType.FieldDefaulting),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(79, 4, EventType.FieldVerifying),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(87, 4, EventType.RowSelected),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(95, 4, EventType.FieldDefaulting),
+			Descriptors.PX1047_RowChangesInEventHandlersForbiddenForArgs.CreateFor(103, 4, EventType.FieldVerifying));
 
 		[Theory]
 		[EmbeddedFileData("DirectAssignment.cs")]
@@ -81,39 +93,43 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.RowChangesInEventHandlers
 		[EmbeddedFileData("NonRowAssignment.cs")]
 		public Task NonRowAssignment_ShouldNotShowDiagnostic(string actual) => VerifyCSharpDiagnosticAsync(actual);
 
-
 		[Theory]
 		[EmbeddedFileData(@"Reversed\IsPatternAssignment.cs")]
 		public Task Reversed_IsPatternAssignment_ShouldNotShowDiagnostic(string actual) => VerifyCSharpDiagnosticAsync(actual);
 
 		[Theory]
 		[EmbeddedFileData(@"Reversed\DirectAssignment.cs")]
-		public Task Reversed_DirectAssignment(string actual) => VerifyCSharpDiagnosticAsync(actual, 
+		public Task Reversed_DirectAssignment(string actual) => VerifyCSharpDiagnosticAsync(actual,
 			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(17, 4, EventType.RowInserting),
-			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(23, 4, EventType.RowSelecting));
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(23, 4, EventType.RowSelecting),
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(29, 4, EventType.FieldUpdating));
 
 		[Theory]
 		[EmbeddedFileData(@"Reversed\IndirectAssignment.cs")]
 		public Task Reversed_IndirectAssignment(string actual) => VerifyCSharpDiagnosticAsync(actual,
 			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(18, 4, EventType.RowInserting),
-			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(25, 4, EventType.RowSelecting));
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(25, 4, EventType.RowSelecting),
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(32, 4, EventType.FieldUpdating));
 
 		[Theory]
 		[EmbeddedFileData(@"Reversed\SetValue.cs")]
 		public Task Reversed_SetValue(string actual) => VerifyCSharpDiagnosticAsync(actual,
 			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(17, 4, EventType.RowInserting),
-			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(23, 4, EventType.RowSelecting));
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(23, 4, EventType.RowSelecting),
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(29, 4, EventType.FieldUpdating));
 
 		[Theory]
 		[EmbeddedFileData(@"Reversed\SetValueExt.cs")]
 		public Task Reversed_SetValueExt(string actual) => VerifyCSharpDiagnosticAsync(actual,
 			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(17, 4, EventType.RowInserting),
-			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(23, 4, EventType.RowSelecting));
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(23, 4, EventType.RowSelecting),
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(29, 4, EventType.FieldUpdating));
 
 		[Theory]
 		[EmbeddedFileData(@"Reversed\IndirectSetValue.cs")]
 		public Task Reversed_IndirectSetValue(string actual) => VerifyCSharpDiagnosticAsync(actual,
 			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(19, 4, EventType.RowInserting),
-			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(27, 4, EventType.RowSelecting));
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(27, 4, EventType.RowSelecting),
+			Descriptors.PX1048_RowChangesInEventHandlersAllowedForArgsOnly.CreateFor(35, 4, EventType.FieldUpdating));
 	}
 }

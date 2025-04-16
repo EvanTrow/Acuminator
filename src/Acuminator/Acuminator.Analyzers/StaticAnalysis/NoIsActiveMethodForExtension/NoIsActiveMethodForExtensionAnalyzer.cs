@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -22,14 +21,14 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoIsActiveMethodForExtension
 	/// <summary>
 	/// The analyzer which checks that DAC and Graph extensions have IsActive method declared.
 	/// </summary>
-	public class NoIsActiveMethodForExtensionAnalyzer : IDacAnalyzer, IPXGraphWithGraphEventsAnalyzer
+	public class NoIsActiveMethodForExtensionAnalyzer : IDacAnalyzer, IPXGraphAnalyzer
 	{
 		public ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(Descriptors.PX1016_NoIsActiveMethodForDacExtension,
 								  Descriptors.PX1016_NoIsActiveMethodForGraphExtension);
 
 		public bool ShouldAnalyze(PXContext pxContext, DacSemanticModel dacExtension) =>
-			dacExtension?.DacType == DacType.DacExtension && dacExtension.IsActiveMethodInfo == null &&
+			dacExtension?.DacType == DacType.DacExtension && dacExtension.IsInSource && dacExtension.IsActiveMethodInfo == null &&
 			!dacExtension.Symbol.IsAbstract && !dacExtension.Symbol.IsGenericType && !dacExtension.IsMappedCacheExtension;
 
 		public void Analyze(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dacExtension)
@@ -38,7 +37,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoIsActiveMethodForExtension
 
 			// ShouldAnalyze already filtered everything and left only DAC extensions without IsActive
 			// We just need to report them
-			Location location = dacExtension.Node.Identifier.GetLocation();
+			Location? location = dacExtension.Node?.Identifier.GetLocation().NullIfLocationKindIsNone();
 
 			if (location == null)
 				return;
@@ -48,13 +47,20 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoIsActiveMethodForExtension
 				pxContext.CodeAnalysisSettings);
 		}
 
-		public bool ShouldAnalyze(PXContext pxContext, PXGraphSemanticModel graphExtension) =>
-			graphExtension.Type == GraphType.PXGraphExtension && graphExtension.IsActiveMethodInfo == null &&
-			!graphExtension.Symbol.IsGenericType &&
-			(!graphExtension.Symbol.IsAbstract || graphExtension.HasPXProtectedAccess);
-		
-		public bool ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graphExtensionhWithEvents) =>
-			!graphExtensionhWithEvents.ConfiguresWorkflow || IsWorkflowExtensionWithBusinessLogic(graphExtensionhWithEvents);	// Filter out workflow extensions without business logic.
+		public bool ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graphExtension)
+		{
+			if (graphExtension == null || !graphExtension.IsInSource || graphExtension.GraphType == GraphType.PXGraph || 
+				graphExtension.IsActiveMethodInfo != null || graphExtension.Symbol.IsGenericType)
+			{  
+				return false; 
+			}
+
+			if (graphExtension.Symbol.IsAbstract && !graphExtension.HasPXProtectedAccess)
+				return false;
+
+			// Filter out workflow extensions without business logic.
+			return !graphExtension.ConfiguresWorkflow || IsWorkflowExtensionWithBusinessLogic(graphExtension);       
+		}
 
 		private bool IsWorkflowExtensionWithBusinessLogic(PXGraphEventSemanticModel graphExtension)
 		{
@@ -65,8 +71,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoIsActiveMethodForExtension
 				return true;
 			}
 
-			return graphExtension.GetAllEvents()
-								 .Any(graphEvent => graphEvent.Symbol.IsDeclaredInType(graphExtension.Symbol));
+			return graphExtension.DeclaredEventHandlers.AllEventHandlersCount > 0;
 		}
 
 		public void Analyze(SymbolAnalysisContext symbolContext, PXContext pxContext, PXGraphEventSemanticModel graphExtension)
@@ -75,8 +80,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoIsActiveMethodForExtension
 
 			// ShouldAnalyze already filtered everything and left only graph extensions without IsActive
 			// We just need to report them
-			var syntaxNode = graphExtension.Symbol.GetSyntax(symbolContext.CancellationToken);
-			Location? location = (syntaxNode as ClassDeclarationSyntax)?.Identifier.GetLocation() ?? syntaxNode?.GetLocation();
+			Location? location = graphExtension.Node?.Identifier.GetLocation().NullIfLocationKindIsNone() ?? graphExtension.Node?.GetLocation();
 
 			if (location == null)
 				return;

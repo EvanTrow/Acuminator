@@ -47,6 +47,21 @@
 		internal const string PXBoolAttribute = "PX.Data.PXBoolAttribute";
 		internal const string PXVariantAttribute = "PX.Data.PXVariantAttribute";
 
+		internal static class AttributesWithHardCodedLength
+		{
+			public const string PXDBBaseScreenIDAttribute = "PX.Data.PXDBBaseScreenIDAttribute";
+			public const string PXDBWeblinkAttribute = "PX.Data.PXDBWeblinkAttribute";
+			public const string PXDBEmailAttribute = "PX.Data.PXDBEmailAttribute";
+			public const string PersonDisplayNameAttribute = "PX.SM.PersonDisplayNameAttribute";
+			public const string RMColorAttribute = "PX.CS.RMColorAttribute";
+			public const string RMFontNameAttribute = "PX.CS.RMFontNameAttribute";
+			public const string ContactDisplayNameAttribute = "PX.Objects.CR.ContactDisplayNameAttribute";
+			public const string PXAttributeValueAttribute = "PX.Objects.CS.PXAttributeValueAttribute";
+			public const string CuryIDStringAttribute = "PX.Objects.CM.Extensions.CurrencyInfo.CuryIDStringAttribute";
+			public const string TaxIDAttribute = "PX.Objects.TX.TaxIDAttribute";
+
+			public const string SMDBRecipientAttribute = "PX.SM.Email.SMDBRecipientAttribute";
+		}
 
 		internal const string PXDBFieldAttribute = "PX.Data.PXDBFieldAttribute";
 
@@ -86,7 +101,10 @@
 		internal const string PXImportAttribute = "PX.Data.PXImportAttribute";
 		internal const string PXHiddenAttribute = "PX.Data.PXHiddenAttribute";
 		internal const string PXCacheNameAttribute = "PX.Data.PXCacheNameAttribute";
+
 		internal const string PXPrimaryGraphAttribute = "PX.Data.PXPrimaryGraphAttribute";
+		internal const string PXPrimaryGraphBaseAttribute = "PX.Data.PXPrimaryGraphBaseAttribute";
+
 		internal const string PXCopyPasteHiddenViewAttribute = "PX.Data.PXCopyPasteHiddenViewAttribute";
 		internal const string PXOverrideAttribute = "PX.Data.PXOverrideAttribute";
 		internal const string PXEventSubscriberAttribute = "PX.Data.PXEventSubscriberAttribute";
@@ -95,19 +113,20 @@
 		internal const string PXUnboundDefaultAttribute = "PX.Data.PXUnboundDefaultAttribute";
 		internal const string PXButtonAttribute = "PX.Data.PXButtonAttribute";
 
-		internal const string BqlDataTypeType = "PX.Data.BQL.IBqlDataType";
-		internal const string BqlStringType = "PX.Data.BQL.IBqlString";
-		internal const string BqlGuidType = "PX.Data.BQL.IBqlGuid";
-		internal const string BqlDateTimeType = "PX.Data.BQL.IBqlDateTime";
-		internal const string BqlBoolType = "PX.Data.BQL.IBqlBool";
-		internal const string BqlByteType = "PX.Data.BQL.IBqlByte";
-		internal const string BqlShortType = "PX.Data.BQL.IBqlShort";
-		internal const string BqlIntType = "PX.Data.BQL.IBqlInt";
-		internal const string BqlLongType = "PX.Data.BQL.IBqlLong";
-		internal const string BqlFloatType = "PX.Data.BQL.IBqlFloat";
-		internal const string BqlDoubleType = "PX.Data.BQL.IBqlDouble";
-		internal const string BqlDecimalType = "PX.Data.BQL.IBqlDecimal";
-		internal const string BqlByteArrayType = "PX.Data.BQL.IBqlByteArray";
+		internal const string IBqlDataTypeType = "PX.Data.BQL.IBqlDataType";
+		internal const string IBqlStringType = "PX.Data.BQL.IBqlString";
+		internal const string IBqlGuidType = "PX.Data.BQL.IBqlGuid";
+		internal const string IBqlDateTimeType = "PX.Data.BQL.IBqlDateTime";
+		internal const string IBqlBoolType = "PX.Data.BQL.IBqlBool";
+		internal const string IBqlByteType = "PX.Data.BQL.IBqlByte";
+		internal const string IBqlShortType = "PX.Data.BQL.IBqlShort";
+		internal const string IBqlIntType = "PX.Data.BQL.IBqlInt";
+		internal const string IBqlLongType = "PX.Data.BQL.IBqlLong";
+		internal const string IBqlFloatType = "PX.Data.BQL.IBqlFloat";
+		internal const string IBqlDoubleType = "PX.Data.BQL.IBqlDouble";
+		internal const string IBqlDecimalType = "PX.Data.BQL.IBqlDecimal";
+		internal const string IBqlByteArrayType = "PX.Data.BQL.IBqlByteArray";
+		internal const string IBqlAttributes = "PX.Objects.CR.IBqlAttributes";
 
 		internal const string CustomPredicate = "PX.Data.CustomPredicate";
 		internal const string AreSame2 = "PX.Data.AreSame`2";
@@ -145,6 +164,8 @@
 		public const string PXGraph1 = "PX.Data.PXGraph`1";
 		public const string PXGraph2 = "PX.Data.PXGraph`2";
 		public const string PXGraph3 = "PX.Data.PXGraph`3";
+
+		public const string IGraphWithInitialization = "PX.Data.DependencyInjection.IGraphWithInitialization";
 
 		public const string PXIntListAttribute = "PX.Data.PXIntListAttribute";
 

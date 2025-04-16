@@ -1,8 +1,10 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
+
 using Acuminator.Analyzers.StaticAnalysis.Dac;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression;
@@ -55,7 +57,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 		private Dictionary<INamedTypeSymbol, List<ITypeSymbol>> GetUsedDacFieldsByKey(DacSemanticModel dac, List<INamedTypeSymbol> keys) =>
 			keys.Select(key => (Key: key, KeyFields: GetOrderedDacFieldsUsedByKey(dac, key)))
 				.ToDictionary(keyWithFields => keyWithFields.Key, 
-							  keyWithFields => keyWithFields.KeyFields);
+							  keyWithFields => keyWithFields.KeyFields,
+							  SymbolEqualityComparer.Default as IEqualityComparer<INamedTypeSymbol>);
 
 		protected abstract List<ITypeSymbol> GetOrderedDacFieldsUsedByKey(DacSemanticModel dac, INamedTypeSymbol key);
 
@@ -83,9 +86,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 				if (usedDacFields.Count == 0)
 					continue;
 
-				var unboundDacFieldsInKey = usedDacFields.Where(dacField => dac.PropertiesByNames.TryGetValue(dacField.Name, out DacPropertyInfo dacProperty) &&
-																			dacProperty.DeclaredDbBoundness == DbBoundnessType.Unbound);
-				ClassDeclarationSyntax keyNode = null;
+				var unboundDacFieldsInKey = 
+					usedDacFields.Where(dacField => dac.PropertiesByNames.TryGetValue(dacField.Name, out DacPropertyInfo? dacProperty) &&
+													dacProperty.DeclaredDbBoundness == DbBoundnessType.Unbound);
+				ClassDeclarationSyntax? keyNode = null;
 
 				foreach (ITypeSymbol unboundDacFieldInKey in unboundDacFieldsInKey)
 				{
@@ -106,7 +110,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 		private bool ReportKeyWithUnboundDacField(SymbolAnalysisContext symbolContext, PXContext context, INamedTypeSymbol key, ClassDeclarationSyntax keyNode,
 												  ITypeSymbol unboundDacFieldInKey)
 		{
-			var location = GetUnboundDacFieldLocation(keyNode, unboundDacFieldInKey) ?? keyNode.Identifier.GetLocation() ?? keyNode.GetLocation();
+			var location = GetUnboundDacFieldLocation(keyNode, unboundDacFieldInKey) ?? 
+						   keyNode.Identifier.GetLocation().NullIfLocationKindIsNone() ?? 
+						   keyNode.GetLocation();
 
 			if (location == null)
 				return false;
@@ -117,9 +123,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 			return true;
 		}
 
-		protected abstract Location GetUnboundDacFieldLocation(ClassDeclarationSyntax keyNode, ITypeSymbol unboundDacFieldInKey);
+		protected abstract Location? GetUnboundDacFieldLocation(ClassDeclarationSyntax keyNode, ITypeSymbol unboundDacFieldInKey);
 
-		protected Location GetUnboundDacFieldLocationFromTypeArguments(GenericNameSyntax genericNodeWithFieldTypeArguments, ITypeSymbol unboundDacFieldInKey)
+		protected Location? GetUnboundDacFieldLocationFromTypeArguments(GenericNameSyntax genericNodeWithFieldTypeArguments, ITypeSymbol unboundDacFieldInKey)
 		{
 			foreach (TypeSyntax genericArgNode in genericNodeWithFieldTypeArguments.TypeArgumentList.Arguments)
 			{				
@@ -130,7 +136,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 
 					case QualifiedNameSyntax complexFieldName when complexFieldName.Right.Identifier.Text == unboundDacFieldInKey.Name:  //Case when type argument is a complex name: Field<{optional PX.Objects.SO.}SOLine.inventoryID>
 
-						SimpleNameSyntax dacNameNode = complexFieldName.Left switch
+						SimpleNameSyntax? dacNameNode = complexFieldName.Left switch
 						{
 							SimpleNameSyntax dacNameNodeWithoutNamespaces => dacNameNodeWithoutNamespaces,       //case Dac.field
 							QualifiedNameSyntax dacNameNodeWithNamespaces => dacNameNodeWithNamespaces.Right,    //cases Namespace.Dac.field and Alias::Namespace.Dac.field
@@ -178,7 +184,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 				allFieldsUnique = false;
 				var locations = duplicateKeys.Select(declaration => declaration.GetSyntax(symbolContext.CancellationToken))
 											 .OfType<ClassDeclarationSyntax>()
-											 .Select(keyClassDeclaration => keyClassDeclaration.Identifier.GetLocation() ??
+											 .Select(keyClassDeclaration => keyClassDeclaration.Identifier.GetLocation().NullIfLocationKindIsNone() ??
 																			keyClassDeclaration.GetLocation())
 											 .Where(location => location != null)
 											 .ToList(capacity: duplicateKeys.Count);
@@ -232,7 +238,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 
 			foreach (INamedTypeSymbol key in keysWithSameDacFields)
 			{
-				string parentDacName = GetParentDacFromKey(context, key)?.MetadataName;
+				string? parentDacName = GetParentDacFromKey(context, key)?.MetadataName;
 
 				if (parentDacName.IsNullOrWhiteSpace())
 					continue;
@@ -251,9 +257,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 			return duplicateKeysByTargetDac.Values.Where(keys => keys.Count > 1);
 		}
 
-		protected abstract ITypeSymbol GetParentDacFromKey(PXContext context, INamedTypeSymbol key);
+		protected abstract ITypeSymbol? GetParentDacFromKey(PXContext context, INamedTypeSymbol key);
 
-		protected string GetHashForSetOfDacFieldsUsedByKey(INamedTypeSymbol key, Dictionary<INamedTypeSymbol, List<ITypeSymbol>> dacFieldsByKey) =>
+		protected string? GetHashForSetOfDacFieldsUsedByKey(INamedTypeSymbol key, Dictionary<INamedTypeSymbol, List<ITypeSymbol>> dacFieldsByKey) =>
 			dacFieldsByKey.TryGetValue(key, out List<ITypeSymbol> usedDacFields) && usedDacFields.Count > 0
 				? GetHashForSetOfDacFields(usedDacFields, areFieldsOrdered: true)
 				: null;
@@ -270,20 +276,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 
 		protected virtual bool ShouldMakeSpecificAnalysisForDacKeys(PXContext context, DacSemanticModel dac)
 		{
-			if (dac.IsFullyUnbound())
+			if (dac.IsFullyUnbound || dac.Attributes.IsDefaultOrEmpty)
 				return false;
 
-			var dacAttributes = dac.Symbol.GetAttributes();
-
-			if (dacAttributes.IsDefaultOrEmpty)
-				return false;
-
-			var pxCacheNameAttribute = context.AttributeTypes.PXCacheNameAttribute;
-			var pxPrimaryGraphAttribute = context.AttributeTypes.PXPrimaryGraphAttribute;
-
-			return dacAttributes.Any(attribute => attribute.AttributeClass != null &&
-												 (attribute.AttributeClass.InheritsFromOrEquals(pxCacheNameAttribute) ||
-												  attribute.AttributeClass.InheritsFromOrEquals(pxPrimaryGraphAttribute)));
+			return dac.Attributes.Any(attrInfo => attrInfo.IsPXCacheName || attrInfo.IsDefaultNavigation);
 		}
 
 		protected abstract void MakeSpecificDacKeysAnalysis(SymbolAnalysisContext symbolContext, PXContext context, DacSemanticModel dac, 
@@ -293,15 +289,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 																 INamedTypeSymbol keyDeclaration, RefIntegrityDacKeyType dacKeyType)
 		{
 			var keyDeclarationNode = keyDeclaration.GetSyntax(symbolContext.CancellationToken);
-			Location location = (keyDeclarationNode as ClassDeclarationSyntax)?.Identifier.GetLocation() ?? keyDeclarationNode?.GetLocation();
-			Location dacLocation = dac.Node.GetLocation();
-			DiagnosticDescriptor px1036Descriptor = GetWrongKeyNameDiagnosticDescriptor(dacKeyType);
+			Location? location = (keyDeclarationNode as ClassDeclarationSyntax)?.Identifier.GetLocation().NullIfLocationKindIsNone() ?? 
+								  keyDeclarationNode?.GetLocation();
+			Location? dacLocation = dac.Node?.GetLocation();
+			DiagnosticDescriptor? px1036Descriptor = GetWrongKeyNameDiagnosticDescriptor(dacKeyType);
 
 			if (location == null || dacLocation == null || px1036Descriptor == null)
 				return;
 
 			var additionalLocations = new[] { dacLocation };
-			var diagnosticProperties = new Dictionary<string, string>
+			var diagnosticProperties = new Dictionary<string, string?>
 			{
 				{ nameof(RefIntegrityDacKeyType),  dacKeyType.ToString() }
 			};
@@ -316,7 +313,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 										context.CodeAnalysisSettings);
 		}
 
-		protected DiagnosticDescriptor GetWrongKeyNameDiagnosticDescriptor(RefIntegrityDacKeyType dacKeyType) =>
+		protected DiagnosticDescriptor? GetWrongKeyNameDiagnosticDescriptor(RefIntegrityDacKeyType dacKeyType) =>
 			dacKeyType switch
 			{
 				RefIntegrityDacKeyType.PrimaryKey => Descriptors.PX1036_WrongDacPrimaryKeyName,
@@ -328,7 +325,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 		protected IEnumerable<Location> GetKeysLocations(IEnumerable<INamedTypeSymbol> keys, CancellationToken cancellationToken) =>
 			keys.Select(key => key.GetSyntax(cancellationToken))
 				.OfType<ClassDeclarationSyntax>()
-				.Select(keyClassDeclaration => keyClassDeclaration.Identifier.GetLocation() ?? keyClassDeclaration.GetLocation())
+				.Select(keyClassDeclaration => keyClassDeclaration.Identifier.GetLocation().NullIfLocationKindIsNone() ?? keyClassDeclaration.GetLocation())
 				.Where(location => location != null)
 				.OrderBy(location => location.SourceSpan.Start);
 	}

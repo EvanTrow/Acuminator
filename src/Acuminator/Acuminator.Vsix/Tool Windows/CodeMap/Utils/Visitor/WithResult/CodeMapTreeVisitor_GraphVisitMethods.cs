@@ -1,8 +1,7 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using Acuminator.Utilities.Common;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
@@ -13,6 +12,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	{
 		#region Roots
 		public virtual TResult VisitNode(GraphNodeViewModel graph) => DefaultVisit(graph);
+
+		public virtual TResult VisitNode(BaseGraphPlaceholderNodeViewModel baseGraph) => DefaultVisit(baseGraph);
 		#endregion
 
 		#region Categories
@@ -22,9 +23,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual TResult VisitNode(CacheAttachedCategoryNodeViewModel cacheAttachedCategory) => DefaultVisit(cacheAttachedCategory);
 
-		public virtual TResult VisitNode(RowEventCategoryNodeViewModel rowEventCategory) => DefaultVisit(rowEventCategory);
+		public virtual TResult VisitNode(RowEventHandlerCategoryNodeViewModel rowEventHandlerCategory) => DefaultVisit(rowEventHandlerCategory);
 
-		public virtual TResult VisitNode(FieldEventCategoryNodeViewModel rowEventCategory) => DefaultVisit(rowEventCategory);
+		public virtual TResult VisitNode(FieldEventHandlerCategoryNodeViewModel fieldEventHandlerCategory) => DefaultVisit(fieldEventHandlerCategory);
 
 		public virtual TResult VisitNode(PXOverridesCategoryNodeViewModel pxOverridesCategory) => DefaultVisit(pxOverridesCategory);
 
@@ -33,16 +34,19 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual TResult VisitNode(GraphBaseMemberOverridesCategoryNodeViewModel graphBaseMemberOverridesCategory) =>
 			DefaultVisit(graphBaseMemberOverridesCategory);
+
+		public virtual TResult VisitNode(GraphBaseTypesCategoryNodeViewModel graphBaseTypesCategory) =>
+			DefaultVisit(graphBaseTypesCategory);
 		#endregion
 
 		#region DAC Grouping
-		public virtual TResult VisitNode(DacGroupingNodeForRowEventViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
+		public virtual TResult VisitNode(DacGroupingNodeForRowEventHandlerViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
 
-		public virtual TResult VisitNode(DacGroupingNodeForCacheAttachedEventViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
+		public virtual TResult VisitNode(DacGroupingNodeForCacheAttachedEventHandlerViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
 
-		public virtual TResult VisitNode(DacGroupingNodeForFieldEventViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
+		public virtual TResult VisitNode(DacGroupingNodeForFieldEventHandlerViewModel dacGroupingNode) => DefaultVisit(dacGroupingNode);
 
-		public virtual TResult VisitNode(DacFieldGroupingNodeForFieldEventViewModel dacFieldGroupingNode) => DefaultVisit(dacFieldGroupingNode);
+		public virtual TResult VisitNode(DacFieldGroupingNodeForFieldEventHandlerViewModel dacFieldGroupingNode) => DefaultVisit(dacFieldGroupingNode);
 		#endregion
 
 		#region Leaf Nodes
@@ -54,14 +58,23 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual TResult VisitNode(CacheAttachedNodeViewModel cacheAttachedNode) => DefaultVisit(cacheAttachedNode);
 
-		public virtual TResult VisitNode(RowEventNodeViewModel rowEventNode) => DefaultVisit(rowEventNode);
+		public virtual TResult VisitNode(RowEventHandlerNodeViewModel rowEventHandlerNode) => DefaultVisit(rowEventHandlerNode);
 
-		public virtual TResult VisitNode(FieldEventNodeViewModel fieldEventNode) => DefaultVisit(fieldEventNode);
+		public virtual TResult VisitNode(FieldEventHandlerNodeViewModel fieldEventHandlerNode) => DefaultVisit(fieldEventHandlerNode);
 
 		public virtual TResult VisitNode(GraphMemberInfoNodeViewModel graphMemberInfo) => DefaultVisit(graphMemberInfo);
 
 		public virtual TResult VisitNode(IsActiveGraphMethodNodeViewModel isActiveGraphMethodNode) => 
 			DefaultVisit(isActiveGraphMethodNode);
+
+		public virtual TResult VisitNode(IsActiveForGraphMethodNodeViewModel isActiveForGraphMethodNode) =>
+			DefaultVisit(isActiveForGraphMethodNode);
+
+		public virtual TResult VisitNode(GraphConfigureMethodNodeViewModel configureMethodNode) =>
+			DefaultVisit(configureMethodNode);
+
+		public virtual TResult VisitNode(GraphInitializeMethodNodeViewModel initializedMethodNode) =>
+			DefaultVisit(initializedMethodNode);
 
 		public virtual TResult VisitNode(GraphInstanceConstructorNodeViewModel graphInstanceConstructorNode) =>
 			DefaultVisit(graphInstanceConstructorNode);
@@ -71,6 +84,14 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual TResult VisitNode(GraphBaseMembeOverrideNodeViewModel graphBaseMembeOverrideNode) =>
 			DefaultVisit(graphBaseMembeOverrideNode);
+		#endregion
+
+		#region Attribute Nodes
+		public virtual TResult VisitNode(GraphAttributesGroupNodeViewModel attributeGroupNode) => DefaultVisit(attributeGroupNode);
+
+		public virtual TResult VisitNode(CacheAttachedAttributeNodeViewModel attributeNode) => DefaultVisit(attributeNode);
+
+		public virtual TResult VisitNode(GraphAttributeNodeViewModel attributeNode) => DefaultVisit(attributeNode);
 		#endregion
 	}
 }

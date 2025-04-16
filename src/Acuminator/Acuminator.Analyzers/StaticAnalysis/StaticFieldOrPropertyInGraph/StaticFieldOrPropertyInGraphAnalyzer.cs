@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -24,16 +23,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.StaticFieldOrPropertyInGraph
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(Descriptors.PX1062_StaticFieldOrPropertyInGraph);
 
-		public override bool ShouldAnalyze(PXContext pxContext, PXGraphSemanticModel graph) =>
-			base.ShouldAnalyze(pxContext, graph) && graph.Type != GraphType.None; 
-
-		public override void Analyze(SymbolAnalysisContext symbolContext, PXContext pxContext, PXGraphSemanticModel graphOrExtension)
+		public override void Analyze(SymbolAnalysisContext symbolContext, PXContext pxContext, PXGraphEventSemanticModel graphOrExtension)
 		{
 			symbolContext.CancellationToken.ThrowIfCancellationRequested();
 
 			var graphStaticFieldsAndProperties = from member in graphOrExtension.Symbol.GetMembers()
 												 where member.IsStatic && member.IsExplicitlyDeclared() &&
-													   graphOrExtension.Symbol.Equals(member.ContainingType) &&
+													   graphOrExtension.Symbol.Equals(member.ContainingType, SymbolEqualityComparer.Default) &&
 													   member is IPropertySymbol or IFieldSymbol { IsConst: false }
 												 select member;
 
@@ -45,7 +41,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.StaticFieldOrPropertyInGraph
 		}
 
 		private void AnalyseStaticFieldOrProperty(SymbolAnalysisContext symbolContext, PXContext pxContext, ISymbol staticFieldOrProperty,
-												  PXGraphSemanticModel graphOrExtension)
+												  PXGraphEventSemanticModel graphOrExtension)
 		{
 			bool isView = graphOrExtension.ViewsByNames.ContainsKey(staticFieldOrProperty.Name);
 			bool isAction = graphOrExtension.ActionsByNames.ContainsKey(staticFieldOrProperty.Name);
@@ -78,15 +74,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.StaticFieldOrPropertyInGraph
 															.FirstOrDefault(modifier => modifier.IsKind(SyntaxKind.StaticKeyword));
 
 			if (staticModifier != null && staticModifier != default(SyntaxToken))
-				return staticModifier.Value.GetLocation();
+				return staticModifier.Value.GetLocation().NullIfLocationKindIsNone();
 
 			return !staticFieldOrProperty.Locations.IsDefaultOrEmpty
 				? staticFieldOrProperty.Locations[0]
 				: null;
 		}
 
-		private (string FormatArg, ImmutableDictionary<string, string>? Properties)? GetDiagnosticFormatArgsAndProperties(ISymbol staticFieldOrProperty,
-																														  bool isView, bool isAction)
+		private (string FormatArg, ImmutableDictionary<string, string?>? Properties)? GetDiagnosticFormatArgsAndProperties(ISymbol staticFieldOrProperty,
+																														   bool isView, bool isAction)
 		{
 			if (isView)
 			{
@@ -114,16 +110,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.StaticFieldOrPropertyInGraph
 			}
 		}
 
-		private ImmutableDictionary<string, string> CreateDiagnosticProperties(bool isViewOrAction, bool isProperty, string codeFixFormatArg)
+		private ImmutableDictionary<string, string?> CreateDiagnosticProperties(bool isViewOrAction, bool isProperty, string codeFixFormatArg)
 		{
-			var properties = ImmutableDictionary.CreateBuilder<string, string>();
+			var properties = ImmutableDictionary.CreateBuilder<string, string?>();
 			properties.Add(StaticFieldOrPropertyInGraphDiagnosticProperties.CodeFixFormatArg, codeFixFormatArg);
 
 			if (isViewOrAction)
 				properties.Add(StaticFieldOrPropertyInGraphDiagnosticProperties.IsViewOrAction, bool.TrueString);
 
 			if (isProperty)
-				properties.Add(StaticFieldOrPropertyInGraphDiagnosticProperties.IsProperty, bool.TrueString);
+				properties.Add(DiagnosticProperty.IsProperty, bool.TrueString);
 
 			return properties.ToImmutable();
 		}

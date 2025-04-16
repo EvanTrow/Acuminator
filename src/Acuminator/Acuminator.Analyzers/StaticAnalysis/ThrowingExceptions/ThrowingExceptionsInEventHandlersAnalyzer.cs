@@ -1,46 +1,39 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
 using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
-using Acuminator.Utilities;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 {
-	public partial class ThrowingExceptionsInEventHandlersAnalyzer : IEventHandlerAnalyzer, IPXGraphWithGraphEventsAnalyzer
+	public partial class ThrowingExceptionsInEventHandlersAnalyzer : ILooseEventHandlerAggregatedAnalyzer, IPXGraphAnalyzer
 	{
 		public ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
 			Descriptors.PX1073_ThrowingExceptionsInRowPersisted,
 			Descriptors.PX1073_ThrowingExceptionsInRowPersisted_NonISV,
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating,
 			Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers);
 
-		bool IEventHandlerAnalyzer.ShouldAnalyze(PXContext pxContext, EventType eventType) => 
-			eventType != EventType.None;
-
-		bool IPXGraphWithGraphEventsAnalyzer.ShouldAnalyze(PXContext pxContext, PXGraphSemanticModel graphOrGraphExtension) =>
-			graphOrGraphExtension != null && !graphOrGraphExtension.Symbol.IsStatic;
-
-		bool IPXGraphWithGraphEventsAnalyzer.ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel pxGraphWithEvents) => true;
+		bool ILooseEventHandlerAggregatedAnalyzer.ShouldAnalyze(PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo) => 
+			eventHandlerInfo.Type != EventType.None;
 
 		/// <summary>
 		/// Analyze events outside graphs and graph extensions.
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="pxContext">The Acumatica context.</param>
-		/// <param name="eventType">Type of the event.</param>
-		void IEventHandlerAnalyzer.Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+		/// <param name="eventHandlerInfo">Information describing the event handler.</param>
+		void ILooseEventHandlerAggregatedAnalyzer.Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -55,11 +48,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 
 			if (methodSyntax != null)
 			{
-				var walker = new ThrowInEventsWalker(context, pxContext, eventType);
+				var walker = new ThrowInEventsWalker(context, pxContext, eventHandlerInfo.Type);
 
 				methodSyntax.Accept(walker);
 			}
 		}
+
+		bool IPXGraphAnalyzer.ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graphOrGraphExtension) =>
+			graphOrGraphExtension?.IsInSource == true && !graphOrGraphExtension.Symbol.IsStatic && 
+			graphOrGraphExtension.DeclaredEventHandlers.AllEventHandlersCount > 0;
 
 		/// <summary>
 		/// Analyzes events in graph or graph extension.
@@ -67,8 +64,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 		/// <param name="context">The context.</param>
 		/// <param name="pxContext">The Acumatica context.</param>
 		/// <param name="graphOrGraphExtension">The graph or graph extension semantic model with events.</param>
-		void IPXGraphWithGraphEventsAnalyzer.Analyze(SymbolAnalysisContext context, PXContext pxContext, 
-													 PXGraphEventSemanticModel graphOrExtensionWithEvents)
+		void IPXGraphAnalyzer.Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel graphOrExtensionWithEvents)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -86,17 +82,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 		private void AnalyzeGraphEventsForEventType(EventType eventType, SymbolAnalysisContext context, PXContext pxContext,
 													PXGraphEventSemanticModel graphOrGraphExtensionWithEvents)
 		{
-			var declaredGraphEventsOfEventType = graphOrGraphExtensionWithEvents
-														.GetEventsByEventType(eventType)
-														.Where(graphEvent => graphEvent.Symbol.IsDeclaredInType(graphOrGraphExtensionWithEvents.Symbol));
+			var declaredGraphEventsOfEventType = graphOrGraphExtensionWithEvents.DeclaredEventHandlers.GetEventHandlersByEventType(eventType);
 			ThrowInGraphEventsWalker? walker = null;
 
-			foreach (GraphEventInfoBase graphEvent in declaredGraphEventsOfEventType)
+			foreach (GraphEventHandlerInfoBase graphEvent in declaredGraphEventsOfEventType)
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
 				walker ??= new ThrowInGraphEventsWalker(context, pxContext, eventType, graphOrGraphExtensionWithEvents);
 
-				graphEvent.Node.Accept(walker);
+				// Node is not null because analysis runs only for graphs declared in source
+				graphEvent.Node!.Accept(walker);
 			}
 		}
 	}

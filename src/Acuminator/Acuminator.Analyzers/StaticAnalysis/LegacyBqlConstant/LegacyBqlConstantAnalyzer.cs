@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-using Acuminator.Analyzers.StaticAnalysis.LegacyBqlField;
 using Acuminator.Utilities;
+using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression;
+using Acuminator.Utilities.Roslyn;
+using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.Dac;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -25,10 +29,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.LegacyBqlConstant
 		public LegacyBqlConstantAnalyzer() : this(null)
 		{ }
 
-		public LegacyBqlConstantAnalyzer(CodeAnalysisSettings codeAnalysisSettings) : base(codeAnalysisSettings)
+		public LegacyBqlConstantAnalyzer(CodeAnalysisSettings? codeAnalysisSettings) : base(codeAnalysisSettings)
 		{ }
 
-		internal override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, PXContext pxContext)
+		protected override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, PXContext pxContext)
 		{
 			compilationStartContext.RegisterSymbolAction(
 				c => Analyze(c, pxContext),
@@ -41,13 +45,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.LegacyBqlConstant
 
 			if (context.Symbol is INamedTypeSymbol constant)
 			{
-				if (!IsConstant(constant, pxContext, out string constantType) || LegacyBqlFieldAnalyzer.AlreadyStronglyTyped(constant, pxContext))
+				if (!IsConstant(constant, pxContext, out string? constantType) || constant.IsStronglyTypedBqlFieldOrBqlConstant(pxContext))
 					return;
 
-				Location location = constant.Locations.FirstOrDefault();
+				Location? location = constant.Locations.FirstOrDefault();
 				if (location != null)
 				{
-					var properties = ImmutableDictionary.CreateBuilder<string, string>();
+					var properties = ImmutableDictionary.CreateBuilder<string, string?>();
 					properties.Add(CorrespondingType, constantType);
 
 					context.ReportDiagnosticWithSuppressionCheck(
@@ -57,7 +61,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LegacyBqlConstant
 			}
 		}
 
-		private static bool IsConstant(ITypeSymbol constantDef, PXContext pxContext, out string constantType)
+		private static bool IsConstant(ITypeSymbol constantDef, PXContext pxContext, [NotNullWhen(returnValue: true)] out string? constantType)
 		{
 			constantType = null;
 
@@ -67,15 +71,18 @@ namespace Acuminator.Analyzers.StaticAnalysis.LegacyBqlConstant
 			var constantUnderlyingType = constantDef
 				.GetBaseTypes()
 				.OfType<INamedTypeSymbol>()
-				.FirstOrDefault(t => t.IsGenericType && t.InheritsFromOrEqualsGeneric(pxContext.BqlConstantType))?
+				.FirstOrDefault(t => t.IsGenericType && t.InheritsFromOrEqualsGeneric(pxContext.BqlConstantType!))?
 				.TypeArguments[0];
 
-			if (constantUnderlyingType == null)
+			if (constantUnderlyingType == null || constantUnderlyingType is IArrayTypeSymbol || constantUnderlyingType.Name.IsNullOrWhiteSpace())
 				return false;
 
-			if (LegacyBqlFieldAnalyzer.PropertyTypeToFieldType.ContainsKey(constantUnderlyingType.Name))
+			var constantDataTypeName = new DataTypeName(constantUnderlyingType.Name);
+			var constantBqlFieldType = DataTypeToBqlFieldTypeMapping.GetBqlFieldType(constantDataTypeName);
+
+			if (constantBqlFieldType != null)
 			{
-				constantType = constantUnderlyingType.Name;
+				constantType = constantDataTypeName.Value;
 				return true;
 			}
 

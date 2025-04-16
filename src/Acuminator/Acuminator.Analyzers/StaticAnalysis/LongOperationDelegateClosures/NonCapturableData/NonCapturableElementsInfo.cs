@@ -1,7 +1,5 @@
-﻿#nullable enable
-
+﻿
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -51,7 +49,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 
 		public NonCapturableElementsInfo(IReadOnlyDictionary<string, PassedParameter> nonCapturableContainingMethodsParameters)
 		{
-			nonCapturableContainingMethodsParameters.ThrowOnNull(nameof(nonCapturableContainingMethodsParameters));
+			nonCapturableContainingMethodsParameters.ThrowOnNull();
 
 			if (nonCapturableContainingMethodsParameters is Dictionary<string, PassedParameter> dictionary)
 				_nonCapturableContainingMethodsParameters = dictionary;
@@ -67,7 +65,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 		[MemberNotNull(nameof(_arguments))]
 		public void AddCallArgument(NonCapturableArgument nonCapturableArgument)
 		{
-			nonCapturableArgument.ThrowOnNull(nameof(nonCapturableArgument));
+			nonCapturableArgument.ThrowOnNull();
 
 			_arguments ??= new List<NonCapturableArgument>(capacity: 1);
 			_arguments.Add(nonCapturableArgument);
@@ -102,7 +100,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 		{
 			_nonCapturableContainingMethodsParameters?.Remove(parameterName);
 
-			var affectedArguments = GetCallArgumentsUsingParameter(parameterName.CheckIfNull(nameof(parameterName)));
+			var affectedArguments = GetCallArgumentsUsingParameter(parameterName.CheckIfNull());
 
 			if (affectedArguments.IsNullOrEmpty())
 				return;

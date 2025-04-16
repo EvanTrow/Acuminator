@@ -1,20 +1,24 @@
-﻿using System;
-using System.Text;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using Microsoft.CodeAnalysis;
-using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
-using Acuminator.Vsix.Utilities;
-using System.Threading.Tasks;
-using System.Threading;
 using System.Collections.Immutable;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
+using Acuminator.Vsix.ToolWindows.CodeMap.Filter;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public abstract class DacFieldGroupingNodeBaseViewModel : TreeNodeViewModel, IGroupNodeWithCyclingNavigation
 	{
-		public GraphEventCategoryNodeViewModel GraphEventsCategoryVM => DacVM.GraphEventsCategoryVM;
+		private readonly string _dacAndDacFieldNameForSearch;
+
+		public override TreeNodeFilterBehavior FilterBehavior => TreeNodeFilterBehavior.DisplayedIfChildrenMeetFilter;
+
+		public GraphEventHandlerCategoryNodeViewModel GraphEventHandlersCategoryVM => DacVM.GraphEventHandlersCategoryVM;
 
 		public DacGroupingNodeBaseViewModel DacVM { get; }
 
@@ -28,25 +32,22 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override Icon NodeIcon => Icon.GroupingDacField;
 
-		public override bool DisplayNodeWithoutChildren => false;
-
 		bool IGroupNodeWithCyclingNavigation.AllowNavigation => true;
 
 		int IGroupNodeWithCyclingNavigation.CurrentNavigationIndex { get; set; }
 
-		IList<TreeNodeViewModel> IGroupNodeWithCyclingNavigation.Children => Children;
+		IList<TreeNodeViewModel> IGroupNodeWithCyclingNavigation.DisplayedChildren => DisplayedChildren;
 
-		public ImmutableArray<GraphFieldEventInfo> FieldEvents { get; }
+		public ImmutableArray<GraphFieldEventHandlerInfo> FieldEventHandlers { get; }
 
-		protected DacFieldGroupingNodeBaseViewModel(DacGroupingNodeBaseViewModel dacVM, string dacFieldName, IEnumerable<GraphFieldEventInfo> dacFieldEvents,
-													bool isExpanded) :
-											  base(dacVM?.Tree, dacVM, isExpanded)
+		protected DacFieldGroupingNodeBaseViewModel(DacGroupingNodeBaseViewModel dacVM, string dacFieldName,
+													IEnumerable<GraphFieldEventHandlerInfo> dacFieldEventHandlers, bool isExpanded) :
+												base(dacVM?.Tree!, dacVM, isExpanded)
 		{
-			dacFieldName.ThrowOnNullOrWhiteSpace(nameof(dacFieldName));
-
-			DacVM = dacVM;
-			DacFieldName = dacFieldName;
-			FieldEvents = dacFieldEvents?.ToImmutableArray() ?? ImmutableArray.Create<GraphFieldEventInfo>();
+			DacVM = dacVM!;
+			DacFieldName = dacFieldName.CheckIfNullOrWhiteSpace();
+			_dacAndDacFieldNameForSearch = $"{DacVM.DacName}#{dacFieldName}";
+			FieldEventHandlers = dacFieldEventHandlers?.ToImmutableArray() ?? ImmutableArray.Create<GraphFieldEventHandlerInfo>();
 		}
 
 		public async override Task NavigateToItemAsync()

@@ -1,4 +1,6 @@
-﻿namespace Acuminator.Analyzers.StaticAnalysis
+﻿using System;
+
+namespace Acuminator.Analyzers.StaticAnalysis
 {
 	/// <summary>
 	/// A class with string constatns representing diagnostic property names. They are used to pass custom data strings from diagnostic to code fix.
@@ -12,23 +14,48 @@
 		public const string RegisterCodeFix = nameof(RegisterCodeFix);
 
 		/// <summary>
-		/// The property used to transfer name of the DAC with the diagnostic.
+		/// The property used to pass the name of the DAC with the diagnostic.
 		/// </summary>
 		public const string DacName = nameof(DacName);
 
 		/// <summary>
-		/// The property used to transfer name of the DAC field with the diagnostic.
+		/// The property used to pass the name of the DAC field with the diagnostic.
 		/// </summary>
-		public const string DacFieldName= nameof(DacFieldName);
+		public const string DacFieldName = nameof(DacFieldName);
 
 		/// <summary>
-		/// The property used to transfer the DAC metadata with the diagnostic.
+		/// The property used to pass the name of the BQL field with the diagnostic.
+		/// </summary>
+		public const string BqlFieldName = nameof(BqlFieldName);
+
+		/// <summary>
+		/// The property used to pass the DAC metadata with the diagnostic.
 		/// </summary>
 		public const string DacMetadataName = nameof(DacMetadataName);
 
 		/// <summary>
-		/// The property used to transfer the field information was gotten from attributes.
+		/// The property used to pass the field information was gotten from attributes.
 		/// </summary>
 		public const string IsBoundField = nameof(IsBoundField);
+
+		/// <summary>
+		/// The property used to pass the information about a property data type like <see cref="String"/>. Usually, it is used for a DAC property.
+		/// </summary>
+		public const string PropertyType = nameof(PropertyType);
+
+		/// <summary>
+		/// The property used to pass the information about a DAC BQL field type like BqlString.
+		/// </summary>
+		public const string BqlFieldType = nameof(BqlFieldType);
+
+		/// <summary>
+		/// The property used to pass the information about a DAC BQL field data type like <see cref="String"/>.
+		/// </summary>
+		public const string BqlFieldDataType = nameof(BqlFieldDataType);
+
+		/// <summary>
+		/// The property used to pass the information that the diagnostic is reported on the property. 
+		/// </summary>
+		public const string IsProperty = nameof(IsProperty);
 	}
 }

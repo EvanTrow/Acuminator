@@ -33,9 +33,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			foreach (IMethodSymbol method in declaredMethods)
 			{
 				cancellation.ThrowIfCancellationRequested();
-				var attributes = method.GetAttributes();
 
-				if (!attributes.IsEmpty && attributes.Any(a => a.AttributeClass.Equals(pxOverrideAttribute)))
+				if (method.HasPXOverrideAttribute(pxOverrideAttribute))
 				{
 					yield return new PXOverrideInfo(method, declarationOrder);
 					declarationOrder++;

@@ -1,8 +1,7 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using Acuminator.Utilities.Common;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
@@ -12,6 +11,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	public abstract class CodeMapTreeWalker : CodeMapTreeVisitor
 	{
 		private int _recursionDepth;
+
+		protected abstract bool VisitOnlyDisplayedNodes { get; }
 
 		public override void VisitNode(TreeNodeViewModel node)
 		{
@@ -33,12 +34,19 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override void DefaultVisit(TreeNodeViewModel node) 
 		{
-			if (node == null || node.Children.Count == 0)
+			if (node == null)
 				return;
 
-			foreach (TreeNodeViewModel child in node.Children)
+			IReadOnlyCollection<TreeNodeViewModel> nodesToVisit = VisitOnlyDisplayedNodes
+				? node.DisplayedChildren
+				: node.AllChildren;
+
+			if (nodesToVisit.Count > 0)
 			{
-				VisitNode(child);
+				foreach (TreeNodeViewModel child in nodesToVisit)
+				{
+					VisitNode(child);
+				}
 			}
 		}
 	}

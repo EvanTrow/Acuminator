@@ -18,7 +18,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		public bool IsAcumatica2018R2_OrGreater { get; }
 		public bool IsAcumatica2019R1_OrGreater { get; }
 
-		public bool IsAcumatica2023R1_OrGreater => PXCache.RowSelectingWhileReading != null;
+		public bool IsAcumatica2023R1_OrGreater { get; }
 
 		public bool IsAcumatica2024R1_OrGreater => PXBqlTable != null;
 
@@ -97,72 +97,79 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		private readonly Lazy<PXGraphExtensionSymbols> _pxGraphExtensionSymbols;
 		public PXGraphExtensionSymbols PXGraphExtension => _pxGraphExtensionSymbols.Value;
 
-		public INamedTypeSymbol PXCacheExtensionType => Compilation.GetTypeByMetadataName(TypeFullNames.PXCacheExtension);
-		public INamedTypeSymbol PXMappedCacheExtensionType => Compilation.GetTypeByMetadataName(TypeFullNames.PXMappedCacheExtension);
-		public INamedTypeSymbol PXLongOperation => Compilation.GetTypeByMetadataName(TypeFullNames.PXLongOperation);
+		public IGraphWithInitializationSymbols IGraphWithInitializationSymbols { get; }
 
-		public INamedTypeSymbol PXSelectBase2018R2NewType => Compilation.GetTypeByMetadataName(TypeFullNames.PXSelectBase_Acumatica2018R2);
-		public INamedTypeSymbol IViewConfig2018R2 => Compilation.GetTypeByMetadataName(TypeFullNames.IViewConfig_Acumatica2018R2);
+		public INamedTypeSymbol PXCacheExtensionType => Compilation.GetTypeByMetadataName(TypeFullNames.PXCacheExtension)!;
+		public INamedTypeSymbol PXMappedCacheExtensionType => Compilation.GetTypeByMetadataName(TypeFullNames.PXMappedCacheExtension)!;
+		public INamedTypeSymbol PXLongOperation => Compilation.GetTypeByMetadataName(TypeFullNames.PXLongOperation)!;
 
-		public INamedTypeSymbol PXActionCollection => Compilation.GetTypeByMetadataName(TypeFullNames.PXActionCollection);
+		public INamedTypeSymbol PXSelectBase2018R2NewType => Compilation.GetTypeByMetadataName(TypeFullNames.PXSelectBase_Acumatica2018R2)!;
+		public INamedTypeSymbol IViewConfig2018R2 => Compilation.GetTypeByMetadataName(TypeFullNames.IViewConfig_Acumatica2018R2)!;
 
-		public INamedTypeSymbol PXAdapterType => Compilation.GetTypeByMetadataName(TypeFullNames.PXAdapter);
-		public INamedTypeSymbol IBqlTableType => Compilation.GetTypeByMetadataName(TypeFullNames.IBqlTable);
-		public INamedTypeSymbol IBqlFieldType => Compilation.GetTypeByMetadataName(TypeFullNames.IBqlField);
+		public INamedTypeSymbol PXActionCollection => Compilation.GetTypeByMetadataName(TypeFullNames.PXActionCollection)!;
+
+		public INamedTypeSymbol PXAdapterType => Compilation.GetTypeByMetadataName(TypeFullNames.PXAdapter)!;
+		public INamedTypeSymbol IBqlTableType => Compilation.GetTypeByMetadataName(TypeFullNames.IBqlTable)!;
+		public INamedTypeSymbol IBqlFieldType => Compilation.GetTypeByMetadataName(TypeFullNames.IBqlField)!;
 
 		[MemberNotNullWhen(returnValue: true, nameof(IsAcumatica2024R1_OrGreater))]
 		public INamedTypeSymbol? PXBqlTable => Compilation.GetTypeByMetadataName(TypeFullNames.PXBqlTable);
 		public INamedTypeSymbol? BqlConstantType => Compilation.GetTypeByMetadataName(TypeFullNames.Constant);
 
-		public INamedTypeSymbol IPXResultsetType => Compilation.GetTypeByMetadataName(TypeFullNames.IPXResultset);
-		public INamedTypeSymbol PXResult => Compilation.GetTypeByMetadataName(TypeFullNames.PXResult);
+		public INamedTypeSymbol IPXResultsetType => Compilation.GetTypeByMetadataName(TypeFullNames.IPXResultset)!;
+		public INamedTypeSymbol PXResult => Compilation.GetTypeByMetadataName(TypeFullNames.PXResult)!;
 
-		public INamedTypeSymbol PXFieldState => Compilation.GetTypeByMetadataName(TypeFullNames.PXFieldState);
-		public INamedTypeSymbol PXAttributeFamily => Compilation.GetTypeByMetadataName(TypeFullNames.PXAttributeFamilyAttribute);
+		public INamedTypeSymbol PXFieldState => Compilation.GetTypeByMetadataName(TypeFullNames.PXFieldState)!;
+		public INamedTypeSymbol PXAttributeFamily => Compilation.GetTypeByMetadataName(TypeFullNames.PXAttributeFamilyAttribute)!;
 
-        public INamedTypeSymbol IPXLocalizableList => Compilation.GetTypeByMetadataName(TypeFullNames.IPXLocalizableList);
-		public INamedTypeSymbol PXConnectionScope => Compilation.GetTypeByMetadataName(TypeFullNames.PXConnectionScope);
+        public INamedTypeSymbol IPXLocalizableList => Compilation.GetTypeByMetadataName(TypeFullNames.IPXLocalizableList)!;
+		public INamedTypeSymbol PXConnectionScope => Compilation.GetTypeByMetadataName(TypeFullNames.PXConnectionScope)!;
 
         public ImmutableArray<IMethodSymbol> StartOperation => PXLongOperation.GetMethods(DelegateNames.StartOperation).ToImmutableArray();
 
-		public INamedTypeSymbol IImplementType => Compilation.GetTypeByMetadataName(TypeFullNames.IImplementType);
+		public INamedTypeSymbol IImplementType => Compilation.GetTypeByMetadataName(TypeFullNames.IImplementType)!;
 
 		public INamedTypeSymbol? PXScreenConfiguration => Compilation.GetTypeByMetadataName(TypeFullNames.Workflow.PXScreenConfiguration);
 
 		public PXContext(Compilation compilation, CodeAnalysisSettings? codeAnalysisSettings)
 		{
-			compilation.ThrowOnNull(nameof(compilation));
+			compilation.ThrowOnNull();
 
 			CodeAnalysisSettings = codeAnalysisSettings ?? CodeAnalysisSettings.Default;
 			Compilation = compilation;
 			IsPlatformReferenced = compilation.GetTypeByMetadataName(TypeFullNames.PXGraph) != null;
 
-			_bql                         = new Lazy<BQLSymbols>(() => new BQLSymbols(Compilation));
-			_bqlTypes                    = new Lazy<BqlDataTypeSymbols>(() => new BqlDataTypeSymbols(Compilation));
-			_events                      = new Lazy<EventSymbols>(() => new EventSymbols(Compilation));
-			_fieldAttributes             = new Lazy<DataTypeAttributeSymbols>(() => new DataTypeAttributeSymbols(Compilation));
-			_systemActionTypes           = new Lazy<PXSystemActionSymbols>(() => new PXSystemActionSymbols(Compilation));
-			_attributes                  = new Lazy<AttributeSymbols>(() => new AttributeSymbols(Compilation));
-			_systemTypes                 = new Lazy<SystemTypeSymbols>(() => new SystemTypeSymbols(Compilation));
-            _localizationMethods         = new Lazy<LocalizationSymbols>(() => new LocalizationSymbols(Compilation));
-            _pxGraph                     = new Lazy<PXGraphSymbols>(() => new PXGraphSymbols(this));
-			_pxGraphExtensionSymbols     = new Lazy<PXGraphExtensionSymbols>(() => new PXGraphExtensionSymbols(this));
-            _pxCache                     = new Lazy<PXCacheSymbols>(() => new PXCacheSymbols(Compilation));
-			_pxAction                    = new Lazy<PXActionSymbols>(() => new PXActionSymbols(Compilation));
-			_pxDatabase                  = new Lazy<PXDatabaseSymbols>(() => new PXDatabaseSymbols(Compilation));
-			_pxView                      = new Lazy<PXViewSymbols>(() => new PXViewSymbols(Compilation));
-			_exceptions                  = new Lazy<ExceptionSymbols>(() => new ExceptionSymbols(Compilation));
-			_serialization               = new Lazy<SerializationSymbols>(() => new SerializationSymbols(Compilation));
-            _pxSelectBaseGeneric         = new Lazy<PXSelectBaseGenericSymbols>(() => new PXSelectBaseGenericSymbols(Compilation));
-            _pxSelectBase                = new Lazy<PXSelectBaseSymbols>(() => new PXSelectBaseSymbols(Compilation));
-			_pxSelectExtensionSymbols    = new Lazy<PXSelectExtensionSymbols>(() => new PXSelectExtensionSymbols(Compilation));
-            _pxProcessingBase            = new Lazy<PXProcessingBaseSymbols>(() => new PXProcessingBaseSymbols(Compilation));
-            _referentialIntegritySymbols = new Lazy<PXReferentialIntegritySymbols>(() => new PXReferentialIntegritySymbols(Compilation));
+			_bql 						 = new Lazy<BQLSymbols>(() => new BQLSymbols(Compilation));
+			_bqlTypes 					 = new Lazy<BqlDataTypeSymbols>(() => new BqlDataTypeSymbols(Compilation));
+			_events 					 = new Lazy<EventSymbols>(() => new EventSymbols(Compilation));
+			_fieldAttributes 			 = new Lazy<DataTypeAttributeSymbols>(() => new DataTypeAttributeSymbols(Compilation));
+			_systemActionTypes 			 = new Lazy<PXSystemActionSymbols>(() => new PXSystemActionSymbols(Compilation));
+			_attributes 				 = new Lazy<AttributeSymbols>(() => new AttributeSymbols(Compilation));
+			_systemTypes 				 = new Lazy<SystemTypeSymbols>(() => new SystemTypeSymbols(Compilation));
+			_localizationMethods 		 = new Lazy<LocalizationSymbols>(() => new LocalizationSymbols(Compilation));
+			_pxGraph 					 = new Lazy<PXGraphSymbols>(() => new PXGraphSymbols(this));
+			_pxGraphExtensionSymbols 	 = new Lazy<PXGraphExtensionSymbols>(() => new PXGraphExtensionSymbols(this));
+			_pxCache 					 = new Lazy<PXCacheSymbols>(() => new PXCacheSymbols(Compilation));
+			_pxAction 					 = new Lazy<PXActionSymbols>(() => new PXActionSymbols(Compilation));
+			_pxDatabase 				 = new Lazy<PXDatabaseSymbols>(() => new PXDatabaseSymbols(Compilation));
+			_pxView 					 = new Lazy<PXViewSymbols>(() => new PXViewSymbols(Compilation));
+			_exceptions 				 = new Lazy<ExceptionSymbols>(() => new ExceptionSymbols(Compilation));
+			_serialization 				 = new Lazy<SerializationSymbols>(() => new SerializationSymbols(Compilation));
+			_pxSelectBaseGeneric 		 = new Lazy<PXSelectBaseGenericSymbols>(() => new PXSelectBaseGenericSymbols(Compilation));
+			_pxSelectBase 				 = new Lazy<PXSelectBaseSymbols>(() => new PXSelectBaseSymbols(Compilation));
+			_pxSelectExtensionSymbols 	 = new Lazy<PXSelectExtensionSymbols>(() => new PXSelectExtensionSymbols(Compilation));
+			_pxProcessingBase 			 = new Lazy<PXProcessingBaseSymbols>(() => new PXProcessingBaseSymbols(Compilation));
+			_referentialIntegritySymbols = new Lazy<PXReferentialIntegritySymbols>(() => new PXReferentialIntegritySymbols(Compilation));
+
+			IGraphWithInitializationSymbols = new IGraphWithInitializationSymbols(Compilation);
 
 			_uiPresentationLogicMethods = new Lazy<ImmutableHashSet<IMethodSymbol>>(GetUiPresentationLogicMethods);
 
-            IsAcumatica2018R2_OrGreater = PXSelectBase2018R2NewType != null;
+			IsAcumatica2018R2_OrGreater = PXSelectBase2018R2NewType != null;
 			IsAcumatica2019R1_OrGreater = IImplementType != null;
+
+			const string archiveProcessGraphName = "PX.Data.Archiving.ArchiveProcess";
+			IsAcumatica2023R1_OrGreater = compilation.GetTypeByMetadataName(archiveProcessGraphName) != null;
 		}
 
 		private ImmutableHashSet<IMethodSymbol> GetUiPresentationLogicMethods()
@@ -182,7 +189,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				.Concat(AttributeTypes.PXStringListAttribute.AppendList)
 				.Concat(AttributeTypes.PXStringListAttribute.SetLocalizable)
 				.Concat(AttributeTypes.PXIntListAttribute.SetList)
-				.ToImmutableHashSet();
+				.ToImmutableHashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
 		}
 	}
 }

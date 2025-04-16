@@ -9,6 +9,9 @@ namespace Acuminator.Tests.Sources
 		{
 			return new object();
 		}
+
+		[PXOverride]
+		public virtual void TestMethodFromGraph(object a, Action<object> baseAction) { }
 	}
 
 	public class DerivedExtension : PXGraphExtension<BaseExtension, MyGraph>
@@ -18,10 +21,13 @@ namespace Acuminator.Tests.Sources
 		{
 			return new object();
 		}
+
+		[PXOverride]
+		public virtual void TestMethodFromGraph(object a, Action<object> baseAction) { }
 	}
 
 	public class MyGraph : PXGraph<MyGraph>
 	{
-
+		public virtual void TestMethodFromGraph(object a) { }
 	}
 }

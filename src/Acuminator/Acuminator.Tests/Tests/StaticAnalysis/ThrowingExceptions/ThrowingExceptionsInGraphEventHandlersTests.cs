@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿#nullable enable
+
+using System;
 using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis;
@@ -10,7 +9,7 @@ using Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
-using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -25,16 +24,23 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ThrowingExceptions
 													.WithIsvSpecificAnalyzersEnabled()
 													.WithRecursiveAnalysisEnabled()
 													.WithSuppressionMechanismDisabled(),
-				new PXGraphWithGraphEventsAggregatorAnalyzer
-				(
-					new ThrowingExceptionsInEventHandlersAnalyzer()
-				));
+				new ThrowingExceptionsInEventHandlersAnalyzer());
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\Graph\ExceptionInRowPersisted.cs")]
 		public async Task ExceptionInRowPersisted(string actual) => await VerifyCSharpDiagnosticAsync(actual,
 			Descriptors.PX1073_ThrowingExceptionsInRowPersisted.CreateFor(25, 6),
 			Descriptors.PX1073_ThrowingExceptionsInRowPersisted.CreateFor(50, 6));
+
+		[Theory]
+		[EmbeddedFileData(@"EventHandlers\Graph\ExceptionInFieldUpdating.cs")]
+		public async Task ExceptionInFieldUpdating(string actual) => await VerifyCSharpDiagnosticAsync(actual,
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(19, 6),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(21, 6),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(23, 6),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(42, 6),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(44, 6),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(46, 6));
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\Graph\ExceptionInRowPersisted_ProcessingGraph.cs")]
@@ -65,6 +71,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ThrowingExceptions
 			Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(69, 4, EventType.ExceptionHandling),
 			Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(72, 4, EventType.CommandPreparing),
 			Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(75, 4, EventType.FieldSelecting),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(78, 4, EventType.FieldUpdating),
 			Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(78, 4, EventType.FieldUpdating),
 			Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(81, 4, EventType.FieldUpdated));
 

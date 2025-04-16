@@ -1,24 +1,29 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using Microsoft.CodeAnalysis;
+using System.Threading.Tasks;
+
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
-using Acuminator.Vsix.Utilities;
+using Acuminator.Vsix.ToolWindows.CodeMap.Filter;
+using Acuminator.Vsix.ToolWindows.CodeMap.Graph;
 using Acuminator.Vsix.Utilities.Navigation;
-using System.Threading.Tasks;
-using System.Threading;
+
+using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class GraphMemberInfoNodeViewModel : TreeNodeViewModel, INodeWithSymbolItem
+	public class GraphMemberInfoNodeViewModel : TreeNodeViewModel, INodeWithDeclarationOrder
 	{
+		public override TreeNodeFilterBehavior FilterBehavior => TreeNodeFilterBehavior.DisplayedIfNodeOrChildrenMeetFilter;
+
 		public GraphMemberNodeViewModel GraphMember { get; }
 
 		public SymbolItem GraphMemberInfoData { get; }
 
-		SymbolItem INodeWithSymbolItem.Symbol => GraphMemberInfoData;
+		public int DeclarationOrder => GraphMemberInfoData.DeclarationOrder;
 
 		public ISymbol GraphMemberInfoSymbol => GraphMemberInfoData.SymbolBase;
 
@@ -32,20 +37,19 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			protected set { }
 		}
 
-		public override bool DisplayNodeWithoutChildren => true;
-
 		public GraphMemberInfoNodeViewModel(GraphMemberNodeViewModel graphMemberVM, SymbolItem memberInfoData, 
-											GraphMemberInfoType graphMemberInfoType, bool isExpanded = false) :
-									  base(graphMemberVM?.Tree, graphMemberVM, isExpanded)
+											GraphMemberInfoType graphMemberInfoType, bool isExpanded) :
+										base(graphMemberVM?.Tree!, graphMemberVM, isExpanded)
 		{
-			memberInfoData.ThrowOnNull(nameof(memberInfoData));
-
-			GraphMemberInfoData = memberInfoData;
-			GraphMember = graphMemberVM;
+			GraphMemberInfoData = memberInfoData.CheckIfNull();
+			GraphMember = graphMemberVM!;
 			GraphMemberInfoType = graphMemberInfoType;
 		}
 
-		public override Task NavigateToItemAsync() => GraphMemberInfoSymbol.NavigateToAsync();
+		public override Task NavigateToItemAsync() =>
+			TryNavigateToItemWithVisualStudioWorkspace(GraphMemberInfoSymbol)
+				? Task.CompletedTask
+				: GraphMemberInfoSymbol.NavigateToAsync();
 
 		private static Icon GetIconType(GraphMemberInfoType graphMemberInfoType) =>
 			graphMemberInfoType switch

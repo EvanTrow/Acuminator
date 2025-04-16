@@ -1,14 +1,14 @@
-﻿using System.Collections.Immutable;
+﻿
+using System.Collections.Immutable;
 using System.Linq;
+
 using Acuminator.Analyzers.StaticAnalysis.Dac;
 using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
 
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.DacUiAttributes
 {
@@ -25,30 +25,23 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacUiAttributes
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			var dacAttributes = dac.Symbol.GetAttributes();
-			var pxCacheNameAttribute = pxContext.AttributeTypes.PXCacheNameAttribute;
-			var pxHiddenAttribute = pxContext.AttributeTypes.PXHiddenAttribute;
 			bool hasPXCacheNameAttribute = false;
 			bool hasPXHiddenAttribute = false;
 
-			foreach (var attribute in dacAttributes.Where(a => a.AttributeClass != null))
+			foreach (var attributeInfo in dac.Attributes.Where(a => a.AttributeType != null))
 			{
-				if (attribute.AttributeClass.InheritsFromOrEquals(pxCacheNameAttribute))
-				{
-					hasPXCacheNameAttribute = true;
-				}
+				context.CancellationToken.ThrowIfCancellationRequested();
 
-				if (attribute.AttributeClass.InheritsFromOrEquals(pxHiddenAttribute))
-				{
-					hasPXHiddenAttribute = true;
-				}
+				hasPXCacheNameAttribute = hasPXCacheNameAttribute || attributeInfo.IsPXCacheName;
+				hasPXHiddenAttribute	= hasPXHiddenAttribute || attributeInfo.IsPXHidden;
 
 				if (hasPXCacheNameAttribute || hasPXHiddenAttribute)
 					return;
 			}
 
+			// Node is not null here because DAC aggregated analyzer runs only on DACs and DAC extensions declared in source code
 			var diagnostic = Diagnostic.Create(Descriptors.PX1094_DacShouldHaveUiAttribute,
-											   dac.Node.Identifier.GetLocation());
+											   dac.Node!.Identifier.GetLocation());
 
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}

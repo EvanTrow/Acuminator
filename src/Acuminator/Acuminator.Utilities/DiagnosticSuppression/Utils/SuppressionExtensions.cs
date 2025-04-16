@@ -12,6 +12,9 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 		public static void ReportDiagnosticWithSuppressionCheck(this SymbolAnalysisContext context, Diagnostic diagnostic,
 																CodeAnalysisSettings settings)
 		{
+			if (diagnostic.Location.SourceTree == null)
+				return;
+
 			var semanticModel = context.Compilation.GetSemanticModel(diagnostic.Location.SourceTree);
 
 			SuppressionManager.ReportDiagnosticWithSuppressionCheck(
@@ -34,7 +37,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 
 		public static string GetXDocumentStringWithDeclaration(this XDocument xDocument)
 		{
-			xDocument.ThrowOnNull(nameof(xDocument));
+			xDocument.ThrowOnNull();
 
 			var builder = new StringBuilder(capacity: 65);
 

@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
+using System.Runtime.CompilerServices;
 
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Semantic;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,8 +20,8 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 	{
 		public static bool IsLocalVariable(this SemanticModel semanticModel, MethodDeclarationSyntax containingMethod, string? variableName)
 		{
-			semanticModel.ThrowOnNull(nameof(semanticModel));
-			containingMethod.ThrowOnNull(nameof(containingMethod));
+			semanticModel.ThrowOnNull();
+			containingMethod.ThrowOnNull();
 
 			if (variableName.IsNullOrWhiteSpace())
 				return false;
@@ -27,7 +29,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 			if (containingMethod.Body == null)
 				return false;
 
-			DataFlowAnalysis dataFlowAnalysis = semanticModel.AnalyzeDataFlow(containingMethod.Body);
+			DataFlowAnalysis? dataFlowAnalysis = semanticModel.AnalyzeDataFlow(containingMethod.Body);
 
 			if (dataFlowAnalysis == null || !dataFlowAnalysis.Succeeded)
 				return false;
@@ -53,7 +55,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 				ArrayCreationExpressionSyntax arrayCreation
 					when arrayCreation.Initializer != null => arrayCreation.Initializer.Expressions.Count,
 
-				ArrayCreationExpressionSyntax arrayCreationWithouInitializer => TryGetSizeOfSingleDimensionalNonJaggedArray(arrayCreationWithouInitializer.Type, 
+				ArrayCreationExpressionSyntax arrayCreationWithouInitializer => TryGetSizeOfSingleDimensionalNonJaggedArray(arrayCreationWithouInitializer.Type,
 																															semanticModel, cancellationToken),
 				ImplicitArrayCreationExpressionSyntax implicitArrayCreation  => implicitArrayCreation.Initializer?.Expressions.Count,
 				InitializerExpressionSyntax initializerExpression
@@ -116,28 +118,19 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		/// </returns>
 		public static Task<SyntaxNode?> GetSyntaxAsync(this ISymbol? symbol, CancellationToken cancellationToken = default)
 		{
-			if (symbol == null)
+			if (symbol == null || !symbol.IsInSourceCode())
 				return Task.FromResult<SyntaxNode?>(null);
 
-			var declarations = symbol.DeclaringSyntaxReferences;
-
-			if (declarations.Length == 0)
-				return Task.FromResult<SyntaxNode?>(null);
-
-			return declarations[0].GetSyntaxAsync(cancellationToken);
+			return symbol.DeclaringSyntaxReferences[0].GetSyntaxAsync(cancellationToken)!;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static SyntaxNode? GetSyntax(this ISymbol? symbol, CancellationToken cancellationToken = default)
 		{
-			if (symbol == null)
+			if (symbol == null || !symbol.IsInSourceCode())
 				return null;
 
-			var declarations = symbol.DeclaringSyntaxReferences;
-
-			if (declarations.Length == 0)
-				return null;
-
-			return declarations[0].GetSyntax(cancellationToken);
+			return symbol.DeclaringSyntaxReferences[0].GetSyntax(cancellationToken);
 		}
 
 		public static Location? GetLocation(this AttributeData? attribute, CancellationToken cancellationToken = default) =>
@@ -148,35 +141,35 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		public static IEnumerable<SyntaxToken> GetIdentifiers(this MemberDeclarationSyntax? member) =>
 			member switch
 			{
-				PropertyDeclarationSyntax propertyDeclaration       => propertyDeclaration.Identifier.ToEnumerable(),
-				FieldDeclarationSyntax fieldDeclaration             => fieldDeclaration.Declaration.Variables.Select(variable => variable.Identifier),
-				MethodDeclarationSyntax methodDeclaration           => methodDeclaration.Identifier.ToEnumerable(),
-				EventDeclarationSyntax eventDeclaration             => eventDeclaration.Identifier.ToEnumerable(),                                           //for explicit event declaration with "add" and "remove"
-				EventFieldDeclarationSyntax eventFieldDeclaration   => eventFieldDeclaration.Declaration.Variables.Select(variable => variable.Identifier),  //for field event declaration
-				DelegateDeclarationSyntax delegateDeclaration       => delegateDeclaration.Identifier.ToEnumerable(),
-				ClassDeclarationSyntax nestedClassDeclaration       => nestedClassDeclaration.Identifier.ToEnumerable(),
-				EnumDeclarationSyntax enumDeclaration               => enumDeclaration.Identifier.ToEnumerable(),
-				StructDeclarationSyntax structDeclaration           => structDeclaration.Identifier.ToEnumerable(),
-				InterfaceDeclarationSyntax interfaceDeclaration     => interfaceDeclaration.Identifier.ToEnumerable(),
+				PropertyDeclarationSyntax propertyDeclaration 		=> propertyDeclaration.Identifier.ToEnumerable(),
+				FieldDeclarationSyntax fieldDeclaration 			=> fieldDeclaration.Declaration.Variables.Select(variable => variable.Identifier),
+				MethodDeclarationSyntax methodDeclaration 			=> methodDeclaration.Identifier.ToEnumerable(),
+				EventDeclarationSyntax eventDeclaration 			=> eventDeclaration.Identifier.ToEnumerable(),                                           //for explicit event declaration with "add" and "remove"
+				EventFieldDeclarationSyntax eventFieldDeclaration 	=> eventFieldDeclaration.Declaration.Variables.Select(variable => variable.Identifier),  //for field event declaration
+				DelegateDeclarationSyntax delegateDeclaration 		=> delegateDeclaration.Identifier.ToEnumerable(),
+				ClassDeclarationSyntax nestedClassDeclaration 		=> nestedClassDeclaration.Identifier.ToEnumerable(),
+				EnumDeclarationSyntax enumDeclaration 				=> enumDeclaration.Identifier.ToEnumerable(),
+				StructDeclarationSyntax structDeclaration 			=> structDeclaration.Identifier.ToEnumerable(),
+				InterfaceDeclarationSyntax interfaceDeclaration 	=> interfaceDeclaration.Identifier.ToEnumerable(),
 				ConstructorDeclarationSyntax constructorDeclaration => constructorDeclaration.Identifier.ToEnumerable(),
-				_                                                   => Enumerable.Empty<SyntaxToken>()
+				_ 													=> []
 			};
 
 		public static Accessibility? GetAccessibility(this MemberDeclarationSyntax member, SemanticModel semanticModel,
 													 CancellationToken cancellationToken = default)
 		{
-			member.ThrowOnNull(nameof(member));
-			semanticModel.ThrowOnNull(nameof(semanticModel));
+			member.ThrowOnNull();
+			semanticModel.ThrowOnNull();
 			
 			switch (member)
 			{		
 				case FieldDeclarationSyntax fieldDeclaration:
-					VariableDeclaratorSyntax firstFieldDeclaration = fieldDeclaration.Declaration.Variables.FirstOrDefault();
+					VariableDeclaratorSyntax? firstFieldDeclaration = fieldDeclaration.Declaration.Variables.FirstOrDefault();
 					return firstFieldDeclaration != null 
 						? semanticModel.GetDeclaredSymbol(firstFieldDeclaration, cancellationToken)?.DeclaredAccessibility
 						: null;
 				case EventFieldDeclarationSyntax eventFieldDeclaration:
-					VariableDeclaratorSyntax firstEventDeclaration = eventFieldDeclaration.Declaration.Variables.FirstOrDefault();     //for field event declaration
+					VariableDeclaratorSyntax? firstEventDeclaration = eventFieldDeclaration.Declaration.Variables.FirstOrDefault();     //for field event declaration
 					return firstEventDeclaration != null 
 						? semanticModel.GetDeclaredSymbol(firstEventDeclaration, cancellationToken)?.DeclaredAccessibility
 						: null;
@@ -210,7 +203,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		}
 
 		public static bool IsPartial(this TypeDeclarationSyntax typeDeclaration) =>
-			typeDeclaration.CheckIfNull(nameof(typeDeclaration))
+			typeDeclaration.CheckIfNull()
 						   .Modifiers
 						   .Any(SyntaxKind.PartialKeyword);
 		
@@ -223,15 +216,15 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		}
 
 		public static SyntaxTokenList GetModifiers(this SyntaxNode member) =>
-			member.CheckIfNull(nameof(member)) switch
+			member.CheckIfNull() switch
 			{
 				BasePropertyDeclarationSyntax basePropertyDeclaration => basePropertyDeclaration.Modifiers,
-				BaseMethodDeclarationSyntax baseMethodDeclaration     => baseMethodDeclaration.Modifiers,
-				BaseTypeDeclarationSyntax baseTypeDeclaration         => baseTypeDeclaration.Modifiers,
-				BaseFieldDeclarationSyntax baseFieldDeclaration       => baseFieldDeclaration.Modifiers,
-				DelegateDeclarationSyntax delegateDeclaration         => delegateDeclaration.Modifiers,
+				BaseMethodDeclarationSyntax baseMethodDeclaration 	  => baseMethodDeclaration.Modifiers,
+				BaseTypeDeclarationSyntax baseTypeDeclaration 		  => baseTypeDeclaration.Modifiers,
+				BaseFieldDeclarationSyntax baseFieldDeclaration 	  => baseFieldDeclaration.Modifiers,
+				DelegateDeclarationSyntax delegateDeclaration 		  => delegateDeclaration.Modifiers,
 				LocalFunctionStatementSyntax localFunctionStatement   => localFunctionStatement.Modifiers,
-				_                                                     => SyntaxFactory.TokenList()
+				_ 													  => SyntaxFactory.TokenList()
 			};
 
 		/// <summary>
@@ -259,7 +252,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 
 		public static IEnumerable<AttributeSyntax> GetAttributes(this MemberDeclarationSyntax member)
 		{
-			member.ThrowOnNull(nameof(member));
+			member.ThrowOnNull();
 			return GetAttributesImpl();
 
 			IEnumerable<AttributeSyntax> GetAttributesImpl()
@@ -281,18 +274,18 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		public static SyntaxList<AttributeListSyntax> GetAttributeLists(this MemberDeclarationSyntax? member) =>
 			member switch
 			{
-				PropertyDeclarationSyntax propertyDeclaration       => propertyDeclaration.AttributeLists,
-				FieldDeclarationSyntax fieldDeclaration             => fieldDeclaration.AttributeLists,
-				MethodDeclarationSyntax methodDeclaration           => methodDeclaration.AttributeLists,
-				EventDeclarationSyntax eventDeclaration             => eventDeclaration.AttributeLists,
-				EventFieldDeclarationSyntax eventFieldDeclaration   => eventFieldDeclaration.AttributeLists,
-				DelegateDeclarationSyntax delegateDeclaration       => delegateDeclaration.AttributeLists,
-				ClassDeclarationSyntax nestedClassDeclaration       => nestedClassDeclaration.AttributeLists,
-				EnumDeclarationSyntax enumDeclaration               => enumDeclaration.AttributeLists,
-				StructDeclarationSyntax structDeclaration           => structDeclaration.AttributeLists,
-				InterfaceDeclarationSyntax interfaceDeclaration     => interfaceDeclaration.AttributeLists,
+				PropertyDeclarationSyntax propertyDeclaration 		=> propertyDeclaration.AttributeLists,
+				FieldDeclarationSyntax fieldDeclaration 			=> fieldDeclaration.AttributeLists,
+				MethodDeclarationSyntax methodDeclaration 			=> methodDeclaration.AttributeLists,
+				EventDeclarationSyntax eventDeclaration 			=> eventDeclaration.AttributeLists,
+				EventFieldDeclarationSyntax eventFieldDeclaration 	=> eventFieldDeclaration.AttributeLists,
+				DelegateDeclarationSyntax delegateDeclaration 		=> delegateDeclaration.AttributeLists,
+				ClassDeclarationSyntax nestedClassDeclaration 		=> nestedClassDeclaration.AttributeLists,
+				EnumDeclarationSyntax enumDeclaration 				=> enumDeclaration.AttributeLists,
+				StructDeclarationSyntax structDeclaration 			=> structDeclaration.AttributeLists,
+				InterfaceDeclarationSyntax interfaceDeclaration 	=> interfaceDeclaration.AttributeLists,
 				ConstructorDeclarationSyntax constructorDeclaration => constructorDeclaration.AttributeLists,
-				_                                                   => new SyntaxList<AttributeListSyntax>()
+				_ 													=> new SyntaxList<AttributeListSyntax>()
 			};
 
 		public static SyntaxTrivia ToSingleLineComment(this string? commentContent)
@@ -308,11 +301,11 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		public static BaseArgumentListSyntax? GetArgumentsList(this SyntaxNode callSite) =>
 			callSite switch
 			{
-				InvocationExpressionSyntax invocation                           => invocation.ArgumentList,
-				ElementAccessExpressionSyntax elementAccess                     => elementAccess.ArgumentList,
-				ObjectCreationExpressionSyntax objectCreation                   => objectCreation.ArgumentList,
-				ElementBindingExpressionSyntax elementBinding                   => elementBinding.ArgumentList,
-				_                                                               => null
+				InvocationExpressionSyntax invocation 		  => invocation.ArgumentList,
+				ElementAccessExpressionSyntax elementAccess   => elementAccess.ArgumentList,
+				ObjectCreationExpressionSyntax objectCreation => objectCreation.ArgumentList,
+				ElementBindingExpressionSyntax elementBinding => elementBinding.ArgumentList,
+				_ 											  => null
 			};
 
 		public static string? GetDocTagName(this XmlNodeSyntax docTagNode) => docTagNode switch
@@ -333,6 +326,146 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 			}
 
 			return false;
+		}
+
+		public static List<SyntaxTrivia> GetRegionDirectiveLinesFromTrivia(this in SyntaxTriviaList trivias)
+		{
+			if (trivias.Count == 0)
+				return [];
+
+			var regionTrivias = new List<SyntaxTrivia>(2);
+			SyntaxTrivia? previousTrivia = null;
+
+			for (int i = 0; i < trivias.Count; i++)
+			{
+				var trivia = trivias[i];
+
+				if (trivia.Kind() is SyntaxKind.RegionDirectiveTrivia or SyntaxKind.EndRegionDirectiveTrivia)
+				{
+					if (previousTrivia.HasValue && previousTrivia.Value.IsKind(SyntaxKind.WhitespaceTrivia))
+						regionTrivias.Add(previousTrivia.Value);
+
+					regionTrivias.Add(trivia);
+				}
+
+				previousTrivia = trivia;
+			}
+
+			return regionTrivias;
+		}
+
+		public static IEnumerable<SingleVariableDesignationSyntax> GetAllVariableDesignations(this PatternSyntax? pattern)
+		{
+			switch (pattern)
+			{
+				case DeclarationPatternSyntax declarationPattern:
+					return declarationPattern.Designation.GetSingleVariableDesignations();
+
+				case UnaryPatternSyntax unaryPattern:
+					return unaryPattern.Pattern.GetAllVariableDesignations();
+
+				case VarPatternSyntax varPattern:
+					return varPattern.Designation.GetSingleVariableDesignations();
+
+				case ParenthesizedPatternSyntax parenthesizedPattern:
+					return parenthesizedPattern.Pattern.GetAllVariableDesignations();
+
+				case RecursivePatternSyntax recursivePattern:
+					IEnumerable<SingleVariableDesignationSyntax>? allSingleVariableDesignations = null;
+
+					if (recursivePattern.PositionalPatternClause?.Subpatterns.Count > 0)
+					{
+						var positionalPatternDesignations =
+							recursivePattern.PositionalPatternClause.Subpatterns
+																	.SelectMany(subpattern => subpattern.Pattern.GetAllVariableDesignations());
+						allSingleVariableDesignations = positionalPatternDesignations;
+					}
+
+					if (recursivePattern.PropertyPatternClause?.Subpatterns.Count > 0)
+					{
+						var propertyPatternDesignations =
+							recursivePattern.PropertyPatternClause.Subpatterns
+																  .SelectMany(subpattern => subpattern.Pattern.GetAllVariableDesignations());
+						allSingleVariableDesignations = allSingleVariableDesignations?.Concat(propertyPatternDesignations) ?? propertyPatternDesignations;
+					}
+					
+					var ownRecursivePatternDesignations = recursivePattern.Designation.GetSingleVariableDesignations();
+					allSingleVariableDesignations = allSingleVariableDesignations?.Concat(ownRecursivePatternDesignations) ?? ownRecursivePatternDesignations;
+					return allSingleVariableDesignations;
+
+				case BinaryPatternSyntax binaryPattern:
+					var designationsFromLeftPattern = binaryPattern.Left.GetAllVariableDesignations();
+					var designationsFromRightPattern = binaryPattern.Right.GetAllVariableDesignations();
+
+					return designationsFromLeftPattern.Concat(designationsFromRightPattern);
+
+				case ConstantPatternSyntax constantPattern:
+				case DiscardPatternSyntax discardPattern:
+				case RelationalPatternSyntax relationalPattern:
+				case TypePatternSyntax typePattern:
+					return [];
+
+				// List patterns are not supported by this version of Roslyn. After upgrade to a new Roslyn version we will need to support them.
+				//case Microsoft.CodeAnalysis.CSharp.Syntax.ListPatternSyntax:
+				//case Microsoft.CodeAnalysis.CSharp.Syntax.SlicePatternSyntax:
+				default:
+					return [];
+			}			
+		}
+
+		public static IEnumerable<SingleVariableDesignationSyntax> GetSingleVariableDesignations(this VariableDesignationSyntax? variableDesignation)
+		{
+			switch (variableDesignation)
+			{
+				case SingleVariableDesignationSyntax singleVariableDesignation:
+					return [singleVariableDesignation];
+				
+				case ParenthesizedVariableDesignationSyntax multipleVariablesDesignation:
+					return multipleVariablesDesignation.Variables.Count switch
+					{
+						0 => [],
+						1 => GetSingleVariableDesignations(multipleVariablesDesignation.Variables[0]),
+						_ => GetSingleVariablesFromMultipleVariablesDesignation(multipleVariablesDesignation, recursionLevel: 0)
+					};
+
+				case DiscardDesignationSyntax:
+				default:
+					return [];
+			}
+
+			//----------------------------------------------------Local Function---------------------------------------------------------------
+			static IEnumerable<SingleVariableDesignationSyntax> GetSingleVariablesFromMultipleVariablesDesignation(
+																			ParenthesizedVariableDesignationSyntax multipleVariablesDesignation,
+																			int recursionLevel)
+			{
+				const int maxRecursionLevel = 100;
+				var variables = multipleVariablesDesignation.Variables;
+
+				for (int i = 0; i < variables.Count; i++)
+				{
+					var variable = variables[i];
+
+					switch (variable)
+					{
+						case SingleVariableDesignationSyntax singleVariable:
+							yield return singleVariable;
+							continue;
+
+						case ParenthesizedVariableDesignationSyntax nestedMultipleVariablesDesignation
+						when recursionLevel <= maxRecursionLevel:
+							var singleVariables = GetSingleVariablesFromMultipleVariablesDesignation(nestedMultipleVariablesDesignation, recursionLevel + 1);
+
+							foreach (SingleVariableDesignationSyntax nestedSingleVariable in singleVariables)
+								yield return nestedSingleVariable;
+
+							continue;
+
+						case DiscardDesignationSyntax:
+						default:
+							continue;
+					}
+				}
+			}
 		}
 	}
 }

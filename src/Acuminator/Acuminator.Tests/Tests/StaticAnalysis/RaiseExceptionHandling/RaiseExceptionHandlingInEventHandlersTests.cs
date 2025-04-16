@@ -10,8 +10,10 @@ using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
 using Acuminator.Utilities.Roslyn;
-using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
+
 using Microsoft.CodeAnalysis.Diagnostics;
+
 using Xunit;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.RaiseExceptionHandling
@@ -19,7 +21,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.RaiseExceptionHandling
 	public class RaiseExceptionHandlingInEventHandlersTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new EventHandlerAnalyzer(CodeAnalysisSettings.Default
+			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 					.WithRecursiveAnalysisEnabled()
 					.WithIsvSpecificAnalyzersEnabled(),
 				new RaiseExceptionHandlingInEventHandlersAnalyzer());
@@ -30,7 +32,9 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.RaiseExceptionHandling
 			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(14, 4, EventType.FieldDefaulting),
 			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(19, 4, EventType.FieldSelecting),
 			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(24, 4, EventType.RowSelecting),
-			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(29, 4, EventType.RowPersisted));
+			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(29, 4, EventType.RowPersisted),
+			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(34, 4, EventType.FieldUpdating),
+			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(39, 4, EventType.FieldUpdating));
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\EventHandlersWithExternalMethod.cs")]
@@ -38,7 +42,9 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.RaiseExceptionHandling
 			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(14, 4, EventType.FieldDefaulting),
 			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(19, 4, EventType.FieldSelecting),
 			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(24, 4, EventType.RowSelecting),
-			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(29, 4, EventType.RowPersisted));
+			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(29, 4, EventType.RowPersisted),
+			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(34, 4, EventType.FieldUpdating),
+			Descriptors.PX1075_RaiseExceptionHandlingInEventHandlers.CreateFor(39, 4, EventType.FieldUpdating));
 		
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\ValidEventHandlers.cs")]

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -15,7 +17,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public List<TreeNodeViewModel> SortNodes(IEnumerable<TreeNodeViewModel> nodes, SortType sortType, SortDirection sortDirection)
 		{
 			if (nodes.IsNullOrEmpty())
-				return new List<TreeNodeViewModel>();
+				return [];
 
 			var sortedNodes = new List<TreeNodeViewModel>(capacity: 8);
 			var sortableNodes = new List<TreeNodeViewModel>(capacity: 8);
@@ -88,15 +90,27 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		protected virtual bool IsSortTypeSupported(TreeNodeViewModel node, SortType sortType) =>
 			node switch
 			{
-				var n when n is DacMemberCategoryNodeViewModel ||
-						   n is GraphMemberCategoryNodeViewModel _ => false,
+				DacMemberCategoryNodeViewModel 	 => false,
+				GraphMemberCategoryNodeViewModel => false,
 
-				IsActiveGraphMethodNodeViewModel _ => false,
-				GraphInstanceConstructorNodeViewModel _ => false,
-				GraphStaticConstructorNodeViewModel _ => false,
+				AttributeNodeViewModel		 => false,
+				AttributesGroupNodeViewModel => false,
 
-				var n when n is DacGroupingNodeBaseViewModel ||
-						   n is DacFieldGroupingNodeBaseViewModel => sortType == SortType.Alphabet,
+				GraphConfigureMethodNodeViewModel	  => false,
+				GraphInitializeMethodNodeViewModel	  => false,
+				IsActiveGraphMethodNodeViewModelBase  => false,
+				GraphInstanceConstructorNodeViewModel => false,
+				GraphStaticConstructorNodeViewModel   => false,
+
+				DacGroupingNodeBaseViewModel or DacFieldGroupingNodeBaseViewModel => sortType == SortType.Alphabet,
+
+				BaseDacPlaceholderNodeViewModel	  => false,
+				BaseGraphPlaceholderNodeViewModel => false,
+				DacFieldPropertyNodeViewModel 	  => false,
+				DacBqlFieldNodeViewModel	  	  => false,
+
+				DacNodeViewModel dacNode	 when dacNode.Parent != null   => false,
+				GraphNodeViewModel graphNode when graphNode.Parent != null => false,
 
 				_ => sortType == SortType.Alphabet || sortType == SortType.Declaration
 			};

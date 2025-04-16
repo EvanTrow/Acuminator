@@ -11,92 +11,43 @@ using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 {
-    public static class DacSymbolsHierarchyUtils
+	public static class DacSymbolsHierarchyUtils
 	{
-        public static IEnumerable<ITypeSymbol> GetDacExtensionsWithDac(this ITypeSymbol dacExtension, PXContext pxContext)
-        {
-            dacExtension.ThrowOnNull(nameof(dacExtension));
-            pxContext.ThrowOnNull(nameof(pxContext));
-
-            if (!dacExtension.IsDacExtension(pxContext))
-            {
-                return Enumerable.Empty<ITypeSymbol>();
-            }
-
-            var extensionBaseType = dacExtension.BaseType;
-            var typeArguments = extensionBaseType.TypeArguments;
-            var dacType = typeArguments.LastOrDefault();
-
-            if (dacType == null || !dacType.IsDAC(pxContext))
-            {
-                return Enumerable.Empty<ITypeSymbol>();
-            }
-
-            var types = new List<ITypeSymbol>(typeArguments.Length + 1) { dacExtension };
-            var typeArgumentsExceptDac = typeArguments.Take(typeArguments.Length - 1);
-
-            foreach (var ta in typeArgumentsExceptDac)
-            {
-                if (!ta.IsDacExtension(pxContext))
-                {
-                    return Enumerable.Empty<ITypeSymbol>();
-                }
-
-                types.Add(ta);
-            }
-
-            types.Add(dacType);
-
-            return types;
-        }
-
-		/// <summary>
-		/// Gets the base types of a given <paramref name="dacType"/> that are DACs too and implement <c>IBqlTable</c>.
-		/// </summary>
-		/// <param name="dacType">The DAC type to act on.</param>
-		/// <param name="pxContext">Acumatica context.</param>
-		/// <returns>
-		/// The base types of a given <paramref name="dacType"/> that are DACs too and implement <c>IBqlTable</c>.
-		/// </returns>
-		/// <remarks>
-		/// This helper MUST be called only on DAC types. The behavior on non DAC types is undefined.
-		/// </remarks>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<ITypeSymbol> GetDacBaseTypes(this ITypeSymbol dacType, PXContext pxContext) =>
-			GetDacBaseTypes(dacType, pxContext, includeDacType: false);
-
-		/// <summary>
-		/// Gets the DAC type <paramref name="dacType"/> with its base types that are DACs too and implement <c>IBqlTable</c>.
-		/// </summary>
-		/// <param name="dacType">The DAC type to act on.</param>
-		/// <param name="pxContext">Acumatica context.</param>
-		/// <returns>
-		/// A collection containing <paramref name="dacType"/> and its base types that are DACs too and implement <c>IBqlTable</c>.
-		/// </returns>
-		/// <remarks>
-		/// This helper MUST be called only on DAC types. The behavior on non DAC types is undefined.
-		/// </remarks>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<ITypeSymbol> GetDacWithBaseTypes(this ITypeSymbol dacType, PXContext pxContext) =>
-			GetDacBaseTypes(dacType, pxContext, includeDacType: true);
-
-		private static IEnumerable<ITypeSymbol> GetDacBaseTypes(ITypeSymbol dacType, PXContext pxContext, bool includeDacType)
+		public static IEnumerable<ITypeSymbol> GetDacExtensionsWithDac(this ITypeSymbol dacExtension, PXContext pxContext)
 		{
-			dacType.ThrowOnNull(nameof(dacType));
-			var pxBqlTable = pxContext.CheckIfNull(nameof(pxContext)).PXBqlTable;
+			dacExtension.ThrowOnNull();
+			pxContext.ThrowOnNull();
 
-			if (dacType.BaseType == null || dacType.BaseType.SpecialType == SpecialType.System_Object ||
-				(pxBqlTable != null && dacType.BaseType.Equals(pxBqlTable)))
+			if (!dacExtension.IsDacExtension(pxContext))
 			{
-				return includeDacType ? [dacType] : [];
+				return [];
 			}
 
-			var dacHierarchy = dacType.GetBaseTypes()
-									  .TakeWhile(type => type.IsDAC(pxContext));
-			if (includeDacType)
-				dacHierarchy = dacHierarchy.PrependItem(dacType);
+			var extensionBaseType = dacExtension.BaseType!;
+			var typeArguments = extensionBaseType.TypeArguments;
+			var dacType = typeArguments.LastOrDefault();
 
-			return dacHierarchy;
+			if (dacType == null || !dacType.IsDAC(pxContext))
+			{
+				return [];
+			}
+
+			var types = new List<ITypeSymbol>(typeArguments.Length + 1) { dacExtension };
+			var typeArgumentsExceptDac = typeArguments.Take(typeArguments.Length - 1);
+
+			foreach (var ta in typeArgumentsExceptDac)
+			{
+				if (!ta.IsDacExtension(pxContext))
+				{
+					return [];
+				}
+
+				types.Add(ta);
+			}
+
+			types.Add(dacType);
+
+			return types;
 		}
 
 		/// <summary>
@@ -135,12 +86,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 		private static IEnumerable<ITypeSymbol> GetDacBaseTypesThatMayStoreDacProperties(ITypeSymbol dacType, PXContext pxContext, bool includeDacType)
 		{
-			dacType.ThrowOnNull(nameof(dacType));
-			var pxBqlTable = pxContext.CheckIfNull(nameof(pxContext)).PXBqlTable;
+			dacType.ThrowOnNull();
+			var pxBqlTable = pxContext.CheckIfNull().PXBqlTable;
 
 			// Optimization for hot path - most DACs have trivial type hierarchy
 			if (dacType.BaseType == null || dacType.BaseType.SpecialType == SpecialType.System_Object ||
-				(pxBqlTable != null && dacType.BaseType.Equals(pxBqlTable)))
+				(pxBqlTable != null && dacType.BaseType.Equals(pxBqlTable, SymbolEqualityComparer.Default)))
 			{
 				return includeDacType ? [dacType] : [];
 			}
@@ -151,7 +102,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			// instead of checking if the type implements IBqlTable interface. This is done to include a useful part of type hierarchy in a scenario 
 			// where the base non DAC type which declares some shared fields, for instance, PX.Objects.TX.TaxDetail class.
 			if (pxBqlTable != null)
-				dacHierarchy = dacHierarchy.TakeWhile(type => !type.Equals(pxBqlTable) && type.SpecialType != SpecialType.System_Object);
+			{
+				dacHierarchy = dacHierarchy.TakeWhile(type => !type.Equals(pxBqlTable, SymbolEqualityComparer.Default) &&
+							   type.SpecialType != SpecialType.System_Object);
+			}
 			else
 				dacHierarchy = dacHierarchy.TakeWhile(type => type.SpecialType != SpecialType.System_Object);
 
@@ -167,13 +121,26 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// <param name="extensionType">The DAC extension type to act on.</param>
 		/// <returns/>
 		public static IEnumerable<ITypeSymbol> GetDacExtensionWithBaseTypes(this ITypeSymbol extensionType) =>
-			extensionType.CheckIfNull(nameof(extensionType))
+			extensionType.CheckIfNull()
 						 .GetBaseTypesAndThis()
 						 .TakeWhile(type => !type.IsDacExtensionBaseType());
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool IsDacExtensionBaseType(this ITypeSymbol type) => 
+		public static bool IsDacExtensionBaseType(this ITypeSymbol type) =>
 			type?.Name == TypeNames.PXCacheExtension;
+
+		/// <summary>
+		/// Gets base DAC extensions from DAC extension type. The type itself is not included.
+		/// </summary>
+		/// <param name="dacExtension">The DAC extension to act on.</param>
+		/// <param name="pxContext">Context.</param>
+		/// <param name="sortDirection">The sort direction. The <see cref="SortDirection.Descending"/> order is from the extension to its base extensions/graph.
+		/// The <see cref="SortDirection.Ascending"/> order is from the DAC/base extensions to the most derived one.</param>
+		/// <param name="includeDac">True to include, false to exclude the DAC type.</param>
+		/// <returns/>
+		public static IEnumerable<ITypeSymbol> GetBaseExtensions(this ITypeSymbol dacExtension, PXContext pxContext,
+																 SortDirection sortDirection, bool includeDac) =>
+			GetDacExtensionWithBaseExtensions(dacExtension, pxContext, sortDirection, includeDac, includeDacExtension: false);
 
 		/// <summary>
 		/// Gets the DAC extension with base DAC extensions from DAC extension type.
@@ -185,37 +152,45 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// <param name="includeDac">True to include, false to exclude the DAC type.</param>
 		/// <returns/>
 		public static IEnumerable<ITypeSymbol> GetDacExtensionWithBaseExtensions(this ITypeSymbol dacExtension, PXContext pxContext,
-																				 SortDirection sortDirection, bool includeDac)
+																				 SortDirection sortDirection, bool includeDac) =>
+			GetDacExtensionWithBaseExtensions(dacExtension, pxContext, sortDirection, includeDac, includeDacExtension: true);
+
+		private static IEnumerable<ITypeSymbol> GetDacExtensionWithBaseExtensions(this ITypeSymbol dacExtension, PXContext pxContext,
+																				  SortDirection sortDirection, bool includeDac, bool includeDacExtension)
 		{
-			pxContext.ThrowOnNull(nameof(pxContext));
+			pxContext.ThrowOnNull();
 
 			if (dacExtension == null || !dacExtension.IsDacExtension(pxContext))
-				return Enumerable.Empty<ITypeSymbol>();
+				return [];
 
 			var extensionBaseType = dacExtension.GetBaseTypesAndThis()
 												.FirstOrDefault(type => type.IsDacExtensionBaseType()) as INamedTypeSymbol;
 			if (extensionBaseType == null)
-				return Enumerable.Empty<ITypeSymbol>();
+				return [];
 
 			var dacType = extensionBaseType.TypeArguments.LastOrDefault();
 
 			if (dacType == null || !dacType.IsDAC(pxContext))
-				return Enumerable.Empty<ITypeSymbol>();
+				return [];
 
 			return sortDirection == SortDirection.Ascending
-				? GetExtensionInAscendingOrder(dacType, dacExtension, extensionBaseType, pxContext, includeDac)
-				: GetExtensionInDescendingOrder(dacType, dacExtension, extensionBaseType, pxContext, includeDac);
+				? GetExtensionInAscendingOrder(dacType, dacExtension, extensionBaseType, pxContext, includeDac, includeDacExtension)
+				: GetExtensionInDescendingOrder(dacType, dacExtension, extensionBaseType, pxContext, includeDac, includeDacExtension);
 		}
 
+
 		private static IEnumerable<ITypeSymbol> GetExtensionInAscendingOrder(ITypeSymbol dacType, ITypeSymbol dacExtension,
-																			 INamedTypeSymbol extensionBaseType, PXContext pxContext, bool includeDac)
+																			 INamedTypeSymbol extensionBaseType, PXContext pxContext, 
+																			 bool includeDac, bool includeDacExtension)
 		{
 			int dacIndex = extensionBaseType.TypeArguments.Length - 1;
 			var extensions = new List<ITypeSymbol>(capacity: extensionBaseType.TypeArguments.Length);
 
 			if (includeDac)
 			{
-				extensions.AddRange(dacType.GetDacWithBaseTypes(pxContext).Reverse());
+				var baseDacTypes = dacType.GetDacWithBaseTypesThatMayStoreDacProperties(pxContext)
+										  .Reverse();
+				extensions.AddRange(baseDacTypes);
 			}
 
 			for (int i = dacIndex - 1; i >= 0; i--)
@@ -223,38 +198,44 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 				var baseExtension = extensionBaseType.TypeArguments[i];
 
 				if (!baseExtension.IsDacExtension(pxContext))
-					return Enumerable.Empty<ITypeSymbol>();
+					return [];
 
 				extensions.Add(baseExtension);      //According to Platform team we shouldn't consider case when the extensions chaining mixes with .Net inheritance
 			}
 
-			extensions.AddRange(dacExtension.GetDacExtensionWithBaseTypes().Reverse());
-			return extensions.Distinct();
+			if (includeDacExtension)
+				extensions.AddRange(dacExtension.GetDacExtensionWithBaseTypes().Reverse());
+			
+			return extensions.Distinct<ITypeSymbol>(SymbolEqualityComparer.Default);
 		}
 
 		private static IEnumerable<ITypeSymbol> GetExtensionInDescendingOrder(ITypeSymbol dacType, ITypeSymbol dacExtension,
-																			  INamedTypeSymbol extensionBaseType, PXContext pxContext, bool includeDac)
+																			  INamedTypeSymbol extensionBaseType, PXContext pxContext, 
+																			  bool includeDac, bool includeDacExtension)
 		{
 			int dacIndex = extensionBaseType.TypeArguments.Length - 1;
 			var extensions = new List<ITypeSymbol>(capacity: extensionBaseType.TypeArguments.Length);
-			extensions.AddRange(dacExtension.GetDacExtensionWithBaseTypes());
+
+			if (includeDacExtension)
+				extensions.AddRange(dacExtension.GetDacExtensionWithBaseTypes());
 
 			for (int i = 0; i <= dacIndex - 1; i++)
 			{
 				var baseExtension = extensionBaseType.TypeArguments[i];
 
 				if (!baseExtension.IsDacExtension(pxContext))
-					return Enumerable.Empty<ITypeSymbol>();
+					return [];
 
 				extensions.Add(baseExtension);      //According to Platform team we shouldn't consider case when the extensions chaining mixes with .Net inheritance
 			}
 
 			if (includeDac)
 			{
-				extensions.AddRange(dacType.GetDacWithBaseTypes(pxContext));
+				var baseDacTypes = dacType.GetDacWithBaseTypesThatMayStoreDacProperties(pxContext);
+				extensions.AddRange(baseDacTypes);
 			}
 
-			return extensions.Distinct();
+			return extensions.Distinct<ITypeSymbol>(SymbolEqualityComparer.Default);
 		}
 	}
 }

@@ -1,11 +1,11 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Acuminator.Utilities.Common;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -32,27 +32,29 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreationForBqlQueries
 			if (node == null || context.CancellationToken.IsCancellationRequested)
 				return;
 
-			string format = nameof(Resources.PX1072Fix).GetLocalized().ToString();
+			string codeFixResourceName = nameof(Resources.PX1072Fix);
 
 			foreach (var diagnostic in context.Diagnostics)
 			{
 				for (int i = 0;
 					diagnostic.Properties.TryGetValue(
 						PXGraphCreationForBqlQueriesAnalyzer.IdentifierNamePropertyPrefix + i,
-						out string value);
+						out string? value);
 					i++)
 				{
-					string identifierName = value;
+					string? identifierName = value;
 
-					if (identifierName.IsNullOrWhiteSpace()) continue;
+					if (identifierName.IsNullOrWhiteSpace()) 
+						continue;
 
-					string codeActionName = String.Format(format, node, identifierName);
+					string equivalenceKey = codeFixResourceName.GetLocalized().ToString();
+					string codeActionName = codeFixResourceName.GetLocalized(node.ToString(), identifierName.ToString()).ToString();
 					bool isGraphExtension = diagnostic.Properties.ContainsKey(
 						PXGraphCreationForBqlQueriesAnalyzer.IsGraphExtensionPropertyPrefix + i);
 
 					var codeAction = CodeAction.Create(codeActionName, 
 						ct => ReplaceIdentifier(context.Document, root!, node, identifierName, isGraphExtension, context.CancellationToken),
-						equivalenceKey: codeActionName);
+						equivalenceKey);
 					context.RegisterCodeFix(codeAction, diagnostic);
 				}
 			}

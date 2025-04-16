@@ -1,28 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿#nullable enable
+
+using System;
 using System.Linq;
-using Microsoft.CodeAnalysis;
+using System.Threading.Tasks;
+
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
-using Acuminator.Vsix.Utilities;
+using Acuminator.Vsix.ToolWindows.CodeMap.Filter;
+using Acuminator.Vsix.ToolWindows.CodeMap.Graph;
 using Acuminator.Vsix.Utilities.Navigation;
-using System.Threading.Tasks;
-using System.Threading;
+
+using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public abstract class GraphMemberNodeViewModel : TreeNodeViewModel, INodeWithSymbolItem
+	public abstract class GraphMemberNodeViewModel : TreeNodeViewModel, INodeWithDeclarationOrder
 	{
+		public override TreeNodeFilterBehavior FilterBehavior => TreeNodeFilterBehavior.DisplayedIfNodeOrChildrenMeetFilter;
+
 		public GraphMemberCategoryNodeViewModel MemberCategory { get; }
 
 		public SymbolItem MemberInfo { get; }
 
-		SymbolItem INodeWithSymbolItem.Symbol => MemberInfo;
+		public int DeclarationOrder => MemberInfo.DeclarationOrder;
 
 		public ISymbol MemberSymbol => MemberInfo.SymbolBase;
 
-		public GraphMemberType MemberType => MemberCategory.CategoryType;
+		public GraphMemberCategory MemberType => MemberCategory.CategoryType;
 
 		public override string Name
 		{
@@ -30,16 +34,17 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			protected set { }
 		}
 
-		public override bool DisplayNodeWithoutChildren => true;
-
 		public GraphMemberNodeViewModel(GraphMemberCategoryNodeViewModel graphMemberCategoryVM, TreeNodeViewModel parent, SymbolItem memberInfo, 
-										bool isExpanded = false) :
-								   base(graphMemberCategoryVM?.Tree, parent, isExpanded)
+										bool isExpanded) :
+								   base(graphMemberCategoryVM?.Tree!, parent, isExpanded)
 		{
-			MemberInfo = memberInfo.CheckIfNull(nameof(memberInfo));
-			MemberCategory = graphMemberCategoryVM;		
+			MemberInfo = memberInfo.CheckIfNull();
+			MemberCategory = graphMemberCategoryVM!;
 		}
 
-		public override Task NavigateToItemAsync() => MemberSymbol.NavigateToAsync();
+		public override Task NavigateToItemAsync() =>
+			TryNavigateToItemWithVisualStudioWorkspace(MemberSymbol)
+				? Task.CompletedTask
+				: MemberSymbol.NavigateToAsync();
 	}
 }

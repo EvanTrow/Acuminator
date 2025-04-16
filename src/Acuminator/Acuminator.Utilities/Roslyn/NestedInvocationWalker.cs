@@ -68,7 +68,7 @@ namespace Acuminator.Utilities.Roslyn
 
 		private Stack<SyntaxNode> NodesStack { get; set; } = new Stack<SyntaxNode>();
 
-        private HashSet<IMethodSymbol> MethodsInStack { get; set; } = new HashSet<IMethodSymbol>();
+        private HashSet<IMethodSymbol> MethodsInStack { get; set; } = new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
 
 		private readonly Lazy<HashSet<INamedTypeSymbol>> _typesToBypass;
 		private readonly Func<IMethodSymbol, bool>? _extraBypassCheck;
@@ -81,9 +81,7 @@ namespace Acuminator.Utilities.Roslyn
 		/// <param name="bypassMethod">(Optional) An optional delegate to control if it is needed to bypass analysis of an invocation of a method and do not step into it. </param>
 		protected NestedInvocationWalker(PXContext pxContext, CancellationToken cancellationToken, Func<IMethodSymbol, bool>? extraBypassCheck = null)
 		{
-			pxContext.ThrowOnNull(nameof (pxContext));
-
-			PxContext = pxContext;
+			PxContext = pxContext.CheckIfNull();
             CancellationToken = cancellationToken;
 			_extraBypassCheck = extraBypassCheck;
 
@@ -92,26 +90,25 @@ namespace Acuminator.Utilities.Roslyn
 		}
 
 		/// <summary>
-		/// Gets types to bypass. The alker won't go into their type members.
+		/// Gets types to bypass. The walker won't go into their type members.
 		/// </summary>
 		/// <returns>
 		/// The types to bypass.
 		/// </returns>
 		/// <remarks>
-		/// some core types from PX.Data namespace
+		/// Some core types from PX.Data namespace
 		/// </remarks>
 		protected virtual HashSet<INamedTypeSymbol> GetTypesToBypass() =>
-			new HashSet<INamedTypeSymbol>()
-			{
-				PxContext.PXGraph.Type!,
-				PxContext.PXView.Type!,
-				PxContext.PXCache.Type!,
-				PxContext.PXCache.GenericType!,
-				PxContext.PXAction.Type!,
-				PxContext.PXSelectBaseGeneric.Type!,
+			[
+				PxContext.PXGraph.Type,
+				PxContext.PXView.Type,
+				PxContext.PXCache.Type,
+				PxContext.PXCache.GenericType,
+				PxContext.PXAction.Type,
+				PxContext.PXSelectBaseGeneric.Type,
 				PxContext.PXAdapterType,
-				PxContext.PXDatabase.Type!
-			};
+				PxContext.PXDatabase.Type
+			];
 
 		protected void ThrowIfCancellationRequested() => CancellationToken.ThrowIfCancellationRequested();
 
@@ -176,6 +173,9 @@ namespace Acuminator.Utilities.Roslyn
 			{
 				var diagnostic = Diagnostic.Create(diagnosticDescriptor, nodeToReport.GetLocation(), messageArgs);
 				var semanticModel = GetSemanticModel(nodeToReport.SyntaxTree);
+
+				if (semanticModel == null)
+					return;
 
 				SuppressionManager.ReportDiagnosticWithSuppressionCheck(semanticModel, reportDiagnostic, diagnostic, Settings, CancellationToken);
 				_reportedDiagnostics.Add(diagnosticKey);
@@ -308,7 +308,7 @@ namespace Acuminator.Utilities.Roslyn
 			try
 			{
 				NodesStack                      = new Stack<SyntaxNode>();
-				MethodsInStack                  = new HashSet<IMethodSymbol>();
+				MethodsInStack                  = new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
 				OriginalNode                    = null;
 				NodeCurrentlyVisitedRecursively = null;
 

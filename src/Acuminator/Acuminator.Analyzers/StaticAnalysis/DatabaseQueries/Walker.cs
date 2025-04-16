@@ -1,12 +1,15 @@
-﻿using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn;
-using Acuminator.Utilities.Roslyn.Semantic;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
+﻿
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+
+using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn;
+using Acuminator.Utilities.Roslyn.Semantic;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.DatabaseQueries
 {
@@ -25,7 +28,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DatabaseQueries
 		public Walker(SymbolAnalysisContext context, PXContext pxContext, DiagnosticDescriptor diagnosticDescriptor)
 			: base(pxContext, context.CancellationToken)
 		{
-			diagnosticDescriptor.ThrowOnNull(nameof(diagnosticDescriptor));
+			diagnosticDescriptor.ThrowOnNull();
 
 			_context = context;
 			_diagnosticDescriptor = diagnosticDescriptor;
@@ -38,7 +41,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DatabaseQueries
 				.Concat(PxContext.AttributeTypes.PXSelectorAttribute.Select)
 				.Concat(PxContext.AttributeTypes.PXSelectorAttribute.GetItem)
 				.Concat(PxContext.PXView.Select)
-				.ToImmutableHashSet();
+				.ToImmutableHashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
 		}
 
 		public override void VisitInvocationExpression(InvocationExpressionSyntax node)

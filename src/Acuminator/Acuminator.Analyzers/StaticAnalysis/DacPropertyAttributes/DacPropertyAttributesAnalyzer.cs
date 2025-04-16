@@ -1,22 +1,19 @@
-﻿#nullable enable
-
+﻿
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis.Dac;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.Roslyn.PXFieldAttributes;
+using Acuminator.Utilities.Roslyn.PXFieldAttributes.Enum;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.DacPropertyAttributes
@@ -46,7 +43,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacPropertyAttributes
 		private static void CheckDacProperty(DacPropertyInfo property, SymbolAnalysisContext symbolContext, PXContext pxContext)
 		{
 			symbolContext.CancellationToken.ThrowIfCancellationRequested();
-			ImmutableArray<AttributeInfo> attributes = property.Attributes;
+			ImmutableArray<DacFieldAttributeInfo> attributes = property.Attributes;
 
 			if (attributes.IsDefaultOrEmpty)
 				return;
@@ -64,11 +61,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacPropertyAttributes
 				return;
 
 			CheckForCalcedOnDbSideAndUnboundTypeAttributes(symbolContext, pxContext, property, attributesWithFieldTypeMetadata);
-			CheckForFieldTypeAttributes(property, symbolContext, pxContext, attributesWithFieldTypeMetadata);
+			CheckDacFieldDataTypeAttributes(property, symbolContext, pxContext, attributesWithFieldTypeMetadata);
 		}
 	
 		private static bool CheckForMultipleAttributesCalcedOnDbSide(SymbolAnalysisContext symbolContext, PXContext pxContext,
-																	 DacPropertyInfo property, List<AttributeInfo> attributesWithFieldTypeMetadata)
+																	 DacPropertyInfo property, List<DacFieldAttributeInfo> attributesWithFieldTypeMetadata)
 		{
 			symbolContext.CancellationToken.ThrowIfCancellationRequested();
 
@@ -100,10 +97,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacPropertyAttributes
 			return false;
 
 			//-----------------------------------------------Local Functions---------------------------------------
-			(List<AttributeInfo>?, List<AttributeInfo>?) FilterAttributeInfosCalcedOnDbSide()
+			(List<DacFieldAttributeInfo>?, List<DacFieldAttributeInfo>?) FilterAttributeInfosCalcedOnDbSide()
 			{
-				List<AttributeInfo>? attributesCalcedOnDbSideOnDacProperty = null;
-				List<AttributeInfo>? attributesCalcedOnDbSideInvalidAggregatorDeclarations = null;
+				List<DacFieldAttributeInfo>? attributesCalcedOnDbSideOnDacProperty = null;
+				List<DacFieldAttributeInfo>? attributesCalcedOnDbSideInvalidAggregatorDeclarations = null;
 
 				foreach (var attribute in attributesWithFieldTypeMetadata)
 				{
@@ -120,13 +117,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacPropertyAttributes
 
 					if (counterOfCalcedOnDbSideAttributeInfos > 0)
 					{
-						attributesCalcedOnDbSideOnDacProperty ??= new List<AttributeInfo>(capacity: 2);
+						attributesCalcedOnDbSideOnDacProperty ??= new List<DacFieldAttributeInfo>(capacity: 2);
 						attributesCalcedOnDbSideOnDacProperty.Add(attribute);
 					}
 
 					if (counterOfCalcedOnDbSideAttributeInfos > 1)
 					{
-						attributesCalcedOnDbSideInvalidAggregatorDeclarations ??= new List<AttributeInfo>(capacity: 2);
+						attributesCalcedOnDbSideInvalidAggregatorDeclarations ??= new List<DacFieldAttributeInfo>(capacity: 2);
 						attributesCalcedOnDbSideInvalidAggregatorDeclarations.Add(attribute);
 					}
 				}
@@ -136,7 +133,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacPropertyAttributes
 		}
 
 		private static void CheckForCalcedOnDbSideAndUnboundTypeAttributes(SymbolAnalysisContext symbolContext, PXContext pxContext,
-																		   DacPropertyInfo property, List<AttributeInfo> attributesWithFieldTypeMetadata)
+																		   DacPropertyInfo property, List<DacFieldAttributeInfo> attributesWithFieldTypeMetadata)
 		{
 			symbolContext.CancellationToken.ThrowIfCancellationRequested();
 
@@ -162,8 +159,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacPropertyAttributes
 				}
 			}
 
+			// Node not null here because aggregated DAC analysers by default run only on DACs in source 
+			// and these properties are declared in the DAC type itself
 			if (hasUnboundTypeAttribute || (!hasPXDBCalcedAttribute && !hasPXDBScalarAttribute) ||
-				property.Node.Identifier.GetLocation() is not Location location)
+				property.Node!.Identifier.GetLocation().NullIfLocationKindIsNone() is not Location location)
 			{
 				return;
 			}
@@ -181,104 +180,61 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacPropertyAttributes
 			}
 		}
 
-		private static void CheckForFieldTypeAttributes(DacPropertyInfo property, SymbolAnalysisContext symbolContext, PXContext pxContext,
-														List<AttributeInfo> attributesWithFieldTypeMetadata)
+		private static void CheckDacFieldDataTypeAttributes(DacPropertyInfo property, SymbolAnalysisContext symbolContext, PXContext pxContext,
+															List<DacFieldAttributeInfo> attributesWithFieldTypeMetadata)
 		{
-			if (property.EffectiveDbBoundness == DbBoundnessType.NotDefined)
-				return;
-
-			var (typeAttributesOnDacProperty, typeAttributesWithDifferentDataTypesOnAggregator, hasNonNullDataType) = 
-				FilterTypeAttributes(attributesWithFieldTypeMetadata);
-
-			if (typeAttributesOnDacProperty.IsNullOrEmpty() || !hasNonNullDataType)
-				return;
-
-			if (typeAttributesWithDifferentDataTypesOnAggregator?.Count > 0)
+			if (property.EffectiveDbBoundness == DbBoundnessType.NotDefined ||
+				property.DeclaredDataTypeAttributes.AllDeclaredDatatypeAttributesOnDacProperty.IsDefaultOrEmpty || !property.HasNonNullDataType)
 			{
-				RegisterDiagnosticForAttributes(symbolContext, pxContext, typeAttributesWithDifferentDataTypesOnAggregator,
+				return;
+			}
+
+			var dataTypeAttributesWithDifferentDataTypesOnAggregator = 
+				property.DeclaredDataTypeAttributes.DeclaredDataTypeAttributesWithMultipleAggregatedDataTypes;
+
+			if (!dataTypeAttributesWithDifferentDataTypesOnAggregator.IsDefaultOrEmpty)
+			{
+				RegisterDiagnosticForAttributes(symbolContext, pxContext, dataTypeAttributesWithDifferentDataTypesOnAggregator,
 												Descriptors.PX1023_MultipleTypeAttributesOnAggregators);
 			}
 
-			if (typeAttributesOnDacProperty.Count > 1)					
+			if (property.DeclaredDataTypeAttributes.AllDeclaredDatatypeAttributesOnDacProperty.Length > 1)
 			{
-				RegisterDiagnosticForAttributes(symbolContext, pxContext, typeAttributesOnDacProperty,
+				RegisterDiagnosticForAttributes(symbolContext, pxContext, 
+												property.DeclaredDataTypeAttributes.AllDeclaredDatatypeAttributesOnDacProperty,
 												Descriptors.PX1023_MultipleTypeAttributesOnProperty);
 			} 
-			else if (typeAttributesWithDifferentDataTypesOnAggregator?.Count is null or 0)
-			{
-				AttributeInfo dataTypeAttribute = typeAttributesOnDacProperty[0];
-				var dataTypeFromAttribute = dataTypeAttribute.AggregatedAttributeMetadata
-															 .Where(atrMetadata => atrMetadata.IsFieldAttribute && atrMetadata.DataType != null)
-															 .Select(atrMetadata => atrMetadata.DataType)
-															 .Distinct()
-															 .FirstOrDefault();
-		
-				CheckAttributeAndPropertyTypesForCompatibility(property, dataTypeAttribute, dataTypeFromAttribute, pxContext, symbolContext);
+			else if (dataTypeAttributesWithDifferentDataTypesOnAggregator.IsDefaultOrEmpty)
+			{		
+				CheckDataTypeAttributeAndPropertyTypeForCompatibility(property, pxContext, symbolContext);
 			}			
 		}
 
-		private static (List<AttributeInfo>?, List<AttributeInfo>?, bool HasNonNullDataType) FilterTypeAttributes(
-																								List<AttributeInfo> attributesWithFieldTypeMetadata)
+		private static void CheckDataTypeAttributeAndPropertyTypeForCompatibility(DacPropertyInfo property, PXContext pxContext, 
+																				 SymbolAnalysisContext symbolContext)
 		{
-			List<AttributeInfo>? typeAttributesOnDacProperty = null;
-			List<AttributeInfo>? typeAttributesWithDifferentDataTypesOnAggregator = null;
-			bool hasNonNullDataType = false;
+			var dataTypeAttribute = property.DeclaredDataTypeAttributes.AllDeclaredDatatypeAttributesOnDacProperty[0];
 
-			foreach (var attribute in attributesWithFieldTypeMetadata)
+			switch (property.EffectivePropertyAndDataTypeAttributeTypesCompatibility)
 			{
-				var dataTypeAttributes = attribute.AggregatedAttributeMetadata
-												  .Where(atrMetadata => atrMetadata.IsFieldAttribute)
-												  .ToList();
-				if (dataTypeAttributes.Count == 0)
-					continue;
-
-				typeAttributesOnDacProperty ??= new List<AttributeInfo>(capacity: 2);
-				typeAttributesOnDacProperty.Add(attribute);
-
-				if (dataTypeAttributes.Count == 1)
-				{
-					hasNonNullDataType = hasNonNullDataType || dataTypeAttributes[0].DataType != null;
-					continue;
-				}
-
-				int countOfDeclaredNonNullDataTypes = dataTypeAttributes.Where(atrMetadata => atrMetadata.DataType != null)
-																		.Select(atrMetadata => atrMetadata.DataType)
-																		.Distinct()
-																		.Count();
-				hasNonNullDataType = hasNonNullDataType || countOfDeclaredNonNullDataTypes > 0;
-
-				if (countOfDeclaredNonNullDataTypes > 1)
-				{
-					typeAttributesWithDifferentDataTypesOnAggregator ??= new List<AttributeInfo>(capacity: 2);
-					typeAttributesWithDifferentDataTypesOnAggregator.Add(attribute);
-				}
-			}
-
-			return (typeAttributesOnDacProperty, typeAttributesWithDifferentDataTypesOnAggregator, hasNonNullDataType);
-		}
-
-		private static void CheckAttributeAndPropertyTypesForCompatibility(DacPropertyInfo property, AttributeInfo dataTypeAttribute, 
-																		   ITypeSymbol? dataTypeFromAttribute, PXContext pxContext, 
-																		   SymbolAnalysisContext symbolContext)
-		{
-			if (dataTypeFromAttribute == null)             //PXDBFieldAttribute and PXEntityAttribute without data type case
-			{
-				ReportIncompatibleTypesDiagnostics(property, dataTypeAttribute, symbolContext, pxContext, registerCodeFix: false);
-				return;
-			}
-
-			if (!dataTypeFromAttribute.Equals(property.EffectivePropertyType))
-			{
-				ReportIncompatibleTypesDiagnostics(property, dataTypeAttribute, symbolContext, pxContext, registerCodeFix: true);
+				case CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.NoDataTypeAttributes:
+					ReportIncompatibleTypesDiagnostics(property, dataTypeAttribute, symbolContext, pxContext, registerCodeFix: false);
+					return;
+				case CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes.IncompatibleTypes:
+					ReportIncompatibleTypesDiagnostics(property, dataTypeAttribute, symbolContext, pxContext, registerCodeFix: true);
+					return;
 			}
 		}
 
-		private static void ReportIncompatibleTypesDiagnostics(DacPropertyInfo property, AttributeInfo fieldAttribute,
+		private static void ReportIncompatibleTypesDiagnostics(DacPropertyInfo property, DacFieldAttributeInfo fieldAttribute,
 															   SymbolAnalysisContext symbolContext, PXContext pxContext, bool registerCodeFix)
 		{
-			var diagnosticProperties = ImmutableDictionary.Create<string, string>()
+			var diagnosticProperties = ImmutableDictionary.Create<string, string?>()
 														  .Add(DiagnosticProperty.RegisterCodeFix, registerCodeFix.ToString());
-			Location? propertyTypeLocation = property.Node.Type.GetLocation();
+
+			// Node not null here because aggregated DAC analysers by default run only on DACs in source 
+			// and these properties are declared in the DAC type itself
+			Location? propertyTypeLocation = property.Node!.Type.GetLocation();
 			Location? attributeLocation = fieldAttribute.AttributeData.GetLocation(symbolContext.CancellationToken);
 
 			if (propertyTypeLocation != null)
@@ -299,15 +255,30 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacPropertyAttributes
 		}
 
 		private static void RegisterDiagnosticForAttributes(SymbolAnalysisContext symbolContext, PXContext pxContext,
-															IEnumerable<AttributeInfo> attributesToReport, DiagnosticDescriptor diagnosticDescriptor)
+															IEnumerable<DacFieldAttributeInfo> attributesToReport, DiagnosticDescriptor diagnosticDescriptor) =>
+			RegisterDiagnosticForAttributes(symbolContext, pxContext,
+											attributesToReport.Select(a => a.AttributeData.GetLocation(symbolContext.CancellationToken)
+																						  .NullIfLocationKindIsNone()),
+											diagnosticDescriptor);
+
+		// Second oveload to prevent the boxing of immutable array
+		private static void RegisterDiagnosticForAttributes(SymbolAnalysisContext symbolContext, PXContext pxContext,
+															ImmutableArray<DacFieldAttributeInfo> attributesToReport, DiagnosticDescriptor diagnosticDescriptor) =>
+			RegisterDiagnosticForAttributes(symbolContext, pxContext, 
+											attributesToReport.Select(a => a.AttributeData.GetLocation(symbolContext.CancellationToken)
+																						  .NullIfLocationKindIsNone()), 
+											diagnosticDescriptor);
+		
+
+		private static void RegisterDiagnosticForAttributes(SymbolAnalysisContext symbolContext, PXContext pxContext,
+															IEnumerable<Location?> attributeLocations, DiagnosticDescriptor diagnosticDescriptor)
 		{
-			Location[] attributeLocations = attributesToReport.Select(a => a.AttributeData.GetLocation(symbolContext.CancellationToken))
-															  .Where(location => location != null)
-															  .ToArray()!;
-			foreach (Location location in attributeLocations)
+			IEnumerable<Location> attributeLocationsToReport = attributeLocations.Where(location => location != null)!;
+
+			foreach (Location location in attributeLocationsToReport)
 			{
 				symbolContext.ReportDiagnosticWithSuppressionCheck(
-					Diagnostic.Create(diagnosticDescriptor, location), 
+					Diagnostic.Create(diagnosticDescriptor, location),
 					pxContext.CodeAnalysisSettings);
 			}
 		}

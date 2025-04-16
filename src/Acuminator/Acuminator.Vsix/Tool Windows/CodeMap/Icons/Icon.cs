@@ -14,13 +14,16 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		Dac,
 		DacExtension,
 
-		DacProperty,	
-		DacKeyProperty,
+		DacField,
+		DacKeyField,
+		DacFieldProperty,
+		DacBqlField,
 
 		DacPropertiesCategory,
 		DacKeysCategory,
 
 		Category,
+		BaseTypesCategory,
 
 		GroupingDac,
 		GroupingDacField,
@@ -49,10 +52,18 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		InitializationAndActivationGraphCategory,
 		IsActiveMethodGraph,
+		ConfigureMethodGraph,
+		InitializeMethodGraph,
 		StaticGraphConstructor,
 		InstanceGraphConstructor,
 
 		InitializationAndActivationDacCategory,
-		IsActiveMethodDac
+		IsActiveMethodDac,
+
+		ProjectionDac,
+
+		Attribute,
+		AttributesGroup,
+		ProjectionAttribute
 	}
 }

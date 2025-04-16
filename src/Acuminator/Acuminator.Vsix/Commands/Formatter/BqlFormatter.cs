@@ -1,12 +1,12 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Acuminator.Analyzers;
+
+using Acuminator.Utilities.Common;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Acuminator.Utilities;
-using Acuminator.Utilities.Common;
 using Microsoft.VisualStudio.Text.Editor;
 
 using Enumerable = System.Linq.Enumerable;
@@ -43,7 +43,7 @@ namespace Acuminator.Vsix.Formatter
 
 		public static BqlFormatter FromTextView(IWpfTextView textView)
 		{
-			textView.ThrowOnNull(nameof(textView));
+			textView.ThrowOnNull();
 
 			int indentSize = textView.Options.GetOptionValue(DefaultOptions.IndentSizeOptionId);
 			int tabSize = textView.Options.GetOptionValue(DefaultOptions.TabSizeOptionId);

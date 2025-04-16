@@ -12,7 +12,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.SavingChanges
 	public class SavingChangesInEventHandlersTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new EventHandlerAnalyzer(CodeAnalysisSettings.Default
+			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 					.WithRecursiveAnalysisEnabled()
 					.WithIsvSpecificAnalyzersEnabled(),
 				new SavingChangesInEventHandlersAnalyzer());

@@ -5,8 +5,10 @@ using Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
-using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
+
 using Microsoft.CodeAnalysis.Diagnostics;
+
 using Xunit;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.ThrowingExceptions
@@ -14,7 +16,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ThrowingExceptions
 	public class ThrowingExceptionsInNonGraphEventHandlers_NonISVTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new EventHandlerAnalyzer(CodeAnalysisSettings.Default
+			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 														 .WithIsvSpecificAnalyzersDisabled()
 														 .WithRecursiveAnalysisEnabled()
 														 .WithSuppressionMechanismDisabled(),
@@ -24,6 +26,13 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ThrowingExceptions
 		[EmbeddedFileData(@"EventHandlers\NonGraph\ExceptionInRowPersisted.cs")]
 		public async Task ExceptionInRowPersisted(string actual) => await VerifyCSharpDiagnosticAsync(actual,
 			Descriptors.PX1073_ThrowingExceptionsInRowPersisted_NonISV.CreateFor(25, 6));
+
+		[Theory]
+		[EmbeddedFileData(@"EventHandlers\NonGraph\ExceptionInFieldUpdating.cs")]
+		public async Task ExceptionInFieldUpdating(string actual) => await VerifyCSharpDiagnosticAsync(actual,
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(17, 6),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(19, 6),
+			Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(21, 6));
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\NonGraph\ExceptionInValidEventHandlers.cs")]
@@ -51,6 +60,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ThrowingExceptions
 				Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(76, 4, EventType.ExceptionHandling),
 				Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(79, 4, EventType.CommandPreparing),
 				Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(82, 4, EventType.FieldSelecting),
+				Descriptors.PX1073_ThrowingExceptionsInFieldUpdating.CreateFor(85, 4, EventType.FieldUpdating),
 				Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(85, 4, EventType.FieldUpdating),
 				Descriptors.PX1074_ThrowingSetupNotEnteredExceptionInEventHandlers.CreateFor(88, 4, EventType.FieldUpdated));
 

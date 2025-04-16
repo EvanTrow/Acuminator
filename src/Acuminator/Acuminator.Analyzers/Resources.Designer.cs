@@ -142,29 +142,56 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Change the view delegate name to match the view name.
+        ///   Looks up a localized string similar to Change the name of the action delegate to match the action name.
         /// </summary>
-        public static string PX1005Fix {
+        public static string PX1005ActionDelegateFix {
             get {
-                return ResourceManager.GetString("PX1005Fix", resourceCulture);
+                return ResourceManager.GetString("PX1005ActionDelegateFix", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A possible typo in the view delegate name. The view name for this delegate: {0}..
+        ///   Looks up a localized string similar to A possible typo in the name of the action delegate. The action name for this delegate: {0}..
         /// </summary>
-        public static string PX1005MessageFormat {
+        public static string PX1005ActionDelegateMessageFormat {
             get {
-                return ResourceManager.GetString("PX1005MessageFormat", resourceCulture);
+                return ResourceManager.GetString("PX1005ActionDelegateMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A possible typo in the view delegate name.
+        ///   Looks up a localized string similar to A possible typo in the name of the action delegate.
         /// </summary>
-        public static string PX1005Title {
+        public static string PX1005ActionDelegateTitle {
             get {
-                return ResourceManager.GetString("PX1005Title", resourceCulture);
+                return ResourceManager.GetString("PX1005ActionDelegateTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Change the name fo the view delegate to match the view name.
+        /// </summary>
+        public static string PX1005ViewDelegateFix {
+            get {
+                return ResourceManager.GetString("PX1005ViewDelegateFix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A possible typo in the name of the view delegate. The view name for this delegate: {0}..
+        /// </summary>
+        public static string PX1005ViewDelegateMessageFormat {
+            get {
+                return ResourceManager.GetString("PX1005ViewDelegateMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A possible typo in the name of the view delegate.
+        /// </summary>
+        public static string PX1005ViewDelegateTitle {
+            get {
+                return ResourceManager.GetString("PX1005ViewDelegateTitle", resourceCulture);
             }
         }
         
@@ -500,6 +527,24 @@ namespace Acuminator.Analyzers {
         /// <summary>
         ///   Looks up a localized string similar to Make the DAC extension public.
         /// </summary>
+        public static string PX1022DacExtensionFix {
+            get {
+                return ResourceManager.GetString("PX1022DacExtensionFix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Non-public DAC extensions are not supported.
+        /// </summary>
+        public static string PX1022DacExtensionTitle {
+            get {
+                return ResourceManager.GetString("PX1022DacExtensionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Make DAC public.
+        /// </summary>
         public static string PX1022DacFix {
             get {
                 return ResourceManager.GetString("PX1022DacFix", resourceCulture);
@@ -507,7 +552,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Non-public DAC extensions are not supported.
+        ///   Looks up a localized string similar to Non-public DACs are not supported.
         /// </summary>
         public static string PX1022DacTitle {
             get {
@@ -518,6 +563,24 @@ namespace Acuminator.Analyzers {
         /// <summary>
         ///   Looks up a localized string similar to Make the graph extension public.
         /// </summary>
+        public static string PX1022GraphExtensionFix {
+            get {
+                return ResourceManager.GetString("PX1022GraphExtensionFix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Non-public graph extensions are not supported.
+        /// </summary>
+        public static string PX1022GraphExtensionTitle {
+            get {
+                return ResourceManager.GetString("PX1022GraphExtensionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Make the graph public.
+        /// </summary>
         public static string PX1022GraphFix {
             get {
                 return ResourceManager.GetString("PX1022GraphFix", resourceCulture);
@@ -525,7 +588,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Non-public graph extensions are not supported.
+        ///   Looks up a localized string similar to Non-public graphs are not supported.
         /// </summary>
         public static string PX1022GraphTitle {
             get {
@@ -624,7 +687,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DAC fields cannot start with the &quot;Company&quot; prefix because company masks work incorrectly with such fields.
+        ///   Looks up a localized string similar to The name of a DAC field cannot start with the &quot;Company&quot; prefix because company masks work incorrectly with such fields..
         /// </summary>
         public static string PX1027ForbiddenCompanyPrefixInDacFieldTitle {
             get {
@@ -1420,6 +1483,141 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add missing &quot;{0}&quot; BQL field to DAC.
+        /// </summary>
+        public static string PX1065FixFormat {
+            get {
+                return ResourceManager.GetString("PX1065FixFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The DAC field property &quot;{0}&quot; has Acumatica attributes declared on it but does not have a corresponding BQL field. Such properties are not supported..
+        /// </summary>
+        public static string PX1065TitleFormat {
+            get {
+                return ResourceManager.GetString("PX1065TitleFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Change the name of the BQL field to &quot;{0}&quot; to match the DAC field property name..
+        /// </summary>
+        public static string PX1066FixFormat {
+            get {
+                return ResourceManager.GetString("PX1066FixFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A possible typo in the BQL field name. The DAC field property name for this BQL field: {0}..
+        /// </summary>
+        public static string PX1066TitleFormat {
+            get {
+                return ResourceManager.GetString("PX1066TitleFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Redeclare the {0} BQL fields in the &quot;{1}&quot; DAC.
+        /// </summary>
+        public static string PX1067From_2_To_5_FieldsFixFormat {
+            get {
+                return ResourceManager.GetString("PX1067From_2_To_5_FieldsFixFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BQL fields from the base DAC should be redeclared in the derived DAC. The &quot;{0}&quot; DAC does not contain a redeclaration of {1} BQL fields..
+        /// </summary>
+        public static string PX1067From_2_To_5_FieldsTitleFormat {
+            get {
+                return ResourceManager.GetString("PX1067From_2_To_5_FieldsTitleFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to fields.
+        /// </summary>
+        public static string PX1067MoreThan5Fields_RemainderMultipleFields {
+            get {
+                return ResourceManager.GetString("PX1067MoreThan5Fields_RemainderMultipleFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to field.
+        /// </summary>
+        public static string PX1067MoreThan5Fields_RemainderSingleField {
+            get {
+                return ResourceManager.GetString("PX1067MoreThan5Fields_RemainderSingleField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Redeclare the {0} and {1} more BQL {2} in the &quot;{3}&quot; DAC.
+        /// </summary>
+        public static string PX1067MoreThan5FieldsFixFormat {
+            get {
+                return ResourceManager.GetString("PX1067MoreThan5FieldsFixFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BQL fields from the base DAC should be redeclared in the derived DAC. The &quot;{0}&quot; DAC does not contain a redeclaration of {1} and {2} more BQL {3}..
+        /// </summary>
+        public static string PX1067MoreThan5FieldsTitleFormat {
+            get {
+                return ResourceManager.GetString("PX1067MoreThan5FieldsTitleFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Redeclare the &quot;{0}&quot; BQL field in the &quot;{1}&quot; DAC.
+        /// </summary>
+        public static string PX1067SingleFieldFixFormat {
+            get {
+                return ResourceManager.GetString("PX1067SingleFieldFixFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BQL fields from the base DAC should be redeclared in the derived DAC. The &quot;{0}&quot; DAC does not contain a redeclaration of the &quot;{1}&quot; BQL field declared in the &quot;{2}&quot; base DAC..
+        /// </summary>
+        public static string PX1067SingleFieldTitleFormat {
+            get {
+                return ResourceManager.GetString("PX1067SingleFieldTitleFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Change the type of the BQL field so that it corresponds to the property type.
+        /// </summary>
+        public static string PX1068FixBqlType {
+            get {
+                return ResourceManager.GetString("PX1068FixBqlType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Change the property type so that it corresponds to the type of the BQL field.
+        /// </summary>
+        public static string PX1068FixPropertyType {
+            get {
+                return ResourceManager.GetString("PX1068FixPropertyType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type of the DAC field property does not correspond to the type of the BQL field.
+        /// </summary>
+        public static string PX1068Title {
+            get {
+                return ResourceManager.GetString("PX1068Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The state of fields and actions can be configured only in the RowSelected event handler.
         /// </summary>
         public static string PX1070Title {
@@ -1465,11 +1663,20 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Exceptions cannot be thrown in the FieldUpdating event handler.
+        /// </summary>
+        public static string PX1073TitleFieldUpdating {
+            get {
+                return ResourceManager.GetString("PX1073TitleFieldUpdating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Exceptions cannot be thrown in the RowPersisted event handler.
         /// </summary>
-        public static string PX1073Title {
+        public static string PX1073TitleRowPersisted {
             get {
-                return ResourceManager.GetString("PX1073Title", resourceCulture);
+                return ResourceManager.GetString("PX1073TitleRowPersisted", resourceCulture);
             }
         }
         
@@ -1515,6 +1722,87 @@ namespace Acuminator.Analyzers {
         public static string PX1076Title {
             get {
                 return ResourceManager.GetString("PX1076Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Change the accessibility modifier to {0}.
+        /// </summary>
+        public static string PX1077Fix {
+            get {
+                return ResourceManager.GetString("PX1077Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Event handlers should be protected and virtual.
+        /// </summary>
+        public static string PX1077Title {
+            get {
+                return ResourceManager.GetString("PX1077Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Event handlers should not be private.
+        /// </summary>
+        public static string PX1077Title_EventHandlersShouldNotBePrivate {
+            get {
+                return ResourceManager.GetString("PX1077Title_EventHandlersShouldNotBePrivate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Event handlers should not be explicit interface implementations.
+        /// </summary>
+        public static string PX1077Title_ExplicitInterfaceImplementation {
+            get {
+                return ResourceManager.GetString("PX1077Title_ExplicitInterfaceImplementation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Event handlers should be {0}.
+        /// </summary>
+        public static string PX1077TitleFormatWithReason {
+            get {
+                return ResourceManager.GetString("PX1077TitleFormatWithReason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC field and the &quot;{1}&quot; referenced field have different sizes specified in the data type attribute. The expected size of the DAC field is {2}..
+        /// </summary>
+        public static string PX1078MessageFormat_TypesOfDacFieldAndReferencedFieldHaveDifferentSize {
+            get {
+                return ResourceManager.GetString("PX1078MessageFormat_TypesOfDacFieldAndReferencedFieldHaveDifferentSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC field and the &quot;{1}&quot; referenced field have different types. The expected type for the DAC field is {2}..
+        /// </summary>
+        public static string PX1078MessageFormat_TypesOfDacFieldAndReferencedFieldMismatch {
+            get {
+                return ResourceManager.GetString("PX1078MessageFormat_TypesOfDacFieldAndReferencedFieldMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DAC field and referenced field have different sizes.
+        /// </summary>
+        public static string PX1078Title_TypesOfDacFieldAndReferencedFieldHaveDifferentSize {
+            get {
+                return ResourceManager.GetString("PX1078Title_TypesOfDacFieldAndReferencedFieldHaveDifferentSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DAC field and referenced field have different types.
+        /// </summary>
+        public static string PX1078Title_TypesOfDacFieldAndReferencedFieldMismatch {
+            get {
+                return ResourceManager.GetString("PX1078Title_TypesOfDacFieldAndReferencedFieldMismatch", resourceCulture);
             }
         }
         
@@ -1722,6 +2010,88 @@ namespace Acuminator.Analyzers {
         public static string PX1096Title {
             get {
                 return ResourceManager.GetString("PX1096Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The forbidden API is used.
+        /// </summary>
+        public static string PX1099Title {
+            get {
+                return ResourceManager.GetString("PX1099Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to event.
+        /// </summary>
+        public static string PX1099Title_EventFormatArg {
+            get {
+                return ResourceManager.GetString("PX1099Title_EventFormatArg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to field.
+        /// </summary>
+        public static string PX1099Title_FieldFormatArg {
+            get {
+                return ResourceManager.GetString("PX1099Title_FieldFormatArg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to method.
+        /// </summary>
+        public static string PX1099Title_MethodFormatArg {
+            get {
+                return ResourceManager.GetString("PX1099Title_MethodFormatArg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace.
+        /// </summary>
+        public static string PX1099Title_NamespaceFormatArg {
+            get {
+                return ResourceManager.GetString("PX1099Title_NamespaceFormatArg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to property.
+        /// </summary>
+        public static string PX1099Title_PropertyFormatArg {
+            get {
+                return ResourceManager.GetString("PX1099Title_PropertyFormatArg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to type.
+        /// </summary>
+        public static string PX1099Title_TypeFormatArg {
+            get {
+                return ResourceManager.GetString("PX1099Title_TypeFormatArg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The forbidden {0} &quot;{1}&quot; is used.
+        /// </summary>
+        public static string PX1099TitleFormat {
+            get {
+                return ResourceManager.GetString("PX1099TitleFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The forbidden {0} &quot;{1}&quot; is used.
+        ///Reason: {2}.
+        /// </summary>
+        public static string PX1099TitleFormatWithReason {
+            get {
+                return ResourceManager.GetString("PX1099TitleFormatWithReason", resourceCulture);
             }
         }
         

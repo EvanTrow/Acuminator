@@ -31,14 +31,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public ProcessingDelegatesWalker(PXContext pxContext, ImmutableHashSet<ISymbol> processingViewSymbols, CancellationToken cancellation)
 			: base(pxContext, cancellation)
 		{
-			_processingViewSymbols = processingViewSymbols.CheckIfNull(nameof(processingViewSymbols));
+			_processingViewSymbols = processingViewSymbols.CheckIfNull();
 		}
 
 		public override void VisitInvocationExpression(InvocationExpressionSyntax node)
 		{
 			ThrowIfCancellationRequested();
 
-			if (node.ArgumentList == null || !(node.Expression is MemberAccessExpressionSyntax memberAccess))
+			if (node.ArgumentList == null || node.Expression is not MemberAccessExpressionSyntax memberAccess)
 			{
 				return;
 			}
@@ -63,7 +63,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				return;
 			}
 
-			var isSetParametersDelegate = PxContext.PXProcessingBase.SetParametersDelegate.Equals(methodSymbol.OriginalDefinition);
+			var isSetParametersDelegate = 
+				PxContext.PXProcessingBase.SetParametersDelegate.Equals(methodSymbol.OriginalDefinition, SymbolEqualityComparer.Default);
 
 			if (isSetParametersDelegate)
 			{
@@ -71,7 +72,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			}
 			else
 			{
-				var isSetProcessDelegate = PxContext.PXProcessingBase.SetProcessDelegate.Contains(methodSymbol.OriginalDefinition);
+				var isSetProcessDelegate = 
+					PxContext.PXProcessingBase.SetProcessDelegate.Contains<IMethodSymbol>(methodSymbol.OriginalDefinition, SymbolEqualityComparer.Default);
 
 				if (isSetProcessDelegate)
 				{

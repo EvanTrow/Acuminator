@@ -1,6 +1,9 @@
-﻿using Acuminator.Utilities.Common;
+﻿using System.Diagnostics.CodeAnalysis;
+
+using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.Semantic;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -14,28 +17,28 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 		/// </summary>
 		private class EventArgsRowWalker : CSharpSyntaxWalker
 		{
-			private static readonly string RowPropertyName = "Row";
+			private const string RowPropertyName = "Row";
 
 			private readonly SemanticModel _semanticModel;
 			private readonly PXContext _pxContext;
 
-			public bool Success { get; private set; }
+			[MemberNotNullWhen(returnValue: true, nameof(FoundRowProperty))]
+			public bool Success => FoundRowProperty != null;
+
+			public IPropertySymbol? FoundRowProperty { get; private set; }
 
 			public EventArgsRowWalker(SemanticModel semanticModel, PXContext pxContext)
 			{
-				semanticModel.ThrowOnNull(nameof (semanticModel));
-				pxContext.ThrowOnNull(nameof (pxContext));
-
-				_semanticModel = semanticModel;
-				_pxContext = pxContext;
+				_semanticModel = semanticModel.CheckIfNull();
+				_pxContext = pxContext.CheckIfNull();
 			}
 
 			public void Reset()
 			{
-				Success = false;
+				FoundRowProperty = null;
 			}
 
-			public override void Visit(SyntaxNode node)
+			public override void Visit(SyntaxNode? node)
 			{
 				if (!Success)
 					base.Visit(node);
@@ -48,9 +51,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.RowChangesInEventHandlers
 					var propertySymbol = _semanticModel.GetSymbolInfo(node).Symbol as IPropertySymbol;
 					var containingType = propertySymbol?.ContainingType?.OriginalDefinition;
 
-					if (containingType != null && _pxContext.Events.EventTypeMap.ContainsKey(containingType))
+					if (containingType != null && _pxContext.Events.EventArgTypeToEventTypeMap.ContainsKey(containingType))
 					{
-						Success = true;
+						FoundRowProperty = propertySymbol;
 					}
 				}
 			}

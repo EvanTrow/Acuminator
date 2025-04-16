@@ -49,8 +49,8 @@ namespace Acuminator.Tests.Tests.Utilities.AttributeSymbolHelpersTests
 		{
 			Document document = CreateDocument(source);
 			var (semanticModel, syntaxRoot) = await document.GetSemanticModelAndRootAsync().ConfigureAwait(false);
-			semanticModel.ThrowOnNull(nameof(semanticModel));
-			syntaxRoot.ThrowOnNull(nameof(syntaxRoot));
+			semanticModel.ThrowOnNull();
+			syntaxRoot.ThrowOnNull();
 
 			List<bool> actual = new List<bool>(capacity: expected.Count);
 			var pxContext = new PXContext(semanticModel.Compilation, CodeAnalysisSettings.Default);
@@ -60,10 +60,11 @@ namespace Acuminator.Tests.Tests.Utilities.AttributeSymbolHelpersTests
 			foreach (var property in properties)
 			{
 				var typeSymbol = semanticModel.GetDeclaredSymbol(property);
-				var attributes = typeSymbol.GetAttributes();
+				var attributes = typeSymbol?.GetAttributes() ?? ImmutableArray<AttributeData>.Empty;
 
 				foreach (var attribute in attributes)
 				{
+					attribute.AttributeClass.ThrowOnNull();
 					actual.Add(attribute.AttributeClass.IsDerivedFromOrAggregatesAttribute(pxdefaultAttribute, pxContext));
 				}
 			}
@@ -102,8 +103,8 @@ namespace Acuminator.Tests.Tests.Utilities.AttributeSymbolHelpersTests
 		{
 			Document document = CreateDocument(source);
 			var (semanticModel, syntaxRoot) = await document.GetSemanticModelAndRootAsync().ConfigureAwait(false);
-			semanticModel.ThrowOnNull(nameof(semanticModel));
-			syntaxRoot.ThrowOnNull(nameof(syntaxRoot));
+			semanticModel.ThrowOnNull();
+			syntaxRoot.ThrowOnNull();
 
 			var actual = new List<DbBoundnessType>(capacity: expected.Count);
 			var pxContext = new PXContext(semanticModel.Compilation, CodeAnalysisSettings.Default);
@@ -112,7 +113,7 @@ namespace Acuminator.Tests.Tests.Utilities.AttributeSymbolHelpersTests
 
 			foreach (var type in types)
 			{
-				INamedTypeSymbol typeSymbol = semanticModel.GetDeclaredSymbol(type).CheckIfNull(nameof(typeSymbol));
+				INamedTypeSymbol typeSymbol = semanticModel.GetDeclaredSymbol(type).CheckIfNull();
 
 				if (!typeSymbol.IsDacOrExtension(pxContext))
 					continue;
@@ -122,6 +123,10 @@ namespace Acuminator.Tests.Tests.Utilities.AttributeSymbolHelpersTests
 				foreach (var property in properties)
 				{
 					var propertySymbol = semanticModel.GetDeclaredSymbol(property);
+
+					if (propertySymbol == null)
+						continue;
+
 					var attributes = propertySymbol.GetAttributes();
 
 					foreach (var attribute in attributes)
@@ -163,8 +168,8 @@ namespace Acuminator.Tests.Tests.Utilities.AttributeSymbolHelpersTests
 		{
 			Document document = CreateDocument(source, externalCode: code);
 			var (semanticModel, syntaxRoot)  = await document.GetSemanticModelAndRootAsync().ConfigureAwait(false);
-			semanticModel.ThrowOnNull(nameof(semanticModel));
-			syntaxRoot.ThrowOnNull(nameof(syntaxRoot));
+			semanticModel.ThrowOnNull();
+			syntaxRoot.ThrowOnNull();
 
 			List<bool> actual = new List<bool>(capacity: expected.Capacity);
 			var pxContext = new PXContext(semanticModel.Compilation, CodeAnalysisSettings.Default);
@@ -349,8 +354,8 @@ namespace Acuminator.Tests.Tests.Utilities.AttributeSymbolHelpersTests
 		{
 			Document document = CreateDocument(source);
 			var (semanticModel, syntaxRoot) = await document.GetSemanticModelAndRootAsync().ConfigureAwait(false);
-			semanticModel.ThrowOnNull(nameof(semanticModel));
-			syntaxRoot.ThrowOnNull(nameof(syntaxRoot));
+			semanticModel.ThrowOnNull();
+			syntaxRoot.ThrowOnNull();
 
 			var expectedSymbols = ConvertSymbolNamesToTypeSymbols(expectedFlattenedSets, semanticModel);
 			var actualResult = new List<List<ITypeSymbol>>(expectedSymbols.Count);
@@ -360,7 +365,7 @@ namespace Acuminator.Tests.Tests.Utilities.AttributeSymbolHelpersTests
 
 			foreach (var type in types)
 			{
-				INamedTypeSymbol typeSymbol = semanticModel.GetDeclaredSymbol(type).CheckIfNull(nameof(typeSymbol));
+				INamedTypeSymbol typeSymbol = semanticModel.GetDeclaredSymbol(type).CheckIfNull();
 
 				if (!typeSymbol.IsDacOrExtension(pxContext))
 					continue;
@@ -395,10 +400,10 @@ namespace Acuminator.Tests.Tests.Utilities.AttributeSymbolHelpersTests
 								   .ToList(capacity: expectedSymbolNamesSets.Length);
 
 		private List<ITypeSymbol> GetTypeSymbolsFromNames(SemanticModel semanticModel, IEnumerable<string> symbolNames) =>
-			symbolNames.Select(symbolName => semanticModel.Compilation.GetTypeByMetadataName(symbolName))
+			symbolNames.Select(symbolName => semanticModel.Compilation.GetTypeByMetadataName(symbolName)!)
 					   .Where(typeSymbol => typeSymbol != null)
-					   .Distinct()
-					   .OrderBy(typeSymbol => typeSymbol.ToString())	
+					   .Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default)
+					   .OrderBy(typeSymbol => typeSymbol.ToString())
 					   .ToList<ITypeSymbol>();
 	}
 }

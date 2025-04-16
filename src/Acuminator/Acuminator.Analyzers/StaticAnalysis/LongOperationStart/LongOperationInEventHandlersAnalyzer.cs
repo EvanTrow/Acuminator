@@ -1,21 +1,23 @@
-﻿using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
-using Acuminator.Utilities.Roslyn;
+﻿
+using System.Collections.Immutable;
+
+using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
+using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Syntax;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
-using System.Collections.Immutable;
-using Acuminator.Utilities;
-using Acuminator.Utilities.Roslyn.Semantic;
 
 namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 {
-    public class LongOperationInEventHandlersAnalyzer : EventHandlerAggregatedAnalyzerBase
+    public class LongOperationInEventHandlersAnalyzer : LooseEventHandlerAggregatedAnalyzerBase
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => 
 			ImmutableArray.Create(Descriptors.PX1046_LongOperationInEventHandlers);
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventType eventType)
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 

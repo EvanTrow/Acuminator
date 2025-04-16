@@ -106,11 +106,20 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to TypoInActionDelegateName.
+        /// </summary>
+        public static string PX1005ActionDelegate {
+            get {
+                return ResourceManager.GetString("PX1005ActionDelegate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to TypoInViewDelegateName.
         /// </summary>
-        public static string PX1005 {
+        public static string PX1005ViewDelegate {
             get {
-                return ResourceManager.GetString("PX1005", resourceCulture);
+                return ResourceManager.GetString("PX1005ViewDelegate", resourceCulture);
             }
         }
         
@@ -259,7 +268,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NonPublicDacExtension.
+        ///   Looks up a localized string similar to NonPublicDac.
         /// </summary>
         public static string PX1022Dac {
             get {
@@ -268,11 +277,29 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NonPublicGraphExtension.
+        ///   Looks up a localized string similar to NonPublicDacExtension.
+        /// </summary>
+        public static string PX1022DacExtension {
+            get {
+                return ResourceManager.GetString("PX1022DacExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NonPublicGraph.
         /// </summary>
         public static string PX1022Graph {
             get {
                 return ResourceManager.GetString("PX1022Graph", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NonPublicGraphExtension.
+        /// </summary>
+        public static string PX1022GraphExtension {
+            get {
+                return ResourceManager.GetString("PX1022GraphExtension", resourceCulture);
             }
         }
         
@@ -673,6 +700,42 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NoBqlFieldForDacFieldProperty.
+        /// </summary>
+        public static string PX1065 {
+            get {
+                return ResourceManager.GetString("PX1065", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TypoInBqlFieldName.
+        /// </summary>
+        public static string PX1066 {
+            get {
+                return ResourceManager.GetString("PX1066", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MissingBqlFieldRedeclarationInDerivedDac.
+        /// </summary>
+        public static string PX1067 {
+            get {
+                return ResourceManager.GetString("PX1067", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PropertyAndBqlFieldTypesMismatch.
+        /// </summary>
+        public static string PX1068 {
+            get {
+                return ResourceManager.GetString("PX1068", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to UiPresentationLogicInEventHandlers.
         /// </summary>
         public static string PX1070 {
@@ -700,11 +763,20 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ExceptionsInFieldUpdating.
+        /// </summary>
+        public static string PX1073FieldUpdating {
+            get {
+                return ResourceManager.GetString("PX1073FieldUpdating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ExceptionsInRowPersisted.
         /// </summary>
-        public static string PX1073 {
+        public static string PX1073RowPersisted {
             get {
-                return ResourceManager.GetString("PX1073", resourceCulture);
+                return ResourceManager.GetString("PX1073RowPersisted", resourceCulture);
             }
         }
         
@@ -732,6 +804,33 @@ namespace Acuminator.Analyzers {
         public static string PX1076 {
             get {
                 return ResourceManager.GetString("PX1076", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EventHandlersShouldBeProtectedVirtual.
+        /// </summary>
+        public static string PX1077 {
+            get {
+                return ResourceManager.GetString("PX1077", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TypesOfDacFieldAndReferencedFieldMismatch.
+        /// </summary>
+        public static string PX1078_DifferentType {
+            get {
+                return ResourceManager.GetString("PX1078_DifferentType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TypesOfDacFieldAndReferencedFieldHaveDifferentSize.
+        /// </summary>
+        public static string PX1078_DifferentTypeSize {
+            get {
+                return ResourceManager.GetString("PX1078_DifferentTypeSize", resourceCulture);
             }
         }
         
@@ -894,6 +993,15 @@ namespace Acuminator.Analyzers {
         public static string PX1096 {
             get {
                 return ResourceManager.GetString("PX1096", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UsageOfForbiddenApi.
+        /// </summary>
+        public static string PX1099 {
+            get {
+                return ResourceManager.GetString("PX1099", resourceCulture);
             }
         }
     }

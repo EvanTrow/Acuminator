@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -14,7 +13,7 @@ using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.Semantic;
-using Acuminator.Utilities.Roslyn.Semantic.Symbols;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -105,9 +104,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 				return Task.FromResult(document);
 
 			// Get a corresponding generic event args symbol
-			var genericEventInfoKey = new EventInfo(eventType, EventHandlerSignatureType.Generic);
+			var genericEventHandlerInfoKey = new EventHandlerLooseInfo(eventType, EventHandlerSignatureType.Generic);
 
-			if (!pxContext.Events.EventHandlerSignatureTypeMap.TryGetValue(genericEventInfoKey, out INamedTypeSymbol genericArgsSymbol))
+			if (!pxContext.Events.EventHandlerSignatureTypeMap.TryGetValue(genericEventHandlerInfoKey, out INamedTypeSymbol genericArgsSymbol))
 				return Task.FromResult(document);
 
 			IParameterSymbol cacheParameterSymbol = methodSymbol.Parameters[0];
@@ -120,8 +119,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 			SyntaxNode cacheParameterReplacement = GetCacheParameterReplacement(newEventInfoParameterName);
 			var newMethodDeclaration = 
 				ReplaceParameterUsages(methodNode, cacheParameterSymbol, cacheParameterReplacement, semanticModel, cancellationToken)
-					.WithIdentifier(Identifier(EventHandlerMethodName))
-					.WithParameterList(newParametersList);
+					?.WithIdentifier(Identifier(EventHandlerMethodName))
+					?.WithParameterList(newParametersList);
+
+			if (newMethodDeclaration == null)
+				return Task.FromResult(document);
 
 			root = root.ReplaceNode(methodNode, newMethodDeclaration);
 			var modifiedDocument = document.WithSyntaxRoot(root);
@@ -185,12 +187,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 			return Parameter(parameterName).WithType(parameterType);
 		}
 
-		private MethodDeclarationSyntax ReplaceParameterUsages(MethodDeclarationSyntax methodDeclaration, IParameterSymbol cacheParameter,
-															   SyntaxNode replacement, SemanticModel semanticModel, CancellationToken cancellation)
+		private MethodDeclarationSyntax? ReplaceParameterUsages(MethodDeclarationSyntax methodDeclaration, IParameterSymbol cacheParameter,
+																SyntaxNode replacement, SemanticModel semanticModel, CancellationToken cancellation)
 
 		{
 			var rewriter = new ParameterUsagesRewriter(cacheParameter, replacement, semanticModel, cancellation);
-			return (MethodDeclarationSyntax)methodDeclaration.Accept(rewriter);
+			return methodDeclaration.Accept(rewriter) as MethodDeclarationSyntax;
 		}
 	}
 }

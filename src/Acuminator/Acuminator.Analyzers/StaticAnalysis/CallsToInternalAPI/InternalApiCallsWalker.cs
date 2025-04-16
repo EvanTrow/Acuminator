@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -56,7 +55,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.CallsToInternalAPI
 
 			if (IsInternalApiType(typeSymbol))
 			{
-				ReportInternalApiDiagnostic(genericName.Identifier.GetLocation());
+				ReportInternalApiDiagnostic(genericName.Identifier.GetLocation().NullIfLocationKindIsNone());
 			}
 
 			base.VisitGenericName(genericName);
@@ -71,7 +70,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.CallsToInternalAPI
 
 			if (IsInternalApiType(typeSymbol))
 			{
-				ReportInternalApiDiagnostic(identifierName.Identifier.GetLocation());
+				ReportInternalApiDiagnostic(identifierName.Identifier.GetLocation().NullIfLocationKindIsNone());
 			}
 		}
 

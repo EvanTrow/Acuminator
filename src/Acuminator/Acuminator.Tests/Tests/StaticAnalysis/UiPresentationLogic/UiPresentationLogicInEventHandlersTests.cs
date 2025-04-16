@@ -9,9 +9,11 @@ using Acuminator.Analyzers.StaticAnalysis.UiPresentationLogic;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
-using Acuminator.Utilities.Roslyn;
-using Acuminator.Utilities.Roslyn.Semantic;
+
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
+
 using Microsoft.CodeAnalysis.Diagnostics;
+
 using Xunit;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.UiPresentationLogic
@@ -19,7 +21,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.UiPresentationLogic
 	public class UiPresentationLogicInEventHandlersTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new EventHandlerAnalyzer(CodeAnalysisSettings.Default
+			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 					.WithRecursiveAnalysisEnabled(),
 				new UiPresentationLogicInEventHandlersAnalyzer());
 

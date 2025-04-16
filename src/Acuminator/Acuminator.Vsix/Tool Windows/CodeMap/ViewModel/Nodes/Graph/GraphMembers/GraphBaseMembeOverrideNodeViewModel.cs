@@ -7,16 +7,16 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using Acuminator.Vsix.Utilities;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.Syntax;
+using Acuminator.Vsix.ToolWindows.CodeMap.Graph;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public class GraphBaseMembeOverrideNodeViewModel : GraphMemberNodeViewModel
 	{
-		public bool IsPersistMethodOverride => BaseMemberOverrideInfo.IsPersistMethodOverride;
+		public MemberOverrideKind OverrideKind => BaseMemberOverrideInfo.OverrideKind;
 
 		public override Icon NodeIcon { get; }
 
@@ -34,7 +34,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		{
 			NodeIcon = GetNodeIcon();
 
-			if (MemberSymbol is IMethodSymbol method && method.Name == EventsNames.CommonEventHandlerWithGenericSignatureName)
+			if (MemberSymbol is IMethodSymbol method && method.Name == Events.Names.CommonEventHandlerWithGenericSignatureName)
 			{	
 				Name = GetNameForOverridenGraphEventHandler(method) ?? baseMemberOverrideInfo.Symbol.Name;
 			}
@@ -44,14 +44,16 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			}
 		}
 
-		private Icon GetNodeIcon() => MemberSymbol switch
+		private Icon GetNodeIcon() => OverrideKind switch
 		{
-			IMethodSymbol method => IsPersistMethodOverride 
-										? Icon.PersistMethodOverride 
-										: Icon.MethodOverrideGraph,
-			IPropertySymbol _    => Icon.PropertyOverrideGraph,
-			IEventSymbol _       => Icon.EventOverrideGraph,
-			_                    => Icon.MethodOverrideGraph
+			MemberOverrideKind.NormalMethodOverride		=> Icon.MethodOverrideGraph,
+			MemberOverrideKind.NormalPropertyOverride  	=> Icon.PropertyOverrideGraph,
+			MemberOverrideKind.NormalEventOverride		=> Icon.EventOverrideGraph,
+
+			MemberOverrideKind.PersistMethodOverride	=> Icon.PersistMethodOverride,
+			MemberOverrideKind.ConfigureMethodOverride 	=> Icon.ConfigureMethodGraph,
+			MemberOverrideKind.InitializeMethodOverride => Icon.InitializeMethodGraph,
+			_ 											=> Icon.None
 		};
 
 		private string? GetNameForOverridenGraphEventHandler(IMethodSymbol graphEventHandler)
@@ -62,7 +64,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				return null;
 
 			var parameterTypesString =  methodNode.ParameterList.Parameters
-																.Select(p => p.Type.ToString())
+																.Where(p => p.Type != null)
+																.Select(p => p.Type!.ToString())
 																.Join(", ");
 			string name = methodNode.Identifier.ToString() + $"({parameterTypesString})";
 			return name;

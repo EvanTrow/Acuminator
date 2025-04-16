@@ -10,9 +10,9 @@ namespace Acuminator.Utilities.DiagnosticSuppression.IO
 	/// </summary>
 	public class DefaultIOErrorProcessor : IIOErrorProcessor
 	{
-		public void ProcessError(Exception exception, [CallerMemberName]string reportedFrom = null)
+		public void ProcessError(Exception exception, [CallerMemberName]string? reportedFrom = null)
 		{
-			exception.ThrowOnNull(nameof(exception));
+			exception.ThrowOnNull();
 			string errorMsg = Resources.FailedToLoadTheSuppressionFile + Environment.NewLine + Environment.NewLine +
 							  string.Format(Resources.FailedToLoadTheSuppressionFileDetails, Environment.NewLine + exception.Message);
 

@@ -7,8 +7,8 @@ using System.Linq;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
+using Acuminator.Vsix.ToolWindows.CodeMap.Graph;
 using Acuminator.Vsix.Utilities;
-
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
@@ -18,15 +18,25 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override Icon NodeIcon => Icon.InitializationAndActivationGraphCategory;
 
-		public GraphInitializationAndActivationCategoryNodeViewModel(GraphNodeViewModel graphViewModel, bool isExpanded) : 
-																base(graphViewModel, GraphMemberType.InitializationAndActivation, isExpanded)
-		{		
+		public GraphInitializationAndActivationCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) :
+																base(graphViewModel, parent, GraphMemberCategory.InitializationAndActivation, 
+																	 isExpanded)
+		{
 		}
 
 		public override IEnumerable<SymbolItem> GetCategoryGraphNodeSymbols()
 		{
 			if (GraphSemanticModel.IsActiveMethodInfo != null)
 				yield return GraphSemanticModel.IsActiveMethodInfo;
+
+			if (GraphSemanticModel.IsActiveForGraphMethodInfo != null)
+				yield return GraphSemanticModel.IsActiveForGraphMethodInfo;
+
+			if (GraphSemanticModel.DeclaredInitializeMethodInfo is InitializeMethodInfo initializeMethodInfo)
+				yield return initializeMethodInfo;
+
+			if (GraphSemanticModel.DeclaredConfigureMethodOverride is ConfigureMethodInfo configureMethodInfo)
+				yield return configureMethodInfo;
 
 			foreach (StaticConstructorInfo staticConstructor in GraphSemanticModel.StaticConstructors)
 			{
@@ -36,7 +46,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 			foreach (InstanceConstructorInfo constructor in CodeMapGraphModel.InstanceConstructors)
 			{
-				yield return constructor;
+				if (!constructor.Symbol.IsImplicitlyDeclared)
+					yield return constructor;
 			}
 		}
 

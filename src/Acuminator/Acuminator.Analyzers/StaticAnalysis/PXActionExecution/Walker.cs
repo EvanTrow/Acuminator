@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Acuminator.Utilities.Common;
+﻿using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Microsoft.CodeAnalysis;
@@ -19,10 +17,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXActionExecution
 					  params object[] messageArgs)
 			: base(pxContext, context.CancellationToken)
 		{
-			diagnosticDescriptor.ThrowOnNull(nameof (diagnosticDescriptor));
-
 			_context = context;
-			_diagnosticDescriptor = diagnosticDescriptor;
+			_diagnosticDescriptor = diagnosticDescriptor.CheckIfNull();
 			_messageArgs = messageArgs;
 		}
 
@@ -33,7 +29,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXActionExecution
 			var methodSymbol = GetSymbol<IMethodSymbol>(node);
 			methodSymbol = methodSymbol?.OriginalDefinition?.OverriddenMethod ?? methodSymbol?.OriginalDefinition;
 
-			if (methodSymbol != null && PxContext.PXAction.Press.Contains(methodSymbol))
+			if (methodSymbol != null && PxContext.PXAction.Press.Contains(methodSymbol, SymbolEqualityComparer.Default))
 			{
 				ReportDiagnostic(_context.ReportDiagnostic, _diagnosticDescriptor, node, _messageArgs);
 			}

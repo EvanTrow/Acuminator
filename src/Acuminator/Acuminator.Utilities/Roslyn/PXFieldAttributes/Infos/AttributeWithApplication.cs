@@ -24,14 +24,14 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 		public AttributeWithApplication(AttributeData attributeApplication, ITypeSymbol attributeType)
 		{
-			Application = attributeApplication.CheckIfNull(nameof(attributeApplication));
-			Type = attributeType.CheckIfNull(nameof(attributeType));		
+			Application = attributeApplication.CheckIfNull();
+			Type = attributeType.CheckIfNull();
 		}
 
 		public override bool Equals(object obj) => obj is AttributeWithApplication other && Equals(other);
 
 		public bool Equals(AttributeWithApplication other) =>
-			Type == other.Type && Application.Equals(other.Application);
+			Type.Equals(other.Type, SymbolEqualityComparer.Default) && Application.Equals(other.Application);
 
 		public override int GetHashCode()
 		{
@@ -39,7 +39,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 			unchecked
 			{
-				hash = 23 * hash + Type.GetHashCode();
+				hash = 23 * hash + SymbolEqualityComparer.Default.GetHashCode(Type);
 				hash = 23 * hash + Application.GetHashCode();
 			}
 

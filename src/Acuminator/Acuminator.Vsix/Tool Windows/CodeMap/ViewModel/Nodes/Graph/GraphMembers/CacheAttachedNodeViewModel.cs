@@ -1,16 +1,19 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
+using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Vsix.ToolWindows.Common;
-using Acuminator.Vsix.Utilities;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public class CacheAttachedNodeViewModel : GraphMemberNodeViewModel, IElementWithTooltip
 	{
+		private readonly string _dacNameWithFieldNameWithEventTypeForSearch;
+
 		public override Icon NodeIcon => Icon.CacheAttached;
 
 		public DacGroupingNodeBaseViewModel DacVM { get; }
@@ -21,17 +24,20 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			protected set;
 		}
 
-		public CacheAttachedNodeViewModel(DacGroupingNodeBaseViewModel dacVM, GraphFieldEventInfo eventInfo, bool isExpanded = false) :
-									 base(dacVM?.GraphEventsCategoryVM, dacVM, eventInfo, isExpanded)
+		public CacheAttachedNodeViewModel(DacGroupingNodeBaseViewModel dacVM, GraphCacheAttachedEventHandlerInfo eventInfo, bool isExpanded = false) :
+									 base(dacVM?.GraphEventHandlersCategoryVM!, dacVM!, eventInfo, isExpanded)
 		{
-			DacVM = dacVM;
+			DacVM = dacVM!;
 			Name = eventInfo.DacFieldName;
+			_dacNameWithFieldNameWithEventTypeForSearch = $"{DacVM}#{Name}#{eventInfo.EventType.ToString()}";
 		}
 
-		TooltipInfo IElementWithTooltip.CalculateTooltip()
+		public override bool NameMatchesPattern(string? pattern) => MatchPattern(_dacNameWithFieldNameWithEventTypeForSearch, pattern);
+
+		TooltipInfo? IElementWithTooltip.CalculateTooltip()
 		{
-			var attributeStrings = Children.OfType<AttributeNodeViewModel>()
-										   .Select(attribute => attribute.CalculateTooltip().Tooltip);
+			var attributeStrings = AllChildren.OfType<AttributeNodeViewModel>()
+											  .Select(attribute => attribute.CalculateTooltip().Tooltip);
 			string aggregatedTooltip = string.Join(Environment.NewLine, attributeStrings);
 			return aggregatedTooltip.IsNullOrWhiteSpace()
 				? null

@@ -20,14 +20,14 @@ namespace Acuminator.Utilities.DiagnosticSuppression.CodeActions
 		public SuppressInSuppressionFileOperation(Diagnostic diagnosticToSuppress, string assemblyName, SemanticModel semanticModel) :
 											 base(assemblyName)
 		{		
-			_diagnosticToSuppress = diagnosticToSuppress.CheckIfNull(nameof(diagnosticToSuppress));
-			_semanticModel = semanticModel.CheckIfNull(nameof(semanticModel));
+			_diagnosticToSuppress = diagnosticToSuppress.CheckIfNull();
+			_semanticModel = semanticModel.CheckIfNull();
 		}
 
 		public override void Apply(Workspace workspace, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
-			SuppressionFile suppressionFile = SuppressionManager.Instance.GetSuppressionFile(AssemblyName);
+			SuppressionFile? suppressionFile = SuppressionManager.Instance?.GetSuppressionFile(AssemblyName);
 
 			if (suppressionFile == null)
 			{

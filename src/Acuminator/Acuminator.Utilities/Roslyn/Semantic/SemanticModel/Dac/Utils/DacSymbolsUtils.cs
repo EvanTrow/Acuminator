@@ -26,7 +26,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static DacType? GetDacType(this ITypeSymbol type, PXContext pxContext)
 		{
-			return type.CheckIfNull(nameof(type)).IsDAC(pxContext)
+			return type.CheckIfNull().IsDAC(pxContext)
 				? DacType.Dac
 				: type.IsDacExtension(pxContext)
 					? DacType.DacExtension
@@ -53,7 +53,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsDAC(this ITypeSymbol typeSymbol, PXContext pxContext)
 		{
-			typeSymbol.ThrowOnNull(nameof(typeSymbol));
+			typeSymbol.ThrowOnNull();
 
 			if (typeSymbol.ImplementsInterface(pxContext.IBqlTableType))    //Should work for named types and type parameters in most cases
 				return true;
@@ -72,7 +72,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsDacExtension(this ITypeSymbol typeSymbol, PXContext pxContext) => 
-			typeSymbol.CheckIfNull(nameof(typeSymbol))
+			typeSymbol.CheckIfNull()
 					  .InheritsFrom(pxContext.PXCacheExtensionType);
 
 		/// <summary>
@@ -89,23 +89,23 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 				: false;
 		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool IsDacField(this ITypeSymbol typeSymbol)
+		public static bool IsDacBqlField(this ITypeSymbol typeSymbol)
 		{
 			if (!typeSymbol.BaseValidation())
 				return false;
-			else if (typeSymbol.ImplementsInterface(TypeNames.IBqlField))       //Should work for named types and type parameters in most cases
+			else if (typeSymbol.ImplementsInterface(TypeNames.BqlField.IBqlField))       //Should work for named types and type parameters in most cases
 				return true;
 			else if (typeSymbol is ITypeParameterSymbol typeParameterSymbol)    //fallback for type parameters when Roslyn can't correctly determine interfaces (see ATR-376)
 				return typeParameterSymbol.GetAllConstraintTypes()
-										  .Any(constraint => constraint.ImplementsInterface(TypeNames.IBqlField));
+										  .Any(constraint => constraint.ImplementsInterface(TypeNames.BqlField.IBqlField));
 			else
 				return false;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool IsDacField(this ITypeSymbol typeSymbol, PXContext pxContext)
+		public static bool IsDacBqlField(this ITypeSymbol typeSymbol, PXContext pxContext)
 		{
-			typeSymbol.ThrowOnNull(nameof(typeSymbol));
+			typeSymbol.ThrowOnNull();
 
 			if (typeSymbol.ImplementsInterface(pxContext.IBqlFieldType))    
 				return true;
@@ -118,6 +118,36 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 				return false;
 		}
 
+		public static bool IsStronglyTypedBqlFieldOrBqlConstant(this INamedTypeSymbol bqlFieldOrBqlConstantType, PXContext pxContext)
+		{
+			pxContext.ThrowOnNull();
+
+			var allInterfaces = bqlFieldOrBqlConstantType.CheckIfNull().AllInterfaces;
+
+			if (allInterfaces.IsDefaultOrEmpty)
+				return false;
+
+			foreach (INamedTypeSymbol @interface in allInterfaces)
+			{
+				if (!@interface.IsGenericType || @interface.TypeArguments.IsDefaultOrEmpty)
+					continue;
+
+				if (!@interface.Equals(pxContext.IImplementType, SymbolEqualityComparer.Default) &&
+					(@interface.OriginalDefinition == null || 
+					 !@interface.OriginalDefinition.Equals(pxContext.IImplementType, SymbolEqualityComparer.Default)))
+				{
+					continue;
+				}
+
+				var firstTypeArgument = @interface.TypeArguments[0];
+
+				if (firstTypeArgument.ImplementsInterface(pxContext.BqlTypes.IBqlDataType))
+					return true;
+			}
+
+			return false;
+		}
+
 		/// <summary>
 		/// Get view's DAC for which the view was declared.
 		/// </summary>
@@ -128,9 +158,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// </returns>
 		public static ITypeSymbol? GetDacFromView(this ITypeSymbol pxView, PXContext pxContext)
 		{
-			pxContext.ThrowOnNull(nameof(pxContext));
+			pxContext.ThrowOnNull();
 
-			if (pxView?.InheritsFrom(pxContext.PXSelectBase.Type!) != true)
+			if (pxView?.InheritsFrom(pxContext.PXSelectBase.Type) != true)
 				return null;
 
 			INamedTypeSymbol baseViewType;
@@ -138,9 +168,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			if (pxView.IsFbqlView(pxContext))
 			{
 
-				baseViewType = pxView.BaseType.ContainingType.GetBaseTypesAndThis()
-															 .OfType<INamedTypeSymbol>()
-															 .FirstOrDefault(t => t.OriginalDefinition.Equals(pxContext.BQL.PXViewOf));
+				baseViewType = pxView.BaseType!.ContainingType
+											   .GetBaseTypesAndThis()
+											   .OfType<INamedTypeSymbol>()
+											   .FirstOrDefault(t => t.OriginalDefinition.Equals(pxContext.BQL.PXViewOf, SymbolEqualityComparer.Default));
 			}
 			else
 			{
@@ -193,7 +224,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// </returns>
 		public static ITypeSymbol? GetDacFromDacExtension(this ITypeSymbol dacExtension, PXContext pxContext)
 		{
-			pxContext.ThrowOnNull(nameof(pxContext));
+			pxContext.ThrowOnNull();
 
 			if (dacExtension == null || !dacExtension.IsDacExtension(pxContext))
 				return null;
@@ -260,8 +291,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// </returns>
 		public static AttributeData? GetProjectionAttributeApplication(this ITypeSymbol dac, PXContext pxContext, bool checkTypeIsDac)
 		{
-			pxContext.ThrowOnNull(nameof(pxContext));
-			dac.ThrowOnNull(nameof(dac));
+			pxContext.ThrowOnNull();
+			dac.ThrowOnNull();
 
 			if (checkTypeIsDac && !dac.IsDAC(pxContext))
 				return null;

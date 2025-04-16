@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Acuminator.Utilities
 {
 	public static class SharedVsSettings
 	{
 		public const string AcuminatorSharedMemorySlotName = "AcuminatorMemorySlot";
+		public const string SharedMemoryNameForTests = "AcuminatorMemorySlotForTests";
 
-		public static VSVersion VSVersion { get; set; }
+		public static VSVersion? VSVersion { get; set; }
 
+		[MemberNotNullWhen(returnValue: true, nameof(VSVersion))]
 		public static bool IsInsideVsProcess => VSVersion != null; 
-
 	}
 }

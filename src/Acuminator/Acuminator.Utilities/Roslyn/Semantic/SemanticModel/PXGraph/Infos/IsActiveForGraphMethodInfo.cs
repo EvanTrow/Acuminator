@@ -1,11 +1,12 @@
 ﻿#nullable enable
 
 using System;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Roslyn.Constants;
+using Acuminator.Utilities.Roslyn.Semantic.SharedInfo;
+using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -20,10 +21,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <summary>
 		/// The IsActiveForGraph&lt;TGraph&gt; declaration order to place it second after IsActive.
 		/// </summary>
-		private const int IsActiveForGraphDeclarationOrderToPlaceItSecond = -2;
+		internal const int IsActiveForGraphDeclarationOrderToPlaceItSecond = IsActiveMethodInfo.IsActiveDeclarationOrderToPlaceItFirst + 1;
 
-		public IsActiveForGraphMethodInfo(MethodDeclarationSyntax node, IMethodSymbol isActiveForGraphMethod, int? declarationOrder = null) :
-									 base(node, isActiveForGraphMethod, declarationOrder ?? IsActiveForGraphDeclarationOrderToPlaceItSecond)
+		public IsActiveForGraphMethodInfo(MethodDeclarationSyntax? node, IMethodSymbol isActiveForGraphMethod, int declarationOrder) :
+									 base(node, isActiveForGraphMethod, declarationOrder)
 		{
 		}
 
@@ -32,26 +33,27 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </summary>
 		/// <param name="graphExtension">The graph extension.</param>
 		/// <param name="cancellationToken">A token that allows processing to be cancelled.</param>
-		/// <param name="declarationOrder">(Optional) The declaration order.</param>
+		/// <param name="customDeclarationOrder">(Optional) The declaration order. Default value is <see cref="IsActiveForGraphDeclarationOrderToPlaceItSecond"/>.</param>
 		/// <returns>
 		/// The <see cref="IsActiveForGraphMethodInfo"/> DTO if the graph extension contains IsActiveForGraph&lt;TGraph&gt; method, otherwise <see langword="null"/>.
 		/// </returns>
-		internal static IsActiveForGraphMethodInfo? GetIsActiveForGraphMethodInfo(INamedTypeSymbol graphExtension, CancellationToken cancellationToken, 
-																				  int? declarationOrder = null)
+		internal static IsActiveForGraphMethodInfo? GetIsActiveForGraphMethodInfo(INamedTypeSymbol graphExtension, CancellationToken cancellationToken,
+																				  int? customDeclarationOrder = null)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
+
+			int declarationOrder				  = customDeclarationOrder ?? IsActiveForGraphDeclarationOrderToPlaceItSecond;
 			var isActiveForGraphCandidates		  = graphExtension.GetMethods(DelegateNames.IsActiveForGraph);
 			IMethodSymbol? isActiveForGraphMethod =
 				isActiveForGraphCandidates.FirstOrDefault(method => method.IsStatic && method.DeclaredAccessibility == Accessibility.Public &&
 																	method.Parameters.IsDefaultOrEmpty && 
 																	method.ReturnType.SpecialType == SpecialType.System_Boolean &&
 																	method.TypeParameters.Length == 1);
+			if (isActiveForGraphMethod == null)
+				return null;
 
-			SyntaxReference? isActiveForGraphMethodReference = isActiveForGraphMethod?.DeclaringSyntaxReferences.FirstOrDefault();
-
-			return isActiveForGraphMethodReference?.GetSyntax(cancellationToken) is MethodDeclarationSyntax isActiveForGraphMethodNode
-				? new IsActiveForGraphMethodInfo(isActiveForGraphMethodNode, isActiveForGraphMethod!, declarationOrder)
-				: null;
+			var isActiveForGraphMethodNode = isActiveForGraphMethod.GetSyntax(cancellationToken) as MethodDeclarationSyntax;
+			return new IsActiveForGraphMethodInfo(isActiveForGraphMethodNode, isActiveForGraphMethod!, declarationOrder);
 		}
 	}
 }

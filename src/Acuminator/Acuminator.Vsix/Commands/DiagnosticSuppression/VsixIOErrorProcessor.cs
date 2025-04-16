@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Acuminator.Utilities.Common;
@@ -13,9 +15,9 @@ namespace Acuminator.Vsix.DiagnosticSuppression
 	/// </summary>
 	public class VsixIOErrorProcessor : IIOErrorProcessor
 	{
-		public void ProcessError(Exception exception, [CallerMemberName]string reportedFrom = null)
+		public void ProcessError(Exception exception, [CallerMemberName]string? reportedFrom = null)
 		{
-			exception.ThrowOnNull(nameof(exception));
+			exception.ThrowOnNull();
 
 			string errorMsg = Resources.FailedToLoadTheSuppressionFile + Environment.NewLine + Environment.NewLine +
 							  string.Format(Resources.FailedToLoadTheSuppressionFileDetails, Environment.NewLine + exception.Message);

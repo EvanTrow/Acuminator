@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿#nullable enable
+
+using System;
+using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -11,27 +12,25 @@ namespace Acuminator.Vsix.Utilities
 {
 	public static class IndentUtils
 	{
-		private const string PxDataNamespacePrefix = "PX.Data.";
-		private const string PxObjectsNamespacePrefix = "PX.Objects.";
-
 		public static int GetPrependLength(SyntaxTokenList? modifiers) => modifiers != null
 			? modifiers.Value.FullSpan.End - modifiers.Value.Span.Start
 			: 0;
 
-		public static string GetSyntaxNodeStringWithRemovedIndent(this SyntaxNode syntaxNode, int tabSize, int prependLength = 0)
+		[return: NotNullIfNotNull(parameterName: nameof(syntaxNode))]
+		public static string? GetSyntaxNodeStringWithRemovedIndent(this SyntaxNode syntaxNode, int tabSize, int prependLength = 0)
 		{
 			if (tabSize <= 0)
 			{
 				throw new ArgumentException("Tab size must be positive", nameof(tabSize));
 			}
 
-			string syntaxNodeString = syntaxNode?.ToString();
+			string? syntaxNodeString = syntaxNode?.ToString();
 
 			if (syntaxNodeString.IsNullOrWhiteSpace())
 				return syntaxNodeString;
 
 			prependLength = tabSize * (prependLength / tabSize);
-			var indentLength = prependLength + syntaxNode.GetNodeIndentLength(tabSize);
+			var indentLength = prependLength + syntaxNode!.GetNodeIndentLength(tabSize);
 
 			if (indentLength == 0)
 				return syntaxNodeString;
@@ -86,12 +85,7 @@ namespace Acuminator.Vsix.Utilities
 			}
 		}
 
-	
-		public static string RemoveCommonAcumaticaNamespacePrefixes(this string codeFragment) =>
-			codeFragment?.Replace(PxDataNamespacePrefix, string.Empty)
-						?.Replace(PxObjectsNamespacePrefix, string.Empty);
-
-		public static int GetNodeIndentLength(this SyntaxNode node, int tabSize)
+		public static int GetNodeIndentLength(this SyntaxNode? node, int tabSize)
 		{
 			if (tabSize <= 0)
 			{
@@ -101,7 +95,7 @@ namespace Acuminator.Vsix.Utilities
 			if (node == null)
 				return 0;
 
-			SyntaxNode currentNode = node;
+			SyntaxNode? currentNode = node;
 
 			while (currentNode != null)
 			{

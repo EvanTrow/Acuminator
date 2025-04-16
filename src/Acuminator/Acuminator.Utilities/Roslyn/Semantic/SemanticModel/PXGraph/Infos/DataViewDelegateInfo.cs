@@ -1,38 +1,24 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
+
 using Acuminator.Utilities.Common;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
-	public class DataViewDelegateInfo : NodeSymbolItem<MethodDeclarationSyntax, IMethodSymbol>, IWriteableBaseItem<DataViewDelegateInfo>
+	public class DataViewDelegateInfo : OverridableNodeSymbolItem<DataViewDelegateInfo, MethodDeclarationSyntax, IMethodSymbol>
 	{
-		/// <summary>
-		/// The overriden item if any
-		/// </summary>
-		public DataViewDelegateInfo Base
-		{
-			get;
-			internal set;
-		}
-
-		DataViewDelegateInfo IWriteableBaseItem<DataViewDelegateInfo>.Base
-		{
-			get => Base;
-			set => Base = value;
-		}
-
-		public DataViewDelegateInfo(MethodDeclarationSyntax node, IMethodSymbol symbol, int declarationOrder)
+		public DataViewDelegateInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder)
 			: base(node, symbol, declarationOrder)
 		{
 		}
 
-		public DataViewDelegateInfo(MethodDeclarationSyntax node, IMethodSymbol symbol, int declarationOrder, DataViewDelegateInfo baseInfo)
-			: this(node, symbol, declarationOrder)
+		public DataViewDelegateInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder, DataViewDelegateInfo baseInfo)
+			: base(node, symbol, declarationOrder, baseInfo)
 		{
-			baseInfo.ThrowOnNull(nameof(baseInfo));
-			Base = baseInfo;
 		}
 
 		/// <summary>
@@ -45,7 +31,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		{
 			const int recursionMax = 100;
 			int counter = 0;
-			DataViewDelegateInfo currentDelegate = includeSelf 
+			DataViewDelegateInfo? currentDelegate = includeSelf 
 					? this 
 					: Base;
 

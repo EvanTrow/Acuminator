@@ -24,7 +24,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 	public sealed partial class SuppressionManager
 	{
 		private static readonly Regex _suppressPattern = new Regex(@"Acuminator\s+disable\s+once\s+(\w+)\s+(\w+)", RegexOptions.Compiled);
-		private static object _initializationLocker = new object();
+		private static readonly object _initializationLocker = new object();
 
 		internal static SuppressionManager? Instance
 		{
@@ -42,29 +42,29 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 
 		private SuppressionManager(ISuppressionFileSystemService fileSystemService, ICustomBuildActionSetter? buildActionSetter)
 		{
-			_fileSystemService = fileSystemService.CheckIfNull(nameof(fileSystemService));
+			_fileSystemService = fileSystemService.CheckIfNull();
 			_suppressionFileCreator = new SuppressionFileCreator(this);
 
 			BuildActionSetter = buildActionSetter;
 		}
 
-		public static void InitOrReset(IEnumerable<SuppressionManagerInitInfo> additionalFiles,
+		public static void InitOrReset(IEnumerable<SuppressionManagerInitInfo>? additionalFiles,
 									   Func<ISuppressionFileSystemService>? fileSystemServiceFabric = null,
 									   Func<ICustomBuildActionSetter>? buildActionSetterFabric = null) =>
 			InitOrReset(additionalFiles, fileSystemServiceFabric, null, buildActionSetterFabric);
 
-		public static void InitOrReset(IEnumerable<SuppressionManagerInitInfo> additionalFiles,
+		public static void InitOrReset(IEnumerable<SuppressionManagerInitInfo>? additionalFiles,
 									   Func<IIOErrorProcessor>? errorProcessorFabric = null,
 									   Func<ICustomBuildActionSetter>? buildActionSetterFabric = null) =>
 			InitOrReset(additionalFiles, null, errorProcessorFabric, buildActionSetterFabric);
 
-		public static void InitOrReset(Workspace workspace, bool generateSuppressionBase, 
+		public static void InitOrReset(Workspace? workspace, bool generateSuppressionBase, 
 									   Func<ISuppressionFileSystemService>? fileSystemServiceFabric = null,
 									   Func<ICustomBuildActionSetter>? buildActionSetterFabric = null) =>
 			InitOrReset(workspace?.CurrentSolution?.GetSuppressionInfo(generateSuppressionBase),
 						fileSystemServiceFabric, null, buildActionSetterFabric);
 
-		public static void InitOrReset(Workspace workspace, bool generateSuppressionBase,
+		public static void InitOrReset(Workspace? workspace, bool generateSuppressionBase,
 									   Func<IIOErrorProcessor>? errorProcessorFabric = null,
 									   Func<ICustomBuildActionSetter>? buildActionSetterFabric = null)
 		{
@@ -187,7 +187,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 		}
 
 		public SuppressionFile? GetSuppressionFile(string assemblyName) =>
-			_fileByAssembly.TryGetValue(assemblyName.CheckIfNullOrWhiteSpace(nameof(assemblyName)), out var existingSuppressionFile)
+			_fileByAssembly.TryGetValue(assemblyName.CheckIfNullOrWhiteSpace(), out var existingSuppressionFile)
 				? existingSuppressionFile
 				: null;
 
@@ -288,7 +288,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 																Diagnostic diagnostic, CodeAnalysisSettings settings, CancellationToken cancellation)
 		{
 			cancellation.ThrowIfCancellationRequested();
-			reportDiagnostic.ThrowOnNull(nameof(reportDiagnostic));
+			reportDiagnostic.ThrowOnNull();
 
 			if (!settings.SuppressionMechanismEnabled)
 			{
