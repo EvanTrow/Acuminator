@@ -41,7 +41,7 @@
     <NoWarn>$(NoWarn);VSTHRD200</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
-    <LangVersion>12.0</LangVersion>
+    <LangVersion>13.0</LangVersion>
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
