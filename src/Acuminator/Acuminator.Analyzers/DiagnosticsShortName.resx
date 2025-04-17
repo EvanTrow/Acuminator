@@ -252,6 +252,9 @@
   <data name="PX1037" xml:space="preserve">
     <value>UnboundDacFieldInKeyDeclaration</value>
   </data>
+  <data name="PX1038" xml:space="preserve">
+    <value>AsyncVoidMethodsAndLambdas</value>
+  </data>
   <data name="PX1040" xml:space="preserve">
     <value>ConstructorInGraphExtension</value>
   </data>

@@ -178,35 +178,48 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 			}
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsStatic(this SyntaxNode node)
 		{
 			SyntaxTokenList modifiers = node.GetModifiers();
 			return modifiers.Any(SyntaxKind.StaticKeyword);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsPublic(this MemberDeclarationSyntax member)
 		{
 			SyntaxTokenList modifiers = member.GetModifiers();
 			return modifiers.Any(SyntaxKind.PublicKeyword);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsReadOnly(this MemberDeclarationSyntax member)
 		{
 			SyntaxTokenList modifiers = member.GetModifiers();
 			return modifiers.Any(SyntaxKind.ReadOnlyKeyword);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsOverride(this MemberDeclarationSyntax member)
 		{
 			SyntaxTokenList modifiers = member.GetModifiers();
 			return modifiers.Any(SyntaxKind.OverrideKeyword);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsPartial(this TypeDeclarationSyntax typeDeclaration) =>
 			typeDeclaration.CheckIfNull()
 						   .Modifiers
 						   .Any(SyntaxKind.PartialKeyword);
-		
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsAsync(this SyntaxNode node)
+		{
+			SyntaxTokenList modifiers = node.GetModifiers();
+			return modifiers.Any(SyntaxKind.AsyncKeyword);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsInternal(this MemberDeclarationSyntax member)
 		{
 			SyntaxTokenList modifiers = member.GetModifiers();
@@ -215,6 +228,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 			return modifiers.Any(SyntaxKind.InternalKeyword) && !modifiers.Any(SyntaxKind.PrivateKeyword);  
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static SyntaxTokenList GetModifiers(this SyntaxNode member) =>
 			member.CheckIfNull() switch
 			{
@@ -224,6 +238,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 				BaseFieldDeclarationSyntax baseFieldDeclaration 	  => baseFieldDeclaration.Modifiers,
 				DelegateDeclarationSyntax delegateDeclaration 		  => delegateDeclaration.Modifiers,
 				LocalFunctionStatementSyntax localFunctionStatement   => localFunctionStatement.Modifiers,
+				AnonymousFunctionExpressionSyntax anonymousFunction   => anonymousFunction.Modifiers,
 				_ 													  => SyntaxFactory.TokenList()
 			};
 
@@ -233,6 +248,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		/// </summary>
 		/// <param name="node">Syntax node</param>
 		/// <returns>Syntax node for the body, if any</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static CSharpSyntaxNode? GetBody(this SyntaxNode? node) =>
 			node switch
 			{
@@ -271,6 +287,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 			}
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static SyntaxList<AttributeListSyntax> GetAttributeLists(this MemberDeclarationSyntax? member) =>
 			member switch
 			{
@@ -288,6 +305,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 				_ 													=> new SyntaxList<AttributeListSyntax>()
 			};
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static SyntaxTrivia ToSingleLineComment(this string? commentContent)
 		{
 			const string commentPrefix = "//";
@@ -308,6 +326,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 				_ 											  => null
 			};
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string? GetDocTagName(this XmlNodeSyntax docTagNode) => docTagNode switch
 		{
 			XmlElementSyntax docTagWithContent	 => docTagWithContent.StartTag?.Name?.ToString(),

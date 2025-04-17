@@ -175,8 +175,8 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 			return null;
 		}
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsStatic(this BaseMethodDeclarationSyntax node) =>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsStatic(this BaseMethodDeclarationSyntax node) =>
 			node.CheckIfNull()
 				.Modifiers
 				.Any(m => m.IsKind(SyntaxKind.StaticKeyword));
@@ -186,5 +186,19 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 			node.CheckIfNull()
 				.Modifiers
 				.Any(m => m.IsKind(SyntaxKind.StaticKeyword));
+
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsVoidMethod(this MethodDeclarationSyntax methodNode)
+		{
+			if (methodNode.CheckIfNull().ReturnType is not PredefinedTypeSyntax returnTypeNode)
+				return false;
+
+			return returnTypeNode.Keyword.IsKind(SyntaxKind.VoidKeyword);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsPartial(this MethodDeclarationSyntax methodNode) =>
+			methodNode.CheckIfNull().Modifiers.Any(SyntaxKind.PartialKeyword);
 	}
 }
