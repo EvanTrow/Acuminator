@@ -9,6 +9,7 @@ using Acuminator.Runner.Analysis.CodeSources;
 using Acuminator.Runner.Constants;
 using Acuminator.Runner.Output;
 using Acuminator.Runner.Resources;
+using Acuminator.Utilities;
 using Acuminator.Utilities.Common;
 
 namespace Acuminator.Runner.Input
@@ -17,12 +18,24 @@ namespace Acuminator.Runner.Input
 	{
 		public AnalysisContext CreateContext(CommandLineOptions commandLineOptions)
 		{
-			commandLineOptions.CheckIfNull(nameof(commandLineOptions));
+			commandLineOptions.ThrowOnNull();
 
-			var codeSource = ReadCodeSource(commandLineOptions.CodeSource) ?? throw new ArgumentException(Messages.CodeSourceNotSpecifiedError);
+			var codeSource = ReadCodeSource(commandLineOptions.CodeSource) ?? 
+							 throw new ArgumentException(Messages.CodeSourceNotSpecifiedError);
+
+			var codeAnalysisSettings = new CodeAnalysisSettings(CodeAnalysisSettings.DefaultRecursiveAnalysisEnabled,
+																commandLineOptions.IsvSpecificAnalysisIsEnabled,
+																staticAnalysisEnabled: true,                   // no sense to run the tool with disabled static analysis
+																suppressionMechanismEnabled: !commandLineOptions.DisableSuppressionMechanism,
+																commandLineOptions.PX1007DiagnosticIsEnabled);
+
+			var bannedApiSettings = new BannedApiSettings(bannedApiAnalysisEnabled: !commandLineOptions.DisablePX1099Diagnostic,
+														  commandLineOptions.BannedApiFilePath, 
+														  commandLineOptions.AllowedApisFilePath);
+
 			OutputFormat outputFormat = GetOutputFormat(commandLineOptions.OutputFormat.NullIfWhiteSpace());
-			var input = new AnalysisContext(codeSource, commandLineOptions.DisableSuppressionMechanism, commandLineOptions.MSBuildPath, 
-											   commandLineOptions.OutputFileName, commandLineOptions.OutputAbsolutePathsToUsages, outputFormat);
+			var input = new AnalysisContext(codeSource, codeAnalysisSettings, bannedApiSettings, commandLineOptions.MSBuildPath, 
+											commandLineOptions.OutputFileName, commandLineOptions.OutputAbsolutePathsToUsages, outputFormat);
 			return input;
 		}
 

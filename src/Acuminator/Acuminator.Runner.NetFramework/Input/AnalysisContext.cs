@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 
 using Acuminator.Runner.Analysis.CodeSources;
 using Acuminator.Runner.Output;
+using Acuminator.Utilities;
 using Acuminator.Utilities.Common;
 
 namespace Acuminator.Runner.Input
@@ -20,9 +20,6 @@ namespace Acuminator.Runner.Input
 		/// <inheritdoc cref="CommandLineOptions.MSBuildPath"/>
 		public string? MSBuildPath { get; }
 
-		/// <inheritdoc cref="CommandLineOptions.DisableSuppressionMechanism"/>
-		public bool DisableSuppressionMechanism { get; }
-
 		/// <inheritdoc cref="CommandLineOptions.OutputFileName"/>
 		public string? OutputFileName { get; }
 
@@ -32,21 +29,20 @@ namespace Acuminator.Runner.Input
 		/// <inheritdoc cref="CommandLineOptions.OutputFormat"/>
 		public OutputFormat OutputFormat { get; }
 
-		/// <summary>
-		/// If true then the unnderlying OS is Linux.
-		/// </summary>
-		public bool IsRunningOnLinux { get; }
+		public CodeAnalysisSettings CodeAnalysisSettings { get; }
 
-		public AnalysisContext(ICodeSource codeSource, bool disableSuppressionMechanism, string? msBuildPath, string? outputFileName, 
-								  bool outputAbsolutePathsToUsages, OutputFormat outputFormat)
+		public BannedApiSettings BannedApiSettings { get; }
+
+		public AnalysisContext(ICodeSource codeSource, CodeAnalysisSettings codeAnalysisSettings, BannedApiSettings bannedApiSettings, 
+							   string? msBuildPath, string? outputFileName, bool outputAbsolutePathsToUsages, OutputFormat outputFormat)
 		{
-			CodeSource 					= codeSource.CheckIfNull(nameof(codeSource));
-			DisableSuppressionMechanism = disableSuppressionMechanism;
+			CodeSource 					= codeSource.CheckIfNull();
+			CodeAnalysisSettings		= codeAnalysisSettings.CheckIfNull();
+			BannedApiSettings			= bannedApiSettings.CheckIfNull();
 			MSBuildPath 				= msBuildPath.NullIfWhiteSpace();
 			OutputFileName				= outputFileName.NullIfWhiteSpace();
 			OutputAbsolutePathsToUsages = outputAbsolutePathsToUsages;
 			OutputFormat				= outputFormat;
-			IsRunningOnLinux			= RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 		}
 	}
 }
