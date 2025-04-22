@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 
 using Acuminator.Runner.Input;
-using CoreCompatibilyzer.Runner.Output.Data;
-using CoreCompatibilyzer.Runner.Output.Json;
-using CoreCompatibilyzer.Runner.Output.PlainText;
+using Acuminator.Runner.Output.Data;
+using Acuminator.Runner.Output.Json;
+using Acuminator.Runner.Output.PlainText;
 using Acuminator.Utilities.Common;
-
-using Serilog;
 
 namespace Acuminator.Runner.Output
 {
@@ -18,7 +16,7 @@ namespace Acuminator.Runner.Output
 	{
 		public IReportOutputter CreateOutputter(AnalysisContext analysisContext)
 		{
-			analysisContext.ThrowOnNull(nameof(analysisContext));
+			analysisContext.ThrowOnNull();
 
 			if (analysisContext.OutputFormat == OutputFormat.PlainText)
 			{

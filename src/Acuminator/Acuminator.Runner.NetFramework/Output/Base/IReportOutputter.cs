@@ -2,6 +2,7 @@
 using System.Threading;
 
 using Acuminator.Runner.Input;
+using Acuminator.Runner.Output.Data;
 
 namespace Acuminator.Runner.Output
 {

@@ -14,7 +14,7 @@ namespace Acuminator.Runner.Output
 	internal interface IProjectReportBuilder
 	{
 		/// <summary>
-		/// Builds the report from the diagnostics.
+		/// Builds the report from hte diagnostics.
 		/// </summary>
 		/// <param name="diagnosticsWithApis">The diagnostics with banned APIs.</param>
 		/// <param name="analysisContext">The analysis context.</param>
