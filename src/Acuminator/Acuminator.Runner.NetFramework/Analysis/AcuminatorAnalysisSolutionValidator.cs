@@ -53,7 +53,7 @@ namespace Acuminator.Runner.Analysis
 			return analyzers;
 		}
 
-		public async Task<RunResult> AnalyseSolution(Solution solution, AppAnalysisContext analysisContext, CancellationToken cancellationToken)
+		public async Task<RunResult> AnalyseSolution(Solution solution, Input.AnalysisContext analysisContext, CancellationToken cancellationToken)
 		{
 			RunResult solutionValidationResult = RunResult.Success;
 			var projectsToValidate = analysisContext.CodeSource.GetProjectsForValidation(solution)
@@ -112,7 +112,7 @@ namespace Acuminator.Runner.Analysis
 		}
 
 		private async Task<(RunResult validationResult, ProjectReport? Report, DiagnosticsWithBannedApis? AnalysisData)> AnalyzeProject(
-																								Project project, AppAnalysisContext analysisContext,
+																								Project project, Input.AnalysisContext analysisContext,
 																								CancellationToken cancellationToken)
 		{
 			Log.Debug("Obtaining Roslyn compilation data for the project \"{ProjectName}\".", project.Name);
@@ -165,7 +165,7 @@ namespace Acuminator.Runner.Analysis
 		}
 
 		private async Task<(RunResult validationResult, ProjectReport? Report, DiagnosticsWithBannedApis? AnalysisData)> RunAnalyzersOnProjectAsync(
-																						Compilation compilation, AppAnalysisContext analysisContext, 
+																						Compilation compilation, Input.AnalysisContext analysisContext, 
 																						Project project, CancellationToken cancellation)
 		{
 			if (_diagnosticAnalyzers.IsDefaultOrEmpty)
@@ -189,7 +189,7 @@ namespace Acuminator.Runner.Analysis
 			return (RunResult.RequirementsNotMet, projectReport, diagnosticsWithApis);
 		}
 
-		private CodeSourceReport CreateCodeSourceReport(AppAnalysisContext analysisContext, List<ProjectReport> projectReports, IEnumerable<Api> allDistinctApis)
+		private CodeSourceReport CreateCodeSourceReport(Input.AnalysisContext analysisContext, List<ProjectReport> projectReports, IEnumerable<Api> allDistinctApis)
 		{
 			if (analysisContext.IncludeAllDistinctApis) 
 			{

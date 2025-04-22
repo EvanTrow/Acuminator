@@ -17,7 +17,7 @@ namespace Acuminator.Runner.Output
     /// </summary>
     internal class ProjectReportBuilder : IProjectReportBuilder
 	{
-		public ProjectReport BuildReport(DiagnosticsWithBannedApis diagnosticsWithApis, AppAnalysisContext analysisContext, Project project, CancellationToken cancellation)
+		public ProjectReport BuildReport(DiagnosticsWithBannedApis diagnosticsWithApis, AnalysisContext analysisContext, Project project, CancellationToken cancellation)
 		{
 			diagnosticsWithApis.ThrowIfNull(nameof(diagnosticsWithApis));
 			project.ThrowOnNull(nameof(project));
@@ -47,7 +47,7 @@ namespace Acuminator.Runner.Output
 			return projectDirectory;
 		}
 
-		protected virtual ReportGroup GetMainReportGroupFromAllDiagnostics(DiagnosticsWithBannedApis diagnosticsWithApis, AppAnalysisContext analysisContext,
+		protected virtual ReportGroup GetMainReportGroupFromAllDiagnostics(DiagnosticsWithBannedApis diagnosticsWithApis, AnalysisContext analysisContext,
 																		   string? projectDirectory, CancellationToken cancellation)
 		{
 			var bannedApisGroups	  		  = GetAllReportGroups(diagnosticsWithApis, analysisContext, projectDirectory, cancellation).ToList();
@@ -77,7 +77,7 @@ namespace Acuminator.Runner.Output
 			)
 			.ToList(capacity: diagnosticsWithApis.UnrecognizedDiagnostics.Count);
 
-		protected virtual IEnumerable<ReportGroup> GetAllReportGroups(DiagnosticsWithBannedApis diagnosticsWithApis, AppAnalysisContext analysisContext,
+		protected virtual IEnumerable<ReportGroup> GetAllReportGroups(DiagnosticsWithBannedApis diagnosticsWithApis, AnalysisContext analysisContext,
 																	  string? projectDirectory, CancellationToken cancellation)
 		{
 			cancellation.ThrowIfCancellationRequested();
@@ -100,7 +100,7 @@ namespace Acuminator.Runner.Output
 			}
 		}
 
-		private IEnumerable<ReportGroup> GetApiGroupsGroupedByNamespaces(AppAnalysisContext analysisContext, DiagnosticsWithBannedApis diagnosticsWithApis,
+		private IEnumerable<ReportGroup> GetApiGroupsGroupedByNamespaces(AnalysisContext analysisContext, DiagnosticsWithBannedApis diagnosticsWithApis,
 																		 string? projectDirectory, CancellationToken cancellation)
 		{
 			var groupedByNamespaces = diagnosticsWithApis.GroupBy(d => d.BannedApi.Namespace)
@@ -117,7 +117,7 @@ namespace Acuminator.Runner.Output
 			}
 		}
 
-		private IEnumerable<ReportGroup> GetApiGroupsGroupedOnlyByTypes(AppAnalysisContext analysisContext, DiagnosticsWithBannedApis diagnosticsWithApis,
+		private IEnumerable<ReportGroup> GetApiGroupsGroupedOnlyByTypes(AnalysisContext analysisContext, DiagnosticsWithBannedApis diagnosticsWithApis,
 																		string? projectDirectory, CancellationToken cancellation)
 		{
 			var namespacesAndOtherApis = diagnosticsWithApis.ToLookup(d => d.BannedApi.Kind == ApiKind.Namespace);
@@ -143,7 +143,7 @@ namespace Acuminator.Runner.Output
 			}
 		}
 
-		private ReportGroup? GetApiGroupForNamespaceDiagnostics(string @namespace, AppAnalysisContext analysisContext,
+		private ReportGroup? GetApiGroupForNamespaceDiagnostics(string @namespace, AnalysisContext analysisContext,
 															    List<(Diagnostic Diagnostic, Api BannedApi)> diagnostics, HashSet<string> usedBannedTypes, 
 															    HashSet<string> usedNamespaces, UsedDistinctApisCalculator usedDistinctApisCalculator, 
 																string? projectDirectory, CancellationToken cancellation)
@@ -246,7 +246,7 @@ namespace Acuminator.Runner.Output
 			return namespaceGroup;
 		}
 
-		private IEnumerable<ReportGroup> GetTypeGroupsForNamespaceMembers(List<(Diagnostic Diagnostic, Api BannedApi)> namespaceMembers, AppAnalysisContext analysisContext,
+		private IEnumerable<ReportGroup> GetTypeGroupsForNamespaceMembers(List<(Diagnostic Diagnostic, Api BannedApi)> namespaceMembers, AnalysisContext analysisContext,
 																		  HashSet<string> usedBannedTypes, UsedDistinctApisCalculator usedDistinctApisCalculator,
 																		  string? projectDirectory,  CancellationToken cancellation)
 		{
@@ -265,7 +265,7 @@ namespace Acuminator.Runner.Output
 			}
 		}
 
-		private ReportGroup? GetTypeDiagnosticGroup(string typeName, AppAnalysisContext analysisContext, List<(Diagnostic Diagnostic, Api BannedApi)> diagnostics,
+		private ReportGroup? GetTypeDiagnosticGroup(string typeName, AnalysisContext analysisContext, List<(Diagnostic Diagnostic, Api BannedApi)> diagnostics,
 													HashSet<string> usedBannedTypes, UsedDistinctApisCalculator usedDistinctApisCalculator, string? projectDirectory)
 		{
 			if (!analysisContext.Grouping.HasGrouping(GroupingMode.Apis) && analysisContext.ReportMode == ReportMode.UsedAPIsWithUsages)
@@ -360,7 +360,7 @@ namespace Acuminator.Runner.Output
 			return typeGroup;
 		}
 
-		private ReportGroup? GetNamespaceDiagnosticsGroupForTypesOnlyGrouping(AppAnalysisContext analysisContext, List<(Diagnostic Diagnostic, Api BannedApi)> diagnostics,
+		private ReportGroup? GetNamespaceDiagnosticsGroupForTypesOnlyGrouping(AnalysisContext analysisContext, List<(Diagnostic Diagnostic, Api BannedApi)> diagnostics,
 																			  UsedDistinctApisCalculator usedDistinctApisCalculator, string? projectDirectory)
 		{
 			if (diagnostics.Count == 0)
@@ -381,7 +381,7 @@ namespace Acuminator.Runner.Output
 			return namespacesSectionGroup;
 		}
 
-		protected IReadOnlyCollection<ReportGroup> GetGroupsAfterNamespaceAndTypeGroupingProcessed(AppAnalysisContext analysisContext, UsedDistinctApisCalculator usedDistinctApisCalculator,
+		protected IReadOnlyCollection<ReportGroup> GetGroupsAfterNamespaceAndTypeGroupingProcessed(AnalysisContext analysisContext, UsedDistinctApisCalculator usedDistinctApisCalculator,
 																								   IEnumerable<(Diagnostic Diagnostic, Api BannedApi)> unsortedDiagnostics, 
 																								   string? projectDirectory)
 		{
@@ -422,7 +422,7 @@ namespace Acuminator.Runner.Output
 
 		private IEnumerable<ReportGroup> GetApiUsagesGroupsGroupedByApi(IEnumerable<(Diagnostic Diagnostic, Api BannedApi)> unsortedDiagnostics,
 																		UsedDistinctApisCalculator usedDistinctApisCalculator,
-																		string? projectDirectory, AppAnalysisContext analysisContext)
+																		string? projectDirectory, AnalysisContext analysisContext)
 		{
 			var diagnosticsGroupedByApi = unsortedDiagnostics.GroupBy(d => d.BannedApi.FullName)
 															 .OrderBy(d => d.Key);
@@ -448,7 +448,7 @@ namespace Acuminator.Runner.Output
 		}
 
 		private IEnumerable<Line> GetFlatApiUsagesLines(IEnumerable<(Diagnostic Diagnostic, Api BannedApi)> unsortedDiagnostics,
-														string? projectDirectory, AppAnalysisContext analysisContext)
+														string? projectDirectory, AnalysisContext analysisContext)
 		{
 			var sortedApisWithLocations = unsortedDiagnostics.Select(d => (FullApiName: d.BannedApi.FullName, 
 																		   Location: GetPrettyLocation(d.Diagnostic, projectDirectory, analysisContext)))
@@ -459,16 +459,16 @@ namespace Acuminator.Runner.Output
 		}
 
 		private IEnumerable<Line> GetApiUsagesLines(IEnumerable<Diagnostic> sortedDiagnostics, string? projectDirectory,
-													AppAnalysisContext analysisContext) =>
+													AnalysisContext analysisContext) =>
 			sortedDiagnostics.Select(diagnostic => GetApiUsageLine(diagnostic, projectDirectory, analysisContext));
 		
-		protected Line GetApiUsageLine(Diagnostic diagnostic, string? projectDirectory, AppAnalysisContext analysisContext)
+		protected Line GetApiUsageLine(Diagnostic diagnostic, string? projectDirectory, AnalysisContext analysisContext)
 		{
 			var prettyLocation = GetPrettyLocation(diagnostic, projectDirectory, analysisContext);
 			return new Line(prettyLocation);
 		}
 
-		protected string GetPrettyLocation(Diagnostic diagnostic, string? projectDirectory, AppAnalysisContext analysisContext)
+		protected string GetPrettyLocation(Diagnostic diagnostic, string? projectDirectory, AnalysisContext analysisContext)
 		{
 			string prettyLocation = diagnostic.Location.GetMappedLineSpan().ToString();
 

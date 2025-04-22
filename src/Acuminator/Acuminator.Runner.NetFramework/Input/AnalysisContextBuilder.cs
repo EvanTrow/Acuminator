@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -14,13 +15,13 @@ namespace Acuminator.Runner.Input
 {
     internal class AnalysisContextBuilder
 	{
-		public AppAnalysisContext CreateContext(CommandLineOptions commandLineOptions)
+		public AnalysisContext CreateContext(CommandLineOptions commandLineOptions)
 		{
 			commandLineOptions.CheckIfNull(nameof(commandLineOptions));
 
 			var codeSource = ReadCodeSource(commandLineOptions.CodeSource) ?? throw new ArgumentException(Messages.CodeSourceNotSpecifiedError);
 			OutputFormat outputFormat = GetOutputFormat(commandLineOptions.OutputFormat.NullIfWhiteSpace());
-			var input = new AppAnalysisContext(codeSource, commandLineOptions.DisableSuppressionMechanism, commandLineOptions.MSBuildPath, 
+			var input = new AnalysisContext(codeSource, commandLineOptions.DisableSuppressionMechanism, commandLineOptions.MSBuildPath, 
 											   commandLineOptions.OutputFileName, commandLineOptions.OutputAbsolutePathsToUsages, outputFormat);
 			return input;
 		}
@@ -41,6 +42,7 @@ namespace Acuminator.Runner.Input
 			return codeSource;
 		}
 
+		[SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "The message is supposed to be localized with a current culture")]
 		private ICodeSource CreateCodeSource(string codeSourceLocation)
 		{
 			string extension = Path.GetExtension(codeSourceLocation);
@@ -50,11 +52,11 @@ namespace Acuminator.Runner.Input
 				CommonConstants.ProjectFileExtension  => new ProjectCodeSource(codeSourceLocation),
 				CommonConstants.SolutionFileExtension => new SolutionCodeSource(codeSourceLocation),
 				_									  => throw new NotSupportedException(
-															string.Format(CultureInfo.InvariantCulture, 
-																		  Messages.NotSupportedCodeSourceType, codeSourceLocation))
+															string.Format(Messages.NotSupportedCodeSourceType, codeSourceLocation))
 			};
 		}
 
+		[SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "The message is supposed to be localized with a current culture")]
 		private OutputFormat GetOutputFormat(string? rawOutputFormat)
 		{
 			const string plainTextFormat = "text";
@@ -66,8 +68,7 @@ namespace Acuminator.Runner.Input
 				return OutputFormat.Json;
 			else
 			{
-				string errorMsg = string.Format(CultureInfo.InvariantCulture, Messages.NotSupportedOutputFormat, rawOutputFormat, 
-												plainTextFormat, jsonFormat);
+				string errorMsg = string.Format(Messages.NotSupportedOutputFormat, rawOutputFormat, plainTextFormat, jsonFormat);
 				throw new NotSupportedException(errorMsg);
 			}
 		}

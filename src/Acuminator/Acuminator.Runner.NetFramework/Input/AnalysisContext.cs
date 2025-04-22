@@ -7,7 +7,7 @@ using Acuminator.Utilities.Common;
 
 namespace Acuminator.Runner.Input
 {
-    internal class AppAnalysisContext
+    internal class AnalysisContext
 	{
 		/// <summary>
 		/// Gets the code source to validate.
@@ -37,7 +37,7 @@ namespace Acuminator.Runner.Input
 		/// </summary>
 		public bool IsRunningOnLinux { get; }
 
-		public AppAnalysisContext(ICodeSource codeSource, bool disableSuppressionMechanism, string? msBuildPath, string? outputFileName, 
+		public AnalysisContext(ICodeSource codeSource, bool disableSuppressionMechanism, string? msBuildPath, string? outputFileName, 
 								  bool outputAbsolutePathsToUsages, OutputFormat outputFormat)
 		{
 			CodeSource 					= codeSource.CheckIfNull(nameof(codeSource));

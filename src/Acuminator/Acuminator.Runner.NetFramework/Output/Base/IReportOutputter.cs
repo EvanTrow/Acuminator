@@ -16,6 +16,6 @@ namespace Acuminator.Runner.Output
 		/// <param name="codeSourceReport">The code source report.</param>
 		/// <param name="analysisContext">The analysis context.</param>
 		/// <param name="cancellation">Cancellation token.</param>
-		void OutputReport(CodeSourceReport codeSourceReport, AppAnalysisContext analysisContext, CancellationToken cancellation);
+		void OutputReport(CodeSourceReport codeSourceReport, AnalysisContext analysisContext, CancellationToken cancellation);
 	}
 }

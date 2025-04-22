@@ -25,7 +25,7 @@ namespace Acuminator.Runner.Analysis
 	[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", Justification = "Resource strings are used for logged messages")]
 	internal class SolutionAnalysisRunner
 	{
-		public async Task<RunResult> RunAnalysisAsync(AppAnalysisContext analysisContext, CancellationToken cancellationToken)
+		public async Task<RunResult> RunAnalysisAsync(AnalysisContext analysisContext, CancellationToken cancellationToken)
 		{
 			analysisContext.ThrowOnNull(nameof(analysisContext));
 
@@ -65,7 +65,7 @@ namespace Acuminator.Runner.Analysis
 				: runResult;
 		}
 
-		private async Task<RunResult> LoadAndAnalyzeCodeSourceAsync(AppAnalysisContext analysisContext, CancellationToken cancellationToken)
+		private async Task<RunResult> LoadAndAnalyzeCodeSourceAsync(AnalysisContext analysisContext, CancellationToken cancellationToken)
 		{
 			Log.Information(Messages.StartAnalyzingTheCodeSourceStatusMessage, analysisContext.CodeSource.Location);
 
@@ -115,7 +115,7 @@ namespace Acuminator.Runner.Analysis
 			}
 		}
 
-		private bool TryRegisterMSBuild(AppAnalysisContext analysisContext)
+		private bool TryRegisterMSBuild(AnalysisContext analysisContext)
 		{
 			if (analysisContext.MSBuildPath != null)
 			{

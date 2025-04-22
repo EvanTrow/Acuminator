@@ -20,7 +20,7 @@ namespace Acuminator.Runner.Output
 		/// <param name="analysisContext">The analysis context.</param>
 		/// <param name="project">The project.</param>
 		/// <param name="cancellation">Cancellation token.</param>
-		ProjectReport BuildReport(DiagnosticsWithBannedApis diagnosticsWithApis, AppAnalysisContext analysisContext, Project project,
+		ProjectReport BuildReport(DiagnosticsWithBannedApis diagnosticsWithApis, AnalysisContext analysisContext, Project project,
 								  CancellationToken cancellation);
 	}
 }

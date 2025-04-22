@@ -16,7 +16,7 @@ namespace Acuminator.Runner.Output
     /// </summary>
     internal class ReportOutputterFactory : IOutputterFactory
 	{
-		public IReportOutputter CreateOutputter(AppAnalysisContext analysisContext)
+		public IReportOutputter CreateOutputter(AnalysisContext analysisContext)
 		{
 			analysisContext.ThrowOnNull(nameof(analysisContext));
 

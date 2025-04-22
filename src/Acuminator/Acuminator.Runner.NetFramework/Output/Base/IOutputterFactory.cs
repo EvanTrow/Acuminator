@@ -17,6 +17,6 @@ namespace Acuminator.Runner.Output
 		/// <returns>
 		/// The new report outputter.
 		/// </returns>
-		IReportOutputter CreateOutputter(AppAnalysisContext analysisContext);
+		IReportOutputter CreateOutputter(AnalysisContext analysisContext);
 	}
 }

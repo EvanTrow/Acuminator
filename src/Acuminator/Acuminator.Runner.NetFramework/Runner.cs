@@ -45,7 +45,7 @@ namespace Acuminator.Runner.NetFramework
 				return RunResult.RunTimeError;
 
 			using var consoleCancellationSubscription = new ConsoleCancellationSubscription(Log.Logger);
-			AppAnalysisContext? analysisContext = CreateAnalysisContextFromCommandLineArguments(commandLineOptions);
+			AnalysisContext? analysisContext = CreateAnalysisContextFromCommandLineArguments(commandLineOptions);
 
 			if (analysisContext == null)
 				return RunResult.RunTimeError;
@@ -85,12 +85,12 @@ namespace Acuminator.Runner.NetFramework
 			}
 		}
 
-		private static AppAnalysisContext? CreateAnalysisContextFromCommandLineArguments(CommandLineOptions commandLineOptions)
+		private static AnalysisContext? CreateAnalysisContextFromCommandLineArguments(CommandLineOptions commandLineOptions)
 		{
 			try
 			{
 				AnalysisContextBuilder analysisContextBuilder = new AnalysisContextBuilder();
-				AppAnalysisContext analysisContext = analysisContextBuilder.CreateContext(commandLineOptions);
+				AnalysisContext analysisContext = analysisContextBuilder.CreateContext(commandLineOptions);
 				return analysisContext;
 			}
 			catch (Exception e)
