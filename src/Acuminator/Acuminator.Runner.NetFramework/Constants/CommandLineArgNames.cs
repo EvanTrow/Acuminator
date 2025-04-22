@@ -20,5 +20,18 @@ namespace Acuminator.Runner.Constants
 		public const string OutputFileLong = "file";
 
 		public const string OutputFormat = "format";
+
+		public const string IsvSpecificAnalysisIsEnabled = "isvMode";
+
+		public const string PX1007DiagnosticIsEnabled = "enable-PX1007";
+
+		public const string DisablePX1099Diagnostic = "disable-PX1099";
+
+		public const string BannedApiFilePath = "bannedAPIs";
+
+		public const string AllowedApisFilePath = "allowedAPIs";
+
+		public const char GenerateSuppressionFileShort = 'g';
+		public const string GenerateSuppressionFileLong = "generateSuppressionFile";
 	}
 }

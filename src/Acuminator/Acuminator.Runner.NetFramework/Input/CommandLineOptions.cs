@@ -70,10 +70,10 @@ namespace Acuminator.Runner.Input
 		public string? MSBuildPath { get; }
 
 		/// <summary>
-		/// The name of the output file. If not specified then the report with analysis results will be outputted to the console window.
+		/// The path to the output file. If not specified then the report with analysis results will be outputted to the console window.
 		/// </summary>
 		[Option(shortName: CommandLineArgNames.OutputFileShort, longName: CommandLineArgNames.OutputFileLong,
-				HelpText = "The name of the output file. If not specified then the report with analysis results will be outputted to the console window.")]
+				HelpText = "The path to the output file. If not specified then the report with analysis results will be outputted to the console window.")]
 		public string? OutputFileName { get; }
 
 		/// <summary>
@@ -104,18 +104,203 @@ namespace Acuminator.Runner.Input
 						   """)]
 		public string? OutputFormat { get; }
 
+		/// <summary>
+		/// This flag indicates whether the ISV analysis mode is enabled.<br/>
+		/// By default, the ISV mode is disabled. Developers should explicitly enable the ISV mode by setting this flag.
+		/// </summary>
+		/// <remarks>
+		/// Acuminator has two analysis modes:
+		/// <list type="bullet">
+		/// <item>The default mode (also called "non-ISV mode") used by Acumatica developers internally</item>
+		/// <item>
+		/// The ISV-mode recommended for ISV and other external developers that create customizations based on Acumatica Framework.<br/><br/>
+		/// The ISV mode got its name from the ISV certification process that is used by Acumatica to validate third party customizations created by Integrated Software Vendors (ISVs).<br/>
+		/// A part of the ISV certification process is the execution of Acuminator analysis in this mode for the code of the customization being validated.
+		/// </item>
+		/// </list> 
+		/// The difference between these two modes is that the analysis in the ISV mode is stricter than in the default mode.<br/>
+		/// In the ISV mode Acuminator performs additional diagnostics that are not used in the default mode. The severity of some diagnostics is increased from "Warning" to "Error".<br/>
+		/// For example, in the ISV mode Acuminator will report usages of Acumatica Framework APIs that are marked for internal use only. 
+		/// </remarks>
+		[Option(longName: CommandLineArgNames.IsvSpecificAnalysisIsEnabled, Default = false,
+				HelpText = """
+							This flag indicates whether the ISV analysis mode is enabled.
+							By default, the ISV mode is disabled. Developers should explicitly enable the ISV mode by setting this flag.
+
+							Acuminator has two analysis modes:
+							- The default mode (also called "non-ISV mode") used by Acumatica developers internally
+							- The ISV-mode recommended for ISV and other external developers that create customizations based on Acumatica Framework.
+
+							  The ISV mode got its name from the ISV certification process that is used by Acumatica to validate third-party customizations created by Integrated Software Vendors (ISVs).
+							  A part of the ISV certification process is the execution of Acuminator analysis in this mode for the code of the customization being validated.
+
+							The difference between these two modes is that the analysis in the ISV mode is stricter than in the default mode.
+							In the ISV mode, Acuminator performs additional diagnostics that are not used in the default mode. The severity of some diagnostics is increased from "Warning" to "Error".
+							For example, in the ISV mode, Acuminator will report usages of Acumatica Framework APIs that are marked for internal use only.
+							""")]
+		public bool IsvSpecificAnalysisIsEnabled { get; }
+
+		/// <summary>
+		/// This flag indicates whether the PX1007 diagnostic is enabled.<br/>
+		/// By default, the PX1007 diagnostic is disabled. Developers should explicitly enable it by specifying this flag.
+		/// </summary>
+		/// <remarks>
+		/// The PX1007 diagnostic is used to check whether the XML documentation comment is present on DACs and DAC field properties.<br/>
+		/// You can find more details about this diagnostic here: https://github.com/Acumatica/Acuminator/blob/dev/docs/diagnostics/PX1007.md.
+		/// <br/>
+		/// This diagnostic is important for Acumatica internal development process, but it is considered as an optional diagnostic for ISV, and other external developers.<br/>
+		/// Therefore, by default it is disabled.
+		/// </remarks>
+		[Option(longName: CommandLineArgNames.PX1007DiagnosticIsEnabled, Default = false,
+				HelpText = """
+						   This flag indicates whether the PX1007 diagnostic is enabled.
+						   By default, the PX1007 diagnostic is disabled. Developers should explicitly enable it by specifying this flag.
+
+						   The PX1007 diagnostic is used to check whether the XML documentation comment is present on DACs and DAC field properties.
+						   You can find more details about this diagnostic here: https://github.com/Acumatica/Acuminator/blob/dev/docs/diagnostics/PX1007.md.
+
+						   This diagnostic is important for Acumatica internal development process, but it is considered as an optional diagnostic for ISV, and other external developers.
+						   Therefore, by default it is disabled.
+						   """)]
+		public bool PX1007DiagnosticIsEnabled { get; }
+
+		/// <summary>
+		/// This flag indicates whether the PX1099 diagnostic for banned API should be disabled.<br/>
+		/// By default, the PX1099 diagnostic is enabled. Developers should explicitly disable it by specifying this flag.
+		/// </summary>
+		/// <remarks>
+		/// The PX1099 diagnostic detects APIs that should not be used with the Acumatica Framework. Each banned API may have its own reason for being banned.<br/>
+		/// <br/>
+		/// The PX1099 diagnostic checks every API call in the code against a list of forbidden APIs and a list of allowed APIs.<br/>
+		/// These lists can be loaded from custom files specified by the <see cref="BannedApiFilePath"/> and <see cref="AllowedApisFilePath"/> options respectively.<br/>
+		/// If no file is specified, a default list of APIs will be used. You can find the content of default API lists and how exactly the diagnostic works in the documentation:
+		/// https://github.com/Acumatica/Acuminator/blob/dev/docs/diagnostics/PX1099.md.
+		/// </remarks>
+		[Option(longName: CommandLineArgNames.DisablePX1099Diagnostic, Default = false,
+				HelpText = """
+						   This flag indicates whether the PX1099 diagnostic for banned API should be disabled.
+						   By default, the PX1099 diagnostic is enabled. Developers should explicitly disable it by specifying this flag.
+
+						   The PX1099 diagnostic detects APIs that should not be used with the Acumatica Framework. Each banned API may have its own reason for being banned.
+
+						   The PX1099 diagnostic checks every API call in the code against a list of forbidden APIs and a list of allowed APIs.
+						   These lists can be loaded from custom files specified by the "BannedApiFilePath" and "AllowedApisFilePath" options respectively.
+						   If no file is specified, a default list of APIs will be used. You can find the content of default API lists and how exactly the diagnostic works in the documentation:
+						   https://github.com/Acumatica/Acuminator/blob/dev/docs/diagnostics/PX1099.md.
+						   """)]
+		public bool DisablePX1099Diagnostic { get; }
+
+		/// <summary>
+		/// A path to a custom file with a list of forbidden APIs for the PX1099 diagnostic.<br/>
+		/// This is an optional parameter that allows developers to override a default list of forbidden APIs for PX1099 diagnostic.<br/>
+		/// </summary>
+		/// <remarks>
+		/// The PX1099 diagnostic checks every API call in the code against a list of forbidden APIs and a list of allowed APIs.<br/>
+		/// The diagnostic supports custom externally provided list of forbidden APIs which can be loaded from a file.<br/>
+		/// If a file with forbidden APIs is not specified, a default list of APIs embedded into Acuminator will be used.<br/>
+		/// You can find the default list of forbidden APIs in the documentation:<br/>
+		/// https://github.com/Acumatica/Acuminator/blob/dev/docs/diagnostics/PX1099.md#banned-and-allowed-apis.
+		/// </remarks>
+		[Option(longName: CommandLineArgNames.BannedApiFilePath,
+				HelpText = """
+						   A path to a custom file with a list of forbidden APIs for the PX1099 diagnostic.
+						   This is an optional parameter that allows developers to override a default list of forbidden APIs for PX1099 diagnostic.
+
+						   The PX1099 diagnostic checks every API call in the code against a list of forbidden APIs and a list of allowed APIs.
+						   The diagnostic supports custom externally provided lists of forbidden APIs which can be loaded from a file.
+						   If a file with forbidden APIs is not specified, a default list of APIs embedded into Acuminator will be used.
+						   You can find the default list of forbidden APIs in the documentation:
+						   https://github.com/Acumatica/Acuminator/blob/dev/docs/diagnostics/PX1099.md#banned-and-allowed-apis.
+						   """)]
+		public string? BannedApiFilePath { get; }
+
+		/// <summary>
+		/// A path to a custom file with a list of allowed APIs for the PX1099 diagnostic.<br/>
+		/// This is an optional parameter that allows developers to override a default list of allowed APIs for PX1099 diagnostic.<br/>
+		/// </summary>
+		/// <remarks>
+		/// The PX1099 diagnostic checks every API call in the code against a list of forbidden APIs and a list of allowed APIs.<br/>
+		/// The diagnostic supports custom externally provided list of allowed APIs which can be loaded from a file.<br/>
+		/// If a file with allowed APIs is not specified, a default list of APIs embedded into Acuminator will be used.<br/>
+		/// You can find the default list of allowed APIs in the documentation:<br/>
+		/// https://github.com/Acumatica/Acuminator/blob/dev/docs/diagnostics/PX1099.md#banned-and-allowed-apis.
+		/// </remarks>
+		[Option(longName: CommandLineArgNames.AllowedApisFilePath,
+				HelpText = """
+						   A path to a custom file with a list of allowed APIs for the PX1099 diagnostic.
+						   This is an optional parameter that allows developers to override a default list of allowed APIs for PX1099 diagnostic.
+
+						   The PX1099 diagnostic checks every API call in the code against a list of forbidden APIs and a list of allowed APIs.
+						   The diagnostic supports custom externally provided lists of allowed APIs which can be loaded from a file.
+						   If a file with allowed APIs is not specified, a default list of APIs embedded into Acuminator will be used.
+						   You can find the default list of allowed APIs in the documentation:
+						   https://github.com/Acumatica/Acuminator/blob/dev/docs/diagnostics/PX1099.md#banned-and-allowed-apis.
+						   """)]
+		public string? AllowedApisFilePath { get; }
+
+		/// <summary>
+		/// This flag indicates whether Acuminator should work in a special suppression generator mode.<br/>
+		/// In this mode Acuminator does not report errors, but instead generates suppression records in Acuminator suppression file for all errors it found in the code.<br/>
+		/// By default, the suppression file generation is disabled. Developers should explicitly enable it by specifying this flag.
+		/// </summary>
+		/// <remarks>
+		/// Acuminator provides two mechanisms to suppress its diagnostics:
+		///<list type="bullet">
+		/// <item>Local suppression with a suppression comment.</item>
+		/// <item>Global suppression with a suppression file.</item>
+		/// </list>
+		/// Each of the mechanisms is used for different scenarios. Local suppression provides a notice to the reader that there is an Acuminator alert suppressed due to the specified reasons.<br/>
+		/// Global suppression does not provide any information regarding alerts suppressed in the code or the reason for the suppression of the alert to the reader.<br/>
+		/// It is used to suppress errors in our legacy code in an automated way to avoid huge rewrite of the legacy code.<br/>
+		/// <br/>
+		/// This is useful for development processes in large codebases where the number of errors is large and the cost of fixing them is high.<br/>
+		/// For example, you can use the Acuminator console tool in CI scenarios to run automatic tests with Acuminator static analysis<br/>
+		/// which will rely on Acuminator suppression file for the main code base and report Acuminator warnings and errors only for the new code.<br/>
+		///<br/>
+		///	The suppression generator mode is designed to support such scenarios by implementing automatic generation of the suppression file for a given codebase.
+		/// </remarks>
+		[Option(shortName: CommandLineArgNames.GenerateSuppressionFileShort, longName: CommandLineArgNames.GenerateSuppressionFileLong, Default = false,
+				HelpText = """
+						   This flag indicates whether Acuminator should work in a special suppression generator mode.
+						   In this mode, Acuminator does not report errors, but instead generates suppression records in the Acuminator suppression file for all errors it found in the code.
+						   By default, the suppression file generation is disabled. Developers should explicitly enable it by specifying this flag.
+
+						   Acuminator provides two mechanisms to suppress its diagnostics:
+						   - Local suppression with a suppression comment.
+						   - Global suppression with a suppression file.
+
+						   Each of the mechanisms is used for different scenarios. Local suppression provides a notice to the reader that there is an Acuminator alert suppressed due to the specified reasons.
+						   Global suppression does not provide any information regarding alerts suppressed in the code or the reason for the suppression of the alert to the reader.
+						   It is used to suppress errors in legacy code in an automated way to avoid a huge rewrite of the legacy code.
+
+						   This is useful for development processes in large codebases where the number of errors is large and the cost of fixing them is high.
+						   For example, you can use the Acuminator console tool in CI scenarios to run automatic tests with Acuminator static analysis
+						   which will rely on the Acuminator suppression file for the main code base and report Acuminator warnings and errors only for the new code.
+
+						   The suppression generator mode is designed to support such scenarios by implementing automatic generation of the suppression file for a given codebase.
+						   """)]
+		public bool GenerateSuppressionFile { get; }
+
 		// Constructor arguments order must be the same as the properties order. This allows command line parser to initialize immutable options object via constructor.
 		// See this for details: https://github.com/commandlineparser/commandline/wiki/Immutable-Options-Type
 		public CommandLineOptions(string codeSource, string verbosity, bool disableSuppressionMechanism, string? msBuildPath, string? outputFileName, 
-								  bool outputAbsolutePathsToUsages, string? outputFormat)
+								  bool outputAbsolutePathsToUsages, string? outputFormat, bool isvSpecificAnalysisIsEnabled, 
+								  bool px1007DiagnosticIsEnabled, bool disablePX1099Diagnostic, string? bannedApiFilePath, string? allowedApisFilePath,
+								  bool generateSuppressionFile)
 		{
-			CodeSource 					= codeSource;
-			Verbosity 					= verbosity;
-			DisableSuppressionMechanism = disableSuppressionMechanism;
-			MSBuildPath 				= msBuildPath;
-			OutputFileName				= outputFileName;
-			OutputAbsolutePathsToUsages = outputAbsolutePathsToUsages;
-			OutputFormat				= outputFormat;
+			CodeSource 					   = codeSource;
+			Verbosity 					   = verbosity;
+			DisableSuppressionMechanism    = disableSuppressionMechanism;
+			MSBuildPath 				   = msBuildPath;
+			OutputFileName				   = outputFileName;
+			OutputAbsolutePathsToUsages    = outputAbsolutePathsToUsages;
+			OutputFormat				   = outputFormat;
+			IsvSpecificAnalysisIsEnabled   = isvSpecificAnalysisIsEnabled;
+			PX1007DiagnosticIsEnabled 	   = px1007DiagnosticIsEnabled;
+			DisablePX1099Diagnostic		   = disablePX1099Diagnostic;
+			BannedApiFilePath			   = bannedApiFilePath;
+			AllowedApisFilePath			   = allowedApisFilePath;
+			GenerateSuppressionFile 	   = generateSuppressionFile;
 		}
 	}
 }
