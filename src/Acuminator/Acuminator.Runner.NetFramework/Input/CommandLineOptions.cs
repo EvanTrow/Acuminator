@@ -257,7 +257,9 @@ namespace Acuminator.Runner.Input
 		/// For example, you can use the Acuminator console tool in CI scenarios to run automatic tests with Acuminator static analysis<br/>
 		/// which will rely on Acuminator suppression file for the main code base and report Acuminator warnings and errors only for the new code.<br/>
 		///<br/>
-		///	The suppression generator mode is designed to support such scenarios by implementing automatic generation of the suppression file for a given codebase.
+		///	The suppression generator mode is designed to support such scenarios by implementing automatic generation of the suppression file for a given codebase.<br/>
+		///	It will generate suppression records for all errors it found in the code and add them to the suppression file.<br/>
+		/// Note that it does not generate suppression records for errors that are already suppressed in the code with local suppression comments.<br/>
 		/// </remarks>
 		[Option(shortName: CommandLineArgNames.GenerateSuppressionFileShort, longName: CommandLineArgNames.GenerateSuppressionFileLong, Default = false,
 				HelpText = """
@@ -278,6 +280,8 @@ namespace Acuminator.Runner.Input
 						   which will rely on the Acuminator suppression file for the main code base and report Acuminator warnings and errors only for the new code.
 
 						   The suppression generator mode is designed to support such scenarios by implementing automatic generation of the suppression file for a given codebase.
+						   It will generate suppression records for all errors it found in the code and add them to the suppression file.
+						   Note that Acuminator does not generate suppression records for errors that are already suppressed in the code with local suppression comments.
 						   """)]
 		public bool GenerateSuppressionFile { get; }
 
