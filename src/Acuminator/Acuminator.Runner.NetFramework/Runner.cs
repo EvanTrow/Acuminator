@@ -34,7 +34,11 @@ namespace Acuminator.Runner.NetFramework
 			}
 			catch (Exception e)
 			{
-				Log.Error(e, "An unhandled runtime error was encountered during the validation.");
+				if (Log.Logger != null)
+					Log.Error(e, "An unhandled runtime error was encountered during the validation.");
+				else
+					Console.WriteLine($"ERROR: An unhandled runtime error was encountered during the validation. Details:{Environment.NewLine}{e}");
+
 				return RunResult.RunTimeError.ToExitCode();
 			}
 		}
@@ -68,7 +72,7 @@ namespace Acuminator.Runner.NetFramework
 				if (!commandLineOptions.Verbosity.IsNullOrWhiteSpace() &&
 					!Enum.TryParse(commandLineOptions.Verbosity, ignoreCase: true, out logLevel))
 				{
-					Console.WriteLine($"The logger verbosity value \"{commandLineOptions.Verbosity}\" is not supported. " +
+					Console.WriteLine($"ERROR: The logger verbosity value \"{commandLineOptions.Verbosity}\" is not supported. " +
 									  "Use help to see the list of allowed verbosity values.");
 					return false;
 				}
@@ -80,7 +84,7 @@ namespace Acuminator.Runner.NetFramework
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine(e);   // Log failed serilog initialization directly to console
+				Console.WriteLine($"ERROR: Unhandled error during the initialization of the logger. Details:{Environment.NewLine}{e}");   // Log failed serilog initialization directly to console
 				return false;
 			}
 		}
