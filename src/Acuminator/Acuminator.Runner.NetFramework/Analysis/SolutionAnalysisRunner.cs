@@ -25,6 +25,13 @@ namespace Acuminator.Runner.Analysis
 	[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", Justification = "Resource strings are used for logged messages")]
 	internal class SolutionAnalysisRunner
 	{
+		private readonly ILogger _logger;
+
+		public SolutionAnalysisRunner(ILogger logger)
+		{
+			_logger = logger.CheckIfNull();
+		}
+
 		public async Task<RunResult> RunAnalysisAsync(AnalysisContext analysisContext, CancellationToken cancellationToken)
 		{
 			analysisContext.ThrowOnNull(nameof(analysisContext));
@@ -45,13 +52,13 @@ namespace Acuminator.Runner.Analysis
 			}
 			catch (OperationCanceledException cancellationException)
 			{
-				Log.Warning(cancellationException, Messages.CodeSourceValidationWasCancelled,
+				_logger.Warning(cancellationException, Messages.CodeSourceValidationWasCancelled,
 							analysisContext.CodeSource.Location);
 				runResult = RunResult.Cancelled;
 			}
 			catch (Exception exception)
 			{
-				Log.Error(exception, Messages.AnalysisOfCodeSourceRuntimeError, analysisContext.CodeSource.Location);
+				_logger.Error(exception, Messages.AnalysisOfCodeSourceRuntimeError, analysisContext.CodeSource.Location);
 				hasErrors = true;
 			}
 			finally
@@ -67,7 +74,7 @@ namespace Acuminator.Runner.Analysis
 
 		private async Task<RunResult> LoadAndAnalyzeCodeSourceAsync(AnalysisContext analysisContext, CancellationToken cancellationToken)
 		{
-			Log.Information(Messages.StartAnalyzingTheCodeSourceStatusMessage, analysisContext.CodeSource.Location);
+			_logger.Information(Messages.StartAnalyzingTheCodeSourceStatusMessage, analysisContext.CodeSource.Location);
 
 			using var workspace = MSBuildWorkspace.Create();
 
@@ -75,25 +82,29 @@ namespace Acuminator.Runner.Analysis
 			{
 				workspace.WorkspaceFailed += OnCodeSourceLoadError;
 
-				Log.Information(Messages.StartLoadingTheCodeSourceAtPathStatusMessage, analysisContext.CodeSource.Location);
+				_logger.Information(Messages.StartLoadingTheCodeSourceAtPathStatusMessage, analysisContext.CodeSource.Location);
 				var solution = await analysisContext.CodeSource.LoadSolutionAsync(workspace, cancellationToken)
 															   .ConfigureAwait(false);
 				if (solution == null)
 				{
-					Log.Error(Messages.FailedToLoadSolutionFromCodeSourceError, analysisContext.CodeSource.Location);
+					_logger.Error(Messages.FailedToLoadSolutionFromCodeSourceError, analysisContext.CodeSource.Location);
 					return RunResult.RunTimeError;
 				}
 
-				Log.Information(Messages.SuccessfullyLoadedCodeSourceAtPathStatusMessage, analysisContext.CodeSource.Location);
-				Log.Debug(Messages.LoadedProjectsCount_Information, solution.ProjectIds.Count);
+				_logger.Information(Messages.SuccessfullyLoadedCodeSourceAtPathStatusMessage, analysisContext.CodeSource.Location);
+				_logger.Debug(Messages.LoadedProjectsCount_Information, solution.ProjectIds.Count);
 
-				Log.Information(Messages.InitializeAcuminatorAnalyzersStatusMessage);
-				var solutionCompatibilityAnalyzer = AcuminatorAnalysisSolutionValidator.CreateAcuminatorSolutionAnalyzer();
-				Log.Information(Messages.StartValidatingSolutionStatusMessage);
+				_logger.Information(Messages.InitializeAcuminatorAnalyzersStatusMessage);
+				var solutionCompatibilityAnalyzer = AcuminatorAnalysisSolutionValidator.CreateAcuminatorSolutionAnalyzer(analysisContext, _logger);
+
+				if (solutionCompatibilityAnalyzer == null)
+					return RunResult.RunTimeError;
+
+				_logger.Information(Messages.StartValidatingSolutionStatusMessage);
 
 				RunResult validationResult = await solutionCompatibilityAnalyzer.AnalyseSolution(solution, analysisContext, cancellationToken);
 				
-				Log.Information(Messages.SuccessfullyFinishedSolutionValidationStatusMessage);
+				_logger.Information(Messages.SuccessfullyFinishedSolutionValidationStatusMessage);
 				return validationResult;
 			}
 			finally
@@ -107,10 +118,10 @@ namespace Acuminator.Runner.Analysis
 			switch (e.Diagnostic.Kind)
 			{
 				case WorkspaceDiagnosticKind.Failure:
-					Log.Error("{WorkspaceDiagnostic}", e.Diagnostic);
+					_logger.Error("{WorkspaceDiagnostic}", e.Diagnostic);
 					break;
 				case WorkspaceDiagnosticKind.Warning:
-					Log.Warning("{WorkspaceDiagnostic}", e.Diagnostic);
+					_logger.Warning("{WorkspaceDiagnostic}", e.Diagnostic);
 					break;
 			}
 		}
@@ -122,19 +133,19 @@ namespace Acuminator.Runner.Analysis
 				return TryRegisterMSBuildByPath(analysisContext.MSBuildPath);
 			}
 
-			Log.Information(Messages.SearchingForMSBuildInstancesStatusMessage);
+			_logger.Information(Messages.SearchingForMSBuildInstancesStatusMessage);
 
 			var vsInstances = MSBuildLocator.QueryVisualStudioInstances();
 			VisualStudioInstance? latestVSInstance = vsInstances.OrderByDescending(vsInstance => vsInstance.Version)
 																.FirstOrDefault();
 			if (latestVSInstance == null)
 			{
-				Log.Error(Messages.NoInstalledMSBuildFoundError);
+				_logger.Error(Messages.NoInstalledMSBuildFoundError);
 				return false;
 			}
 
-			Log.Information(Messages.MSBuild_VisualStudioNameAndVersion_Info, latestVSInstance.Name, latestVSInstance.Version);
-			Log.Information(Messages.MSBuildPath_Info, latestVSInstance.MSBuildPath);
+			_logger.Information(Messages.MSBuild_VisualStudioNameAndVersion_Info, latestVSInstance.Name, latestVSInstance.Version);
+			_logger.Information(Messages.MSBuildPath_Info, latestVSInstance.MSBuildPath);
 
 			try
 			{
@@ -143,7 +154,7 @@ namespace Acuminator.Runner.Analysis
 			}
 			catch (Exception e)
 			{
-				Log.Error(e, Messages.MSBuildInstanceRegistrationError);
+				_logger.Error(e, Messages.MSBuildInstanceRegistrationError);
 				return false;
 			}
 		}
@@ -152,17 +163,17 @@ namespace Acuminator.Runner.Analysis
 		{
 			try
 			{
-				Log.Information(Messages.RegisteringMSBuildAtTheProvidedPathStatusMessage, msBuildPath);
+				_logger.Information(Messages.RegisteringMSBuildAtTheProvidedPathStatusMessage, msBuildPath);
 
 				string? msBuildDir = Path.GetDirectoryName(msBuildPath);
 				MSBuildLocator.RegisterMSBuildPath(msBuildDir);
 
-				Log.Information(Messages.SuccessfullyRegisteredMSBuildAtProvidedPathStatusMessage, msBuildPath);
+				_logger.Information(Messages.SuccessfullyRegisteredMSBuildAtProvidedPathStatusMessage, msBuildPath);
 				return true;
 			}
 			catch (Exception e)
 			{
-				Log.Error(e, Messages.MSBuildRegistrationAtProvidedPathFailedError, msBuildPath);
+				_logger.Error(e, Messages.MSBuildRegistrationAtProvidedPathFailedError, msBuildPath);
 				return false;
 			}
 		}
@@ -176,7 +187,7 @@ namespace Acuminator.Runner.Analysis
 			}
 			catch (Exception e)
 			{
-				Log.Error(e, Messages.UnregisterMSBuildInstanceError);
+				_logger.Error(e, Messages.UnregisterMSBuildInstanceError);
 				return false;
 			}
 		}

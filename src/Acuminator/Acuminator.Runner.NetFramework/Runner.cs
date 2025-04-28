@@ -45,16 +45,20 @@ namespace Acuminator.Runner.NetFramework
 
 		private static async Task<RunResult> RunValidationWithParsedOptionsAsync(CommandLineOptions commandLineOptions)
 		{
-			if (!TryInitalizeSerilog(commandLineOptions))
+			var logger = TryInitalizeLogger(commandLineOptions);
+
+			if (logger == null)
 				return RunResult.RunTimeError;
 
-			using var consoleCancellationSubscription = new ConsoleCancellationSubscription(Log.Logger);
+			Log.Logger = logger;
+
+			using var consoleCancellationSubscription = new ConsoleCancellationSubscription(logger);
 			AnalysisContext? analysisContext = CreateAnalysisContextFromCommandLineArguments(commandLineOptions);
 
 			if (analysisContext == null)
 				return RunResult.RunTimeError;
 
-			var analyzer = new SolutionAnalysisRunner();
+			var analyzer = new SolutionAnalysisRunner(logger);
 			var analysisResult = await analyzer.RunAnalysisAsync(analysisContext, consoleCancellationSubscription.CancellationToken);
 
 			OutputValidationResult(analysisResult, analysisContext.CodeSource.Type);
@@ -62,7 +66,7 @@ namespace Acuminator.Runner.NetFramework
 			return analysisResult;
 		}
 
-		private static bool TryInitalizeSerilog(CommandLineOptions commandLineOptions)
+		private static ILogger? TryInitalizeLogger(CommandLineOptions commandLineOptions)
 		{
 			try
 			{
@@ -74,18 +78,18 @@ namespace Acuminator.Runner.NetFramework
 				{
 					Console.WriteLine($"ERROR: The logger verbosity value \"{commandLineOptions.Verbosity}\" is not supported. " +
 									  "Use help to see the list of allowed verbosity values.");
-					return false;
+					return null;
 				}
 
 				loggerConfiguration = loggerConfiguration.MinimumLevel.Is(logLevel)
 														 .Enrich.FromLogContext();
-				Log.Logger = loggerConfiguration.CreateLogger();
-				return true;
+				var logger = loggerConfiguration.CreateLogger();
+				return logger;
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine($"ERROR: Unhandled error during the initialization of the logger. Details:{Environment.NewLine}{e}");   // Log failed serilog initialization directly to console
-				return false;
+				return null;
 			}
 		}
 
