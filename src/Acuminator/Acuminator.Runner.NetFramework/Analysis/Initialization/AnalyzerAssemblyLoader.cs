@@ -1,11 +1,9 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Reflection;
 
 using Microsoft.CodeAnalysis;
 
-namespace Acuminator.Runner.Analysis.Helpers
+namespace Acuminator.Runner.Analysis.Initialization
 {
 	internal class AnalyzerAssemblyLoader : IAnalyzerAssemblyLoader
 	{
@@ -13,7 +11,6 @@ namespace Acuminator.Runner.Analysis.Helpers
 		{
 		}
 
-		public Assembly LoadFromPath(string fullPath) => 
-			Assembly.LoadFrom(fullPath);
+		public Assembly LoadFromPath(string fullPath) => Assembly.LoadFrom(fullPath);
 	}
 }
