@@ -19,7 +19,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 
 		internal string Path { get; }
 
-		private readonly ISuppressionFileWatcherService _fileWatcher;
+		private readonly ISuppressionFileWatcherService? _fileWatcher;
 
 		/// <summary>
 		/// Indicates whether to generate errors suppression base to suppression file or not
@@ -49,7 +49,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 		}
 
 		private SuppressionFile(string assemblyName, string path, bool generateSuppressionBase,
-								HashSet<SuppressMessage> messages, ISuppressionFileWatcherService watcher)
+								HashSet<SuppressMessage> messages, ISuppressionFileWatcherService? watcher)
 		{
 			AssemblyName = assemblyName;
 			Path = path;
@@ -89,7 +89,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				messages = LoadMessages(fileSystemService, suppressionFilePath);
 			}
 
-			ISuppressionFileWatcherService fileWatcher;
+			ISuppressionFileWatcherService? fileWatcher;
 
 			lock (fileSystemService)
 			{
