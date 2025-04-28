@@ -17,6 +17,10 @@ namespace Acuminator.Runner.Input
 		/// </value>
 		public ICodeSource CodeSource { get; }
 
+		public CodeAnalysisSettings CodeAnalysisSettings { get; }
+
+		public BannedApiSettings BannedApiSettings { get; }
+
 		/// <inheritdoc cref="CommandLineOptions.MSBuildPath"/>
 		public string? MSBuildPath { get; }
 
@@ -29,12 +33,12 @@ namespace Acuminator.Runner.Input
 		/// <inheritdoc cref="CommandLineOptions.OutputFormat"/>
 		public OutputFormat OutputFormat { get; }
 
-		public CodeAnalysisSettings CodeAnalysisSettings { get; }
-
-		public BannedApiSettings BannedApiSettings { get; }
+		/// <inheritdoc cref="CommandLineOptions.GenerateSuppressionFile"/>
+		public bool GenerateSuppressionFile { get; }
 
 		public AnalysisContext(ICodeSource codeSource, CodeAnalysisSettings codeAnalysisSettings, BannedApiSettings bannedApiSettings, 
-							   string? msBuildPath, string? outputFileName, bool outputAbsolutePathsToUsages, OutputFormat outputFormat)
+							   string? msBuildPath, string? outputFileName, bool outputAbsolutePathsToUsages, OutputFormat outputFormat,
+							   bool generateSuppressionFile)
 		{
 			CodeSource 					= codeSource.CheckIfNull();
 			CodeAnalysisSettings		= codeAnalysisSettings.CheckIfNull();
@@ -43,6 +47,7 @@ namespace Acuminator.Runner.Input
 			OutputFileName				= outputFileName.NullIfWhiteSpace();
 			OutputAbsolutePathsToUsages = outputAbsolutePathsToUsages;
 			OutputFormat				= outputFormat;
+			GenerateSuppressionFile		= generateSuppressionFile;
 		}
 	}
 }
