@@ -8,6 +8,9 @@ using Microsoft.CodeAnalysis.MSBuild;
 
 namespace Acuminator.Runner.Analysis.CodeSources
 {
+    /// <summary>
+    /// Interface for code source.
+    /// </summary>
     internal interface ICodeSource
     {
         CodeSourceType Type { get; }
