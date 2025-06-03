@@ -142,6 +142,15 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to obtain Roslyn compilation data for the project with name \&quot;{ProjectName}\&quot; and path \&quot;{ProjectPath}\&quot;..
+        /// </summary>
+        internal static string FailedToObtainRoslynCompilationDataForTheProjectError {
+            get {
+                return ResourceManager.GetString("FailedToObtainRoslynCompilationDataForTheProjectError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Finished Acuminator validation of the project \&quot;{ProjectName}\&quot;. Project validation result: {Result}..
         /// </summary>
         internal static string FinishedAcuminatorValidationOfTheProjectInfo {
@@ -228,6 +237,33 @@ namespace Acuminator.Runner.Resources {
         internal static string NotSupportedOutputFormat {
             get {
                 return ResourceManager.GetString("NotSupportedOutputFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Obtained Roslyn compilation data for the project \&quot;{ProjectName}\&quot; successfully..
+        /// </summary>
+        internal static string ObtainedRoslynCompilationDataForTheProjectDebug {
+            get {
+                return ResourceManager.GetString("ObtainedRoslynCompilationDataForTheProjectDebug", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Obtaining Roslyn compilation data for the project \&quot;{ProjectName}\&quot;..
+        /// </summary>
+        internal static string ObtainingRoslynCompilationDataForTheProjectDebug {
+            get {
+                return ResourceManager.GetString("ObtainingRoslynCompilationDataForTheProjectDebug", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The project {ProjectName} does not reference Acumatica Platform. Validation can not be performed.
+        /// </summary>
+        internal static string ProjectDoesNotReferenceAcumaticaPlatformValidationError {
+            get {
+                return ResourceManager.GetString("ProjectDoesNotReferenceAcumaticaPlatformValidationError", resourceCulture);
             }
         }
         

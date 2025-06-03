@@ -124,6 +124,9 @@
   <data name="FailedToObtainCompilationWithAnalyzersError" xml:space="preserve">
     <value>Failed to obtain compilation with analyzers</value>
   </data>
+  <data name="FailedToObtainRoslynCompilationDataForTheProjectError" xml:space="preserve">
+    <value>Failed to obtain Roslyn compilation data for the project with name \"{ProjectName}\" and path \"{ProjectPath}\".</value>
+  </data>
   <data name="FinishedAcuminatorValidationOfTheProjectInfo" xml:space="preserve">
     <value>Finished Acuminator validation of the project \"{ProjectName}\". Project validation result: {Result}.</value>
   </data>
@@ -153,6 +156,15 @@
   </data>
   <data name="NotSupportedOutputFormat" xml:space="preserve">
     <value>Not supported output format "{0}". You can specify only "{1}" and "{2}" values as output formats.</value>
+  </data>
+  <data name="ObtainedRoslynCompilationDataForTheProjectDebug" xml:space="preserve">
+    <value>Obtained Roslyn compilation data for the project \"{ProjectName}\" successfully.</value>
+  </data>
+  <data name="ObtainingRoslynCompilationDataForTheProjectDebug" xml:space="preserve">
+    <value>Obtaining Roslyn compilation data for the project \"{ProjectName}\".</value>
+  </data>
+  <data name="ProjectDoesNotReferenceAcumaticaPlatformValidationError" xml:space="preserve">
+    <value>The project {ProjectName} does not reference Acumatica Platform. Validation can not be performed</value>
   </data>
   <data name="RegisteringMSBuildAtTheProvidedPathStatusMessage" xml:space="preserve">
     <value>Registering MSBuild instance at the provided path "{MSBuildPath}".</value>

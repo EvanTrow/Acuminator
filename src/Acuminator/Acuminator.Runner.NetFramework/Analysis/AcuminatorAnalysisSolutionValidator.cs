@@ -119,33 +119,34 @@ namespace Acuminator.Runner.Analysis
 			return solutionValidationResult;
 		}
 
+		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", 
+						 Justification = "Resource strings are used to simplify review by Doc Team")]
 		private async Task<(RunResult ValidationResult, ProjectReport? Report, bool IsPlatformReferenced)> AnalyzeProject(Project project, 
 																												Input.AnalysisContext analysisContext, 
 																								CancellationToken cancellationToken)
 		{
-			_logger.Debug("Obtaining Roslyn compilation data for the project \"{ProjectName}\".", project.Name);
+			_logger.Debug(Messages.ObtainingRoslynCompilationDataForTheProjectDebug, project.Name);
 			var compilation = await project.GetCompilationAsync(cancellationToken).ConfigureAwait(false);
 
 			if (compilation == null)
 			{
-				_logger.Error("Failed to obtain Roslyn compilation data for the project with name \"{ProjectName}\" and path \"{ProjectPath}\".",
-						  project.Name, project.FilePath);
+				_logger.Error(Messages.FailedToObtainRoslynCompilationDataForTheProjectError, project.Name, project.FilePath);
 				return (RunResult.RunTimeError, Report: null, IsPlatformReferenced: false);
 			}
 
-			_logger.Debug("Obtained Roslyn compilation data for the project \"{ProjectName}\" successfully.", project.Name);
+			_logger.Debug(Messages.ObtainedRoslynCompilationDataForTheProjectDebug, project.Name);
 
 			if (!IsPlatformReferenced(compilation))
 			{
 				if (analysisContext.CodeSource.Type == CodeSources.CodeSourceType.Project)
 				{
-					_logger.Error("The project {ProjectName} does not reference Acumatica Platform. Validation can not be performed", project.Name);
+					_logger.Error(Messages.ProjectDoesNotReferenceAcumaticaPlatformValidationError, project.Name);
 					return (RunResult.RequirementsNotMet, Report: null, IsPlatformReferenced: false);
 		}
 				else
 			{
 					// For solution with multiple projects we will not fail only if there are no projects referencing Acumatica Platform.
-					_logger.Warning("The project {ProjectName} does not reference Acumatica Platform. Validation can not be performed", project.Name);
+					_logger.Warning(Messages.ProjectDoesNotReferenceAcumaticaPlatformValidationError, project.Name);
 					return (RunResult.Success, Report: null, IsPlatformReferenced: false);
 				}
 			}
