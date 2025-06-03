@@ -70,10 +70,8 @@ namespace Acuminator.Runner.Analysis
 
 			using (var reportOutputter = _outputterFactory.CreateOutputter(analysisContext))
 			{
-				var projectReports 	  	  = new List<ProjectReport>(capacity: solution.ProjectIds.Count);
-				var allUsedNamespaces 	  = new HashSet<string>();
-				var allUsedTypes 	  	  = new HashSet<string>();
-				IEnumerable<Api> usedApis = Enumerable.Empty<Api>();
+				var projectReports = new List<ProjectReport>(capacity: solution.ProjectIds.Count);
+				bool hasProjectReferencingAcumatica = false;
 
 				foreach (Project project in projectsToValidate)
 				{
@@ -86,32 +84,28 @@ namespace Acuminator.Runner.Analysis
 						return solutionValidationResult;
 					}
 
-					var (projectValidationResult, projectReport, projectAnalysisData) = 
+					var (projectValidationResult, projectReport, isPlatformReferenced) =
 						await AnalyzeProject(project, analysisContext, cancellationToken).ConfigureAwait(false);
+
+					hasProjectReferencingAcumatica = hasProjectReferencingAcumatica || isPlatformReferenced;
 
 					if (projectReport != null)
 						projectReports.Add(projectReport);
 
 					solutionValidationResult = solutionValidationResult.Combine(projectValidationResult);
 
-					if (projectAnalysisData != null)
-					{
-						allUsedNamespaces.AddRange(projectAnalysisData.UsedNamespaces);
-						allUsedTypes.AddRange(projectAnalysisData.UsedBannedTypes);
-
-						usedApis = usedApis.Concat(projectAnalysisData.UsedDistinctApis);
+					_logger.Information(Messages.FinishedAcuminatorValidationOfTheProjectInfo, project.Name, projectValidationResult);
 					}
 
-					Log.Information("Finished validation of the project \"{ProjectName}\". Project valudation result: {Result}.",
-									project.Name, projectValidationResult);
+				if (!hasProjectReferencingAcumatica)
+				{
+					_logger.Error(Messages.NoProjectInCodeSourceReferencesAcumaticaPlatformError, analysisContext.CodeSource.Location);
+					return RunResult.RunTimeError;
 				}
 
 				if (projectReports.Count > 0)
 				{
-					var distinctApisCalculator = new UsedDistinctApisCalculator(analysisContext, allUsedNamespaces, allUsedTypes);
-					IEnumerable<Api> allDistinctApis = distinctApisCalculator.GetAllUsedApis(usedApis);
-					var codeSourceReport = CreateCodeSourceReport(analysisContext, projectReports, allDistinctApis);
-
+					var codeSourceReport = new CodeSourceReport(analysisContext.CodeSource.Location, projectReports);
 					reportOutputter.OutputReport(codeSourceReport, analysisContext, cancellationToken);
 				}
 			}

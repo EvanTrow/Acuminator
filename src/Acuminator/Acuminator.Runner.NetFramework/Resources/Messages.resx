@@ -151,6 +151,9 @@
   <data name="NoInstalledMSBuildFoundError" xml:space="preserve">
     <value>No installed MSBuild version was found on the machine.</value>
   </data>
+  <data name="NoProjectInCodeSourceReferencesAcumaticaPlatformError" xml:space="preserve">
+    <value>No project in the provided \"{CodeSource}\" references Acumatica Platform</value>
+  </data>
   <data name="NotSupportedCodeSourceType" xml:space="preserve">
     <value>Not supported code source {0}. You can specify only C# projects (*.csproj) and solutions (*.sln) as code sources.</value>
   </data>

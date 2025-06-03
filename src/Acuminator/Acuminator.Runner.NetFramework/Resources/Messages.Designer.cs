@@ -223,6 +223,15 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No project in the provided \&quot;{CodeSource}\&quot; references Acumatica Platform.
+        /// </summary>
+        internal static string NoProjectInCodeSourceReferencesAcumaticaPlatformError {
+            get {
+                return ResourceManager.GetString("NoProjectInCodeSourceReferencesAcumaticaPlatformError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Not supported code source {0}. You can specify only C# projects (*.csproj) and solutions (*.sln) as code sources..
         /// </summary>
         internal static string NotSupportedCodeSourceType {
