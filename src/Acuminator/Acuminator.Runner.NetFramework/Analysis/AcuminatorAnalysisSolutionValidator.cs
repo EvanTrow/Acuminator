@@ -119,58 +119,48 @@ namespace Acuminator.Runner.Analysis
 			return solutionValidationResult;
 		}
 
-		private async Task<(RunResult validationResult, ProjectReport? Report, DiagnosticsWithBannedApis? AnalysisData)> AnalyzeProject(
-																								Project project, Input.AnalysisContext analysisContext,
+		private async Task<(RunResult ValidationResult, ProjectReport? Report, bool IsPlatformReferenced)> AnalyzeProject(Project project, 
+																												Input.AnalysisContext analysisContext, 
 																								CancellationToken cancellationToken)
 		{
-			Log.Debug("Obtaining Roslyn compilation data for the project \"{ProjectName}\".", project.Name);
+			_logger.Debug("Obtaining Roslyn compilation data for the project \"{ProjectName}\".", project.Name);
 			var compilation = await project.GetCompilationAsync(cancellationToken).ConfigureAwait(false);
 
 			if (compilation == null)
 			{
-				Log.Error("Failed to obtain Roslyn compilation data for the project with name \"{ProjectName}\" and path \"{ProjectPath}\".",
+				_logger.Error("Failed to obtain Roslyn compilation data for the project with name \"{ProjectName}\" and path \"{ProjectPath}\".",
 						  project.Name, project.FilePath);
-				return (RunResult.RunTimeError, Report: null, AnalysisData: null);
+				return (RunResult.RunTimeError, Report: null, IsPlatformReferenced: false);
 			}
 
-			Log.Debug("Obtained Roslyn compilation data for the project \"{ProjectName}\" successfully.", project.Name);
-			Log.Debug("Obtaining .Net runtime version targeted by the project \"{ProjectName}\".", project.Name);
+			_logger.Debug("Obtained Roslyn compilation data for the project \"{ProjectName}\" successfully.", project.Name);
 
-			var dotNetVersion = DotNetVersionsStorage.Instance.GetDotNetRuntimeVersion(compilation);
-			var versionValidationResult = ValidateProjectVersion(project, dotNetVersion, analysisContext.TargetRuntime);
+			if (!IsPlatformReferenced(compilation))
+			{
+				if (analysisContext.CodeSource.Type == CodeSources.CodeSourceType.Project)
+				{
+					_logger.Error("The project {ProjectName} does not reference Acumatica Platform. Validation can not be performed", project.Name);
+					return (RunResult.RequirementsNotMet, Report: null, IsPlatformReferenced: false);
+		}
+				else
+			{
+					// For solution with multiple projects we will not fail only if there are no projects referencing Acumatica Platform.
+					_logger.Warning("The project {ProjectName} does not reference Acumatica Platform. Validation can not be performed", project.Name);
+					return (RunResult.Success, Report: null, IsPlatformReferenced: false);
+				}
+			}
 
-			if (versionValidationResult.HasValue)
-				return (versionValidationResult.Value, Report: null, AnalysisData: null);
-
-			if (!IsBannedStorageInitAndNonEmpty)
-				return (RunResult.Success, Report: null, AnalysisData: null);
-			
-			var projectAnalysisResult = await RunAnalyzersOnProjectAsync(compilation, analysisContext, project, cancellationToken)
-												.ConfigureAwait(false);
-			return projectAnalysisResult;
+			var (validationResult, projectReport) = await RunAnalyzersOnProjectAsync(compilation, analysisContext, project, cancellationToken)
+															.ConfigureAwait(false);
+			return (validationResult, projectReport, IsPlatformReferenced: true);
 		}
 
-		private RunResult? ValidateProjectVersion(Project project, DotNetRuntime? projectVersion, DotNetRuntime targetVersion)
-		{
-			if (projectVersion == null)
+		private bool IsPlatformReferenced(Compilation compilation)
 			{
-				Log.Error("Failed to get the .Net runtime version targeted by the project with name \"{ProjectName}\" and path \"{ProjectPath}\".",
-						  project.Name, project.FilePath);
-				return RunResult.RunTimeError;
+			var acuminatorPxContext = new PXContext(compilation, null);
+			return acuminatorPxContext.IsPlatformReferenced;
 			}
 
-			Log.Information("Project \"{ProjectName}\" targeted .Net runtime version is \"{ProjectDotNetVersion}\".", project.Name, projectVersion.Value);
-
-			if (DotNetRunTimeComparer.Instance.Compare(projectVersion.Value, targetVersion) >= 0)
-			{
-				Log.Information("The .Net runtime version \"{ProjectDotNetVersion}\" of the project \"{ProjectName}\" " +
-								"is greater or equals to the target .Net runtime version \"{TargetDotNetVersion}\".",
-								projectVersion.Value, project.Name, targetVersion);
-				return RunResult.Success;
-			}
-
-			return null;
-		}
 
 		private async Task<(RunResult validationResult, ProjectReport? Report, DiagnosticsWithBannedApis? AnalysisData)> RunAnalyzersOnProjectAsync(
 																						Compilation compilation, Input.AnalysisContext analysisContext, 
