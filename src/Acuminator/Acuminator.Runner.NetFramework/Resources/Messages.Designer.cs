@@ -70,6 +70,15 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancelled Acuminator validation of the \&quot;{CodeSource}\&quot;. Project \&quot;{ProjectName}\&quot; validation result: {Result}..
+        /// </summary>
+        internal static string CancelledCodeSourceValidationInfo {
+            get {
+                return ResourceManager.GetString("CancelledCodeSourceValidationInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Code source to use for Acuminator validation is not found at {0}.
         /// </summary>
         internal static string CodeSourceNotFoundError {
@@ -97,6 +106,24 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to initialize Acuminator global suppression mechanism for the code source \&quot;{CodeSource}\&quot;..
+        /// </summary>
+        internal static string FailedToInitializeAcuminatorGlobalSuppressionMechanismError {
+            get {
+                return ResourceManager.GetString("FailedToInitializeAcuminatorGlobalSuppressionMechanismError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load Acuminator analyzers. The analysis of the code source \&quot;{CodeSource}\&quot; cannot be performed.
+        /// </summary>
+        internal static string FailedToLoadAcuminatorAnalyzersError {
+            get {
+                return ResourceManager.GetString("FailedToLoadAcuminatorAnalyzersError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to load solution from the code source &quot;{CodeSourcePath}&quot;..
         /// </summary>
         internal static string FailedToLoadSolutionFromCodeSourceError {
@@ -111,6 +138,15 @@ namespace Acuminator.Runner.Resources {
         internal static string FailedToObtainCompilationWithAnalyzersError {
             get {
                 return ResourceManager.GetString("FailedToObtainCompilationWithAnalyzersError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Finished Acuminator validation of the project \&quot;{ProjectName}\&quot;. Project validation result: {Result}..
+        /// </summary>
+        internal static string FinishedAcuminatorValidationOfTheProjectInfo {
+            get {
+                return ResourceManager.GetString("FinishedAcuminatorValidationOfTheProjectInfo", resourceCulture);
             }
         }
         
@@ -219,6 +255,15 @@ namespace Acuminator.Runner.Resources {
         internal static string StartAnalyzingTheCodeSourceStatusMessage {
             get {
                 return ResourceManager.GetString("StartAnalyzingTheCodeSourceStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Started Acuminator validation of the project \&quot;{ProjectName}\&quot;..
+        /// </summary>
+        internal static string StartedAcuminatorValidationOfTheProjectInfo {
+            get {
+                return ResourceManager.GetString("StartedAcuminatorValidationOfTheProjectInfo", resourceCulture);
             }
         }
         

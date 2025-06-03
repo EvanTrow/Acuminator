@@ -40,21 +40,30 @@ namespace Acuminator.Runner.Analysis
 
 		public static AcuminatorAnalysisSolutionValidator CreateAcuminatorSolutionAnalyzer()
 		{
-			var diagnosticAnalyzers	= CollectAnalyzers();
-			return new AcuminatorAnalysisSolutionValidator(diagnosticAnalyzers);
+			var acuminatorAnalysisInitializer = new AcuminatorAnalysisInitializer(analysisContext, logger);
+			var (areSettingsInitialized, diagnosticAnalyzers) = acuminatorAnalysisInitializer.InitializeAcuminatorSettingsAndGetAnalyzers();
+
+			return areSettingsInitialized && !diagnosticAnalyzers.IsDefaultOrEmpty
+					? new AcuminatorAnalysisSolutionValidator(diagnosticAnalyzers, logger, acuminatorAnalysisInitializer)
+					: null;
 		}
 
-		private static ImmutableArray<DiagnosticAnalyzer> CollectAnalyzers()
-		{
-			var analyzersAssemblyPath = typeof(PXDiagnosticAnalyzer).Assembly.Location;
-			var analyzerReference 	  = new AnalyzerFileReference(analyzersAssemblyPath, new AnalyzerAssemblyLoader());
-			var analyzers 			  = analyzerReference.GetAnalyzers(LanguageNames.CSharp);
-
-			return analyzers;
-		}
-
+		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", 
+						 Justification = "Resource strings are used to simplify review by Doc Team")]
 		public async Task<RunResult> AnalyseSolution(Solution solution, Input.AnalysisContext analysisContext, CancellationToken cancellationToken)
 		{
+			if (_diagnosticAnalyzers.IsDefaultOrEmpty)
+			{
+				_logger.Error(Messages.FailedToLoadAcuminatorAnalyzersError, analysisContext.CodeSource.Location);
+				return RunResult.RunTimeError;
+		}
+
+			if (!_acuminatorAnalysisInitializer.InitializeAcuminatorGlobalSuppressionMechanismForCodeSource(solution))
+		{
+				_logger.Error(Messages.FailedToInitializeAcuminatorGlobalSuppressionMechanismError, analysisContext.CodeSource.Location);
+				return RunResult.RunTimeError;
+			}
+
 			RunResult solutionValidationResult = RunResult.Success;
 			var projectsToValidate = analysisContext.CodeSource.GetProjectsForValidation(solution)
 															   .OrderBy(p => p.Name);
@@ -68,12 +77,11 @@ namespace Acuminator.Runner.Analysis
 
 				foreach (Project project in projectsToValidate)
 				{
-					Log.Information("Started validation of the project \"{ProjectName}\".", project.Name);
+					_logger.Information(Messages.StartedAcuminatorValidationOfTheProjectInfo, project.Name);
 
 					if (cancellationToken.IsCancellationRequested)
 					{
-						Log.Information("Finished validation of the project \"{ProjectName}\". Project valudation result: {Result}.",
-										project.Name, RunResult.Cancelled);
+						_logger.Information(Messages.CancelledCodeSourceValidationInfo, analysisContext.CodeSource.Location, project.Name, RunResult.Cancelled);
 						solutionValidationResult = solutionValidationResult.Combine(RunResult.Cancelled);
 						return solutionValidationResult;
 					}
