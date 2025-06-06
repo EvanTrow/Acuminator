@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Acuminator.Runner.Analysis.Helpers;
-using Acuminator.Runner.Input;
+using Acuminator.Runner.Analysis.Initialization;
 using Acuminator.Runner.Output;
-
+using Acuminator.Runner.Resources;
 using Acuminator.Utilities.Common;
-using Acuminator.Analyzers.StaticAnalysis;
+using Acuminator.Utilities.Roslyn.Semantic;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -26,19 +24,24 @@ namespace Acuminator.Runner.Analysis
 	{
 		private readonly IOutputterFactory _outputterFactory;
 		private readonly IProjectReportBuilder	_reportBuilder;
+		private readonly ILogger _logger;
+		private readonly AcuminatorAnalysisInitializer _acuminatorAnalysisInitializer;
 
 		private readonly ImmutableArray<DiagnosticAnalyzer> _diagnosticAnalyzers;
 
-		private AcuminatorAnalysisSolutionValidator(ImmutableArray<DiagnosticAnalyzer> diagnosticAnalyzers,
-													IProjectReportBuilder? customReportBuilder = null, 
+		private AcuminatorAnalysisSolutionValidator(ImmutableArray<DiagnosticAnalyzer> diagnosticAnalyzers, ILogger logger,
+													AcuminatorAnalysisInitializer acuminatorAnalysisInitializer,
+													IProjectReportBuilder? customReportBuilder = null,
 													IOutputterFactory? customOutputFactory = null)
-		{ 
-			_diagnosticAnalyzers = diagnosticAnalyzers;
-			_reportBuilder 		 = customReportBuilder ?? new ProjectReportBuilder();
-			_outputterFactory 	 = customOutputFactory ?? new ReportOutputterFactory();
+		{
+			_diagnosticAnalyzers 		   = diagnosticAnalyzers;
+			_logger 			 		   = logger;
+			_acuminatorAnalysisInitializer = acuminatorAnalysisInitializer;
+			_reportBuilder 		 		   = customReportBuilder ?? new ProjectReportBuilder();
+			_outputterFactory 	 		   = customOutputFactory ?? new ReportOutputterFactory();
 		}
 
-		public static AcuminatorAnalysisSolutionValidator CreateAcuminatorSolutionAnalyzer()
+		public static AcuminatorAnalysisSolutionValidator? CreateAcuminatorSolutionAnalyzer(Input.AnalysisContext analysisContext, ILogger logger)
 		{
 			var acuminatorAnalysisInitializer = new AcuminatorAnalysisInitializer(analysisContext, logger);
 			var (areSettingsInitialized, diagnosticAnalyzers) = acuminatorAnalysisInitializer.InitializeAcuminatorSettingsAndGetAnalyzers();
@@ -56,10 +59,10 @@ namespace Acuminator.Runner.Analysis
 			{
 				_logger.Error(Messages.FailedToLoadAcuminatorAnalyzersError, analysisContext.CodeSource.Location);
 				return RunResult.RunTimeError;
-		}
+			}
 
 			if (!_acuminatorAnalysisInitializer.InitializeAcuminatorGlobalSuppressionMechanismForCodeSource(solution))
-		{
+			{
 				_logger.Error(Messages.FailedToInitializeAcuminatorGlobalSuppressionMechanismError, analysisContext.CodeSource.Location);
 				return RunResult.RunTimeError;
 			}
@@ -71,7 +74,7 @@ namespace Acuminator.Runner.Analysis
 			using (var reportOutputter = _outputterFactory.CreateOutputter(analysisContext))
 			{
 				var projectReports = new List<ProjectReport>(capacity: solution.ProjectIds.Count);
-				bool hasProjectReferencingAcumatica = false;
+				bool hasRefenceToAcumatica = false;
 
 				foreach (Project project in projectsToValidate)
 				{
@@ -87,7 +90,7 @@ namespace Acuminator.Runner.Analysis
 					var (projectValidationResult, projectReport, isPlatformReferenced) =
 						await AnalyzeProject(project, analysisContext, cancellationToken).ConfigureAwait(false);
 
-					hasProjectReferencingAcumatica = hasProjectReferencingAcumatica || isPlatformReferenced;
+					hasRefenceToAcumatica = hasRefenceToAcumatica || isPlatformReferenced;
 
 					if (projectReport != null)
 						projectReports.Add(projectReport);
@@ -95,9 +98,9 @@ namespace Acuminator.Runner.Analysis
 					solutionValidationResult = solutionValidationResult.Combine(projectValidationResult);
 
 					_logger.Information(Messages.FinishedAcuminatorValidationOfTheProjectInfo, project.Name, projectValidationResult);
-					}
+				}
 
-				if (!hasProjectReferencingAcumatica)
+				if (!hasRefenceToAcumatica)
 				{
 					_logger.Error(Messages.NoProjectInCodeSourceReferencesAcumaticaPlatformError, analysisContext.CodeSource.Location);
 					return RunResult.RunTimeError;
@@ -117,7 +120,7 @@ namespace Acuminator.Runner.Analysis
 						 Justification = "Resource strings are used to simplify review by Doc Team")]
 		private async Task<(RunResult ValidationResult, ProjectReport? Report, bool IsPlatformReferenced)> AnalyzeProject(Project project, 
 																												Input.AnalysisContext analysisContext, 
-																								CancellationToken cancellationToken)
+																												CancellationToken cancellationToken)
 		{
 			_logger.Debug(Messages.ObtainingRoslynCompilationDataForTheProjectDebug, project.Name);
 			var compilation = await project.GetCompilationAsync(cancellationToken).ConfigureAwait(false);
@@ -136,70 +139,55 @@ namespace Acuminator.Runner.Analysis
 				{
 					_logger.Error(Messages.ProjectDoesNotReferenceAcumaticaPlatformValidationError, project.Name);
 					return (RunResult.RequirementsNotMet, Report: null, IsPlatformReferenced: false);
-		}
+				}
 				else
-			{
+				{
 					// For solution with multiple projects we will not fail only if there are no projects referencing Acumatica Platform.
 					_logger.Warning(Messages.ProjectDoesNotReferenceAcumaticaPlatformValidationError, project.Name);
 					return (RunResult.Success, Report: null, IsPlatformReferenced: false);
 				}
 			}
-
+			
 			var (validationResult, projectReport) = await RunAnalyzersOnProjectAsync(compilation, analysisContext, project, cancellationToken)
 															.ConfigureAwait(false);
 			return (validationResult, projectReport, IsPlatformReferenced: true);
 		}
 
 		private bool IsPlatformReferenced(Compilation compilation)
-			{
+		{
 			var acuminatorPxContext = new PXContext(compilation, null);
 			return acuminatorPxContext.IsPlatformReferenced;
-			}
+		}
 
-
-		private async Task<(RunResult validationResult, ProjectReport? Report, DiagnosticsWithBannedApis? AnalysisData)> RunAnalyzersOnProjectAsync(
-																						Compilation compilation, Input.AnalysisContext analysisContext, 
-																						Project project, CancellationToken cancellation)
+		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier",
+						 Justification = "Resource strings are used to simplify review by Doc Team")]
+		private async Task<(RunResult ValidationResult, ProjectReport? Report)> RunAnalyzersOnProjectAsync(Compilation compilation, 
+																										   Input.AnalysisContext analysisContext,
+																										   Project project, CancellationToken cancellation)
 		{
-			if (_diagnosticAnalyzers.IsDefaultOrEmpty)
-				return (RunResult.Success, Report: null, AnalysisData: null);
-
-			SuppressionManager.UseSuppression = !analysisContext.DisableSuppressionMechanism;
-			var compilationAnalysisOptions = new CompilationWithAnalyzersOptions(options: null!, OnAnalyzerException,
+			var analyzerOptions = GetAnalyzerOptions();
+			var compilationAnalysisOptions = new CompilationWithAnalyzersOptions(analyzerOptions!, OnAnalyzerException,
 																				 concurrentAnalysis: !Debugger.IsAttached, 
 																				 logAnalyzerExecutionTime: false);
-			CompilationWithAnalyzers compilationWithAnalyzers = compilation.WithAnalyzers(compilationAnalysisOptions, _diagnosticAnalyzers, cancellation);
+			var compilationWithAnalyzers = new CompilationWithAnalyzers(compilation, _diagnosticAnalyzers, compilationAnalysisOptions);
 
 			var diagnosticResults = await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(cancellation).ConfigureAwait(false);
-			Log.Error("{Project} - Total Errors Count: {ErrorCount}", project.Name, diagnosticResults.Length);
-
+			
 			if (diagnosticResults.IsDefaultOrEmpty)
-				return (RunResult.Success, Report: null, AnalysisData: null);
-
-			var diagnosticsWithApis		= new DiagnosticsWithBannedApis(diagnosticResults, analysisContext);
-			ProjectReport projectReport = _reportBuilder.BuildReport(diagnosticsWithApis, analysisContext, project, cancellation);
-
-			return (RunResult.RequirementsNotMet, projectReport, diagnosticsWithApis);
-		}
-
-		private CodeSourceReport CreateCodeSourceReport(Input.AnalysisContext analysisContext, List<ProjectReport> projectReports, IEnumerable<Api> allDistinctApis)
-		{
-			if (analysisContext.IncludeAllDistinctApis) 
 			{
-				var sortedDistinctApiLines = allDistinctApis.OrderBy(api => api.FullName)
-															.Select(api => new Line(api.FullName))
-															.ToList();
-
-				var codeSourceReport = new CodeSourceReport(analysisContext.CodeSource.Location, sortedDistinctApiLines, projectReports);
-				return codeSourceReport;
+				_logger.Information(Messages.AcuminatorValidationPassedMessage, project.Name);
+				var successfulReport = ProjectReport.SuccessfulReport(project.Name);
+				return (RunResult.Success, successfulReport);
 			}
 			else
-			{
-				int allDistinctApisCount = allDistinctApis.Count();
-				var codeSourceReport = new CodeSourceReport(analysisContext.CodeSource.Location, allDistinctApisCount, projectReports);
-				return codeSourceReport;
-			}
+				_logger.Error(Messages.ProjectTotalErrorsCountMessage, project.Name, diagnosticResults.Length);
+
+			ProjectReport projectReport = _reportBuilder.BuildReport(diagnosticResults, analysisContext, project, cancellation);
+
+			return (RunResult.RequirementsNotMet, projectReport);
 		}
+
+		private AnalyzerOptions? GetAnalyzerOptions() => null;		// TODO Here we may need to put support for .editorcofing files in the future
 
 		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", Justification = "Ok to use runtime dependent new line in message")]
 		private void OnAnalyzerException(Exception exception, DiagnosticAnalyzer analyzer, Diagnostic diagnostic)
@@ -207,7 +195,7 @@ namespace Acuminator.Runner.Analysis
 			var prettyLocation = diagnostic.Location.GetMappedLineSpan().ToString();
 
 			string errorMsg = $"Analyzer error:{Environment.NewLine}{{Id}}{Environment.NewLine}{{Location}}{Environment.NewLine}{{Analyzer}}";
-			Log.Error(exception, errorMsg, diagnostic.Id, prettyLocation, analyzer.ToString());
+			_logger.Error(exception, errorMsg, diagnostic.Id, prettyLocation, analyzer.ToString());
 		}
 	}
 }
