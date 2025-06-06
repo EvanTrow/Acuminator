@@ -70,6 +70,15 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Acuminator version &quot;{Version}&quot; is used for the analysis..
+        /// </summary>
+        internal static string AcuminatorVersionInfo {
+            get {
+                return ResourceManager.GetString("AcuminatorVersionInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error happened during the Acuminator analysis of &quot;{CodeSourcePath}&quot;..
         /// </summary>
         internal static string AnalysisOfCodeSourceRuntimeError {
@@ -115,6 +124,15 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error during the collection of Acuminator analyzers.
+        /// </summary>
+        internal static string ErrorDuringAcuminatorAnalyzersCollection {
+            get {
+                return ResourceManager.GetString("ErrorDuringAcuminatorAnalyzersCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to initialize Acuminator global suppression mechanism for the code source &quot;{CodeSource}&quot;..
         /// </summary>
         internal static string FailedToInitializeAcuminatorGlobalSuppressionMechanismError {
@@ -138,6 +156,15 @@ namespace Acuminator.Runner.Resources {
         internal static string FailedToLoadSolutionFromCodeSourceError {
             get {
                 return ResourceManager.GetString("FailedToLoadSolutionFromCodeSourceError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to obtain Acuminator version. The analysis will be performed without Acuminator version information..
+        /// </summary>
+        internal static string FailedToObtainAcuminatorVersionWarning {
+            get {
+                return ResourceManager.GetString("FailedToObtainAcuminatorVersionWarning", resourceCulture);
             }
         }
         

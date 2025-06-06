@@ -100,6 +100,9 @@
   <data name="AcuminatorValidationPassedMessage" xml:space="preserve">
     <value>The project "{0}" passed Acuminator validation successfully</value>
   </data>
+  <data name="AcuminatorVersionInfo" xml:space="preserve">
+    <value>Acuminator version "{Version}" is used for the analysis.</value>
+  </data>
   <data name="AnalysisOfCodeSourceRuntimeError" xml:space="preserve">
     <value>An error happened during the Acuminator analysis of "{CodeSourcePath}".</value>
   </data>
@@ -115,6 +118,9 @@
   <data name="CodeSourceValidationWasCancelled" xml:space="preserve">
     <value>The Acuminator validation of "{CodeSourcePath}" was cancelled.</value>
   </data>
+  <data name="ErrorDuringAcuminatorAnalyzersCollection" xml:space="preserve">
+    <value>Error during the collection of Acuminator analyzers</value>
+  </data>
   <data name="FailedToInitializeAcuminatorGlobalSuppressionMechanismError" xml:space="preserve">
     <value>Failed to initialize Acuminator global suppression mechanism for the code source "{CodeSource}".</value>
   </data>
@@ -123,6 +129,9 @@
   </data>
   <data name="FailedToLoadSolutionFromCodeSourceError" xml:space="preserve">
     <value>Failed to load solution from the code source "{CodeSourcePath}".</value>
+  </data>
+  <data name="FailedToObtainAcuminatorVersionWarning" xml:space="preserve">
+    <value>Failed to obtain Acuminator version. The analysis will be performed without Acuminator version information.</value>
   </data>
   <data name="FailedToObtainCompilationWithAnalyzersError" xml:space="preserve">
     <value>Failed to obtain compilation with analyzers</value>

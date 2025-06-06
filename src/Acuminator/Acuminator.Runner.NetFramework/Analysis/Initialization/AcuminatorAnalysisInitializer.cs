@@ -18,6 +18,7 @@ using AnalyzerFileReference = Microsoft.CodeAnalysis.Diagnostics.AnalyzerFileRef
 using Acuminator.Utilities.DiagnosticSuppression;
 using System.Linq;
 using Acuminator.Runner.Constants;
+using Acuminator.Runner.Resources;
 
 namespace Acuminator.Runner.Analysis.Initialization
 {
@@ -32,6 +33,8 @@ namespace Acuminator.Runner.Analysis.Initialization
 			_logger = logger.CheckIfNull();
 		}
 
+		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", 
+						 Justification = "Resource strings are used to simplify review by Doc Team")]
 		public (bool AreSettingsInitialized, ImmutableArray<DiagnosticAnalyzer> Analyzers) InitializeAcuminatorSettingsAndGetAnalyzers()
 		{
 			try
@@ -43,13 +46,15 @@ namespace Acuminator.Runner.Analysis.Initialization
 				var acuminatorVersion = typeof(Acuminator.SharedConstants).Assembly.GetName()?.Version;
 
 				if (acuminatorVersion != null)
-					_logger.Information("Use Acuminator version \"{Version}\".", acuminatorVersion);
+					_logger.Information(Messages.AcuminatorVersionInfo, acuminatorVersion);
+				else
+					_logger.Warning(Messages.FailedToObtainAcuminatorVersionWarning);
 
 				return (AreSettingsInitialized: true, Analyzers: analyzers);
 			}
 			catch (Exception e)
 			{
-				_logger.Error(e, "Error during the collection of Acuminator analyzers");
+				_logger.Error(e, Messages.ErrorDuringAcuminatorAnalyzersCollection);
 				return (AreSettingsInitialized: false, Analyzers: []);
 			}
 		}
@@ -63,13 +68,48 @@ namespace Acuminator.Runner.Analysis.Initialization
 			return analyzers;
 		}
 
-		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", Justification = "Ok to use a string variable due to a long message")]
-		public bool InitializeAcuminatorGlobalSuppressionMechanismForProject(Project project)
+		public bool InitializeAcuminatorGlobalSuppressionMechanismForCodeSource(Solution solution)
 		{
-			var acuminatorSuppressionFiles = project.CheckIfNull().AdditionalDocuments
-																  .Where(d => IsAcuminatorSuppressionFile(d.FilePath))
-																  .Select(d => new SuppressionManagerInitInfo(d.FilePath!, _analysisContext.GenerateSuppressionFile))
-																  .ToList(capacity: 1);
+			solution.ThrowOnNull();
+
+			switch (_analysisContext.CodeSource.Type)
+			{
+				case CodeSources.CodeSourceType.Project:
+					var project = _analysisContext.CodeSource.GetProjectsForValidation(solution).FirstOrDefault();
+
+					return project != null
+						? InitializeAcuminatorGlobalSuppressionMechanismForProject(project)
+						: true;
+
+				case CodeSources.CodeSourceType.Solution:
+					return InitializeAcuminatorGlobalSuppressionMechanismForSolution(solution);
+
+				default:
+					if (_analysisContext.GenerateSuppressionFile)
+					{
+						_logger.Error("""
+									  The Acuminator console tool is configured to generate a suppression file for the code source "{CodeSource}" but the code source is not a project or solution.
+									  The generation of Acuminator suppression file is supported only for a project or solution.
+									  """,
+									 _analysisContext.CodeSource.Location);
+						return false;
+					}
+					else
+					{
+						_logger.Warning("Acuminator suppression via suppression file is not supported for the code source \"{CodeSource}\". The code source is not a project or solution.",
+										_analysisContext.CodeSource.Location);
+						return true;
+					}
+			}
+		}
+
+		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", Justification = "Ok to use a string variable due to a long message")]
+		private bool InitializeAcuminatorGlobalSuppressionMechanismForProject(Project project)
+		{
+			var acuminatorSuppressionFiles = project.AdditionalDocuments
+													.Where(d => IsAcuminatorSuppressionFile(d.FilePath))
+													.Select(d => new SuppressionManagerInitInfo(d.FilePath!, _analysisContext.GenerateSuppressionFile))
+													.ToList(capacity: 1);
 
 			if (_analysisContext.GenerateSuppressionFile && acuminatorSuppressionFiles.Count == 0)
 			{
@@ -108,13 +148,13 @@ namespace Acuminator.Runner.Analysis.Initialization
 		}
 
 		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", Justification = "Ok to use a string variable due to a long message")]
-		public bool InitializeAcuminatorGlobalSuppressionMechanismForSolution(Solution solution)
+		private bool InitializeAcuminatorGlobalSuppressionMechanismForSolution(Solution solution)
 		{
-			var acuminatorSuppressionFiles = solution.CheckIfNull().Projects
-																   .SelectMany(project => project.AdditionalDocuments)
-																   .Where(d => IsAcuminatorSuppressionFile(d.FilePath))
-																   .Select(d => new SuppressionManagerInitInfo(d.FilePath!, _analysisContext.GenerateSuppressionFile))
-																   .ToList(capacity: 1);
+			var acuminatorSuppressionFiles = solution.Projects
+													 .SelectMany(project => project.AdditionalDocuments)
+													 .Where(d => IsAcuminatorSuppressionFile(d.FilePath))
+													 .Select(d => new SuppressionManagerInitInfo(d.FilePath!, _analysisContext.GenerateSuppressionFile))
+													 .ToList(capacity: 1);
 
 			if (_analysisContext.GenerateSuppressionFile && acuminatorSuppressionFiles.Count == 0)
 			{
