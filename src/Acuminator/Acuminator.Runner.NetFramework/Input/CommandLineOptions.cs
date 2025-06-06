@@ -285,12 +285,21 @@ namespace Acuminator.Runner.Input
 						   """)]
 		public bool GenerateSuppressionFile { get; }
 
+		/// <summary>
+		/// This optional flag indicates whether found Acuminator errors in the report should be grouped by file. By default, there will be no grouping.
+		/// </summary>
+		[Option(longName: CommandLineArgNames.GroupErrorsByFile, Default = false,
+				HelpText = """
+						   This optional flag indicates whether found Acuminator errors in the report should be grouped by file. By default, there will be no grouping.
+						   """)]
+		public bool GroupErrorsByFile { get; }
+
 		// Constructor arguments order must be the same as the properties order. This allows command line parser to initialize immutable options object via constructor.
 		// See this for details: https://github.com/commandlineparser/commandline/wiki/Immutable-Options-Type
 		public CommandLineOptions(string codeSource, string verbosity, bool disableSuppressionMechanism, string? msBuildPath, string? outputFileName, 
 								  bool outputAbsolutePathsToUsages, string? outputFormat, bool isvSpecificAnalysisIsEnabled, 
 								  bool px1007DiagnosticIsEnabled, bool disablePX1099Diagnostic, string? bannedApiFilePath, string? allowedApisFilePath,
-								  bool generateSuppressionFile)
+								  bool generateSuppressionFile, bool groupErrorsByFile)
 		{
 			CodeSource 					   = codeSource;
 			Verbosity 					   = verbosity;
@@ -305,6 +314,7 @@ namespace Acuminator.Runner.Input
 			BannedApiFilePath			   = bannedApiFilePath;
 			AllowedApisFilePath			   = allowedApisFilePath;
 			GenerateSuppressionFile 	   = generateSuppressionFile;
+			GroupErrorsByFile			   = groupErrorsByFile;
 		}
 	}
 }

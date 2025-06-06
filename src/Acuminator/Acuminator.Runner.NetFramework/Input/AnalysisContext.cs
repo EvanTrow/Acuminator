@@ -36,9 +36,14 @@ namespace Acuminator.Runner.Input
 		/// <inheritdoc cref="CommandLineOptions.GenerateSuppressionFile"/>
 		public bool GenerateSuppressionFile { get; }
 
+		/// <summary>
+		/// The grouping mode for Acuminator errors in the report.
+		/// </summary>
+		public GroupingMode GroupingMode { get; }
+
 		public AnalysisContext(ICodeSource codeSource, CodeAnalysisSettings codeAnalysisSettings, BannedApiSettings bannedApiSettings, 
 							   string? msBuildPath, string? outputFileName, bool outputAbsolutePathsToUsages, OutputFormat outputFormat,
-							   bool generateSuppressionFile)
+							   bool generateSuppressionFile, GroupingMode groupingMode)
 		{
 			CodeSource 					= codeSource.CheckIfNull();
 			CodeAnalysisSettings		= codeAnalysisSettings.CheckIfNull();
@@ -48,6 +53,7 @@ namespace Acuminator.Runner.Input
 			OutputAbsolutePathsToUsages = outputAbsolutePathsToUsages;
 			OutputFormat				= outputFormat;
 			GenerateSuppressionFile		= generateSuppressionFile;
+			GroupingMode				= groupingMode;
 		}
 	}
 }

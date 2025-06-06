@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Acuminator.Runner.Analysis.CodeSources;
 using Acuminator.Runner.Constants;
@@ -34,9 +35,10 @@ namespace Acuminator.Runner.Input
 														  commandLineOptions.AllowedApisFilePath);
 
 			OutputFormat outputFormat = GetOutputFormat(commandLineOptions.OutputFormat.NullIfWhiteSpace());
+			GroupingMode groupingMode = GetGroupingMode(commandLineOptions);
 			var input = new AnalysisContext(codeSource, codeAnalysisSettings, bannedApiSettings, commandLineOptions.MSBuildPath, 
 											commandLineOptions.OutputFileName, commandLineOptions.OutputAbsolutePathsToUsages, outputFormat,
-											commandLineOptions.GenerateSuppressionFile);
+											commandLineOptions.GenerateSuppressionFile, groupingMode);
 			return input;
 		}
 
@@ -70,7 +72,6 @@ namespace Acuminator.Runner.Input
 			};
 		}
 
-		[SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "The message is supposed to be localized with a current culture")]
 		private OutputFormat GetOutputFormat(string? rawOutputFormat)
 		{
 			const string plainTextFormat = "text";
@@ -82,9 +83,14 @@ namespace Acuminator.Runner.Input
 				return OutputFormat.Json;
 			else
 			{
-				string errorMsg = string.Format(Messages.NotSupportedOutputFormat, rawOutputFormat, plainTextFormat, jsonFormat);
+				string errorMsg = string.Format(CultureInfo.CurrentCulture, Messages.NotSupportedOutputFormat, rawOutputFormat, plainTextFormat, jsonFormat);
 				throw new NotSupportedException(errorMsg);
 			}
 		}
+
+		private GroupingMode GetGroupingMode(CommandLineOptions commandLineOptions) =>
+			commandLineOptions.GroupErrorsByFile
+				? GroupingMode.Files
+				: GroupingMode.None;
 	}
 }

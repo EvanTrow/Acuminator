@@ -14,6 +14,8 @@ namespace Acuminator.Runner.Constants
 		public const string DisableSuppressionMechanism = "noSuppression";
 		public const string MSBuildPath = "msBuildPath";
 
+		public const string GroupErrorsByFile = "groupByFile";
+
 		public const string OutputAbsolutePathsToUsages = "outputAbsolutePaths";
 
 		public const char OutputFileShort = 'f';
