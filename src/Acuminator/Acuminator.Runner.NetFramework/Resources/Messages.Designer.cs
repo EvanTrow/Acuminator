@@ -61,6 +61,15 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The project &quot;{0}&quot; passed Acuminator validation successfully.
+        /// </summary>
+        internal static string AcuminatorValidationPassedMessage {
+            get {
+                return ResourceManager.GetString("AcuminatorValidationPassedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error happened during the Acuminator analysis of &quot;{CodeSourcePath}&quot;..
         /// </summary>
         internal static string AnalysisOfCodeSourceRuntimeError {
@@ -70,7 +79,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cancelled Acuminator validation of the \&quot;{CodeSource}\&quot;. Project \&quot;{ProjectName}\&quot; validation result: {Result}..
+        ///   Looks up a localized string similar to Cancelled Acuminator validation of the &quot;{CodeSource}&quot;. Project &quot;{ProjectName}&quot; validation result: {Result}..
         /// </summary>
         internal static string CancelledCodeSourceValidationInfo {
             get {
@@ -106,7 +115,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to initialize Acuminator global suppression mechanism for the code source \&quot;{CodeSource}\&quot;..
+        ///   Looks up a localized string similar to Failed to initialize Acuminator global suppression mechanism for the code source &quot;{CodeSource}&quot;..
         /// </summary>
         internal static string FailedToInitializeAcuminatorGlobalSuppressionMechanismError {
             get {
@@ -115,7 +124,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to load Acuminator analyzers. The analysis of the code source \&quot;{CodeSource}\&quot; cannot be performed.
+        ///   Looks up a localized string similar to Failed to load Acuminator analyzers. The analysis of the code source &quot;{CodeSource}&quot; cannot be performed.
         /// </summary>
         internal static string FailedToLoadAcuminatorAnalyzersError {
             get {
@@ -142,7 +151,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to obtain Roslyn compilation data for the project with name \&quot;{ProjectName}\&quot; and path \&quot;{ProjectPath}\&quot;..
+        ///   Looks up a localized string similar to Failed to obtain Roslyn compilation data for the project with name &quot;{ProjectName}&quot; and path &quot;{ProjectPath}&quot;..
         /// </summary>
         internal static string FailedToObtainRoslynCompilationDataForTheProjectError {
             get {
@@ -151,7 +160,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Finished Acuminator validation of the project \&quot;{ProjectName}\&quot;. Project validation result: {Result}..
+        ///   Looks up a localized string similar to Finished Acuminator validation of the project &quot;{ProjectName}&quot;. Project validation result: {Result}..
         /// </summary>
         internal static string FinishedAcuminatorValidationOfTheProjectInfo {
             get {
@@ -223,7 +232,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No project in the provided \&quot;{CodeSource}\&quot; references Acumatica Platform.
+        ///   Looks up a localized string similar to No project in the provided &quot;{CodeSource}&quot; references Acumatica Platform.
         /// </summary>
         internal static string NoProjectInCodeSourceReferencesAcumaticaPlatformError {
             get {
@@ -250,7 +259,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Obtained Roslyn compilation data for the project \&quot;{ProjectName}\&quot; successfully..
+        ///   Looks up a localized string similar to Obtained Roslyn compilation data for the project &quot;{ProjectName}&quot; successfully..
         /// </summary>
         internal static string ObtainedRoslynCompilationDataForTheProjectDebug {
             get {
@@ -259,7 +268,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Obtaining Roslyn compilation data for the project \&quot;{ProjectName}\&quot;..
+        ///   Looks up a localized string similar to Obtaining Roslyn compilation data for the project &quot;{ProjectName}&quot;..
         /// </summary>
         internal static string ObtainingRoslynCompilationDataForTheProjectDebug {
             get {
@@ -273,6 +282,15 @@ namespace Acuminator.Runner.Resources {
         internal static string ProjectDoesNotReferenceAcumaticaPlatformValidationError {
             get {
                 return ResourceManager.GetString("ProjectDoesNotReferenceAcumaticaPlatformValidationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {Project} - Total Errors Count: {ErrorCount}.
+        /// </summary>
+        internal static string ProjectTotalErrorsCountMessage {
+            get {
+                return ResourceManager.GetString("ProjectTotalErrorsCountMessage", resourceCulture);
             }
         }
         
@@ -304,7 +322,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Started Acuminator validation of the project \&quot;{ProjectName}\&quot;..
+        ///   Looks up a localized string similar to Started Acuminator validation of the project &quot;{ProjectName}&quot;..
         /// </summary>
         internal static string StartedAcuminatorValidationOfTheProjectInfo {
             get {
