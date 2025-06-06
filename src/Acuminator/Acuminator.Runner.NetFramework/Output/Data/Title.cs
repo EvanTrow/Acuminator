@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 
 using Acuminator.Runner.Output.Json;
-using Acuminator.Utils.Common;
+using Acuminator.Utilities.Common;
 
 namespace Acuminator.Runner.Output
 {
@@ -17,7 +17,7 @@ namespace Acuminator.Runner.Output
 
         public Title(string text, TitleKind titleKind)
         {
-			Text = text.ThrowIfNullOrWhiteSpace(nameof(text));
+			Text = text.CheckIfNullOrWhiteSpace();
 			Kind = titleKind;
         }
 
