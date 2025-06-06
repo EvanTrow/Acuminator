@@ -8,9 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Acuminator.Runner.Analysis.Initialization;
+using Acuminator.Runner.Input;
 using Acuminator.Runner.Output;
 using Acuminator.Runner.Resources;
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.Semantic;
 
 using Microsoft.CodeAnalysis;
@@ -20,10 +22,10 @@ using Serilog;
 
 namespace Acuminator.Runner.Analysis
 {
-    internal sealed class AcuminatorAnalysisSolutionValidator
+	internal sealed class AcuminatorAnalysisSolutionValidator
 	{
 		private readonly IOutputterFactory _outputterFactory;
-		private readonly IProjectReportBuilder	_reportBuilder;
+		private readonly IProjectReportBuilder _reportBuilder;
 		private readonly ILogger _logger;
 		private readonly AcuminatorAnalysisInitializer _acuminatorAnalysisInitializer;
 
@@ -34,11 +36,11 @@ namespace Acuminator.Runner.Analysis
 													IProjectReportBuilder? customReportBuilder = null,
 													IOutputterFactory? customOutputFactory = null)
 		{
-			_diagnosticAnalyzers 		   = diagnosticAnalyzers;
-			_logger 			 		   = logger;
+			_diagnosticAnalyzers = diagnosticAnalyzers;
+			_logger = logger;
 			_acuminatorAnalysisInitializer = acuminatorAnalysisInitializer;
-			_reportBuilder 		 		   = customReportBuilder ?? new ProjectReportBuilder();
-			_outputterFactory 	 		   = customOutputFactory ?? new ReportOutputterFactory();
+			_reportBuilder = customReportBuilder ?? new ProjectReportBuilder();
+			_outputterFactory = customOutputFactory ?? new ReportOutputterFactory();
 		}
 
 		public static AcuminatorAnalysisSolutionValidator? CreateAcuminatorSolutionAnalyzer(Input.AnalysisContext analysisContext, ILogger logger)
@@ -51,7 +53,7 @@ namespace Acuminator.Runner.Analysis
 					: null;
 		}
 
-		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", 
+		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier",
 						 Justification = "Resource strings are used to simplify review by Doc Team")]
 		public async Task<RunResult> AnalyseSolution(Solution solution, Input.AnalysisContext analysisContext, CancellationToken cancellationToken)
 		{
@@ -116,10 +118,10 @@ namespace Acuminator.Runner.Analysis
 			return solutionValidationResult;
 		}
 
-		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", 
+		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier",
 						 Justification = "Resource strings are used to simplify review by Doc Team")]
-		private async Task<(RunResult ValidationResult, ProjectReport? Report, bool IsPlatformReferenced)> AnalyzeProject(Project project, 
-																												Input.AnalysisContext analysisContext, 
+		private async Task<(RunResult ValidationResult, ProjectReport? Report, bool IsPlatformReferenced)> AnalyzeProject(Project project,
+																												Input.AnalysisContext analysisContext,
 																												CancellationToken cancellationToken)
 		{
 			_logger.Debug(Messages.ObtainingRoslynCompilationDataForTheProjectDebug, project.Name);
@@ -147,7 +149,7 @@ namespace Acuminator.Runner.Analysis
 					return (RunResult.Success, Report: null, IsPlatformReferenced: false);
 				}
 			}
-			
+
 			var (validationResult, projectReport) = await RunAnalyzersOnProjectAsync(compilation, analysisContext, project, cancellationToken)
 															.ConfigureAwait(false);
 			return (validationResult, projectReport, IsPlatformReferenced: true);
@@ -161,33 +163,34 @@ namespace Acuminator.Runner.Analysis
 
 		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier",
 						 Justification = "Resource strings are used to simplify review by Doc Team")]
-		private async Task<(RunResult ValidationResult, ProjectReport? Report)> RunAnalyzersOnProjectAsync(Compilation compilation, 
+		private async Task<(RunResult ValidationResult, ProjectReport? Report)> RunAnalyzersOnProjectAsync(Compilation compilation,
 																										   Input.AnalysisContext analysisContext,
 																										   Project project, CancellationToken cancellation)
 		{
 			var analyzerOptions = GetAnalyzerOptions();
 			var compilationAnalysisOptions = new CompilationWithAnalyzersOptions(analyzerOptions!, OnAnalyzerException,
-																				 concurrentAnalysis: !Debugger.IsAttached, 
+																				 concurrentAnalysis: !Debugger.IsAttached,
 																				 logAnalyzerExecutionTime: false);
 			var compilationWithAnalyzers = new CompilationWithAnalyzers(compilation, _diagnosticAnalyzers, compilationAnalysisOptions);
 
 			var diagnosticResults = await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(cancellation).ConfigureAwait(false);
-			
-			if (diagnosticResults.IsDefaultOrEmpty)
+			var filteredResults = FilterDiagnosticResults(diagnosticResults, analysisContext);
+
+			if (filteredResults.IsDefaultOrEmpty)
 			{
 				_logger.Information(Messages.AcuminatorValidationPassedMessage, project.Name);
 				var successfulReport = ProjectReport.SuccessfulReport(project.Name);
 				return (RunResult.Success, successfulReport);
 			}
 			else
-				_logger.Error(Messages.ProjectTotalErrorsCountMessage, project.Name, diagnosticResults.Length);
+				_logger.Error(Messages.ProjectTotalErrorsCountMessage, project.Name, filteredResults.Length);
 
-			ProjectReport projectReport = _reportBuilder.BuildReport(diagnosticResults, analysisContext, project, cancellation);
+			ProjectReport projectReport = _reportBuilder.BuildReport(filteredResults, analysisContext, project, cancellation);
 
 			return (RunResult.RequirementsNotMet, projectReport);
 		}
 
-		private AnalyzerOptions? GetAnalyzerOptions() => null;		// TODO Here we may need to put support for .editorcofing files in the future
+		private AnalyzerOptions? GetAnalyzerOptions() => null;      // TODO Here we may need to put support for .editorcofing files in the future
 
 		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", Justification = "Ok to use runtime dependent new line in message")]
 		private void OnAnalyzerException(Exception exception, DiagnosticAnalyzer analyzer, Diagnostic diagnostic)
@@ -196,6 +199,19 @@ namespace Acuminator.Runner.Analysis
 
 			string errorMsg = $"Analyzer error:{Environment.NewLine}{{Id}}{Environment.NewLine}{{Location}}{Environment.NewLine}{{Analyzer}}";
 			_logger.Error(exception, errorMsg, diagnostic.Id, prettyLocation, analyzer.ToString());
+		}
+
+		private ImmutableArray<Diagnostic> FilterDiagnosticResults(ImmutableArray<Diagnostic> diagnosticResults, Input.AnalysisContext analysisContext)
+		{
+			if (diagnosticResults.IsDefaultOrEmpty)
+				return diagnosticResults;
+
+			var filteredDiagnostics = diagnosticResults.Where(d => d.IsAcuminatorDiagnostic());
+
+			if (analysisContext.CodeAnalysisSettings.SuppressionMechanismEnabled)
+				filteredDiagnostics = filteredDiagnostics.Where(d => !d.IsSuppressed);
+
+			return filteredDiagnostics.ToImmutableArray();
 		}
 	}
 }
