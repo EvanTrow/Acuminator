@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 using Acuminator.Runner.Analysis.CodeSources;
 using Acuminator.Runner.Constants;
@@ -35,7 +34,7 @@ namespace Acuminator.Runner.Input
 														  commandLineOptions.AllowedApisFilePath);
 
 			OutputFormat outputFormat = GetOutputFormat(commandLineOptions.OutputFormat.NullIfWhiteSpace());
-			GroupingMode groupingMode = GetGroupingMode(commandLineOptions);
+			GroupingMode groupingMode = GetGroupingMode(commandLineOptions.ReportGrouping);
 			var input = new AnalysisContext(codeSource, codeAnalysisSettings, bannedApiSettings, commandLineOptions.MSBuildPath, 
 											commandLineOptions.OutputFileName, commandLineOptions.OutputAbsolutePathsToUsages, outputFormat,
 											commandLineOptions.GenerateSuppressionFile, groupingMode);
@@ -88,9 +87,27 @@ namespace Acuminator.Runner.Input
 			}
 		}
 
-		private GroupingMode GetGroupingMode(CommandLineOptions commandLineOptions) =>
-			commandLineOptions.GroupErrorsByFile
+		private GroupingMode GetGroupingMode(string? rawGroupingLocation)
+		{
+			if (rawGroupingLocation.IsNullOrWhiteSpace())
+				return GroupingMode.None;
+
+			const char FileGroupingChar = 'F';
+			const char DiagnosticGroupingChar = 'D';
+
+			string rawGroupingLocationUppered = rawGroupingLocation.ToUpperInvariant();
+
+			bool groupByFiles = rawGroupingLocationUppered.Contains(FileGroupingChar);
+			bool groupByDiagnostic = rawGroupingLocationUppered.Contains(DiagnosticGroupingChar);
+
+			GroupingMode grouping = groupByFiles
 				? GroupingMode.Files
 				: GroupingMode.None;
+
+			if (groupByDiagnostic)
+				grouping |= GroupingMode.Diagnostics;
+
+			return grouping;
+		}
 	}
 }

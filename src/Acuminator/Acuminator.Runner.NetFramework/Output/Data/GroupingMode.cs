@@ -14,9 +14,14 @@ namespace Acuminator.Runner.Output
 		None = 0b0000,
 
 		/// <summary>
-		/// Group API calls by source file.
+		/// Group found errors by source file.
 		/// </summary>
-		Files = 0b0001
+		Files = 0b0001,
+
+		/// <summary>
+		/// Group found errors by diagnostic ID.
+		/// </summary>
+		Diagnostics = 0b0010
 	}
 
 	internal static class GroupingModeExtensions

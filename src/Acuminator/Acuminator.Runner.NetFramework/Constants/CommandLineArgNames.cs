@@ -14,7 +14,8 @@ namespace Acuminator.Runner.Constants
 		public const string DisableSuppressionMechanism = "noSuppression";
 		public const string MSBuildPath = "msBuildPath";
 
-		public const string GroupErrorsByFile = "groupByFile";
+		public const char ReportGroupingShort = 'g';
+		public const string ReportGroupingLong = "grouping";
 
 		public const string OutputAbsolutePathsToUsages = "outputAbsolutePaths";
 
@@ -33,7 +34,6 @@ namespace Acuminator.Runner.Constants
 
 		public const string AllowedApisFilePath = "allowedAPIs";
 
-		public const char GenerateSuppressionFileShort = 'g';
-		public const string GenerateSuppressionFileLong = "generateSuppressionFile";
+		public const string GenerateSuppressionFile = "generateSuppressionFile";
 	}
 }

@@ -261,7 +261,7 @@ namespace Acuminator.Runner.Input
 		///	It will generate suppression records for all errors it found in the code and add them to the suppression file.<br/>
 		/// Note that it does not generate suppression records for errors that are already suppressed in the code with local suppression comments.<br/>
 		/// </remarks>
-		[Option(shortName: CommandLineArgNames.GenerateSuppressionFileShort, longName: CommandLineArgNames.GenerateSuppressionFileLong, Default = false,
+		[Option(longName: CommandLineArgNames.GenerateSuppressionFile, Default = false,
 				HelpText = """
 						   This flag indicates whether Acuminator should work in a special suppression generator mode.
 						   In this mode, Acuminator does not report errors, but instead generates suppression records in the Acuminator suppression file for all errors it found in the code.
@@ -286,20 +286,36 @@ namespace Acuminator.Runner.Input
 		public bool GenerateSuppressionFile { get; }
 
 		/// <summary>
-		/// This optional flag indicates whether found Acuminator errors in the report should be grouped by file. By default, there will be no grouping.
+		/// The report grouping. By default, there is no grouping. You can make grouping by source file paths, diagnostic IDs, or both:<br/>
+		///	- Add "<c>f</c>" or "<c>F</c>" to group found errors by source file.<br/>
+		/// - Add "<c>d</c>" or "<c>D</c>" to group found errors by Acuminator diagnostic IDs.<br/><br/>
+		///	Any combination of these characters will specify a report grouping. For example, specify "<c>fd</c>" to group errors in the report both by files and diagnostic IDs.
 		/// </summary>
-		[Option(longName: CommandLineArgNames.GroupErrorsByFile, Default = false,
+		/// <remarks>
+		/// Reports grouping works like this:<br/>
+		/// - First, errors in the report are grouped by filepaths, if "<c>f</c>" or "<c>F</c>" is specified in the grouping.<br/>
+		/// - Second, errors in the report are grouped by diagnostic IDs, if "<c>d</c>" or "<c>D</c>" is specified in the grouping.<br/>
+		/// </remarks>
+		[Option(shortName: CommandLineArgNames.ReportGroupingShort, longName: CommandLineArgNames.ReportGroupingLong,
 				HelpText = """
-						   This optional flag indicates whether found Acuminator errors in the report should be grouped by file. By default, there will be no grouping.
-						   """)]
-		public bool GroupErrorsByFile { get; }
+		The report grouping. By default, there is no grouping. You can make grouping by source file paths, diagnostic IDs, or both:
+		  - Add "f" or "F" to group results by source file.
+		  - Add "d" or "D" to group found errors by Acuminator diagnostic IDs.
+
+		Any combination of these characters will specify a report grouping. For example, specify "fd" to group errors in the report both by files and diagnostic IDs.
+		
+		Reports grouping works like this:
+		  - First, errors in the report are grouped by filepaths, if "f" or "F" is specified in the grouping.
+		  - Second, errors in the report are grouped by diagnostic IDs, if "d" or "D" is specified in the grouping.
+		""")]
+		public string? ReportGrouping { get; }
 
 		// Constructor arguments order must be the same as the properties order. This allows command line parser to initialize immutable options object via constructor.
 		// See this for details: https://github.com/commandlineparser/commandline/wiki/Immutable-Options-Type
 		public CommandLineOptions(string codeSource, string verbosity, bool disableSuppressionMechanism, string? msBuildPath, string? outputFileName, 
 								  bool outputAbsolutePathsToUsages, string? outputFormat, bool isvSpecificAnalysisIsEnabled, 
 								  bool px1007DiagnosticIsEnabled, bool disablePX1099Diagnostic, string? bannedApiFilePath, string? allowedApisFilePath,
-								  bool generateSuppressionFile, bool groupErrorsByFile)
+								  bool generateSuppressionFile, string? reportGrouping)
 		{
 			CodeSource 					   = codeSource;
 			Verbosity 					   = verbosity;
@@ -314,7 +330,7 @@ namespace Acuminator.Runner.Input
 			BannedApiFilePath			   = bannedApiFilePath;
 			AllowedApisFilePath			   = allowedApisFilePath;
 			GenerateSuppressionFile 	   = generateSuppressionFile;
-			GroupErrorsByFile			   = groupErrorsByFile;
+			ReportGrouping				   = reportGrouping;
 		}
 	}
 }
