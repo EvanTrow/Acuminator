@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 
-using Acuminator.ApiData.Model;
 using Acuminator.Runner.Input;
 using Acuminator.Runner.Output.Data;
-using Acuminator.Utils.Common;
+using Acuminator.Utilities.Common;
 
 using Microsoft.CodeAnalysis;
 
-namespace Acuminator.Runner.Output
+namespace Acuminator.Runner.Output.Grouping
 {
 	/// <summary>
 	/// Base class to group report lines.
@@ -27,41 +28,33 @@ namespace Acuminator.Runner.Output
 			Grouping = grouping;
 		}
 
-		/// <summary>
-		/// Get API groups
-		/// </summary>
-		/// <param name="analysisContext">Analysis context.</param>
-		/// <param name="diagnosticsWithApis">The diagnostics with APIs.</param>
-		/// <param name="projectDirectory">Pathname of the project directory.</param>
-		/// <param name="cancellation">Cancellation token.</param>
-		/// <returns>
-		/// Output API results grouped by <see cref="Grouping"/>.
-		/// </returns>
-		public abstract IEnumerable<ReportGroup> GetApiGroups(AppAnalysisContext analysisContext, DiagnosticsWithBannedApis diagnosticsWithApis,
-															  string? projectDirectory, CancellationToken cancellation);
+		/// <inheritdoc cref="IGroupLines.GetGroupedErrors(AnalysisContext, ImmutableArray{Diagnostic}, string?, CancellationToken)"/>
+		public abstract IEnumerable<ReportGroup> GetGroupedErrors(AnalysisContext analysisContext, ImmutableArray<Diagnostic> diagnostics,
+																  string? projectDirectory, CancellationToken cancellation);
 
-		protected IEnumerable<Line> GetFlatApiUsagesLines(IEnumerable<(Diagnostic Diagnostic, Api BannedApi)> unsortedDiagnostics,
-														  string? projectDirectory, AppAnalysisContext analysisContext)
+		protected IEnumerable<Line> GetFlatErrorWithLocationLines(IEnumerable<Diagnostic> unsortedDiagnostics, string? projectDirectory, 
+																  AnalysisContext analysisContext)
 		{
-			var sortedApisWithLocations = unsortedDiagnostics.Select(d => (FullApiName: d.BannedApi.FullName,
-																		   Location: GetPrettyLocation(d.Diagnostic, projectDirectory, analysisContext)))
-															 .OrderBy(apiWithLocation => apiWithLocation.FullApiName)
-															 .ThenBy(apiWithLocation => apiWithLocation.Location)
-															 .Select(apiWithLocation => new Line(apiWithLocation.FullApiName, apiWithLocation.Location));
+			var sortedApisWithLocations = unsortedDiagnostics.Select(d => (Diagnostic: d,
+																		   Location: GetPrettyLocation(d, projectDirectory, analysisContext)))
+															 .OrderBy(diagnosticWithLocation => diagnosticWithLocation.Diagnostic.Id)
+															 .ThenBy(diagnosticWithLocation  => diagnosticWithLocation.Location)
+															 .Select(diagnosticWithLocation  => new Line(GetDiagnosticContent(diagnosticWithLocation.Diagnostic), 
+																										 diagnosticWithLocation.Location));
 			return sortedApisWithLocations;
 		}
 
 		protected IEnumerable<Line> GetApiUsagesLines(IEnumerable<Diagnostic> sortedDiagnostics, string? projectDirectory,
-													  AppAnalysisContext analysisContext) =>
-			sortedDiagnostics.Select(diagnostic => GetApiUsageLine(diagnostic, projectDirectory, analysisContext));
+													  AnalysisContext analysisContext) =>
+			sortedDiagnostics.Select(diagnostic => GetDiagnosticLocationLine(diagnostic, projectDirectory, analysisContext));
 
-		protected Line GetApiUsageLine(Diagnostic diagnostic, string? projectDirectory, AppAnalysisContext analysisContext)
+		protected Line GetDiagnosticLocationLine(Diagnostic diagnostic, string? projectDirectory, AnalysisContext analysisContext)
 		{
 			var prettyLocation = GetPrettyLocation(diagnostic, projectDirectory, analysisContext);
 			return new Line(prettyLocation);
 		}
 
-		protected string GetPrettyLocation(Diagnostic diagnostic, string? projectDirectory, AppAnalysisContext analysisContext)
+		protected string GetPrettyLocation(Diagnostic diagnostic, string? projectDirectory, AnalysisContext analysisContext)
 		{
 			string prettyLocation = diagnostic.Location.GetMappedLineSpan().ToString();
 
@@ -77,6 +70,15 @@ namespace Acuminator.Runner.Output
 
 			string relativeLocation = "." + prettyLocation.Substring(projectDirectory.Length);
 			return relativeLocation;
+		}
+
+		protected string GetDiagnosticContent(Diagnostic diagnostic)
+		{
+			string errorMessage = diagnostic.GetMessage(CultureInfo.CurrentCulture).NullIfWhiteSpace() ??
+								  diagnostic.GetMessage(CultureInfo.InvariantCulture).NullIfWhiteSpace() ??
+								  diagnostic.Descriptor.Title.ToString(CultureInfo.InvariantCulture);
+
+			return $"{diagnostic.Id}: {errorMessage}";
 		}
 	}
 }
