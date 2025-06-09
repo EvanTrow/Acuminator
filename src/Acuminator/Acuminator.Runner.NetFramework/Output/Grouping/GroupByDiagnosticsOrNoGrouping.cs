@@ -71,6 +71,7 @@ namespace Acuminator.Runner.Output.Grouping
 		private IReadOnlyCollection<ReportGroup> GetNotGroupedDiagnostics(AnalysisContext analysisContext, IEnumerable<Diagnostic> unsortedDiagnostics,
 																		  string? projectDirectory, CancellationToken cancellation)
 		{
+			cancellation.ThrowIfCancellationRequested();
 			IReadOnlyCollection<Diagnostic> diagnosticsMaterializedCollection = (unsortedDiagnostics as IReadOnlyCollection<Diagnostic>) ?? 
 																				 unsortedDiagnostics.ToList();
 			var distinctDiagnosticsCount = diagnosticsMaterializedCollection.GroupBy(d => d.Id)
@@ -78,6 +79,8 @@ namespace Acuminator.Runner.Output.Grouping
 			var sortedNotGroupedDiagnostics = GetOrderedDiagnosticsWithLocationLines(diagnosticsMaterializedCollection, projectDirectory, analysisContext,
 																		   sortBySourceFile: true, sortByDiagnosticId: true)
 												.ToList(capacity: diagnosticsMaterializedCollection.Count);
+
+			cancellation.ThrowIfCancellationRequested();
 
 			var singleGroupWithAllDiagnosticsOrdered = new ReportGroup
 			{
