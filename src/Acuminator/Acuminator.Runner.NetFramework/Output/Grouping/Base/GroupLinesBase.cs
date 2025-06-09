@@ -28,9 +28,9 @@ namespace Acuminator.Runner.Output.Grouping
 			Grouping = grouping;
 		}
 
-		/// <inheritdoc cref="IGroupLines.GetGroupedErrors(AnalysisContext, ImmutableArray{Diagnostic}, string?, CancellationToken)"/>
-		public abstract IEnumerable<ReportGroup> GetGroupedErrors(AnalysisContext analysisContext, ImmutableArray<Diagnostic> diagnostics,
-																  string? projectDirectory, CancellationToken cancellation);
+		/// <inheritdoc cref="IGroupLines.GetGroupedDiagnostics(AnalysisContext, ImmutableArray{Diagnostic}, string?, CancellationToken)"/>
+		public abstract IEnumerable<ReportGroup> GetGroupedDiagnostics(AnalysisContext analysisContext, ImmutableArray<Diagnostic> diagnostics,
+																	   string? projectDirectory, CancellationToken cancellation);
 
 		protected IEnumerable<Line> GetFlatErrorWithLocationLines(IEnumerable<Diagnostic> unsortedDiagnostics, string? projectDirectory, 
 																  AnalysisContext analysisContext)

@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis;
 namespace Acuminator.Runner.Output.Grouping
 {
 	/// <summary>
-	/// Interface for helpers that group report lines.
+	/// Interface for helpers that group found diagnostics.
 	/// </summary>
 	internal interface IGroupLines
 	{
@@ -30,7 +30,7 @@ namespace Acuminator.Runner.Output.Grouping
 		/// <returns>
 		/// Acuminator diagnostics grouped according to the <see cref="Grouping"/> mode.
 		/// </returns>
-		IEnumerable<ReportGroup> GetGroupedErrors(AnalysisContext analysisContext, ImmutableArray<Diagnostic> diagnostics,
-												  string? projectDirectory, CancellationToken cancellation);
+		IEnumerable<ReportGroup> GetGroupedDiagnostics(AnalysisContext analysisContext, ImmutableArray<Diagnostic> diagnostics,
+													   string? projectDirectory, CancellationToken cancellation);
 	}
 }
