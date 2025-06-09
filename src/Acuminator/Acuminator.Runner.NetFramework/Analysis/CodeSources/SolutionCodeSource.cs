@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,13 +18,13 @@ namespace Acuminator.Runner.Analysis.CodeSources
 
         public SolutionCodeSource(string solutionPath)
         {
-            Location = solutionPath.CheckIfNullOrWhiteSpace(nameof(solutionPath));
+            Location = solutionPath.CheckIfNullOrWhiteSpace();
         }
 
 		public Task<Solution> LoadSolutionAsync(MSBuildWorkspace workspace, CancellationToken cancellationToken) =>
 			workspace.OpenSolutionAsync(Location, cancellationToken: cancellationToken);
 
         public IEnumerable<Project> GetProjectsForValidation(Solution solution) =>
-            solution.CheckIfNull(nameof(solution)).Projects;
+            solution.CheckIfNull().Projects;
 	}
 }

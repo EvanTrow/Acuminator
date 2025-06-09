@@ -20,7 +20,7 @@ namespace Acuminator.Runner.Analysis.CodeSources
 
         public ProjectCodeSource(string projectPath)
         {
-            Location = projectPath.CheckIfNullOrWhiteSpace(nameof(projectPath));
+            Location = projectPath.CheckIfNullOrWhiteSpace();
         }
 
 		public async Task<Solution> LoadSolutionAsync(MSBuildWorkspace workspace, CancellationToken cancellationToken)
@@ -31,7 +31,7 @@ namespace Acuminator.Runner.Analysis.CodeSources
 
 		public IEnumerable<Project> GetProjectsForValidation(Solution solution)
 		{
-            var project = solution.CheckIfNull(nameof(solution)).Projects.FirstOrDefault(p => p.FilePath == Location);
+            var project = solution.CheckIfNull().Projects.FirstOrDefault(p => p.FilePath == Location);
 			return project != null ? [project] : [];
 		}
 	}

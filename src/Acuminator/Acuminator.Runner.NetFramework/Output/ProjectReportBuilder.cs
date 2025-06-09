@@ -23,7 +23,7 @@ namespace Acuminator.Runner.Output
 		public ProjectReport BuildReport(IEnumerable<Diagnostic> foundDiagnostics, AnalysisContext analysisContext, 
 										 Project project, CancellationToken cancellation)
 		{
-			var diagnosticsArray = foundDiagnostics?.ToImmutableArray() ?? ImmutableArray<Diagnostic>.Empty;
+			var diagnosticsArray = foundDiagnostics?.ToImmutableArray() ?? [];
 			return BuildReport(diagnosticsArray, analysisContext, project, cancellation);
 		}
 

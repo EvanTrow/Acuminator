@@ -34,7 +34,7 @@ namespace Acuminator.Runner.Analysis
 
 		public async Task<RunResult> RunAnalysisAsync(AnalysisContext analysisContext, CancellationToken cancellationToken)
 		{
-			analysisContext.ThrowOnNull(nameof(analysisContext));
+			analysisContext.ThrowOnNull();
 
 			if (cancellationToken.IsCancellationRequested)
 				return RunResult.Cancelled;
