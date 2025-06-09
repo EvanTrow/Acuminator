@@ -1,41 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
-using Acuminator.ApiData.Model;
 using Acuminator.Runner.Input;
 using Acuminator.Runner.Output.Data;
-using Acuminator.Utils.Common;
+using Acuminator.Utilities.Common;
 
 using Microsoft.CodeAnalysis;
 
-namespace Acuminator.Runner.Output
+namespace Acuminator.Runner.Output.Grouping
 {
 	/// <summary>
-	/// Results grouper by <see cref="GroupingMode.Apis"/> or <see cref="GroupingMode.None"/> grouping modes.
+	/// Results grouper that either groups found diagnostics by ID or does not apply grouping at all.
 	/// </summary>
-	internal class GroupByAPIsOrNoGrouping : GroupLinesBase
+	internal class GroupByDiagnosticsOrNoGrouping : GroupLinesBase
 	{
-		public GroupByAPIsOrNoGrouping(GroupingMode grouping) : base(grouping)
+		public GroupByDiagnosticsOrNoGrouping(GroupingMode grouping) : base(grouping)
 		{
 		}
 
 		/// <summary>
-		/// Group results by <see cref="GroupingMode.Apis"/> or <see cref="GroupingMode.None"/> grouping modes.
+		/// Group reported diagnostics by ID or do not apply grouping at all.
 		/// </summary>
 		/// <param name="analysisContext">Analysis context.</param>
-		/// <param name="diagnosticsWithApis">The diagnostics with APIs.</param>
+		/// <param name="diagnostics">Diagnostics to group.</param>
 		/// <param name="projectDirectory">Pathname of the project directory.</param>
 		/// <param name="cancellation">Cancellation token.</param>
 		/// <returns>
-		/// Output API results grouped by <see cref="GroupingMode.Apis"/> or <see cref="GroupingMode.None"/> grouping modes.
+		/// Acuminator diagnostics grouped by <see cref="GroupingMode.Apis"/> or <see cref="GroupingMode.None"/> grouping modes.
 		/// </returns>
-		public override IEnumerable<ReportGroup> GetApiGroups(AppAnalysisContext analysisContext, DiagnosticsWithBannedApis diagnosticsWithApis,
-															  string? projectDirectory, CancellationToken cancellation) =>
-			GetApiGroupsGroupedByApi(analysisContext, diagnosticsWithApis, projectDirectory, cancellation);
+		public override IEnumerable<ReportGroup> GetGroupedDiagnostics(AnalysisContext analysisContext, ImmutableArray<Diagnostic> diagnostics,
+																  string? projectDirectory, CancellationToken cancellation) =>
+			GetErrorsGroupedByDiagnosticID(analysisContext, diagnostics, projectDirectory, cancellation);
 
-		protected IEnumerable<ReportGroup> GetApiGroupsGroupedByApi(AppAnalysisContext analysisContext, DiagnosticsWithBannedApis diagnosticsWithApis,
+		protected IEnumerable<ReportGroup> GetErrorsGroupedByDiagnosticID(AnalysisContext analysisContext, ImmutableArray<Diagnostic> diagnostics,
 																	string? projectDirectory, CancellationToken cancellation)
 		{
 			var sortedFlatDiagnostics = diagnosticsWithApis.OrderBy(d => d.BannedApi.FullName);
@@ -102,10 +102,10 @@ namespace Acuminator.Runner.Output
 				var usagesLines = GetApiUsagesLines(apiDiagnostics, projectDirectory, analysisContext).ToList();
 				var apiGroup = new ReportGroup
 				{
-					GroupTitle 		  = new Title(apiName, TitleKind.Api),
+					GroupTitle 		  = new Title(apiName, TitleKind.Diagnostic),
 					TotalErrorCount   = usagesLines.Count,
 					DistinctApisCount = distinctApis.Count(),
-					LinesTitle 		  = new Title("Usages", TitleKind.Usages),
+					LinesTitle 		  = new Title("Usages", TitleKind.Locations),
 					Lines 			  = usagesLines.NullIfEmpty()
 				};
 
