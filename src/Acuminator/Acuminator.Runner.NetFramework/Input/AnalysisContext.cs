@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 using Acuminator.Runner.Analysis.CodeSources;
 using Acuminator.Runner.Output;
@@ -41,6 +42,11 @@ namespace Acuminator.Runner.Input
 		/// </summary>
 		public GroupingMode GroupingMode { get; }
 
+		/// <summary>
+		/// Are file paths on the unnderlying OS case sensitive or not.
+		/// </summary>
+		public bool CaseSensitiveFilePaths { get; }
+
 		public AnalysisContext(ICodeSource codeSource, CodeAnalysisSettings codeAnalysisSettings, BannedApiSettings bannedApiSettings, 
 							   string? msBuildPath, string? outputFileName, bool outputAbsolutePathsToUsages, OutputFormat outputFormat,
 							   bool generateSuppressionFile, GroupingMode groupingMode)
@@ -54,6 +60,7 @@ namespace Acuminator.Runner.Input
 			OutputFormat				= outputFormat;
 			GenerateSuppressionFile		= generateSuppressionFile;
 			GroupingMode				= groupingMode;
+			CaseSensitiveFilePaths		= RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 		}
 	}
 }

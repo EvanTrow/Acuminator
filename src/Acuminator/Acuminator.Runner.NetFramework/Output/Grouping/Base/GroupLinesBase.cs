@@ -68,7 +68,7 @@ namespace Acuminator.Runner.Output
 			if (analysisContext.OutputAbsolutePathsToUsages || projectDirectory.IsNullOrWhiteSpace())
 				return prettyLocation;
 
-			StringComparison stringComparison = analysisContext.IsRunningOnLinux
+			StringComparison stringComparison = analysisContext.CaseSensitiveFilePaths
 				? StringComparison.Ordinal
 				: StringComparison.OrdinalIgnoreCase;
 
