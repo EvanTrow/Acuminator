@@ -21,7 +21,7 @@ namespace Acuminator.Runner.Output.Grouping
 		/// <summary>
 		/// Group found errors by diagnostic ID.
 		/// </summary>
-		Diagnostics = 0b0010
+		DiagnosticIDs = 0b0010
 	}
 
 	internal static class GroupingModeExtensions

@@ -106,7 +106,7 @@ namespace Acuminator.Runner.Input
 				: GroupingMode.None;
 
 			if (groupByDiagnostic)
-				grouping |= GroupingMode.Diagnostics;
+				grouping |= GroupingMode.DiagnosticIDs;
 
 			return grouping;
 		}
