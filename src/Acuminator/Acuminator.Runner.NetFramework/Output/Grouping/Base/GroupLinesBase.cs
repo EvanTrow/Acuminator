@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -78,16 +77,6 @@ namespace Acuminator.Runner.Output.Grouping
 									unsortedDiagnosticInfos.OrderBy(d => d.Location);
 			sortedDiagnosticInfos = sortedDiagnosticInfos.ThenBy(d => d.Content, StringComparer.Ordinal);
 			return sortedDiagnosticInfos;
-		}
-
-		protected IEnumerable<Line> GetDiagnosticLocationLines(IEnumerable<Diagnostic> sortedDiagnostics, string? projectDirectory,
-																AnalysisContext analysisContext) =>
-			sortedDiagnostics.Select(diagnostic => GetDiagnosticLocationLine(diagnostic, projectDirectory, analysisContext));
-
-		protected Line GetDiagnosticLocationLine(Diagnostic diagnostic, string? projectDirectory, AnalysisContext analysisContext)
-		{
-			var prettyLocation = GetPrettyLocation(diagnostic, projectDirectory, analysisContext);
-			return new Line(prettyLocation);
 		}
 
 		protected string GetPrettyLocation(Diagnostic diagnostic, string? projectDirectory, AnalysisContext analysisContext)
