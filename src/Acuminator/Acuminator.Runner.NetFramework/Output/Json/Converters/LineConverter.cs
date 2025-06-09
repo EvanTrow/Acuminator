@@ -25,9 +25,9 @@ namespace Acuminator.Runner.Output.Json
 					return;
 
 				case 2:
-					var (fullApiName, location) = (line.Spans[0].ToString(), line.Spans[1].ToString());
+					var (diagnosticContent, location) = (line.Spans[0].ToString(), line.Spans[1].ToString());
 
-					writer.WriteStringValue($"{fullApiName}: {location}");
+					writer.WriteStringValue($"{diagnosticContent}: {location}");
 					return;
 
 				default:
