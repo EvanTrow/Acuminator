@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading;
 
 using Acuminator.Runner.Input;
 using Acuminator.Runner.Output.Data;
-using Acuminator.Utils.Common;
+using Acuminator.Runner.Output.Grouping;
+using Acuminator.Runner.Resources;
+using Acuminator.Utilities.Common;
 
 using Microsoft.CodeAnalysis;
 
@@ -17,21 +20,32 @@ namespace Acuminator.Runner.Output
     /// </summary>
     internal class ProjectReportBuilder : IProjectReportBuilder
 	{
-		public ProjectReport BuildReport(DiagnosticsWithBannedApis diagnosticsWithApis, AppAnalysisContext analysisContext, Project project, CancellationToken cancellation)
+		public ProjectReport BuildReport(IEnumerable<Diagnostic> foundDiagnostics, AnalysisContext analysisContext, 
+										 Project project, CancellationToken cancellation)
 		{
-			diagnosticsWithApis.ThrowIfNull(nameof(diagnosticsWithApis));
-			project.ThrowIfNull(nameof(project));
+			var diagnosticsArray = foundDiagnostics?.ToImmutableArray() ?? ImmutableArray<Diagnostic>.Empty;
+			return BuildReport(diagnosticsArray, analysisContext, project, cancellation);
+		}
 
+		public ProjectReport BuildReport(ImmutableArray<Diagnostic> foundDiagnostics, AnalysisContext analysisContext, 
+										 Project project, CancellationToken cancellation)
+		{
+			project.ThrowOnNull();
+			analysisContext.ThrowOnNull();
 			cancellation.ThrowIfCancellationRequested();
 
-			string? projectDirectory   = GetProjectDirectory(project);
-			
-			var mainReportGroup = GetMainReportGroupFromAllDiagnostics(diagnosticsWithApis, analysisContext, projectDirectory, cancellation);
+			string? projectDirectory = GetProjectDirectory(project);
+			int distinctErrorsCount  = !foundDiagnostics.IsDefaultOrEmpty
+				? foundDiagnostics.GroupBy(d => d.Id).Count()
+				: 0;
+
+			var mainReportGroup = GetMainReportGroupFromAllDiagnostics(foundDiagnostics, analysisContext, projectDirectory, 
+																	   distinctErrorsCount, cancellation);
 			var report = new ProjectReport(project.Name)
 			{
-				TotalErrorCount   = diagnosticsWithApis.TotalDiagnosticsCount,
-				DistinctApisCount = diagnosticsWithApis.UsedDistinctApis.Count,
-				ReportDetails     = mainReportGroup,
+				TotalDiagnosticsCount	 = foundDiagnostics.Length,
+				DistinctDiagnosticsCount = distinctErrorsCount,
+				ReportDetails			 = mainReportGroup,
 			};
 
 			return report;
@@ -47,62 +61,36 @@ namespace Acuminator.Runner.Output
 			return projectDirectory;
 		}
 
-		protected virtual ReportGroup GetMainReportGroupFromAllDiagnostics(DiagnosticsWithBannedApis diagnosticsWithApis, AppAnalysisContext analysisContext,
-																		   string? projectDirectory, CancellationToken cancellation)
+		protected virtual ReportGroup GetMainReportGroupFromAllDiagnostics(ImmutableArray<Diagnostic> foundDiagnostics, AnalysisContext analysisContext,
+																		   string? projectDirectory, int distinctErrorsCount, CancellationToken cancellation)
 		{
-			var bannedApisGroups	  		  = GetAllReportGroups(diagnosticsWithApis, analysisContext, projectDirectory, cancellation).ToList();
-			var sortedUnrecognizedDiagnostics = GetLinesForUnrecognizedDiagnostics(diagnosticsWithApis);
-			int recognizedErrorsCount 		  = diagnosticsWithApis.TotalDiagnosticsCount - diagnosticsWithApis.UnrecognizedDiagnostics.Count;
+			var diagnosticGroups = GetAllReportGroups(foundDiagnostics, analysisContext, projectDirectory, cancellation).ToList();
 
 			var mainApiGroup = new ReportGroup()
 			{
-				TotalErrorCount   = recognizedErrorsCount,
-				DistinctApisCount = diagnosticsWithApis.UsedDistinctApis.Count,
+				TotalDiagnosticsCount    = foundDiagnostics.Length,
+				DistinctDiagnosticsCount = distinctErrorsCount,
 
-				ChildrenTitle 	  = new Title("Found APIs", TitleKind.AllApis),
-				ChildrenGroups 	  = bannedApisGroups.NullIfEmpty(),
-				LinesTitle		  = sortedUnrecognizedDiagnostics.Count > 0
-										? new Title("Unrecognized diagnostics", TitleKind.NotSpecified)
-										: null,
-				Lines			  = sortedUnrecognizedDiagnostics.NullIfEmpty(),
+				ChildrenTitle  = new Title(Messages.FoundErrorsReportSubtitle, TitleKind.AllDiagnostics),
+				ChildrenGroups = diagnosticGroups.NullIfEmpty(),
 			};
 
 			return mainApiGroup;
 		}
 
-		protected virtual IReadOnlyList<Line> GetLinesForUnrecognizedDiagnostics(DiagnosticsWithBannedApis diagnosticsWithApis) =>
-			(from diagnostic in diagnosticsWithApis.UnrecognizedDiagnostics
-			 orderby (diagnostic.Location.SourceTree?.FilePath ?? string.Empty)
-			 select new Line(diagnostic.ToString())
-			)
-			.ToList(capacity: diagnosticsWithApis.UnrecognizedDiagnostics.Count);
-
-		protected virtual IEnumerable<ReportGroup> GetAllReportGroups(DiagnosticsWithBannedApis diagnosticsWithApis, AppAnalysisContext analysisContext,
+		protected virtual IEnumerable<ReportGroup> GetAllReportGroups(ImmutableArray<Diagnostic> foundDiagnostics, AnalysisContext analysisContext,
 																	  string? projectDirectory, CancellationToken cancellation)
 		{
 			cancellation.ThrowIfCancellationRequested();
 
-			var linesGrouper = GetLinesGrouper(analysisContext.Grouping);
-			var apiGroups	 = linesGrouper.GetApiGroups(analysisContext, diagnosticsWithApis, projectDirectory, cancellation);
-			return apiGroups;
+			var linesGrouper	   = GetLinesGrouper(analysisContext.GroupingMode);
+			var groupedDiagnostics = linesGrouper.GetGroupedDiagnostics(analysisContext, foundDiagnostics, projectDirectory, cancellation);
+			return groupedDiagnostics;
 		}
 
-		protected virtual IGroupLines GetLinesGrouper(GroupingMode groupingMode)
-		{
-			if (groupingMode.HasGrouping(GroupingMode.Files))
-			{
-				return new GroupByAnyGroupingCombination(groupingMode);
-			}
-			else if (groupingMode.HasGrouping(GroupingMode.Namespaces))
-			{
-				return new GroupByNamespacesTypesAndApis(groupingMode);
-			}
-			else if (groupingMode.HasGrouping(GroupingMode.Types)) 
-			{
-				return new GroupByTypesAndAPIs(groupingMode);
-			}
-			else
-				return new GroupByAPIsOrNoGrouping(groupingMode);
-		}
+		protected virtual IGroupLines GetLinesGrouper(GroupingMode groupingMode) =>
+			groupingMode.HasGrouping(GroupingMode.Files)
+				? new GroupByFilesAndDiagnosticIDs(groupingMode)
+				: new GroupByDiagnosticsOrNoGrouping(groupingMode);
 	}
 }

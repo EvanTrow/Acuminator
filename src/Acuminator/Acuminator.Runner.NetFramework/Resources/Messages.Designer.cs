@@ -196,6 +196,15 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Found Errors.
+        /// </summary>
+        internal static string FoundErrorsReportSubtitle {
+            get {
+                return ResourceManager.GetString("FoundErrorsReportSubtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Initialize Acuminator analyzers..
         /// </summary>
         internal static string InitializeAcuminatorAnalyzersStatusMessage {

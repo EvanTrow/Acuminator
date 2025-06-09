@@ -142,6 +142,9 @@
   <data name="FinishedAcuminatorValidationOfTheProjectInfo" xml:space="preserve">
     <value>Finished Acuminator validation of the project "{ProjectName}". Project validation result: {Result}.</value>
   </data>
+  <data name="FoundErrorsReportSubtitle" xml:space="preserve">
+    <value>Found Errors</value>
+  </data>
   <data name="InitializeAcuminatorAnalyzersStatusMessage" xml:space="preserve">
     <value>Initialize Acuminator analyzers.</value>
   </data>

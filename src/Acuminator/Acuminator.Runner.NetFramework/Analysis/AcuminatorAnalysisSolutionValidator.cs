@@ -8,8 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Acuminator.Runner.Analysis.Initialization;
-using Acuminator.Runner.Input;
 using Acuminator.Runner.Output;
+using Acuminator.Runner.Output.Data;
 using Acuminator.Runner.Resources;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn;
@@ -36,11 +36,11 @@ namespace Acuminator.Runner.Analysis
 													IProjectReportBuilder? customReportBuilder = null,
 													IOutputterFactory? customOutputFactory = null)
 		{
-			_diagnosticAnalyzers = diagnosticAnalyzers;
-			_logger = logger;
+			_diagnosticAnalyzers 		   = diagnosticAnalyzers;
+			_logger 					   = logger;
 			_acuminatorAnalysisInitializer = acuminatorAnalysisInitializer;
-			_reportBuilder = customReportBuilder ?? new ProjectReportBuilder();
-			_outputterFactory = customOutputFactory ?? new ReportOutputterFactory();
+			_reportBuilder 				   = customReportBuilder ?? new ProjectReportBuilder();
+			_outputterFactory 			   = customOutputFactory ?? new ReportOutputterFactory();
 		}
 
 		public static AcuminatorAnalysisSolutionValidator? CreateAcuminatorSolutionAnalyzer(Input.AnalysisContext analysisContext, ILogger logger)
