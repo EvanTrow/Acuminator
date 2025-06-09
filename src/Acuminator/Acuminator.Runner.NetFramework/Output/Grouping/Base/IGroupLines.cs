@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Threading;
 
 using Acuminator.Runner.Input;
@@ -30,7 +29,7 @@ namespace Acuminator.Runner.Output.Grouping
 		/// <returns>
 		/// Acuminator diagnostics grouped according to the <see cref="Grouping"/> mode.
 		/// </returns>
-		IEnumerable<ReportGroup> GetGroupedDiagnostics(AnalysisContext analysisContext, ImmutableArray<Diagnostic> diagnostics,
+		IEnumerable<ReportGroup> GetGroupedDiagnostics(AnalysisContext analysisContext, IEnumerable<Diagnostic> diagnostics,
 													   string? projectDirectory, CancellationToken cancellation);
 	}
 }
