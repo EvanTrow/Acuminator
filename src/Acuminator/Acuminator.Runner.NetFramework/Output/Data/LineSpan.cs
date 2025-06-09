@@ -4,7 +4,7 @@ using System.Linq;
 
 using Acuminator.Utilities.Common;
 
-namespace Acuminator.Runner.Output
+namespace Acuminator.Runner.Output.Data
 {
 	internal readonly struct LineSpan : IEquatable<LineSpan>, IComparable<LineSpan>
 	{

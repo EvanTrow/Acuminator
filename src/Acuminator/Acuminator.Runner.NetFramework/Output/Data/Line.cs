@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 using Acuminator.Runner.Output.Json;
 using Acuminator.Utilities.Common;
 
-namespace Acuminator.Runner.Output
+namespace Acuminator.Runner.Output.Data
 {
 	[JsonConverter(typeof(LineConverter))]
 	internal readonly struct Line : IEquatable<Line>, IComparable<Line>

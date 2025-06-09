@@ -5,7 +5,7 @@ using System.Linq;
 
 using Acuminator.Utilities.Common;
 
-namespace Acuminator.Runner.Output
+namespace Acuminator.Runner.Output.Data
 {
 	internal class CodeSourceReport
 	{
@@ -19,7 +19,7 @@ namespace Acuminator.Runner.Output
 		{
 			CodeSourceName 	= codeSourceName.CheckIfNullOrWhiteSpace();
 			ProjectReports 	= projectReports.CheckIfNullOrEmpty().ToList();
-			TotalErrorCount = ProjectReports.Sum(report => report.TotalErrorCount);
+			TotalErrorCount = ProjectReports.Sum(report => report.TotalErrorsCount);
 		}
 	}
 }

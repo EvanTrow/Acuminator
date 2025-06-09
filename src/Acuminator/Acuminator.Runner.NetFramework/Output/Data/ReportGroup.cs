@@ -5,7 +5,7 @@ using System.Linq;
 
 using System.Text.Json.Serialization;
 
-namespace Acuminator.Runner.Output
+namespace Acuminator.Runner.Output.Data
 {
 	internal class ReportGroup
 	{

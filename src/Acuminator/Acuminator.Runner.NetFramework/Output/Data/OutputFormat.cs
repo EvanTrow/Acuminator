@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Acuminator.Runner.Output
+namespace Acuminator.Runner.Output.Data
 {
     /// <summary>
     /// Report output data format.

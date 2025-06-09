@@ -7,7 +7,7 @@ using System.Linq;
 
 using Acuminator.Runner.Analysis.CodeSources;
 using Acuminator.Runner.Constants;
-using Acuminator.Runner.Output;
+using Acuminator.Runner.Output.Data;
 using Acuminator.Runner.Output.Grouping;
 using Acuminator.Runner.Resources;
 using Acuminator.Utilities;

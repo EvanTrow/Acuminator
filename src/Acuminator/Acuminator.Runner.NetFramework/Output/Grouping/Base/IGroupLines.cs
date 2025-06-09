@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Threading;
 
 using Acuminator.Runner.Input;
+using Acuminator.Runner.Output.Data;
 
 using Microsoft.CodeAnalysis;
 
