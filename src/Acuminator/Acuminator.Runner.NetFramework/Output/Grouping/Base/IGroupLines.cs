@@ -21,14 +21,14 @@ namespace Acuminator.Runner.Output.Grouping
 		GroupingMode Grouping { get; }
 
 		/// <summary>
-		/// Get Acuminator errors grouped according to the <see cref="Grouping"/> mode.
+		/// Get Acuminator diagnostics grouped according to the <see cref="Grouping"/> mode.
 		/// </summary>
 		/// <param name="analysisContext">Analysis context.</param>
 		/// <param name="diagnostics">Diagnostics to group.</param>
 		/// <param name="projectDirectory">Pathname of the project directory.</param>
 		/// <param name="cancellation">Cancellation token.</param>
 		/// <returns>
-		/// Acuminator errors grouped according to the <see cref="Grouping"/> mode.
+		/// Acuminator diagnostics grouped according to the <see cref="Grouping"/> mode.
 		/// </returns>
 		IEnumerable<ReportGroup> GetGroupedErrors(AnalysisContext analysisContext, ImmutableArray<Diagnostic> diagnostics,
 												  string? projectDirectory, CancellationToken cancellation);

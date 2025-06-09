@@ -14,12 +14,12 @@ using Microsoft.CodeAnalysis;
 namespace Acuminator.Runner.Output.Grouping
 {
 	/// <summary>
-	/// Base class to group report lines.
+	/// Base class to group Acuminator diagnostics.
 	/// </summary>
 	internal abstract class GroupLinesBase : IGroupLines
 	{
 		/// <summary>
-		/// Gets the required output results grouping.
+		/// The diagnostics' grouping mode.
 		/// </summary>
 		public GroupingMode Grouping { get; }
 
