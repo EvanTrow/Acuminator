@@ -11,6 +11,8 @@ using Acuminator.Utilities.Common;
 
 using Microsoft.CodeAnalysis;
 
+using DiagnosticInfo = (Microsoft.CodeAnalysis.Diagnostic Diagnostic, string Content, string Location);
+
 namespace Acuminator.Runner.Output.Grouping
 {
 	/// <summary>
@@ -32,20 +34,54 @@ namespace Acuminator.Runner.Output.Grouping
 		public abstract IEnumerable<ReportGroup> GetGroupedDiagnostics(AnalysisContext analysisContext, IEnumerable<Diagnostic> diagnostics,
 																	   string? projectDirectory, CancellationToken cancellation);
 
-		protected IEnumerable<Line> GetFlatErrorWithLocationLines(IEnumerable<Diagnostic> unsortedDiagnostics, string? projectDirectory, 
-																  AnalysisContext analysisContext)
+		/// <summary>
+		/// Gets the ordered diagnostics with location report lines for given <paramref name="unsortedDiagnostics"/>.<br/>
+		/// If <paramref name="sortBySourceFile"/> is true, the diagnostics are sorted additionally by source file. This sorting is always applied first.<br/>
+		/// If <paramref name="sortByDiagnosticId"/> is true, the diagnostics are sorted additionally by diagnostic identifier. This sorting is applied after sorting by source file.<br/>
+		/// </summary>
+		/// <param name="unsortedDiagnostics">The unsorted diagnostics.</param>
+		/// <param name="projectDirectory">Pathname of the project directory.</param>
+		/// <param name="analysisContext">Context for the analysis.</param>
+		/// <param name="sortBySourceFile">True to sort by source file. This sorting is always applied first.</param>
+		/// <param name="sortByDiagnosticId">True to sort by diagnostic identifier. This sorting is applied after sorting by source file.</param>
+		/// <returns>
+		/// The ordered diagnostics with location report lines for given <paramref name="unsortedDiagnostics"/>.
+		/// </returns>
+		protected IEnumerable<Line> GetOrderedDiagnosticsWithLocationLines(IEnumerable<Diagnostic> unsortedDiagnostics, string? projectDirectory, 
+																		   AnalysisContext analysisContext, bool sortBySourceFile, bool sortByDiagnosticId)
 		{
-			var sortedApisWithLocations = unsortedDiagnostics.Select(d => (Diagnostic: d,
-																		   Location: GetPrettyLocation(d, projectDirectory, analysisContext)))
-															 .OrderBy(diagnosticWithLocation => diagnosticWithLocation.Diagnostic.Id)
-															 .ThenBy(diagnosticWithLocation  => diagnosticWithLocation.Location)
-															 .Select(diagnosticWithLocation  => new Line(GetDiagnosticContent(diagnosticWithLocation.Diagnostic), 
-																										 diagnosticWithLocation.Location));
-			return sortedApisWithLocations;
+			var unsortedDiagnosticInfos = unsortedDiagnostics.Select(d => (Diagnostic: d,
+																		   Content: GetDiagnosticContent(d),
+																		   Location: GetPrettyLocation(d, projectDirectory, analysisContext)));
+
+			var sortedDiagnosticInfos = GetSortedDiagnosticInfos(sortByDiagnosticId, sortBySourceFile, unsortedDiagnosticInfos);
+			var reportLines	= sortedDiagnosticInfos.Select(d  => new Line(d.Content, d.Location));
+
+			return reportLines;
 		}
 
-		protected IEnumerable<Line> GetApiUsagesLines(IEnumerable<Diagnostic> sortedDiagnostics, string? projectDirectory,
-													  AnalysisContext analysisContext) =>
+		private IEnumerable<DiagnosticInfo> GetSortedDiagnosticInfos(bool sortBySourceFile, bool sortByDiagnosticId, 
+																	 IEnumerable<DiagnosticInfo> unsortedDiagnosticInfos)
+		{
+			IOrderedEnumerable<DiagnosticInfo>? sortedDiagnosticInfos = null;
+
+			if (sortBySourceFile)
+				sortedDiagnosticInfos = unsortedDiagnosticInfos.OrderBy(d => d.Diagnostic.Location.SourceTree?.FilePath ?? string.Empty);
+			
+			if (sortByDiagnosticId)
+			{
+				sortedDiagnosticInfos = sortedDiagnosticInfos?.ThenBy(d => d.Diagnostic.Id) ?? 
+										unsortedDiagnosticInfos.OrderBy(d => d.Diagnostic.Id);
+			}
+
+			sortedDiagnosticInfos = sortedDiagnosticInfos?.ThenBy(d => d.Location) ??
+									unsortedDiagnosticInfos.OrderBy(d => d.Location);
+			sortedDiagnosticInfos = sortedDiagnosticInfos.ThenBy(d => d.Content, StringComparer.Ordinal);
+			return sortedDiagnosticInfos;
+		}
+
+		protected IEnumerable<Line> GetDiagnosticLocationLines(IEnumerable<Diagnostic> sortedDiagnostics, string? projectDirectory,
+																AnalysisContext analysisContext) =>
 			sortedDiagnostics.Select(diagnostic => GetDiagnosticLocationLine(diagnostic, projectDirectory, analysisContext));
 
 		protected Line GetDiagnosticLocationLine(Diagnostic diagnostic, string? projectDirectory, AnalysisContext analysisContext)
