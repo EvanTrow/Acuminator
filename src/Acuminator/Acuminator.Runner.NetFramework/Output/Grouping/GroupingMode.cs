@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Acuminator.Runner.Output
+namespace Acuminator.Runner.Output.Grouping
 {
 	/// <summary>
 	/// Report grouping modes.

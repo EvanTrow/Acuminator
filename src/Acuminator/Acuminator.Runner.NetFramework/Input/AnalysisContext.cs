@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 using Acuminator.Runner.Analysis.CodeSources;
 using Acuminator.Runner.Output;
+using Acuminator.Runner.Output.Grouping;
 using Acuminator.Utilities;
 using Acuminator.Utilities.Common;
 
