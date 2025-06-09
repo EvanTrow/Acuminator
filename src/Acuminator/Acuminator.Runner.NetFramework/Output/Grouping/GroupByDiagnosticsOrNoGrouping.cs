@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
@@ -18,119 +17,76 @@ namespace Acuminator.Runner.Output.Grouping
 	internal class GroupByDiagnosticsOrNoGrouping : GroupLinesBase
 	{
 		public GroupByDiagnosticsOrNoGrouping(GroupingMode grouping) : base(grouping)
-		{
-		}
+		{ }
 
 		/// <summary>
-		/// Group reported diagnostics by ID or do not apply grouping at all.
+		/// Group reported diagnostics by <see cref="Diagnostic.Id"/> or do not apply grouping at all.
 		/// </summary>
 		/// <param name="analysisContext">Analysis context.</param>
 		/// <param name="diagnostics">Diagnostics to group.</param>
 		/// <param name="projectDirectory">Pathname of the project directory.</param>
 		/// <param name="cancellation">Cancellation token.</param>
 		/// <returns>
-		/// Acuminator diagnostics grouped by <see cref="GroupingMode.Apis"/> or <see cref="GroupingMode.None"/> grouping modes.
+		/// Acuminator diagnostics grouped by <see cref="Diagnostic.Id"/> or not grouped at all.
 		/// </returns>
-		public override IEnumerable<ReportGroup> GetGroupedDiagnostics(AnalysisContext analysisContext, ImmutableArray<Diagnostic> diagnostics,
-																  string? projectDirectory, CancellationToken cancellation) =>
-			GetErrorsGroupedByDiagnosticID(analysisContext, diagnostics, projectDirectory, cancellation);
+		public override IEnumerable<ReportGroup> GetGroupedDiagnostics(AnalysisContext analysisContext, IEnumerable<Diagnostic> diagnostics,
+																		string? projectDirectory, CancellationToken cancellation) =>
+			GroupDiagnosticsByDiagnosticIdOrNothing(analysisContext, diagnostics, projectDirectory, cancellation);
 
-		protected IEnumerable<ReportGroup> GetErrorsGroupedByDiagnosticID(AnalysisContext analysisContext, ImmutableArray<Diagnostic> diagnostics,
-																	string? projectDirectory, CancellationToken cancellation)
+		protected IReadOnlyCollection<ReportGroup> GroupDiagnosticsByDiagnosticIdOrNothing(AnalysisContext analysisContext, 
+																						   IEnumerable<Diagnostic> unsortedDiagnostics,
+																						   string? projectDirectory, CancellationToken cancellation)
 		{
-			var sortedFlatDiagnostics = diagnosticsWithApis.OrderBy(d => d.BannedApi.FullName);
-			var flattenedApiGroups =
-				GetGroupsAfterNamespaceAndTypeGroupingProcessed(analysisContext, diagnosticsWithApis.DistinctApisCalculator,
-																sortedFlatDiagnostics, projectDirectory);
-			return flattenedApiGroups;
+			return analysisContext.GroupingMode.HasGrouping(GroupingMode.DiagnosticIDs)
+				? GroupDiagnosticsByDiagnosticId(unsortedDiagnostics, projectDirectory, analysisContext, cancellation).ToList()
+				: GetNotGroupedDiagnostics(analysisContext, unsortedDiagnostics, projectDirectory, cancellation);
 		}
 
-		protected IReadOnlyCollection<ReportGroup> GetGroupsAfterNamespaceAndTypeGroupingProcessed(AppAnalysisContext analysisContext, 
-																								UsedDistinctApisCalculator usedDistinctApisCalculator,
-																								IEnumerable<(Diagnostic Diagnostic, Api BannedApi)> unsortedDiagnostics,
-																								string? projectDirectory)
+		private IEnumerable<ReportGroup> GroupDiagnosticsByDiagnosticId(IEnumerable<Diagnostic> unsortedDiagnostics, string? projectDirectory,
+																		AnalysisContext analysisContext, CancellationToken cancellation)
 		{
-			bool isGroupedByApis = analysisContext.Grouping.HasGrouping(GroupingMode.Apis);
+			cancellation.ThrowIfCancellationRequested();
+			var diagnosticsGroupedById = unsortedDiagnostics.GroupBy(d => d.Id)
+															.OrderBy(d => d.Key);
 
-			switch (analysisContext.ReportMode)
+			foreach (var diagnosticsWithSameId in diagnosticsGroupedById)
 			{
-				case ReportMode.UsedAPIsOnly:
-					return CreateAggregatedGroupWithoutUsagesForUsedApi(usedDistinctApisCalculator, unsortedDiagnostics);
+				cancellation.ThrowIfCancellationRequested();
 
-				case ReportMode.UsedAPIsWithUsages when isGroupedByApis:
-					return GetGroupsForApiUsagesGroupedByApi(unsortedDiagnostics, usedDistinctApisCalculator, projectDirectory, analysisContext).ToList();
-
-				case ReportMode.UsedAPIsWithUsages when !isGroupedByApis:
-					return GetGroupForFlattenedAPIsCombinedWithTheirUsages(analysisContext, usedDistinctApisCalculator, unsortedDiagnostics, projectDirectory);
-
-				default:
-					throw new NotSupportedException($"Report mode \"{analysisContext.ReportMode}\" is not supported");
-			}
-		}
-
-		private static IReadOnlyCollection<ReportGroup> CreateAggregatedGroupWithoutUsagesForUsedApi(UsedDistinctApisCalculator usedDistinctApisCalculator, 
-																									IEnumerable<(Diagnostic Diagnostic, Api BannedApi)> unsortedDiagnostics)
-		{
-			var allDistinctApis    = usedDistinctApisCalculator.GetAllUsedApis(unsortedDiagnostics);
-			var sortedDistinctApis = allDistinctApis.OrderBy(api => api.FullName);
-
-			var lines = sortedDistinctApis.Select(api => new Line(api.FullName)).ToList();
-			var usedApisGroup = new ReportGroup
-			{
-				TotalErrorCount   = lines.Count,
-				DistinctApisCount = lines.Count,
-				Lines 			  = lines.NullIfEmpty()
-			};
-
-			return new[] { usedApisGroup };
-		}
-
-		private IEnumerable<ReportGroup> GetGroupsForApiUsagesGroupedByApi(IEnumerable<(Diagnostic Diagnostic, Api BannedApi)> unsortedDiagnostics,
-																		   UsedDistinctApisCalculator usedDistinctApisCalculator,
-																		   string? projectDirectory, AppAnalysisContext analysisContext)
-		{
-			var diagnosticsGroupedByApi = unsortedDiagnostics.GroupBy(d => d.BannedApi.FullName)
-															 .OrderBy(d => d.Key);
-
-			foreach (var diagnosticsForApiGroup in diagnosticsGroupedByApi)
-			{
-				var diagnosticsForApi = diagnosticsForApiGroup.ToList();
-				string apiName 		  = diagnosticsForApiGroup.Key;
-				var distinctApis 	  = usedDistinctApisCalculator.GetAllUsedApis(diagnosticsForApi);
-				var apiDiagnostics 	  = diagnosticsForApi.Select(d => d.Diagnostic)
-														 .OrderBy(d => d.Location.SourceTree?.FilePath ?? string.Empty);
-				var usagesLines = GetApiUsagesLines(apiDiagnostics, projectDirectory, analysisContext).ToList();
-				var apiGroup = new ReportGroup
+				string diagnosticId	= diagnosticsWithSameId.Key;
+				var diagnosticsWithLocations = GetOrderedDiagnosticsWithLocationLines(diagnosticsWithSameId, projectDirectory, analysisContext, 
+																					  sortBySourceFile: true, sortByDiagnosticId: false)
+																		.ToList();
+				var diagnosticIdGroup = new ReportGroup
 				{
-					GroupTitle 		  = new Title(apiName, TitleKind.Diagnostic),
-					TotalErrorCount   = usagesLines.Count,
-					DistinctApisCount = distinctApis.Count(),
-					LinesTitle 		  = new Title("Usages", TitleKind.Locations),
-					Lines 			  = usagesLines.NullIfEmpty()
+					GroupTitle 			  = new Title(diagnosticId, TitleKind.DiagnosticId),
+					TotalDiagnosticsCount = diagnosticsWithLocations.Count,
+					Lines 				  = diagnosticsWithLocations.NullIfEmpty()
 				};
 
-				yield return apiGroup;
+				yield return diagnosticIdGroup;
 			}
 		}
 
-		private IReadOnlyCollection<ReportGroup> GetGroupForFlattenedAPIsCombinedWithTheirUsages(AppAnalysisContext analysisContext,
-																								 UsedDistinctApisCalculator usedDistinctApisCalculator,
-																								 IEnumerable<(Diagnostic Diagnostic, Api BannedApi)> unsortedDiagnostics,
-																								 string? projectDirectory)
+		private IReadOnlyCollection<ReportGroup> GetNotGroupedDiagnostics(AnalysisContext analysisContext, IEnumerable<Diagnostic> unsortedDiagnostics,
+																		  string? projectDirectory, CancellationToken cancellation)
 		{
-			var allDistinctApis = usedDistinctApisCalculator.GetAllUsedApis(unsortedDiagnostics);
-			int distinctApisCount = allDistinctApis.Count();
+			IReadOnlyCollection<Diagnostic> diagnosticsMaterializedCollection = (unsortedDiagnostics as IReadOnlyCollection<Diagnostic>) ?? 
+																				 unsortedDiagnostics.ToList();
+			var distinctDiagnosticsCount = diagnosticsMaterializedCollection.GroupBy(d => d.Id)
+																			.Count();
+			var sortedNotGroupedDiagnostics = GetOrderedDiagnosticsWithLocationLines(diagnosticsMaterializedCollection, projectDirectory, analysisContext,
+																		   sortBySourceFile: true, sortByDiagnosticId: true)
+												.ToList(capacity: diagnosticsMaterializedCollection.Count);
 
-			var flatApiUsageLines = GetFlatApiUsagesLines(unsortedDiagnostics, projectDirectory, analysisContext).ToList();
-
-			var flatApiUsageGroup = new ReportGroup
+			var singleGroupWithAllDiagnosticsOrdered = new ReportGroup
 			{
-				TotalErrorCount = flatApiUsageLines.Count,
-				DistinctApisCount = distinctApisCount,
-				Lines = flatApiUsageLines.NullIfEmpty()
+				TotalDiagnosticsCount	 = diagnosticsMaterializedCollection.Count,
+				DistinctDiagnosticsCount = distinctDiagnosticsCount,
+				Lines					 = sortedNotGroupedDiagnostics.NullIfEmpty()
 			};
 
-			return new[] { flatApiUsageGroup };
+			return [singleGroupWithAllDiagnosticsOrdered];
 		}
 	}
 }
