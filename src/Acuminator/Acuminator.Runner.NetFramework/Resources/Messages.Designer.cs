@@ -250,6 +250,15 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No file.
+        /// </summary>
+        internal static string NoFilePlaceholder {
+            get {
+                return ResourceManager.GetString("NoFilePlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No installed MSBuild version was found on the machine..
         /// </summary>
         internal static string NoInstalledMSBuildFoundError {

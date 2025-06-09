@@ -160,6 +160,9 @@
   <data name="MSBuild_VisualStudioNameAndVersion_Info" xml:space="preserve">
     <value>Found MSBuild instance with name "{VisualStudioName}", version "{VisualStudioVersion}".</value>
   </data>
+  <data name="NoFilePlaceholder" xml:space="preserve">
+    <value>No file</value>
+  </data>
   <data name="NoInstalledMSBuildFoundError" xml:space="preserve">
     <value>No installed MSBuild version was found on the machine.</value>
   </data>

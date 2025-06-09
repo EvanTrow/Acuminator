@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
 using Acuminator.Runner.Input;
 using Acuminator.Runner.Output.Data;
+using Acuminator.Runner.Resources;
 using Acuminator.Utilities.Common;
 
 using Microsoft.CodeAnalysis;
@@ -33,88 +33,67 @@ namespace Acuminator.Runner.Output.Grouping
 		public override IEnumerable<ReportGroup> GetGroupedDiagnostics(AnalysisContext analysisContext, IEnumerable<Diagnostic> diagnostics,
 																	   string? projectDirectory, CancellationToken cancellation)
 		{
-			var diagnosticsGroupedByFiles = diagnosticsWithApis.GroupBy(d => d.Diagnostic.Location.SourceTree?.FilePath.NullIfWhiteSpace() ?? string.Empty)
-															   .OrderBy(d => d.Key);
+			var diagnosticsGroupedByFiles = diagnostics.GroupBy(d => d.Location.SourceTree?.FilePath.NullIfWhiteSpace() ?? string.Empty)
+													   .OrderBy(d => d.Key);
 
-			foreach (var diagnosticsByApiGroup in diagnosticsGroupedByFiles)
+			foreach (var diagnosticsByFileGroup in diagnosticsGroupedByFiles)
 			{
 				cancellation.ThrowIfCancellationRequested();
 
-				var diagnosticsByFile = diagnosticsByApiGroup.ToList();
-				string fileName 	  = diagnosticsByApiGroup.Key.NullIfWhiteSpace() ?? "No file";
-
-				var diagnosticsInFileWithApis = new DiagnosticsWithBannedApis(diagnosticsByFile!, analysisContext);
-				var fileGroup = GetGroupForFileDiagnostics(analysisContext, diagnosticsInFileWithApis, projectDirectory, fileName, cancellation);
+				var diagnosticsByFile = diagnosticsByFileGroup.ToList();
+				string fileName 	  = diagnosticsByFileGroup.Key.NullIfWhiteSpace() ?? Messages.NoFilePlaceholder;
+				var fileGroup		  = GetGroupForFileDiagnostics(analysisContext, diagnosticsByFile, projectDirectory, fileName, cancellation);
 
 				if (fileGroup != null)
 					yield return fileGroup;
 			}
 		}
 
-		private ReportGroup? GetGroupForFileDiagnostics(AnalysisContext analysisContext, ImmutableArray<Diagnostic> diagnostics, 
+		private ReportGroup? GetGroupForFileDiagnostics(AnalysisContext analysisContext, List<Diagnostic> diagnostics, 
 														string? projectDirectory, string fileName, CancellationToken cancellation)
 		{
-			bool groupByNamespaces = analysisContext.Grouping.HasGrouping(GroupingMode.Namespaces);
-			bool groupByTypes 	   = analysisContext.Grouping.HasGrouping(GroupingMode.Types);
-			bool groupByApis 	   = analysisContext.Grouping.HasGrouping(GroupingMode.Apis);
+			bool groupByDiagnosticID = analysisContext.GroupingMode.HasGrouping(GroupingMode.DiagnosticIDs);
 
-			if (!groupByNamespaces && !groupByApis && !groupByApis)
-				return CreateGroupByFileOnly(fileName, analysisContext, diagnosticsInFileWithApis, projectDirectory);
-
-			var subGroups = GetSubGroups(analysisContext, diagnosticsInFileWithApis, projectDirectory, groupByNamespaces, groupByTypes, cancellation);
-			var fileGroup = new ReportGroup
+			if (groupByDiagnosticID)
 			{
-				GroupTitle 		  = new Title(fileName, TitleKind.File),
-				TotalErrorCount   = diagnosticsInFileWithApis.Count,
-				DistinctDiagnosticsCount = diagnosticsInFileWithApis.UsedDistinctApis.Count,
-				ChildrenGroups 	  = subGroups.NullIfEmpty()
-			};
+				var subGroups = GetSubGroupsByDiagnosticID(analysisContext, diagnostics, projectDirectory, cancellation);
+				var fileGroup = new ReportGroup
+				{
+					GroupTitle 				 = new Title(fileName, TitleKind.File),
+					TotalDiagnosticsCount 	 = diagnostics.Count,
+					DistinctDiagnosticsCount = subGroups.Count,
+					ChildrenGroups 			 = subGroups.NullIfEmpty()
+				};
 
-			return fileGroup;
-		}
-
-		private List<ReportGroup>? GetSubGroups(AppAnalysisContext analysisContext, DiagnosticsWithBannedApis diagnosticsInFileWithApis, 
-												string? projectDirectory, bool groupByNamespaces, bool groupByTypes, CancellationToken cancellation)
-		{
-			List<ReportGroup>? subGroups;
-			if (groupByNamespaces)
-			{
-				subGroups = GetApiGroupsByNamespaces(analysisContext, diagnosticsInFileWithApis, projectDirectory, cancellation)?.ToList();
-			}
-			else if (groupByTypes)
-			{
-				subGroups = GetApiGroupsForTypesAndApisGrouping(analysisContext, diagnosticsInFileWithApis, projectDirectory, cancellation)?.ToList();
+				return fileGroup;
 			}
 			else
 			{
-				subGroups = GetApiGroupsGroupedByApi(analysisContext, diagnosticsInFileWithApis, projectDirectory, cancellation)?.ToList();
+				return CreateGroupByFileOnly(fileName, analysisContext, diagnostics, projectDirectory);
 			}
+		}
 
+		private IReadOnlyCollection<ReportGroup> GetSubGroupsByDiagnosticID(AnalysisContext analysisContext, List<Diagnostic> diagnostics,
+																			string? projectDirectory, CancellationToken cancellation)
+		{
+			var subGroups = GroupDiagnosticsByDiagnosticIdOrNothing(analysisContext, diagnostics, projectDirectory, 
+																	sortBySourceFile: false, sortByDiagnosticId: true, cancellation);
 			return subGroups;
 		}
 
-		private ReportGroup CreateGroupByFileOnly(string fileName, AppAnalysisContext analysisContext, DiagnosticsWithBannedApis diagnosticsInFileWithApis,
-												  string? projectDirectory)
+		private ReportGroup CreateGroupByFileOnly(string fileName, AnalysisContext analysisContext, List<Diagnostic> diagnostics, string? projectDirectory)
 		{
-			List<Line> lines;
-		
-			if (analysisContext.ReportMode == ReportMode.UsedAPIsWithUsages)
-			{
-				lines = GetFlatApiUsagesLines(diagnosticsInFileWithApis, projectDirectory, analysisContext).ToList(diagnosticsInFileWithApis.Count);
-			}
-			else
-			{
-				lines = diagnosticsInFileWithApis.OrderBy(d => d.BannedApi.FullName)
-												 .Select(d => new Line(d.BannedApi.FullName))
-												 .ToList(diagnosticsInFileWithApis.Count);
-			}
-
+			int distinctDiagnosticsCount = diagnostics.GroupBy(d => d.Id)
+													  .Count();
+			var lines = GetOrderedDiagnosticsWithLocationLines(diagnostics, projectDirectory, analysisContext,
+															   sortBySourceFile: false, sortByDiagnosticId: true)
+													   .ToList(diagnostics.Count);
 			var fileGroup = new ReportGroup
 			{
-				GroupTitle 		  = new Title(fileName, TitleKind.File),
-				TotalErrorCount   = diagnosticsInFileWithApis.Count,
-				DistinctDiagnosticsCount = diagnosticsInFileWithApis.UsedDistinctApis.Count,
-				Lines 			  = lines.NullIfEmpty()
+				GroupTitle 				 = new Title(fileName, TitleKind.File),
+				TotalDiagnosticsCount	 = diagnostics.Count,
+				DistinctDiagnosticsCount = distinctDiagnosticsCount,
+				Lines 					 = lines.NullIfEmpty()
 			};
 
 			return fileGroup;
