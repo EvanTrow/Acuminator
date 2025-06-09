@@ -1,36 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
 using Acuminator.Runner.Input;
 using Acuminator.Runner.Output.Data;
-using Acuminator.Utils.Common;
+using Acuminator.Utilities.Common;
 
 using Microsoft.CodeAnalysis;
 
-namespace Acuminator.Runner.Output
+namespace Acuminator.Runner.Output.Grouping
 {
 	/// <summary>
-	/// Results grouper by any combination of file, namespace, types, and API grouping modes.
+	/// Results grouper by any combination of file and diagnostic ID grouping modes.
 	/// </summary>
-	internal sealed class GroupByAnyGroupingCombination : GroupByNamespacesTypesAndApis
+	internal sealed class GroupByFilesAndDiagnosticIDs : GroupByDiagnosticsOrNoGrouping
 	{
-		public GroupByAnyGroupingCombination(GroupingMode grouping) : base(grouping)
+		public GroupByFilesAndDiagnosticIDs(GroupingMode grouping) : base(grouping)
 		{ }
 
 		/// <summary>
-		///  Group results by any combination of file, namespace, types, and API grouping modes.
+		/// Group reported diagnostics by source file containing the diagnostic.
 		/// </summary>
 		/// <param name="analysisContext">Analysis context.</param>
-		/// <param name="diagnosticsWithApis">The diagnostics with APIs.</param>
+		/// <param name="diagnostics">Diagnostics to group.</param>
 		/// <param name="projectDirectory">Pathname of the project directory.</param>
 		/// <param name="cancellation">Cancellation token.</param>
 		/// <returns>
-		/// Output API results grouped by any combination of file, namespace, types, and API grouping modes.
+		/// Acuminator diagnostics grouped by source file.
 		/// </returns>
-		public override IEnumerable<ReportGroup> GetApiGroups(AppAnalysisContext analysisContext, DiagnosticsWithBannedApis diagnosticsWithApis,
-															  string? projectDirectory, CancellationToken cancellation)
+		public override IEnumerable<ReportGroup> GetGroupedDiagnostics(AnalysisContext analysisContext, IEnumerable<Diagnostic> diagnostics,
+																	   string? projectDirectory, CancellationToken cancellation)
 		{
 			var diagnosticsGroupedByFiles = diagnosticsWithApis.GroupBy(d => d.Diagnostic.Location.SourceTree?.FilePath.NullIfWhiteSpace() ?? string.Empty)
 															   .OrderBy(d => d.Key);
@@ -50,7 +51,7 @@ namespace Acuminator.Runner.Output
 			}
 		}
 
-		private ReportGroup? GetGroupForFileDiagnostics(AppAnalysisContext analysisContext, DiagnosticsWithBannedApis diagnosticsInFileWithApis, 
+		private ReportGroup? GetGroupForFileDiagnostics(AnalysisContext analysisContext, ImmutableArray<Diagnostic> diagnostics, 
 														string? projectDirectory, string fileName, CancellationToken cancellation)
 		{
 			bool groupByNamespaces = analysisContext.Grouping.HasGrouping(GroupingMode.Namespaces);
@@ -65,7 +66,7 @@ namespace Acuminator.Runner.Output
 			{
 				GroupTitle 		  = new Title(fileName, TitleKind.File),
 				TotalErrorCount   = diagnosticsInFileWithApis.Count,
-				DistinctApisCount = diagnosticsInFileWithApis.UsedDistinctApis.Count,
+				DistinctDiagnosticsCount = diagnosticsInFileWithApis.UsedDistinctApis.Count,
 				ChildrenGroups 	  = subGroups.NullIfEmpty()
 			};
 
@@ -112,7 +113,7 @@ namespace Acuminator.Runner.Output
 			{
 				GroupTitle 		  = new Title(fileName, TitleKind.File),
 				TotalErrorCount   = diagnosticsInFileWithApis.Count,
-				DistinctApisCount = diagnosticsInFileWithApis.UsedDistinctApis.Count,
+				DistinctDiagnosticsCount = diagnosticsInFileWithApis.UsedDistinctApis.Count,
 				Lines 			  = lines.NullIfEmpty()
 			};
 
