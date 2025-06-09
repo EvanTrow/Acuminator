@@ -145,6 +145,13 @@ namespace Acuminator.Utilities.Common
 		public static bool IsNullOrEmpty<T>([NotNullWhen(returnValue: false)] this T[]? array) => 
 			array?.Length is null or 0;
 
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IReadOnlyCollection<T>? NullIfEmpty<T>(this IReadOnlyCollection<T>? source) =>
+			source?.Count > 0
+				? source
+				: null;
+
 		/// <summary>
 		/// An <see cref="IReadOnlyCollection{T}"/> extension method that converts a source to an immutable array a bit more optimally.
 		/// </summary>
