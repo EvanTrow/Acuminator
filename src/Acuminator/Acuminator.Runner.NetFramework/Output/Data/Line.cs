@@ -17,14 +17,15 @@ namespace Acuminator.Runner.Output.Data
 		public Line(string line)
 		{
 			var span = new LineSpan(line.CheckIfNull());
-			Spans	 = ImmutableArray.Create(span);
+			Spans	 = [span];
 		}
 
-		public Line(string part1, string part2)
+		public Line(string idPart1, string messagePart, string locationPart)
 		{
-			var span1 = new LineSpan(part1.CheckIfNull());
-			var span2 = new LineSpan(part2.CheckIfNull());
-			Spans = ImmutableArray.Create(span1, span2);
+			var span1 = new LineSpan(idPart1.CheckIfNull());
+			var span2 = new LineSpan(messagePart.CheckIfNull());
+			var span3 = new LineSpan(locationPart.CheckIfNull());
+			Spans = [span1, span2, span3];
 		}
 
 		public Line(IReadOnlyCollection<string> spans)
@@ -34,17 +35,14 @@ namespace Acuminator.Runner.Output.Data
 						 .ToImmutableArray();
         }
 
-		public override string ToString()
+		public override string ToString() => Spans.Length switch
 		{
-			if (Spans.Length == 1)
-				return Spans[0].ToString();
-			else if (Spans.Length == 2)
-				return $"{Spans[0].ToString()} {Spans[1].ToString()}";
-			else if (Spans.Length > 2)
-				return string.Join(" ", Spans);
-			else
-				return string.Empty;
-		}
+			0 => string.Empty,
+			1 => Spans[0].ToString(),
+			2 => $"{Spans[0].ToString()} {Spans[1].ToString()}",
+			3 => $"{Spans[0].ToString()} {Spans[1].ToString()} {Spans[2].ToString()}",
+			_ => string.Join(" ", Spans)
+		};
 
 		public override bool Equals(object obj) =>
 			obj is Line other && Equals(other);

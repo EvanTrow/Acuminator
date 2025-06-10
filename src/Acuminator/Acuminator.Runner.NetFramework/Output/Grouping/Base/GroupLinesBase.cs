@@ -11,7 +11,7 @@ using Acuminator.Utilities.Common;
 
 using Microsoft.CodeAnalysis;
 
-using DiagnosticInfo = (Microsoft.CodeAnalysis.Diagnostic Diagnostic, string Content, string Location);
+using DiagnosticInfo = (Microsoft.CodeAnalysis.Diagnostic Diagnostic, string Message, string Location);
 
 namespace Acuminator.Runner.Output.Grouping
 {
@@ -51,11 +51,11 @@ namespace Acuminator.Runner.Output.Grouping
 																		   AnalysisContext analysisContext, bool sortBySourceFile, bool sortByDiagnosticId)
 		{
 			var unsortedDiagnosticInfos = unsortedDiagnostics.Select(d => (Diagnostic: d,
-																		   Content: GetDiagnosticContent(d),
+																		   Message: GetDiagnosticMessage(d),
 																		   Location: GetPrettyLocation(d, projectDirectory, analysisContext)));
 
 			var sortedDiagnosticInfos = GetSortedDiagnosticInfos(sortByDiagnosticId, sortBySourceFile, unsortedDiagnosticInfos);
-			var reportLines	= sortedDiagnosticInfos.Select(d  => new Line(d.Content, d.Location));
+			var reportLines	= sortedDiagnosticInfos.Select(d  => new Line(d.Diagnostic.Id, d.Message, d.Location));
 
 			return reportLines;
 		}
@@ -76,7 +76,7 @@ namespace Acuminator.Runner.Output.Grouping
 
 			sortedDiagnosticInfos = sortedDiagnosticInfos?.ThenBy(d => d.Location) ??
 									unsortedDiagnosticInfos.OrderBy(d => d.Location);
-			sortedDiagnosticInfos = sortedDiagnosticInfos.ThenBy(d => d.Content, StringComparer.Ordinal);
+			sortedDiagnosticInfos = sortedDiagnosticInfos.ThenBy(d => d.Message, StringComparer.Ordinal);
 			return sortedDiagnosticInfos;
 		}
 
@@ -98,13 +98,12 @@ namespace Acuminator.Runner.Output.Grouping
 			return relativeLocation.Enquote();
 		}
 
-		protected string GetDiagnosticContent(Diagnostic diagnostic)
+		protected string GetDiagnosticMessage(Diagnostic diagnostic)
 		{
-			string errorMessage = diagnostic.GetMessage(CultureInfo.CurrentCulture).NullIfWhiteSpace() ??
-								  diagnostic.GetMessage(CultureInfo.InvariantCulture).NullIfWhiteSpace() ??
-								  diagnostic.Descriptor.Title.ToString(CultureInfo.InvariantCulture);
-
-			return $"{diagnostic.Id}: {errorMessage}";
+			string message = diagnostic.GetMessage(CultureInfo.CurrentCulture).NullIfWhiteSpace() ??
+							 diagnostic.GetMessage(CultureInfo.InvariantCulture).NullIfWhiteSpace() ??
+							 diagnostic.Descriptor.Title.ToString(CultureInfo.InvariantCulture);
+			return message;
 		}
 	}
 }

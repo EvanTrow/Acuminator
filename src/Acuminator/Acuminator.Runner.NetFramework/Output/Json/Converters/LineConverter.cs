@@ -25,10 +25,19 @@ namespace Acuminator.Runner.Output.Json
 					return;
 
 				case 2:
-					var (diagnosticContent, location) = (line.Spans[0].ToString(), line.Spans[1].ToString());
+					{
+						var (diagnosticContent, location) = (line.Spans[0].ToString(), line.Spans[1].ToString());
 
-					writer.WriteStringValue($"{diagnosticContent}: {location}");
-					return;
+						writer.WriteStringValue($"{diagnosticContent}: {location}");
+						return;
+					}
+				case 3:
+					{
+						var (diagnosticId, diagnosticMessage, location) = (line.Spans[0].ToString(), line.Spans[1].ToString(), line.Spans[2].ToString());
+
+						writer.WriteStringValue($"{diagnosticId}: {diagnosticMessage}: {location}");
+						return;
+					}
 
 				default:
 					string lineStr = line.ToString();
