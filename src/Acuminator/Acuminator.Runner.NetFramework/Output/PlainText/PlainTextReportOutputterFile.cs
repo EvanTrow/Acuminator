@@ -6,14 +6,14 @@ using System.Threading;
 
 using Acuminator.Runner.Input;
 using Acuminator.Runner.Output.Data;
-using Acuminator.Utils.Common;
+using Acuminator.Utilities.Common;
 
 using Serilog;
 
 namespace Acuminator.Runner.Output.PlainText
 {
 	/// <summary>
-	/// The base class for the report outputter in the plain text format.
+	/// TThe report outputter to file in the plain text format.
 	/// </summary>
 	internal class PlainTextReportOutputterFile : PlainTextReportOutputterBase
 	{
@@ -22,9 +22,8 @@ namespace Acuminator.Runner.Output.PlainText
 
 		public PlainTextReportOutputterFile(string outputFile)
 		{
-			outputFile.ThrowIfNullOrWhiteSpace(nameof(outputFile));
+			DeleteExistingFile(outputFile.CheckIfNullOrWhiteSpace());
 
-			DeleteExistingFile(outputFile);
 			_streamWriter = GetStreamWriter(outputFile);
 		}
 
@@ -37,7 +36,7 @@ namespace Acuminator.Runner.Output.PlainText
 			}
 		}
 
-		public sealed override void OutputReport(CodeSourceReport codeSourceReport, AppAnalysisContext analysisContext, CancellationToken cancellation)
+		public sealed override void OutputReport(CodeSourceReport codeSourceReport, AnalysisContext analysisContext, CancellationToken cancellation)
 		{
 			if (_disposed)
 				throw new ObjectDisposedException(objectName: GetType().FullName);
@@ -45,7 +44,7 @@ namespace Acuminator.Runner.Output.PlainText
 			base.OutputReport(codeSourceReport, analysisContext, cancellation);
 		}
 
-		public sealed override void OutputReport(ProjectReport projectReport, AppAnalysisContext analysisContext, CancellationToken cancellation)
+		public sealed override void OutputReport(ProjectReport projectReport, AnalysisContext analysisContext, CancellationToken cancellation)
 		{
 			if (_disposed)
 				throw new ObjectDisposedException(objectName: GetType().FullName);
@@ -55,33 +54,21 @@ namespace Acuminator.Runner.Output.PlainText
 			base.OutputReport(projectReport, analysisContext, cancellation);
 		}
 
-		protected override void WriteDistinctApisTitle(string titleText, int depth, int itemsCount)
-		{
-			if (titleText == null)
-				return;
-
-			string padding 			= GetPadding(depth);
-			string suffix 			= itemsCount > 0 ? ":" : string.Empty;
-			string titleWithPadding = $"{padding}{titleText}(Count: {itemsCount}){suffix}";
-
-			WriteLine(titleWithPadding);
-		}
-
-		protected override void WriteTitle(in Title? title, int depth, int itemsCount, int distinctApisCount, bool hasContent)
+		protected override void WriteTitle(in Title? title, int indentationLevel, int diagnosticsCount, int? distinctDiagnosticsCount, bool hasContent)
 		{
 			if (title == null)
 				return;
 
-			string padding = GetPadding(depth);
+			string padding = GetPadding(indentationLevel);
 			string suffix  = hasContent ? ":" : string.Empty;
-			string titleWithPadding = title.Value.Kind == TitleKind.Usages
-				? $"{padding}{title.Value.Text}{suffix}"
-				: $"{padding}{title.Value.Text}(Count: {itemsCount}, Distinct APIs: {distinctApisCount}){suffix}";
+			string titleWithPadding = distinctDiagnosticsCount.HasValue
+				? $"{padding}{title.Value.Text}(Diagnostics Count: {diagnosticsCount}, Distinct Diagnostics: {distinctDiagnosticsCount.Value}){suffix}"
+				: $"{padding}{title.Value.Text}(Diagnostics Count: {diagnosticsCount}){suffix}";
 
 			WriteLine(titleWithPadding);
 		}
 
-		protected override void WriteLine(in Line line, int depth)
+		protected override void WriteLine(in Line line, int indentationLevel)
 		{
 			if (line.Spans.IsDefaultOrEmpty)
 			{
@@ -89,12 +76,12 @@ namespace Acuminator.Runner.Output.PlainText
 				return;
 			}
 
-			string padding = GetPadding(depth);
+			string padding = GetPadding(indentationLevel);
 
 			if (line.Spans.Length == 2)
 			{
-				var (fullApiName, location) = (line.Spans[0].ToString(), line.Spans[1].ToString());
-				WriteLine($"{padding}{fullApiName}: {location}");
+				var (diagnosticContent, location) = (line.Spans[0].ToString(), line.Spans[1].ToString());
+				WriteLine($"{padding}{diagnosticContent}: {location}");
 			}
 			else
 				WriteLine(padding + line.ToString());
