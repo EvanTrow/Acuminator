@@ -12,9 +12,10 @@ namespace Acuminator.Runner.Output.Data
 		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public Title? GroupTitle { get; init; }
 
-		public required int TotalErrorCount { get; init; }
+		public required int TotalDiagnosticsCount { get; init; }
 
-		public required int DistinctApisCount { get; init; }
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+		public int? DistinctDiagnosticsCount { get; init; }
 
 		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public Title? LinesTitle { get; init; }

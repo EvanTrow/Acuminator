@@ -1,16 +1,12 @@
 ﻿using System;
 
-namespace Acuminator.Runner.Output
+namespace Acuminator.Runner.Output.Data
 {
 	internal enum TitleKind
 	{
 		NotSpecified,
 		File,
-		Namespace,
-		Type,
-		Members,
-		Api,
-		AllApis,
-		Usages
+		DiagnosticId,
+		AllDiagnostics
 	}
 }

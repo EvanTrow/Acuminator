@@ -11,15 +11,15 @@ namespace Acuminator.Runner.Output.Data
 	{
 		public string CodeSourceName { get; }
 
-		public int TotalErrorCount { get; }
+		public int TotalDiagnosticsCount { get; }
 
 		public IReadOnlyCollection<ProjectReport> ProjectReports { get; }
 
 		public CodeSourceReport(string codeSourceName, IEnumerable<ProjectReport> projectReports)
 		{
-			CodeSourceName 	= codeSourceName.CheckIfNullOrWhiteSpace();
-			ProjectReports 	= projectReports.CheckIfNullOrEmpty().ToList();
-			TotalErrorCount = ProjectReports.Sum(report => report.TotalErrorsCount);
+			CodeSourceName 		  = codeSourceName.CheckIfNullOrWhiteSpace();
+			ProjectReports 		  = projectReports.CheckIfNullOrEmpty().ToList();
+			TotalDiagnosticsCount = ProjectReports.Sum(report => report.TotalDiagnosticsCount);
 		}
 	}
 }

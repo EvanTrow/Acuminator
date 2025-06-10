@@ -23,9 +23,9 @@ namespace Acuminator.Runner.Output.PlainText
 			codeSourceReport.ThrowOnNull();
 			cancellation.ThrowIfCancellationRequested();
 
-			WriteLine($"{codeSourceReport.CodeSourceName} - Total Errors Count: {codeSourceReport.TotalErrorCount}");
+			WriteLine($"{codeSourceReport.CodeSourceName} - Total Errors Count: {codeSourceReport.TotalDiagnosticsCount}");
 
-			if (codeSourceReport.TotalErrorCount == 0)
+			if (codeSourceReport.TotalDiagnosticsCount == 0)
 				return;
 
 			foreach (ProjectReport projectReport in codeSourceReport.ProjectReports)
