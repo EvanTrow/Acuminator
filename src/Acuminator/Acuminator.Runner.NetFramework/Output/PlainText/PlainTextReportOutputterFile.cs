@@ -6,6 +6,7 @@ using System.Threading;
 
 using Acuminator.Runner.Input;
 using Acuminator.Runner.Output.Data;
+using Acuminator.Runner.Resources;
 using Acuminator.Utilities.Common;
 
 using Serilog;
@@ -62,8 +63,9 @@ namespace Acuminator.Runner.Output.PlainText
 			string padding = GetPadding(indentationLevel);
 			string suffix  = hasContent ? ":" : string.Empty;
 			string titleWithPadding = distinctDiagnosticsCount.HasValue
-				? $"{padding}{title.Value.Text}(Diagnostics Count: {diagnosticsCount}, Distinct Diagnostics: {distinctDiagnosticsCount.Value}){suffix}"
-				: $"{padding}{title.Value.Text}(Diagnostics Count: {diagnosticsCount}){suffix}";
+				? $"{padding}{title.Value.Text}({Messages.DiagnosticsCountReportTitlePart}: {diagnosticsCount}, " + 
+						$"{Messages.DistinctDiagnosticsReportTitlePart}: {distinctDiagnosticsCount.Value}){suffix}"
+				: $"{padding}{title.Value.Text}({Messages.DiagnosticsCountReportTitlePart}: {diagnosticsCount}){suffix}";
 
 			WriteLine(titleWithPadding);
 		}

@@ -124,6 +124,24 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Diagnostics Count.
+        /// </summary>
+        internal static string DiagnosticsCountReportTitlePart {
+            get {
+                return ResourceManager.GetString("DiagnosticsCountReportTitlePart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Distinct Diagnostics.
+        /// </summary>
+        internal static string DistinctDiagnosticsReportTitlePart {
+            get {
+                return ResourceManager.GetString("DistinctDiagnosticsReportTitlePart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error during the collection of Acuminator analyzers.
         /// </summary>
         internal static string ErrorDuringAcuminatorAnalyzersCollection {

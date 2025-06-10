@@ -5,6 +5,7 @@ using System.Threading;
 
 using Acuminator.Runner.Input;
 using Acuminator.Runner.Output.Data;
+using Acuminator.Runner.Resources;
 using Acuminator.Utilities.Common;
 
 using Serilog;
@@ -23,7 +24,7 @@ namespace Acuminator.Runner.Output.PlainText
 			codeSourceReport.ThrowOnNull();
 			cancellation.ThrowIfCancellationRequested();
 
-			WriteLine($"{codeSourceReport.CodeSourceName} - Diagnostics Count: {codeSourceReport.TotalDiagnosticsCount}");
+			WriteLine($"{codeSourceReport.CodeSourceName} - {Messages.DiagnosticsCountReportTitlePart}: {codeSourceReport.TotalDiagnosticsCount}");
 
 			if (codeSourceReport.TotalDiagnosticsCount == 0)
 				return;
@@ -42,8 +43,8 @@ namespace Acuminator.Runner.Output.PlainText
 			projectReport.ThrowOnNull();
 			cancellation.ThrowIfCancellationRequested();
 
-			WriteLine($"{projectReport.ProjectName} - Diagnostics Count: {projectReport.TotalDiagnosticsCount}");
-			WriteLine($"{projectReport.ProjectName} - Distinct Diagnostics: {projectReport.DistinctDiagnosticsCount}");
+			WriteLine($"{projectReport.ProjectName} - {Messages.DiagnosticsCountReportTitlePart}: {projectReport.TotalDiagnosticsCount}");
+			WriteLine($"{projectReport.ProjectName} - {Messages.DistinctDiagnosticsReportTitlePart}: {projectReport.DistinctDiagnosticsCount}");
 
 			if (projectReport.TotalDiagnosticsCount == 0)
 				return;

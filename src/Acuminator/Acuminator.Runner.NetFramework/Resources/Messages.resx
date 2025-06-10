@@ -118,6 +118,12 @@
   <data name="CodeSourceValidationWasCancelled" xml:space="preserve">
     <value>The Acuminator validation of "{CodeSourcePath}" was cancelled.</value>
   </data>
+  <data name="DiagnosticsCountReportTitlePart" xml:space="preserve">
+    <value>Diagnostics Count</value>
+  </data>
+  <data name="DistinctDiagnosticsReportTitlePart" xml:space="preserve">
+    <value>Distinct Diagnostics</value>
+  </data>
   <data name="ErrorDuringAcuminatorAnalyzersCollection" xml:space="preserve">
     <value>Error during the collection of Acuminator analyzers</value>
   </data>
