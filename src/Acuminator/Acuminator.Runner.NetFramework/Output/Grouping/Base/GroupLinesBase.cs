@@ -6,6 +6,7 @@ using System.Threading;
 
 using Acuminator.Runner.Input;
 using Acuminator.Runner.Output.Data;
+using Acuminator.Runner.Utilities;
 using Acuminator.Utilities.Common;
 
 using Microsoft.CodeAnalysis;
@@ -84,17 +85,17 @@ namespace Acuminator.Runner.Output.Grouping
 			string prettyLocation = diagnostic.Location.GetMappedLineSpan().ToString();
 
 			if (analysisContext.OutputAbsolutePathsToUsages || projectDirectory.IsNullOrWhiteSpace())
-				return prettyLocation;
+				return prettyLocation.Enquote();
 
 			StringComparison stringComparison = analysisContext.CaseSensitiveFilePaths
 				? StringComparison.Ordinal
 				: StringComparison.OrdinalIgnoreCase;
 
 			if (!prettyLocation.StartsWith(projectDirectory, stringComparison))
-				return prettyLocation;
+				return prettyLocation.Enquote();
 
 			string relativeLocation = "." + prettyLocation.Substring(projectDirectory.Length);
-			return relativeLocation;
+			return relativeLocation.Enquote();
 		}
 
 		protected string GetDiagnosticContent(Diagnostic diagnostic)
