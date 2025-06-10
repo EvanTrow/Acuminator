@@ -52,7 +52,7 @@ namespace Acuminator.Runner.Input
 		/// <summary>
 		/// When this optional flag is specified, the code analysis will report Acuminator errors suppressed with Acuminator suppression mechanisms.
 		/// </summary>
-		[Option(longName: CommandLineArgNames.DisableSuppressionMechanism,
+		[Option(longName: CommandLineArgNames.DisableSuppressionMechanism, Default = false,
 				HelpText = "When this optional flag is specified, the code analysis will report Acuminator errors suppressed with Acuminator suppression mechanisms.")]
 		public bool DisableSuppressionMechanism { get; }
 
@@ -82,7 +82,7 @@ namespace Acuminator.Runner.Input
 		///	By default, file paths in locations are relative to the containing project directory.<br/>
 		///	However, if this flag is set, then the absolute file paths will be used.
 		/// </summary>
-		[Option(longName: CommandLineArgNames.OutputAbsolutePathsToUsages,
+		[Option(longName: CommandLineArgNames.OutputAbsolutePathsToUsages, Default = false,
 				HelpText = """
 						   This flag regulates how the locations of found diagnostics will be outputted.
 						   By default, file paths in locations are relative to the containing project directory.
