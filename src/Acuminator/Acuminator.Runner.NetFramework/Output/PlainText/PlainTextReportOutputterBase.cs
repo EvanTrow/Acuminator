@@ -23,7 +23,7 @@ namespace Acuminator.Runner.Output.PlainText
 			codeSourceReport.ThrowOnNull();
 			cancellation.ThrowIfCancellationRequested();
 
-			WriteLine($"{codeSourceReport.CodeSourceName} - Total Errors Count: {codeSourceReport.TotalDiagnosticsCount}");
+			WriteLine($"{codeSourceReport.CodeSourceName} - Diagnostics Count: {codeSourceReport.TotalDiagnosticsCount}");
 
 			if (codeSourceReport.TotalDiagnosticsCount == 0)
 				return;
@@ -42,8 +42,8 @@ namespace Acuminator.Runner.Output.PlainText
 			projectReport.ThrowOnNull();
 			cancellation.ThrowIfCancellationRequested();
 
-			WriteLine($"{projectReport.ProjectName} - Total Errors Count: {projectReport.TotalDiagnosticsCount}");
-			WriteLine($"{projectReport.ProjectName} - Distinct Diagnostics Count: {projectReport.DistinctDiagnosticsCount}");
+			WriteLine($"{projectReport.ProjectName} - Diagnostics Count: {projectReport.TotalDiagnosticsCount}");
+			WriteLine($"{projectReport.ProjectName} - Distinct Diagnostics: {projectReport.DistinctDiagnosticsCount}");
 
 			if (projectReport.TotalDiagnosticsCount == 0)
 				return;
