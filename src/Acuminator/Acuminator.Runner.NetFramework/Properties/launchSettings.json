@@ -1,0 +1,24 @@
+{
+  "profiles": {
+    "help": {
+      "commandName": "Project",
+      "commandLineArgs": "--help"
+    },
+    "version": {
+      "commandName": "Project",
+      "commandLineArgs": "--version"
+    },
+    "json + console + grouping by diagnostic + PX1007 + no PX1099": {
+      "commandName": "Project",
+      "commandLineArgs": "\"..\\..\\..\\..\\..\\Samples\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo.csproj\"  --format json -g d --enable-PX1007 --disable-PX1099"
+    },
+    "json + file + grouping by diagnostic + PX1007 + no PX1099": {
+      "commandName": "Project",
+      "commandLineArgs": "\"..\\..\\..\\..\\..\\Samples\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo.csproj\" -f report.json  --format json -g d --enable-PX1007 --disable-PX1099"
+    },
+    "text + console + grouping by diagnostic and file + PX1007 + PX1099": {
+      "commandName": "Project",
+      "commandLineArgs": "\"..\\..\\..\\..\\..\\Samples\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo.csproj\" -g FD --enable-PX1007"
+    }
+  }
+}
