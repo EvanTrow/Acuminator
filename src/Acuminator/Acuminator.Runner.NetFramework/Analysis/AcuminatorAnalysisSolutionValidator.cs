@@ -43,7 +43,7 @@ namespace Acuminator.Runner.Analysis
 			_outputterFactory 			   = customOutputFactory ?? new ReportOutputterFactory();
 		}
 
-		public static AcuminatorAnalysisSolutionValidator? CreateAcuminatorSolutionAnalyzer(Input.AnalysisContext analysisContext, ILogger logger)
+		public static AcuminatorAnalysisSolutionValidator? CreateSolutionValidator(Input.AnalysisContext analysisContext, ILogger logger)
 		{
 			var acuminatorAnalysisInitializer = new AcuminatorAnalysisInitializer(analysisContext, logger);
 			var (areSettingsInitialized, diagnosticAnalyzers) = acuminatorAnalysisInitializer.InitializeAcuminatorSettingsAndGetAnalyzers();
@@ -157,7 +157,7 @@ namespace Acuminator.Runner.Analysis
 
 		private bool IsPlatformReferenced(Compilation compilation)
 		{
-			var acuminatorPxContext = new PXContext(compilation, null);
+			var acuminatorPxContext = new PXContext(compilation, codeAnalysisSettings: null);
 			return acuminatorPxContext.IsPlatformReferenced;
 		}
 

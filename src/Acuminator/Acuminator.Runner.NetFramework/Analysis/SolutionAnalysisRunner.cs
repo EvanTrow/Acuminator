@@ -95,14 +95,14 @@ namespace Acuminator.Runner.Analysis
 				_logger.Debug(Messages.LoadedProjectsCount_Information, solution.ProjectIds.Count);
 
 				_logger.Information(Messages.InitializeAcuminatorAnalyzersStatusMessage);
-				var solutionCompatibilityAnalyzer = AcuminatorAnalysisSolutionValidator.CreateAcuminatorSolutionAnalyzer(analysisContext, _logger);
+				var solutionValidator = AcuminatorAnalysisSolutionValidator.CreateSolutionValidator(analysisContext, _logger);
 
-				if (solutionCompatibilityAnalyzer == null)
+				if (solutionValidator == null)
 					return RunResult.RunTimeError;
 
 				_logger.Information(Messages.StartValidatingSolutionStatusMessage);
 
-				RunResult validationResult = await solutionCompatibilityAnalyzer.AnalyseSolution(solution, analysisContext, cancellationToken);
+				RunResult validationResult = await solutionValidator.AnalyseSolution(solution, analysisContext, cancellationToken);
 				
 				_logger.Information(Messages.SuccessfullyFinishedSolutionValidationStatusMessage);
 				return validationResult;
