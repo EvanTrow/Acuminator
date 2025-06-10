@@ -80,10 +80,11 @@ namespace Acuminator.Runner.Output.PlainText
 
 			string padding = GetPadding(indentationLevel);
 
-			if (line.Spans.Length == 2)
+			if (line.Spans.Length == 3)
 			{
-				var (diagnosticContent, location) = (line.Spans[0].ToString(), line.Spans[1].ToString());
-				WriteLine($"{padding}{diagnosticContent}: {location}");
+				var (diagnosticId, diagnosticMessage, location) = 
+					(line.Spans[0].ToString(), line.Spans[1].ToString(), line.Spans[2].ToString());
+				WriteLine($"{padding}{diagnosticId}{LinePartsSeparator}{diagnosticMessage}{LinePartsSeparator}{location}");
 			}
 			else
 				WriteLine(padding + line.ToString());

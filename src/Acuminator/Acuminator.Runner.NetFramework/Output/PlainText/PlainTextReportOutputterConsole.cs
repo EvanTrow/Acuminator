@@ -55,9 +55,10 @@ namespace Acuminator.Runner.Output.PlainText
 					WriteLine();
 					return;
 
-				case 2:
-					WriteDiagnosticWithLocation(indentationLevel, diagnosticContent: line.Spans[0].ToString(), 
-												location: line.Spans[1].ToString());
+				case 3:
+					WriteDiagnosticWithLocation(indentationLevel, diagnosticId: line.Spans[0].ToString(), 
+												diagnosticMessage: line.Spans[1].ToString(),
+												location: line.Spans[2].ToString());
 					return;
 					
 				case 1:
@@ -68,22 +69,31 @@ namespace Acuminator.Runner.Output.PlainText
 			}
 		}
 
-		private void WriteDiagnosticWithLocation(int indentationLevel, string diagnosticContent, string location)
+		private void WriteDiagnosticWithLocation(int indentationLevel, string diagnosticId, string diagnosticMessage, string location)
 		{ 
 			string padding = GetPadding(indentationLevel);
 			var oldColor   = Console.ForegroundColor;
 
-			try
+			WriteStringPartWithColor(padding + diagnosticId, ConsoleColor.Green);
+			Console.Write(LinePartsSeparator);
+			Console.Write(diagnosticMessage + LinePartsSeparator);
+			WriteStringPartWithColor(location, ConsoleColor.Yellow);
+			Console.Write(Environment.NewLine);
+			
+			//-----------------------------------------Local Function---------------------------------------------------
+			static void WriteStringPartWithColor(string part, ConsoleColor color)
 			{
-				Console.ForegroundColor = ConsoleColor.Cyan;
-				Console.Write(padding + diagnosticContent);
+				var oldColor = Console.ForegroundColor;
+				try
+				{
+					Console.ForegroundColor = color;
+					Console.Write(part);
+				}
+				finally
+				{
+					Console.ForegroundColor = oldColor;
+				}
 			}
-			finally
-			{
-				Console.ForegroundColor = oldColor;
-			}
-
-			Console.Write($": {location}{Environment.NewLine}");
 		}
 
 		private void WriteAllDiagnosticsTitle(string allDiagnosticsTitle) =>
@@ -93,7 +103,7 @@ namespace Acuminator.Runner.Output.PlainText
 			OutputTitle(fileName, ConsoleColor.Magenta);
 
 		private void WriteDiagnosticIdTitle(string diagnosticIdTitle) =>
-			 OutputTitle(diagnosticIdTitle, ConsoleColor.Green);
+			 OutputTitle(diagnosticIdTitle, ConsoleColor.DarkGreen);
 
 		private void OutputTitle(string text, ConsoleColor color)
 		{

@@ -17,6 +17,8 @@ namespace Acuminator.Runner.Output.PlainText
 	/// </summary>
 	internal abstract class PlainTextReportOutputterBase : IReportOutputter
 	{
+		protected const string LinePartsSeparator = ": ";
+
 		public abstract void Dispose();
 
 		public virtual void OutputReport(CodeSourceReport codeSourceReport, AnalysisContext analysisContext, CancellationToken cancellation)
