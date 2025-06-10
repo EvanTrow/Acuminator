@@ -129,7 +129,7 @@ namespace Acuminator.Runner.Analysis.Initialization
 				string suppressionFileName = project.Name + SuppressionFile.SuppressionFileExtension;
 				return $"""
 					   Acuminator console tool is configured to generate a suppression file for the project "{project.Name}" 
-					   because --{CommandLineArgNames.GenerateSuppressionFileLong} flag was passed among command line arguments.
+					   because --{CommandLineArgNames.GenerateSuppressionFile} flag was passed among command line arguments.
 					   However, the project does not contain an Acuminator suppression file.
 					   To generate the project's suppression file you need to create an empty suppression file first with the name "{suppressionFileName}" in the project's root folder.
 					   The content of the empty suppression file should be like this:
@@ -173,7 +173,7 @@ namespace Acuminator.Runner.Analysis.Initialization
 			{
 				return $"""
 					   Acuminator console tool is configured to generate a suppression file for projects of the solution "{solution.FilePath}" 
-					   because --{CommandLineArgNames.GenerateSuppressionFileLong} flag was passed among command line arguments.
+					   because --{CommandLineArgNames.GenerateSuppressionFile} flag was passed among command line arguments.
 					   However, the solution does not contain any project with an Acuminator suppression file.
 					   To generate a suppression file for a project you need to create an empty suppression file for the project first with the name "<ProjectName>.{SuppressionFile.SuppressionFileExtension}" in the project's root folder:
 					   The content of the empty suppression file should be like this:
