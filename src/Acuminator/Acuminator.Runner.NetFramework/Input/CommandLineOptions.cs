@@ -50,14 +50,15 @@ namespace Acuminator.Runner.Input
 		public string? Verbosity { get; }
 
 		/// <summary>
-		/// If this flag is set to true then the code analysis won't take into consideration suppression comments present in the code.
+		/// When this optional flag is specified, the code analysis will report Acuminator errors suppressed with Acuminator suppression mechanisms.
 		/// </summary>
 		[Option(longName: CommandLineArgNames.DisableSuppressionMechanism,
 				HelpText = "When this optional flag is specified, the code analysis will report Acuminator errors suppressed with Acuminator suppression mechanisms.")]
 		public bool DisableSuppressionMechanism { get; }
 
 		/// <summary>
-		/// Optional explicitly specified path to MSBuild. Can be null. If null then MSBuild path is retrieved automatically.
+		/// This optional parameter allows you to provide explicitly a path to the MSBuild tool that will be used for analysis.
+		///	By default, MSBuild installations will be searched automatically on the current machine and the latest found version will be used.
 		/// </summary>
 		/// <value>
 		/// The optional explicitly specified path to MSBuild.
@@ -77,13 +78,13 @@ namespace Acuminator.Runner.Input
 		public string? OutputFileName { get; }
 
 		/// <summary>
-		/// This flag regulates how the locations of API usages will be outputted.<br/>
+		/// This flag regulates how the locations of found diagnostics will be outputted.<br/>
 		///	By default, file paths in locations are relative to the containing project directory.<br/>
 		///	However, if this flag is set, then the absolute file paths will be used.
 		/// </summary>
 		[Option(longName: CommandLineArgNames.OutputAbsolutePathsToUsages,
 				HelpText = """
-						   This flag regulates how the locations of API usages will be outputted.
+						   This flag regulates how the locations of found diagnostics will be outputted.
 						   By default, file paths in locations are relative to the containing project directory.
 						   However, if this flag is set, then the absolute file paths will be used.
 						   """)]
@@ -239,7 +240,7 @@ namespace Acuminator.Runner.Input
 		public string? AllowedApisFilePath { get; }
 
 		/// <summary>
-		/// This flag indicates whether Acuminator should work in a special suppression generator mode.<br/>
+		/// This flag indicates whether Acuminator should work in a special suppression file generator mode.<br/>
 		/// In this mode Acuminator does not report errors, but instead generates suppression records in Acuminator suppression file for all errors it found in the code.<br/>
 		/// By default, the suppression file generation is disabled. Developers should explicitly enable it by specifying this flag.
 		/// </summary>
@@ -257,13 +258,13 @@ namespace Acuminator.Runner.Input
 		/// For example, you can use the Acuminator console tool in CI scenarios to run automatic tests with Acuminator static analysis<br/>
 		/// which will rely on Acuminator suppression file for the main code base and report Acuminator warnings and errors only for the new code.<br/>
 		///<br/>
-		///	The suppression generator mode is designed to support such scenarios by implementing automatic generation of the suppression file for a given codebase.<br/>
+		///	The suppression file generator mode is designed to support such scenarios by implementing automatic generation of the suppression file for a given codebase.<br/>
 		///	It will generate suppression records for all errors it found in the code and add them to the suppression file.<br/>
 		/// Note that it does not generate suppression records for errors that are already suppressed in the code with local suppression comments.<br/>
 		/// </remarks>
 		[Option(longName: CommandLineArgNames.GenerateSuppressionFile, Default = false,
 				HelpText = """
-						   This flag indicates whether Acuminator should work in a special suppression generator mode.
+						   This flag indicates whether Acuminator should work in a special suppression file generator mode.
 						   In this mode, Acuminator does not report errors, but instead generates suppression records in the Acuminator suppression file for all errors it found in the code.
 						   By default, the suppression file generation is disabled. Developers should explicitly enable it by specifying this flag.
 
@@ -279,7 +280,7 @@ namespace Acuminator.Runner.Input
 						   For example, you can use the Acuminator console tool in CI scenarios to run automatic tests with Acuminator static analysis
 						   which will rely on the Acuminator suppression file for the main code base and report Acuminator warnings and errors only for the new code.
 
-						   The suppression generator mode is designed to support such scenarios by implementing automatic generation of the suppression file for a given codebase.
+						   The suppression file generator mode is designed to support such scenarios by implementing automatic generation of the suppression file for a given codebase.
 						   It will generate suppression records for all errors it found in the code and add them to the suppression file.
 						   Note that Acuminator does not generate suppression records for errors that are already suppressed in the code with local suppression comments.
 						   """)]
