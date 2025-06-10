@@ -45,7 +45,7 @@ namespace Acuminator.Runner.Output.PlainText
 
 		protected override void WriteLine(string text) => Console.WriteLine(text);
 
-		protected override void WriteLine(in Line line, int indentation)
+		protected override void WriteLine(in Line line, int indentationLevel)
 		{
 			switch (line.Spans.Length)
 			{
@@ -54,21 +54,21 @@ namespace Acuminator.Runner.Output.PlainText
 					return;
 
 				case 2:
-					WriteDiagnosticWithLocation(indentation, diagnosticContent: line.Spans[0].ToString(), 
+					WriteDiagnosticWithLocation(indentationLevel, diagnosticContent: line.Spans[0].ToString(), 
 												location: line.Spans[1].ToString());
 					return;
 					
 				case 1:
 				default:
-					string padding = GetPadding(indentation);
+					string padding = GetPadding(indentationLevel);
 					WriteLine(padding + line.ToString());
 					return;
 			}
 		}
 
-		private void WriteDiagnosticWithLocation(int indentation, string diagnosticContent, string location)
+		private void WriteDiagnosticWithLocation(int indentationLevel, string diagnosticContent, string location)
 		{ 
-			string padding = GetPadding(indentation);
+			string padding = GetPadding(indentationLevel);
 			var oldColor   = Console.ForegroundColor;
 
 			try

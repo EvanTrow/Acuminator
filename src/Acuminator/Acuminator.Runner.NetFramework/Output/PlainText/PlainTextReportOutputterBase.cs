@@ -160,14 +160,14 @@ namespace Acuminator.Runner.Output.PlainText
 
 		protected abstract void WriteLine(string text);
 
-		protected abstract void WriteLine(in Line line, int depth);
+		protected abstract void WriteLine(in Line line, int indentationLevel);
 
-		protected string GetPadding(int depth)
+		protected string GetPadding(int indentationLevel)
 		{
 			const int paddingMultiplier = 4;
-			string padding = depth <= 0
+			string padding = indentationLevel <= 0
 				? string.Empty
-				: new string(' ', depth * paddingMultiplier);
+				: new string(' ', indentationLevel * paddingMultiplier);
 
 			return string.Intern(padding);
 		}
