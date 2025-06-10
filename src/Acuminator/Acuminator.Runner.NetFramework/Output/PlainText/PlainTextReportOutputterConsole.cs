@@ -22,9 +22,9 @@ namespace Acuminator.Runner.Output.PlainText
 			string padding = GetPadding(indentationLevel);
 			string suffix = hasContent ? ":" : string.Empty;
 			string titleWithPadding = distinctDiagnosticsCount.HasValue
-				? $"{padding}{title.Value.Text}({Messages.DiagnosticsCountReportTitlePart}: {diagnosticsCount}, " + 
+				? $"{padding}{title.Value.Text}({Messages.ErrorsCountReportTitlePart}: {diagnosticsCount}, " + 
 					$"{Messages.DistinctDiagnosticsReportTitlePart}: {distinctDiagnosticsCount.Value}){suffix}"
-				: $"{padding}{title.Value.Text}({Messages.DiagnosticsCountReportTitlePart}: {diagnosticsCount}){suffix}";
+				: $"{padding}{title.Value.Text}({Messages.ErrorsCountReportTitlePart}: {diagnosticsCount}){suffix}";
 
 			switch (title?.Kind)
 			{

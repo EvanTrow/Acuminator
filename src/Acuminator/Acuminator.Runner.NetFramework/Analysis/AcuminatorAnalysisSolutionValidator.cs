@@ -183,7 +183,7 @@ namespace Acuminator.Runner.Analysis
 				return (RunResult.Success, successfulReport);
 			}
 			else
-				_logger.Error(Messages.ProjectTotalErrorsCountMessage, project.Name, filteredResults.Length);
+				_logger.Error($"{{Project}} - {Messages.ErrorsCountReportTitlePart}: {{ErrorCount}}", project.Name, filteredResults.Length);
 
 			ProjectReport projectReport = _reportBuilder.BuildReport(filteredResults, analysisContext, project, cancellation);
 

@@ -124,15 +124,6 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Diagnostics Count.
-        /// </summary>
-        internal static string DiagnosticsCountReportTitlePart {
-            get {
-                return ResourceManager.GetString("DiagnosticsCountReportTitlePart", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Distinct Diagnostics.
         /// </summary>
         internal static string DistinctDiagnosticsReportTitlePart {
@@ -147,6 +138,15 @@ namespace Acuminator.Runner.Resources {
         internal static string ErrorDuringAcuminatorAnalyzersCollection {
             get {
                 return ResourceManager.GetString("ErrorDuringAcuminatorAnalyzersCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Errors Count.
+        /// </summary>
+        internal static string ErrorsCountReportTitlePart {
+            get {
+                return ResourceManager.GetString("ErrorsCountReportTitlePart", resourceCulture);
             }
         }
         
@@ -345,15 +345,6 @@ namespace Acuminator.Runner.Resources {
         internal static string ProjectDoesNotReferenceAcumaticaPlatformValidationError {
             get {
                 return ResourceManager.GetString("ProjectDoesNotReferenceAcumaticaPlatformValidationError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {Project} - Total Errors Count: {ErrorCount}.
-        /// </summary>
-        internal static string ProjectTotalErrorsCountMessage {
-            get {
-                return ResourceManager.GetString("ProjectTotalErrorsCountMessage", resourceCulture);
             }
         }
         
