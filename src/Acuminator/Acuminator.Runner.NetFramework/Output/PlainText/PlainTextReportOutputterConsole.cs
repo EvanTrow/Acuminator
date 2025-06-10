@@ -7,54 +7,33 @@ using Acuminator.Runner.Output.Data;
 namespace Acuminator.Runner.Output.PlainText
 {
 	/// <summary>
-	/// The base class for the report outputter in the plain text format.
+	/// The report outputter to console in the plain text format.
 	/// </summary>
 	internal class PlainTextReportOutputterConsole : PlainTextReportOutputterBase
 	{
 		public override void Dispose() { }
 
-		protected override void WriteDistinctApisTitle(string titleText, int depth, int itemsCount)
-		{
-			if (titleText == null)
-				return;
-
-			string padding = GetPadding(depth);
-			string suffix  = itemsCount > 0 ? ":" : string.Empty;
-
-			WriteAllDistinctApisTitle($"{padding}{titleText}(Count: {itemsCount}){suffix}");
-		}
-
-		protected override void WriteTitle(in Title? title, int depth, int itemsCount, int distinctApisCount, bool hasContent)
+		protected override void WriteTitle(in Title? title, int indentationLevel, int diagnosticsCount, int? distinctDiagnosticsCount, bool hasContent)
 		{
 			if (title == null)
 				return;
 
-			string padding = GetPadding(depth);
+			string padding = GetPadding(indentationLevel);
 			string suffix = hasContent ? ":" : string.Empty;
-			string titleWithPadding = $"{padding}{title.Value.Text}(Count: {itemsCount}, Distinct APIs: {distinctApisCount}){suffix}";
+			string titleWithPadding = distinctDiagnosticsCount.HasValue
+				? $"{padding}{title.Value.Text}(Diagnostics Count: {diagnosticsCount}, Distinct Diagnostics: {distinctDiagnosticsCount.Value}){suffix}"
+				: $"{padding}{title.Value.Text}(Diagnostics Count: {diagnosticsCount}){suffix}";
 
 			switch (title?.Kind)
 			{
 				case TitleKind.File:
 					WriteFileName(titleWithPadding);
 					return;
-				case TitleKind.Namespace:
-					WriteNamespaceTitle(titleWithPadding);
+				case TitleKind.DiagnosticId:
+					WriteDiagnosticIdTitle(titleWithPadding);
 					return;
-				case TitleKind.Type:
-					WriteTypeTitle(titleWithPadding);
-					return;
-				case TitleKind.Members:
-					WriteMembersTitle(titleWithPadding);
-					return;
-				case TitleKind.Api:
-					WriteApiTitle(titleWithPadding);
-					return;
-				case TitleKind.AllApis:
-					WriteAllApisTitle(titleWithPadding);
-					return;
-				case TitleKind.Usages:
-					WriteUsagesTitle($"{padding}{title.Value.Text}{suffix}");
+				case TitleKind.AllDiagnostics:
+					WriteAllDiagnosticsTitle(titleWithPadding);
 					return;
 				default:
 					WriteLine(titleWithPadding);
@@ -66,7 +45,7 @@ namespace Acuminator.Runner.Output.PlainText
 
 		protected override void WriteLine(string text) => Console.WriteLine(text);
 
-		protected override void WriteLine(in Line line, int depth)
+		protected override void WriteLine(in Line line, int indentation)
 		{
 			switch (line.Spans.Length)
 			{
@@ -75,26 +54,27 @@ namespace Acuminator.Runner.Output.PlainText
 					return;
 
 				case 2:
-					WriteFlatApiUsage(depth, line.Spans[0].ToString(), line.Spans[1].ToString());
+					WriteDiagnosticWithLocation(indentation, diagnosticContent: line.Spans[0].ToString(), 
+												location: line.Spans[1].ToString());
 					return;
 					
 				case 1:
 				default:
-					string padding = GetPadding(depth);
+					string padding = GetPadding(indentation);
 					WriteLine(padding + line.ToString());
 					return;
 			}
 		}
 
-		private void WriteFlatApiUsage(int depth, string fullApiName, string location)
+		private void WriteDiagnosticWithLocation(int indentation, string diagnosticContent, string location)
 		{ 
-			string padding = GetPadding(depth);
+			string padding = GetPadding(indentation);
 			var oldColor   = Console.ForegroundColor;
 
 			try
 			{
 				Console.ForegroundColor = ConsoleColor.Cyan;
-				Console.Write(padding + fullApiName);
+				Console.Write(padding + diagnosticContent);
 			}
 			finally
 			{
@@ -104,29 +84,14 @@ namespace Acuminator.Runner.Output.PlainText
 			Console.Write($": {location}{Environment.NewLine}");
 		}
 
-		private void WriteAllApisTitle(string allApisTitle) =>
-			OutputTitle(allApisTitle, ConsoleColor.DarkCyan);
-
-		private void WriteAllDistinctApisTitle(string allDistinctApisTitle) =>
-			OutputTitle(allDistinctApisTitle, ConsoleColor.DarkCyan);
+		private void WriteAllDiagnosticsTitle(string allDiagnosticsTitle) =>
+			OutputTitle(allDiagnosticsTitle, ConsoleColor.DarkCyan);
 
 		private void WriteFileName(string fileName) =>
-			OutputTitle(fileName, ConsoleColor.DarkMagenta);
+			OutputTitle(fileName, ConsoleColor.Magenta);
 
-		private void WriteNamespaceTitle(string namespaceTitle) =>
-			OutputTitle(namespaceTitle, ConsoleColor.DarkCyan);
-
-		private void WriteTypeTitle(string typeTitle) =>
-			OutputTitle(typeTitle, ConsoleColor.Magenta);
-
-		private void WriteMembersTitle(string typeMembersTitle) =>
-			OutputTitle(typeMembersTitle, ConsoleColor.Yellow);
-
-		private void WriteApiTitle(string apiTitle) =>
-			 OutputTitle(apiTitle, ConsoleColor.Cyan);
-
-		private void WriteUsagesTitle(string usagesTitle) =>
-			OutputTitle(usagesTitle, ConsoleColor.Blue);
+		private void WriteDiagnosticIdTitle(string diagnosticIdTitle) =>
+			 OutputTitle(diagnosticIdTitle, ConsoleColor.Green);
 
 		private void OutputTitle(string text, ConsoleColor color)
 		{
