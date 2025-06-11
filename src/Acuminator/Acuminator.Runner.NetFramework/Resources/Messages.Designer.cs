@@ -448,6 +448,15 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The validation was successfully cancelled..
+        /// </summary>
+        internal static string ValidationWasSuccessfullyCancelledDebugInfo {
+            get {
+                return ResourceManager.GetString("ValidationWasSuccessfullyCancelledDebugInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Welcome to the Acuminator code analysis runner, the CLI tool that runs Acuminator diagnostics!.
         /// </summary>
         internal static string WelcomeMessage {

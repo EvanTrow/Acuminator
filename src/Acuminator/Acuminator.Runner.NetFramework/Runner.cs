@@ -16,6 +16,7 @@ using Acuminator.Runner.Analysis.CodeSources;
 using Acuminator.Runner.Input;
 using Acuminator.Runner.Utilities;
 using Acuminator.Utilities.Common;
+using Acuminator.Runner.Resources;
 
 namespace Acuminator.Runner.NetFramework
 {
@@ -61,7 +62,7 @@ namespace Acuminator.Runner.NetFramework
 			var analyzer = new SolutionAnalysisRunner(logger);
 			var analysisResult = await analyzer.RunAnalysisAsync(analysisContext, consoleCancellationSubscription.CancellationToken);
 
-			OutputValidationResult(analysisResult, analysisContext.CodeSource.Type);
+			OutputValidationResult(logger, analysisResult, analysisContext);
 
 			return analysisResult;
 		}
@@ -118,29 +119,29 @@ namespace Acuminator.Runner.NetFramework
 			return Task.FromResult(RunResult.RunTimeError);
 		}
 
-		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", Justification = "No need for structured loghing here")]
-		private static void OutputValidationResult(RunResult runResult, CodeSourceType codeSourceType)
+		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", Justification = "No need for structured logging here")]
+		private static void OutputValidationResult(ILogger logger, RunResult runResult, AnalysisContext analysisContext)
 		{
 			switch (runResult)
 			{
 				case RunResult.Success:
-					Log.Information("The validation passed successfully!");
+					logger.Information("The validation passed successfully!");
 					return;
 				case RunResult.RequirementsNotMet:
-					string codeSourceTypeName = codeSourceType switch
+					string codeSourceTypeName = analysisContext.CodeSource.Type switch
 					{
 						CodeSourceType.Solution => "solution",
 						CodeSourceType.Project => "project",
 						_ => "code"
 					};
 
-					Log.Error($"The validation is finished. The validated {codeSourceTypeName} did not pass the validation.");
+					logger.Error($"The validation is finished. The validated {codeSourceTypeName} did not pass the validation.");
 					return;
 				case RunResult.Cancelled:
-					Log.Warning("The validation was cancelled.");
+					logger.Warning(Messages.CodeSourceValidationWasCancelled, analysisContext.CodeSource.Location);
 					return;
 				case RunResult.RunTimeError:
-					Log.Error("A runtime error was encountered during the validation.");
+					logger.Error("A runtime error was encountered during the validation.");
 					return;
 			}
 		}

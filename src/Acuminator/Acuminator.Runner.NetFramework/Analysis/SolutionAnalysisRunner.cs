@@ -52,8 +52,7 @@ namespace Acuminator.Runner.Analysis
 			}
 			catch (OperationCanceledException cancellationException)
 			{
-				_logger.Warning(cancellationException, Messages.CodeSourceValidationWasCancelled,
-							analysisContext.CodeSource.Location);
+				_logger.Debug(Messages.ValidationWasSuccessfullyCancelledDebugInfo);
 				runResult = RunResult.Cancelled;
 			}
 			catch (Exception exception)

@@ -246,6 +246,9 @@
   <data name="UnregisterMSBuildInstanceError" xml:space="preserve">
     <value>Error on attempt to unregister MSBuild.</value>
   </data>
+  <data name="ValidationWasSuccessfullyCancelledDebugInfo" xml:space="preserve">
+    <value>The validation was successfully cancelled.</value>
+  </data>
   <data name="WelcomeMessage" xml:space="preserve">
     <value>Welcome to the Acuminator code analysis runner, the CLI tool that runs Acuminator diagnostics!</value>
   </data>
