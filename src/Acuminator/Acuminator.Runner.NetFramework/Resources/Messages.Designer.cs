@@ -430,6 +430,15 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Total Errors Count.
+        /// </summary>
+        internal static string TotalErrorsCountReportTitlePart {
+            get {
+                return ResourceManager.GetString("TotalErrorsCountReportTitlePart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error on attempt to unregister MSBuild..
         /// </summary>
         internal static string UnregisterMSBuildInstanceError {

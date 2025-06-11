@@ -55,6 +55,12 @@ namespace Acuminator.Runner.Output.PlainText
 			base.OutputReport(projectReport, analysisContext, cancellation);
 		}
 
+		protected override void WriteCodeSourceTitle(string codeSourceTitle) => 
+			WriteLine(codeSourceTitle);
+		
+		protected override void WriteProjectTitle(string projectTitle) => 
+			WriteLine(projectTitle);
+
 		protected override void WriteTitle(in Title? title, int indentationLevel, int diagnosticsCount, int? distinctDiagnosticsCount, bool hasContent)
 		{
 			if (title == null)

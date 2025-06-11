@@ -26,7 +26,7 @@ namespace Acuminator.Runner.Output.PlainText
 			codeSourceReport.ThrowOnNull();
 			cancellation.ThrowIfCancellationRequested();
 
-			WriteTitle($"{codeSourceReport.CodeSourceName}({Messages.ErrorsCountReportTitlePart}: {codeSourceReport.TotalDiagnosticsCount})");
+			WriteCodeSourceTitle($"{codeSourceReport.CodeSourceName}({Messages.TotalErrorsCountReportTitlePart}: {codeSourceReport.TotalDiagnosticsCount})");
 
 			if (codeSourceReport.TotalDiagnosticsCount == 0)
 				return;
@@ -45,8 +45,8 @@ namespace Acuminator.Runner.Output.PlainText
 			projectReport.ThrowOnNull();
 			cancellation.ThrowIfCancellationRequested();
 
-			WriteLine($"{projectReport.ProjectName} - {Messages.ErrorsCountReportTitlePart}: {projectReport.TotalDiagnosticsCount}");
-			WriteLine($"{projectReport.ProjectName} - {Messages.DistinctDiagnosticsReportTitlePart}: {projectReport.DistinctDiagnosticsCount}");
+			WriteProjectTitle($"{projectReport.ProjectName}({Messages.ErrorsCountReportTitlePart}: {projectReport.TotalDiagnosticsCount}, " + 
+							  $"{Messages.DistinctDiagnosticsReportTitlePart}: {projectReport.DistinctDiagnosticsCount})");
 
 			if (projectReport.TotalDiagnosticsCount == 0)
 				return;
@@ -148,6 +148,10 @@ namespace Acuminator.Runner.Output.PlainText
 
 			return true;
 		}
+
+		protected abstract void WriteCodeSourceTitle(string codeSourceTitle);
+
+		protected abstract void WriteProjectTitle(string projectTitle);
 
 		protected abstract void WriteTitle(in Title? title, int indentationLevel, int diagnosticsCount, int? distinctDiagnosticsCount, bool hasContent);
 

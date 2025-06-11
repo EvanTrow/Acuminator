@@ -138,14 +138,14 @@
   <data name="CodeSourceValidationWasCancelled" xml:space="preserve">
     <value>The Acuminator validation of "{CodeSourcePath}" was cancelled.</value>
   </data>
-  <data name="ErrorsCountReportTitlePart" xml:space="preserve">
-    <value>Errors Count</value>
-  </data>
   <data name="DistinctDiagnosticsReportTitlePart" xml:space="preserve">
     <value>Distinct Diagnostics</value>
   </data>
   <data name="ErrorDuringAcuminatorAnalyzersCollection" xml:space="preserve">
     <value>Error during the collection of Acuminator analyzers</value>
+  </data>
+  <data name="ErrorsCountReportTitlePart" xml:space="preserve">
+    <value>Errors Count</value>
   </data>
   <data name="FailedToInitializeAcuminatorGlobalSuppressionMechanismError" xml:space="preserve">
     <value>Failed to initialize Acuminator global suppression mechanism for the code source "{CodeSource}".</value>
@@ -239,6 +239,9 @@
   </data>
   <data name="SuccessfullyRegisteredMSBuildAtProvidedPathStatusMessage" xml:space="preserve">
     <value>Successfully registered MSBuild instance at the provided path "{MSBuildPath}".</value>
+  </data>
+  <data name="TotalErrorsCountReportTitlePart" xml:space="preserve">
+    <value>Total Errors Count</value>
   </data>
   <data name="UnregisterMSBuildInstanceError" xml:space="preserve">
     <value>Error on attempt to unregister MSBuild.</value>

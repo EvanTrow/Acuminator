@@ -74,7 +74,7 @@ namespace Acuminator.Runner.Output.PlainText
 			string padding = GetPadding(indentationLevel);
 			var oldColor   = Console.ForegroundColor;
 
-			WriteStringPartWithColor(padding + diagnosticId, ConsoleColor.Green);
+			WriteStringPartWithColor(padding + diagnosticId, ConsoleColor.White);
 			Console.Write(LinePartsSeparator);
 			Console.Write(diagnosticMessage + LinePartsSeparator);
 			WriteStringPartWithColor(location, ConsoleColor.Yellow);
@@ -96,6 +96,12 @@ namespace Acuminator.Runner.Output.PlainText
 			}
 		}
 
+		protected override void WriteCodeSourceTitle(string codeSourceTitle) =>
+			OutputTitle(codeSourceTitle, ConsoleColor.Gray);
+
+		protected override void WriteProjectTitle(string projectTitle) => 
+			OutputTitle(projectTitle, ConsoleColor.Blue);
+
 		private void WriteAllDiagnosticsTitle(string allDiagnosticsTitle) =>
 			OutputTitle(allDiagnosticsTitle, ConsoleColor.DarkCyan);
 
@@ -103,7 +109,7 @@ namespace Acuminator.Runner.Output.PlainText
 			OutputTitle(fileName, ConsoleColor.Magenta);
 
 		private void WriteDiagnosticIdTitle(string diagnosticIdTitle) =>
-			 OutputTitle(diagnosticIdTitle, ConsoleColor.DarkGreen);
+			 OutputTitle(diagnosticIdTitle, ConsoleColor.Green);
 
 		private void OutputTitle(string text, ConsoleColor color)
 		{
