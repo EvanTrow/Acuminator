@@ -144,7 +144,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacExtensionDefaultAttribute
 
 			var pxDefaultAttribute = defaultAttributes[0].AttributeData;
 			var hasPersistingCheckNothing = (from arg in pxDefaultAttribute.NamedArguments
-											 where TypeNames.PersistingCheck.Equals(arg.Key, StringComparison.Ordinal)
+											 where TypeNames.PersistingCheck.Equals(arg.Key, StringComparison.Ordinal) &&
+												   arg.Value.Kind is TypedConstantKind.Enum or TypedConstantKind.Primitive
 											 select arg.Value.Value)
 											.Any(value => value is int persistingCheck && 
 														  persistingCheck == (int)PXPersistingCheckValues.Nothing);
