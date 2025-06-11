@@ -19,6 +19,10 @@
     "text + console + grouping by diagnostic and file + PX1007 + PX1099": {
       "commandName": "Project",
       "commandLineArgs": "\"..\\..\\..\\..\\..\\Samples\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo.csproj\" -g FD --enable-PX1007"
+    },
+    "PXObjects": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\Repos\\Acumatica2\\WebSites\\Pure\\PX.Objects\\PX.Objects.csproj -g D --enable-PX1007"
     }
   }
 }
