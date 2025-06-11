@@ -79,7 +79,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error happened during the Acuminator analysis of &quot;{CodeSourcePath}&quot;..
+        ///   Looks up a localized string similar to An error happened during the Acuminator analysis of &quot;{CodeSource}&quot;..
         /// </summary>
         internal static string AnalysisOfCodeSourceRuntimeError {
             get {
@@ -93,6 +93,15 @@ namespace Acuminator.Runner.Resources {
         internal static string CancelledCodeSourceValidationInfo {
             get {
                 return ResourceManager.GetString("CancelledCodeSourceValidationInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The validation is finished. &quot;{CodeSource}&quot; failed the validation..
+        /// </summary>
+        internal static string CodeSourceFailedValidationMessage {
+            get {
+                return ResourceManager.GetString("CodeSourceFailedValidationMessage", resourceCulture);
             }
         }
         
@@ -115,7 +124,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The Acuminator validation of &quot;{CodeSourcePath}&quot; was cancelled..
+        ///   Looks up a localized string similar to The Acuminator validation of &quot;{CodeSource}&quot; was cancelled..
         /// </summary>
         internal static string CodeSourceValidationWasCancelled {
             get {
@@ -169,7 +178,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to load solution from the code source &quot;{CodeSourcePath}&quot;..
+        ///   Looks up a localized string similar to Failed to load solution from the code source &quot;{CodeSource}&quot;..
         /// </summary>
         internal static string FailedToLoadSolutionFromCodeSourceError {
             get {
@@ -358,6 +367,15 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A runtime error was encountered during the validation..
+        /// </summary>
+        internal static string RuntimeErrorHappenedDuringValidationMessage {
+            get {
+                return ResourceManager.GetString("RuntimeErrorHappenedDuringValidationMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Searching for MSBuild instances installed on the current machine..
         /// </summary>
         internal static string SearchingForMSBuildInstancesStatusMessage {
@@ -367,7 +385,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Start analyzing the code source &quot;{CodeSourcePath}&quot;..
+        ///   Looks up a localized string similar to Start analyzing the code source &quot;{CodeSource}&quot;..
         /// </summary>
         internal static string StartAnalyzingTheCodeSourceStatusMessage {
             get {
@@ -385,7 +403,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Start loading the code source &quot;{CodeSourcePath}&quot;..
+        ///   Looks up a localized string similar to Start loading the code source &quot;{CodeSource}&quot;..
         /// </summary>
         internal static string StartLoadingTheCodeSourceAtPathStatusMessage {
             get {
@@ -412,7 +430,7 @@ namespace Acuminator.Runner.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Successfully loaded the code source &quot;{CodeSourcePath}&quot;..
+        ///   Looks up a localized string similar to Successfully loaded the code source &quot;{CodeSource}&quot;..
         /// </summary>
         internal static string SuccessfullyLoadedCodeSourceAtPathStatusMessage {
             get {
@@ -444,6 +462,15 @@ namespace Acuminator.Runner.Resources {
         internal static string UnregisterMSBuildInstanceError {
             get {
                 return ResourceManager.GetString("UnregisterMSBuildInstanceError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The validation passed successfully!.
+        /// </summary>
+        internal static string ValidationPassedSuccessfullyMessage {
+            get {
+                return ResourceManager.GetString("ValidationPassedSuccessfullyMessage", resourceCulture);
             }
         }
         

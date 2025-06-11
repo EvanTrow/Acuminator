@@ -119,29 +119,23 @@ namespace Acuminator.Runner.NetFramework
 			return Task.FromResult(RunResult.RunTimeError);
 		}
 
-		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", Justification = "No need for structured logging here")]
+		[SuppressMessage("CodeQuality", "Serilog004:Constant MessageTemplate verifier", 
+						 Justification = "Resource strings are used to simplify review by Doc Team")]
 		private static void OutputValidationResult(ILogger logger, RunResult runResult, AnalysisContext analysisContext)
 		{
 			switch (runResult)
 			{
 				case RunResult.Success:
-					logger.Information("The validation passed successfully!");
+					logger.Information(Messages.ValidationPassedSuccessfullyMessage);
 					return;
 				case RunResult.RequirementsNotMet:
-					string codeSourceTypeName = analysisContext.CodeSource.Type switch
-					{
-						CodeSourceType.Solution => "solution",
-						CodeSourceType.Project => "project",
-						_ => "code"
-					};
-
-					logger.Error($"The validation is finished. The validated {codeSourceTypeName} did not pass the validation.");
+					logger.Error(Messages.CodeSourceFailedValidationMessage, analysisContext.CodeSource.Location);
 					return;
 				case RunResult.Cancelled:
 					logger.Warning(Messages.CodeSourceValidationWasCancelled, analysisContext.CodeSource.Location);
 					return;
 				case RunResult.RunTimeError:
-					logger.Error("A runtime error was encountered during the validation.");
+					logger.Error(Messages.RuntimeErrorHappenedDuringValidationMessage);
 					return;
 			}
 		}

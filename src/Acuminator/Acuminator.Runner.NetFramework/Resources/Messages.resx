@@ -124,10 +124,13 @@
     <value>Acuminator version "{Version}" is used for the analysis.</value>
   </data>
   <data name="AnalysisOfCodeSourceRuntimeError" xml:space="preserve">
-    <value>An error happened during the Acuminator analysis of "{CodeSourcePath}".</value>
+    <value>An error happened during the Acuminator analysis of "{CodeSource}".</value>
   </data>
   <data name="CancelledCodeSourceValidationInfo" xml:space="preserve">
     <value>Cancelled Acuminator validation of the "{CodeSource}". Project "{ProjectName}" validation result: {Result}.</value>
+  </data>
+  <data name="CodeSourceFailedValidationMessage" xml:space="preserve">
+    <value>The validation is finished. "{CodeSource}" failed the validation.</value>
   </data>
   <data name="CodeSourceNotFoundError" xml:space="preserve">
     <value>Code source to use for Acuminator validation is not found at {0}</value>
@@ -136,7 +139,7 @@
     <value>Code source is not specified</value>
   </data>
   <data name="CodeSourceValidationWasCancelled" xml:space="preserve">
-    <value>The Acuminator validation of "{CodeSourcePath}" was cancelled.</value>
+    <value>The Acuminator validation of "{CodeSource}" was cancelled.</value>
   </data>
   <data name="DistinctDiagnosticsReportTitlePart" xml:space="preserve">
     <value>Distinct Diagnostics</value>
@@ -154,7 +157,7 @@
     <value>Failed to load Acuminator analyzers. The analysis of the code source "{CodeSource}" cannot be performed</value>
   </data>
   <data name="FailedToLoadSolutionFromCodeSourceError" xml:space="preserve">
-    <value>Failed to load solution from the code source "{CodeSourcePath}".</value>
+    <value>Failed to load solution from the code source "{CodeSource}".</value>
   </data>
   <data name="FailedToObtainAcuminatorVersionWarning" xml:space="preserve">
     <value>Failed to obtain Acuminator version. The analysis will be performed without Acuminator version information.</value>
@@ -216,14 +219,17 @@
   <data name="RegisteringMSBuildAtTheProvidedPathStatusMessage" xml:space="preserve">
     <value>Registering MSBuild instance at the provided path "{MSBuildPath}".</value>
   </data>
+  <data name="RuntimeErrorHappenedDuringValidationMessage" xml:space="preserve">
+    <value>A runtime error was encountered during the validation.</value>
+  </data>
   <data name="SearchingForMSBuildInstancesStatusMessage" xml:space="preserve">
     <value>Searching for MSBuild instances installed on the current machine.</value>
   </data>
   <data name="StartAnalyzingTheCodeSourceStatusMessage" xml:space="preserve">
-    <value>Start analyzing the code source "{CodeSourcePath}".</value>
+    <value>Start analyzing the code source "{CodeSource}".</value>
   </data>
   <data name="StartLoadingTheCodeSourceAtPathStatusMessage" xml:space="preserve">
-    <value>Start loading the code source "{CodeSourcePath}".</value>
+    <value>Start loading the code source "{CodeSource}".</value>
   </data>
   <data name="StartValidatingSolutionStatusMessage" xml:space="preserve">
     <value>Start validating the solution.</value>
@@ -235,7 +241,7 @@
     <value>Successfully finished validating the solution.</value>
   </data>
   <data name="SuccessfullyLoadedCodeSourceAtPathStatusMessage" xml:space="preserve">
-    <value>Successfully loaded the code source "{CodeSourcePath}".</value>
+    <value>Successfully loaded the code source "{CodeSource}".</value>
   </data>
   <data name="SuccessfullyRegisteredMSBuildAtProvidedPathStatusMessage" xml:space="preserve">
     <value>Successfully registered MSBuild instance at the provided path "{MSBuildPath}".</value>
@@ -245,6 +251,9 @@
   </data>
   <data name="UnregisterMSBuildInstanceError" xml:space="preserve">
     <value>Error on attempt to unregister MSBuild.</value>
+  </data>
+  <data name="ValidationPassedSuccessfullyMessage" xml:space="preserve">
+    <value>The validation passed successfully!</value>
   </data>
   <data name="ValidationWasSuccessfullyCancelledDebugInfo" xml:space="preserve">
     <value>The validation was successfully cancelled.</value>
