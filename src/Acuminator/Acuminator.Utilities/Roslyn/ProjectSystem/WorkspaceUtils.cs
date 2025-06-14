@@ -1,8 +1,5 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -24,8 +21,8 @@ namespace Acuminator.Utilities.Roslyn.ProjectSystem
 		public static IEnumerable<SuppressionManagerInitInfo> GetSuppressionInfo(this Solution solution, bool generateSuppressionBase)
 		{
 			var suppressionFiles = solution.GetAllAdditionalDocuments()
-										   .Where(additionalDoc => !additionalDoc.FilePath.IsNullOrWhiteSpace() && 
-																	SuppressionFile.IsSuppressionFile(additionalDoc.FilePath));
+										   .Where(additionalDoc => !additionalDoc.FilePath.IsNullOrWhiteSpace() &&
+																	additionalDoc.FilePath.IsSuppressionFile(checkFileExists: false));
 			return suppressionFiles.Where(file => !file.FilePath.IsNullOrWhiteSpace())
 								   .Select(file => new SuppressionManagerInitInfo(file.FilePath!, generateSuppressionBase));
 		}
@@ -37,8 +34,8 @@ namespace Acuminator.Utilities.Roslyn.ProjectSystem
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<TextDocument> GetSuppressionFiles(this Project project) =>
 			project.CheckIfNull().AdditionalDocuments
-								 .Where(additionalDoc => !additionalDoc.FilePath.IsNullOrWhiteSpace() && 
-														  SuppressionFile.IsSuppressionFile(additionalDoc.FilePath));
+								 .Where(additionalDoc => !additionalDoc.FilePath.IsNullOrWhiteSpace() &&
+														  additionalDoc.FilePath.IsSuppressionFile(checkFileExists: false));
 
 		/// <summary>
 		/// Get workspace indentation size.

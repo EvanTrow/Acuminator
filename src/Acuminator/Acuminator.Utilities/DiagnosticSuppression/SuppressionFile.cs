@@ -65,11 +65,6 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 
 		internal bool ContainsMessage(SuppressMessage message) => Messages.ContainsKey(message);
 
-		internal static bool IsSuppressionFile(string path)
-		{
-			return SuppressionFileExtension.Equals(System.IO.Path.GetExtension(path), StringComparison.Ordinal);
-		}
-
 		internal static SuppressionFile Load(ISuppressionFileSystemService fileSystemService, string suppressionFilePath, 
 											 bool generateSuppressionBase)
 		{

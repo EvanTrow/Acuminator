@@ -2,23 +2,22 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
+using System.Linq;
 
 using Acuminator.Analyzers.StaticAnalysis;
+using Acuminator.Runner.Constants;
 using Acuminator.Runner.Input;
+using Acuminator.Runner.Resources;
 using Acuminator.Utilities;
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.DiagnosticSuppression;
 
 using Microsoft.CodeAnalysis;
 
 using Serilog;
 
-using DiagnosticAnalyzer = Microsoft.CodeAnalysis.Diagnostics.DiagnosticAnalyzer;
 using AnalyzerFileReference = Microsoft.CodeAnalysis.Diagnostics.AnalyzerFileReference;
-using Acuminator.Utilities.DiagnosticSuppression;
-using System.Linq;
-using Acuminator.Runner.Constants;
-using Acuminator.Runner.Resources;
+using DiagnosticAnalyzer = Microsoft.CodeAnalysis.Diagnostics.DiagnosticAnalyzer;
 
 namespace Acuminator.Runner.Analysis.Initialization
 {
@@ -107,7 +106,7 @@ namespace Acuminator.Runner.Analysis.Initialization
 		private bool InitializeAcuminatorGlobalSuppressionMechanismForProject(Project project)
 		{
 			var acuminatorSuppressionFiles = project.AdditionalDocuments
-													.Where(d => IsAcuminatorSuppressionFile(d.FilePath))
+													.Where(d => d.FilePath.IsSuppressionFile(checkFileExists: true))
 													.Select(d => new SuppressionManagerInitInfo(d.FilePath!, _analysisContext.GenerateSuppressionFile))
 													.ToList(capacity: 1);
 
@@ -152,7 +151,7 @@ namespace Acuminator.Runner.Analysis.Initialization
 		{
 			var acuminatorSuppressionFiles = solution.Projects
 													 .SelectMany(project => project.AdditionalDocuments)
-													 .Where(d => IsAcuminatorSuppressionFile(d.FilePath))
+													 .Where(d => d.FilePath.IsSuppressionFile(checkFileExists: true))
 													 .Select(d => new SuppressionManagerInitInfo(d.FilePath!, _analysisContext.GenerateSuppressionFile))
 													 .ToList(capacity: 1);
 
@@ -189,15 +188,6 @@ namespace Acuminator.Runner.Analysis.Initialization
 					   </ItemGroup>
 					   """;
 			}
-		}
-
-		private bool IsAcuminatorSuppressionFile([NotNullWhen(returnValue: true)]string? filePath)
-		{
-			if (filePath.IsNullOrWhiteSpace() || !File.Exists(filePath))
-				return false;
-
-			string extension = Path.GetExtension(filePath);
-			return SuppressionFile.SuppressionFileExtension.Equals(extension, StringComparison.Ordinal);
 		}
 	}
 }

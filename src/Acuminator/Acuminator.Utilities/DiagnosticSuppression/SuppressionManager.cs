@@ -1,7 +1,4 @@
-﻿#nullable enable
-
-using System;
-using System.Collections.Concurrent;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -77,7 +74,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 										Func<IIOErrorProcessor>? errorProcessorFabric,
 										Func<ICustomBuildActionSetter>? buildActionSetterFabric)
 		{
-			suppressionFileInfos ??= Enumerable.Empty<SuppressionManagerInitInfo>();
+			suppressionFileInfos ??= [];
 
 			lock (_initializationLocker)
 			{
@@ -122,7 +119,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 		{
 			foreach (SuppressionManagerInitInfo fileInfo in suppressionFiles)
 			{
-				if (!SuppressionFile.IsSuppressionFile(fileInfo.Path))
+				if (!fileInfo.Path.IsSuppressionFile(checkFileExists: false))
 				{
 					throw new ArgumentException($"File {fileInfo.Path} is not a suppression file");
 				}
