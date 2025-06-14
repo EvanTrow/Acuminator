@@ -12,6 +12,7 @@ using Acuminator.Runner.Output;
 using Acuminator.Runner.Output.Data;
 using Acuminator.Runner.Resources;
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.Semantic;
 
@@ -106,6 +107,11 @@ namespace Acuminator.Runner.Analysis
 				{
 					_logger.Error(Messages.NoProjectInCodeSourceReferencesAcumaticaPlatformError, analysisContext.CodeSource.Location);
 					return RunResult.RunTimeError;
+				}
+
+				if (analysisContext.GenerateSuppressionFile)
+				{
+					SuppressionManager.SaveSuppressionAllSuppressionFiles();
 				}
 
 				if (projectReports.Count > 0)
