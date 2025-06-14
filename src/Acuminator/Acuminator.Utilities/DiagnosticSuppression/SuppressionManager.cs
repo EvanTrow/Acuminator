@@ -159,7 +159,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			_fileByAssembly[assembly] = newFile;
 		}
 
-		public static void SaveSuppressionBase()
+		public static void SaveSuppressionAllSuppressionFiles()
 		{
 			CheckIfInstanceIsInitialized(throwOnNotInitialized: true);
 
