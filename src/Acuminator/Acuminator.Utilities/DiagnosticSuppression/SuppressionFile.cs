@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Xml.Linq;
+
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression.IO;
 
@@ -22,9 +23,9 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 		private readonly ISuppressionFileWatcherService? _fileWatcher;
 
 		/// <summary>
-		/// Indicates whether to generate errors suppression base to suppression file or not
+		/// Suppression work mode for this suppression file.
 		/// </summary>
-		internal bool GenerateSuppressionBase { get; }
+		internal GlobalSuppressionWorkMode SuppressionWorkMode { get; }
 
 		private ConcurrentDictionary<SuppressMessage, object?> Messages { get; } = new ConcurrentDictionary<SuppressMessage, object?>();
 
@@ -48,12 +49,12 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			}
 		}
 
-		private SuppressionFile(string assemblyName, string path, bool generateSuppressionBase,
+		private SuppressionFile(string assemblyName, string path, GlobalSuppressionWorkMode suppressionWorkMode,
 								HashSet<SuppressMessage> messages, ISuppressionFileWatcherService? watcher)
 		{
 			AssemblyName = assemblyName;
 			Path = path;
-			GenerateSuppressionBase = generateSuppressionBase;
+			SuppressionWorkMode = suppressionWorkMode;
 
 			foreach (SuppressMessage message in messages)
 			{
@@ -65,18 +66,14 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 
 		internal bool ContainsMessage(SuppressMessage message) => Messages.ContainsKey(message);
 
-		internal static SuppressionFile Load(ISuppressionFileSystemService fileSystemService, string suppressionFilePath, 
-											 bool generateSuppressionBase)
+		internal static SuppressionFile Load(ISuppressionFileSystemService fileSystemService, string suppressionFilePath,
+											 GlobalSuppressionWorkMode suppressionWorkMode)
 		{
 			fileSystemService.ThrowOnNull();
 			suppressionFilePath.ThrowOnNullOrWhiteSpace();
 
-			string assemblyName = fileSystemService.GetFileName(suppressionFilePath);
-			if (string.IsNullOrEmpty(assemblyName))
-			{
-				throw new FormatException("Acuminator suppression file name cannot be empty");
-			}
-
+			string assemblyName = fileSystemService.GetFileName(suppressionFilePath).NullIfWhiteSpace() ??
+								  throw new FormatException("Acuminator suppression file name cannot be empty");
 			var messages = new HashSet<SuppressMessage>();
 
 			if (!generateSuppressionBase)
@@ -91,7 +88,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				fileWatcher = fileSystemService.CreateWatcher(suppressionFilePath);
 			}
 			
-			return new SuppressionFile(assemblyName, suppressionFilePath, generateSuppressionBase, messages, fileWatcher);
+			return new SuppressionFile(assemblyName, suppressionFilePath, suppressionWorkMode, messages, fileWatcher);
 		}
 
 		public void Dispose() => _fileWatcher?.Dispose();
