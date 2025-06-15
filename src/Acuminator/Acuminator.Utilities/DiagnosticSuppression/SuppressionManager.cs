@@ -69,7 +69,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			InitOrReset(suppressionFileInfos, null, errorProcessorFabric, buildActionSetterFabric);
 		}
 
-		private static void InitOrReset(IEnumerable<SuppressionManagerInitInfo>? suppressionFileInfos,
+		private static void InitOrReset(IEnumerable<GlobalSuppressionFileInitInfo>? suppressionFileInfos,
 										Func<ISuppressionFileSystemService>? fileSystemServiceFabric,
 										Func<IIOErrorProcessor>? errorProcessorFabric,
 										Func<ICustomBuildActionSetter>? buildActionSetterFabric)
@@ -115,16 +115,16 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			_fileByAssembly.Clear();
 		}
 
-		private void LoadSuppressionFiles(IEnumerable<SuppressionManagerInitInfo> suppressionFiles)
+		private void LoadSuppressionFiles(IEnumerable<GlobalSuppressionFileInitInfo> suppressionFiles)
 		{
-			foreach (SuppressionManagerInitInfo fileInfo in suppressionFiles)
+			foreach (GlobalSuppressionFileInitInfo fileInfo in suppressionFiles)
 			{
 				if (!fileInfo.Path.IsSuppressionFile(checkFileExists: false))
 				{
 					throw new ArgumentException($"File {fileInfo.Path} is not a suppression file");
 				}
 
-				var file = LoadFileAndTrackItsChanges(fileInfo.Path, fileInfo.GenerateSuppressionBase);
+				var file = LoadFileAndTrackItsChanges(fileInfo.Path, fileInfo.SuppressionWorkMode);
 
 				if (!_fileByAssembly.TryAdd(file.AssemblyName, file))
 				{
@@ -133,11 +133,11 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			}
 		}
 
-		private SuppressionFile LoadFileAndTrackItsChanges(string suppressionFilePath, bool generateSuppressionBase)
+		private SuppressionFile LoadFileAndTrackItsChanges(string suppressionFilePath, GlobalSuppressionWorkMode suppressionWorkMode)
 		{
 			lock (_fileSystemService)
 			{
-				SuppressionFile suppressionFile = SuppressionFile.Load(_fileSystemService, suppressionFilePath, generateSuppressionBase);
+				SuppressionFile suppressionFile = SuppressionFile.Load(_fileSystemService, suppressionFilePath, suppressionWorkMode);
 				suppressionFile.Changed += ReloadFile;
 				return suppressionFile;
 			}
@@ -155,7 +155,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				oldFile.Dispose();
 			}
 
-			var newFile = LoadFileAndTrackItsChanges(suppressionFilePath: e.FullPath, generateSuppressionBase: false);
+			var newFile = LoadFileAndTrackItsChanges(suppressionFilePath: e.FullPath, GlobalSuppressionWorkMode.ReportUnsuppressedErrors);
 			_fileByAssembly[assembly] = newFile;
 		}
 
@@ -181,9 +181,9 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			}
 		}
 
-		internal SuppressionFile LoadSuppressionFileFrom(string filePath)
+		internal SuppressionFile LoadSuppressionFileFrom(string filePath, GlobalSuppressionWorkMode suppressionWorkMode)
 		{
-			SuppressionFile suppressionFile = LoadFileAndTrackItsChanges(filePath, generateSuppressionBase: false);
+			SuppressionFile suppressionFile = LoadFileAndTrackItsChanges(filePath, suppressionWorkMode);
 			_fileByAssembly[suppressionFile.AssemblyName] = suppressionFile;
 			return suppressionFile;
 		}
@@ -263,7 +263,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				foreach (SuppressionFile currentFile in Instance._fileByAssembly.Files)
 				{
 					var oldFile = SuppressionFile.Load(Instance._fileSystemService, suppressionFilePath: currentFile.Path,
-													   generateSuppressionBase: false);
+													   GlobalSuppressionWorkMode.ReportUnsuppressedErrors);
 
 					diffList.Add(CompareFiles(oldFile, currentFile));
 				}
