@@ -159,16 +159,21 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			_fileByAssembly[assembly] = newFile;
 		}
 
-		public static void SaveSuppressionAllSuppressionFiles()
+		public static void SaveSuppressionFiles(bool saveOnlyGeneratedFiles)
 		{
 			CheckIfInstanceIsInitialized(throwOnNotInitialized: true);
 
 			lock (Instance._fileSystemService)
 			{
-				//Create local copy in order to avoid concurency problem when the collection is changed during the iteration
-				var filesWithGeneratedSuppression = Instance._fileByAssembly.Files.Where(f => f.GenerateSuppressionBase).ToList();
+				var filesStore = Instance._fileByAssembly;
+				var filesWithGeneratedSuppression = saveOnlyGeneratedFiles 
+					? filesStore.Files.Where(f => f.SuppressionWorkMode.HasFlag(GlobalSuppressionWorkMode.GenerateSuppressionFile)) 
+					: filesStore.Files;
 
-				foreach (var file in filesWithGeneratedSuppression)
+				//Create local copy in order to avoid concurency problem when the collection is changed during the iteration
+				var filesLocalCopy = filesWithGeneratedSuppression.ToList(filesStore.Count);
+
+				foreach (var file in filesLocalCopy)
 				{
 					XDocument newSuppressionXmlFile = file.MessagesToDocument(Instance._fileSystemService);
 					Instance._fileSystemService.Save(newSuppressionXmlFile, file.Path);

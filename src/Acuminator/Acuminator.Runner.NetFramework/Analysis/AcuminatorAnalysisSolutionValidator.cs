@@ -111,7 +111,7 @@ namespace Acuminator.Runner.Analysis
 
 				if (analysisContext.GenerateSuppressionFile)
 				{
-					SuppressionManager.SaveSuppressionAllSuppressionFiles();
+					SuppressionManager.SaveSuppressionFiles(saveOnlyGeneratedFiles: true);
 				}
 
 				if (projectReports.Count > 0)
