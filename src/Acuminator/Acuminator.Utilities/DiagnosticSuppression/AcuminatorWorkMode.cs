@@ -6,7 +6,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 	/// Work modes og the global suppression mechanism.
 	/// </summary>
 	[Flags]
-	public enum GlobalSuppressionWorkMode : byte
+	public enum AcuminatorWorkMode : byte
 	{
 		/// <summary>
 		/// Acuminator will report errors that are not suppressed in the project suppression file.
@@ -25,14 +25,14 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 	}
 
 	/// <summary>
-	/// The helper class for <see cref="GlobalSuppressionWorkMode"/>.
+	/// The helper class for <see cref="AcuminatorWorkMode"/>.
 	/// </summary>
-	public static class GlobalSuppressionWorkModeExtensions
+	public static class AcuminatorWorkModeExtensions
 	{
 		/// <summary>
 		/// Checks if the mode contains the specified flag.
 		/// </summary>
-		public static bool HasFlag(this GlobalSuppressionWorkMode mode, GlobalSuppressionWorkMode flag) =>
+		public static bool HasFlag(this AcuminatorWorkMode mode, AcuminatorWorkMode flag) =>
 			(mode & flag) == flag;
 	}
 }

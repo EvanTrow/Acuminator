@@ -48,25 +48,25 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 		public static void InitOrReset(IEnumerable<GlobalSuppressionFileInitInfo>? additionalFiles,
 									   Func<ISuppressionFileSystemService>? fileSystemServiceFabric = null,
 									   Func<ICustomBuildActionSetter>? buildActionSetterFabric = null) =>
-			InitOrReset(additionalFiles, fileSystemServiceFabric, null, buildActionSetterFabric);
+			InitOrReset(additionalFiles, fileSystemServiceFabric, errorProcessorFabric: null, buildActionSetterFabric);
 
 		public static void InitOrReset(IEnumerable<GlobalSuppressionFileInitInfo>? additionalFiles,
 									   Func<IIOErrorProcessor>? errorProcessorFabric = null,
 									   Func<ICustomBuildActionSetter>? buildActionSetterFabric = null) =>
-			InitOrReset(additionalFiles, null, errorProcessorFabric, buildActionSetterFabric);
+			InitOrReset(additionalFiles, fileSystemServiceFabric: null, errorProcessorFabric, buildActionSetterFabric);
 
-		public static void InitOrReset(Workspace? workspace, GlobalSuppressionWorkMode suppressionWorkMode, 
+		public static void InitOrReset(Workspace? workspace, AcuminatorWorkMode workMode, 
 									   Func<ISuppressionFileSystemService>? fileSystemServiceFabric = null,
 									   Func<ICustomBuildActionSetter>? buildActionSetterFabric = null) =>
-			InitOrReset(workspace?.CurrentSolution?.GetSuppressionInfo(suppressionWorkMode),
-						fileSystemServiceFabric, null, buildActionSetterFabric);
+			InitOrReset(workspace?.CurrentSolution?.GetSuppressionInfo(workMode),
+						fileSystemServiceFabric, errorProcessorFabric: null, buildActionSetterFabric);
 
-		public static void InitOrReset(Workspace? workspace, GlobalSuppressionWorkMode suppressionWorkMode,
+		public static void InitOrReset(Workspace? workspace, AcuminatorWorkMode workMode,
 									   Func<IIOErrorProcessor>? errorProcessorFabric = null,
 									   Func<ICustomBuildActionSetter>? buildActionSetterFabric = null)
 		{
-			var suppressionFileInfos = workspace?.CurrentSolution?.GetSuppressionInfo(suppressionWorkMode);
-			InitOrReset(suppressionFileInfos, null, errorProcessorFabric, buildActionSetterFabric);
+			var suppressionFileInfos = workspace?.CurrentSolution?.GetSuppressionInfo(workMode);
+			InitOrReset(suppressionFileInfos, fileSystemServiceFabric: null, errorProcessorFabric, buildActionSetterFabric);
 		}
 
 		private static void InitOrReset(IEnumerable<GlobalSuppressionFileInitInfo>? suppressionFileInfos,
@@ -124,7 +124,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 					throw new ArgumentException($"File {fileInfo.Path} is not a suppression file");
 				}
 
-				var file = LoadFileAndTrackItsChanges(fileInfo.Path, fileInfo.SuppressionWorkMode);
+				var file = LoadFileAndTrackItsChanges(fileInfo.Path, fileInfo.WorkMode);
 
 				if (!_fileByAssembly.TryAdd(file.AssemblyName, file))
 				{
@@ -133,11 +133,11 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			}
 		}
 
-		private SuppressionFile LoadFileAndTrackItsChanges(string suppressionFilePath, GlobalSuppressionWorkMode suppressionWorkMode)
+		private SuppressionFile LoadFileAndTrackItsChanges(string suppressionFilePath, AcuminatorWorkMode workMode)
 		{
 			lock (_fileSystemService)
 			{
-				SuppressionFile suppressionFile = SuppressionFile.Load(_fileSystemService, suppressionFilePath, suppressionWorkMode);
+				SuppressionFile suppressionFile = SuppressionFile.Load(_fileSystemService, suppressionFilePath, workMode);
 				suppressionFile.Changed += ReloadFile;
 				return suppressionFile;
 			}
@@ -158,7 +158,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				oldFile.Dispose();
 			}
 
-			var newFile = LoadFileAndTrackItsChanges(suppressionFilePath: e.FullPath, GlobalSuppressionWorkMode.ReportUnsuppressedErrors);
+			var newFile = LoadFileAndTrackItsChanges(suppressionFilePath: e.FullPath, AcuminatorWorkMode.ReportUnsuppressedErrors);
 			
 			if (newMessagesInOldFile?.Count > 0)
 			{
@@ -179,7 +179,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			{
 				var filesStore = Instance._fileByAssembly;
 				var filesWithGeneratedSuppression = saveOnlyGeneratedFiles 
-					? filesStore.Files.Where(f => f.SuppressionWorkMode.HasFlag(GlobalSuppressionWorkMode.GenerateSuppressionFile)) 
+					? filesStore.Files.Where(f => f.WorkMode.HasFlag(AcuminatorWorkMode.GenerateSuppressionFile)) 
 					: filesStore.Files;
 
 				//Create local copy in order to avoid concurency problem when the collection is changed during the iteration
@@ -193,9 +193,9 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			}
 		}
 
-		internal SuppressionFile LoadSuppressionFileFrom(string filePath, GlobalSuppressionWorkMode suppressionWorkMode)
+		internal SuppressionFile LoadSuppressionFileFrom(string filePath, AcuminatorWorkMode workMode)
 		{
-			SuppressionFile suppressionFile = LoadFileAndTrackItsChanges(filePath, suppressionWorkMode);
+			SuppressionFile suppressionFile = LoadFileAndTrackItsChanges(filePath, workMode);
 			_fileByAssembly[suppressionFile.AssemblyName] = suppressionFile;
 			return suppressionFile;
 		}
@@ -273,7 +273,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				foreach (SuppressionFile currentFile in Instance._fileByAssembly.Files)
 				{
 					var oldFile = SuppressionFile.Load(Instance._fileSystemService, suppressionFilePath: currentFile.Path,
-													   GlobalSuppressionWorkMode.ReportUnsuppressedErrors);
+													   AcuminatorWorkMode.ReportUnsuppressedErrors);
 
 					diffList.Add(CompareFiles(oldFile, currentFile));
 				}
@@ -385,14 +385,14 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			// - The suppressed diagnostic has suppressable Severity, we don't suppress minor informational diagnostics currently.
 			// - There is no Acuminator suppression comment for the suppressed diagnostic, we don't want to allow creation of suppressions
 			//   for diagnostics suppressed with a comment.
-			bool addSuppressionToSuppressionFile = file.SuppressionWorkMode.HasFlag(GlobalSuppressionWorkMode.GenerateSuppressionFile) && 
+			bool addSuppressionToSuppressionFile = file.WorkMode.HasFlag(AcuminatorWorkMode.GenerateSuppressionFile) && 
 												   !hasSuppressionComment && IsSuppressableSeverity(diagnostic.Descriptor.DefaultSeverity);
 			if (addSuppressionToSuppressionFile)
 			{
 				file.AddGeneratedSuppressionMessage(message);   // The check for presence in loaded suppressions will be done by the called method 
 			}
 
-			if (file.SuppressionWorkMode.HasFlag(GlobalSuppressionWorkMode.ReportUnsuppressedErrors))
+			if (file.WorkMode.HasFlag(AcuminatorWorkMode.ReportUnsuppressedErrors))
 			{
 				// Check whether the diagnostic is suppressed by checking if the suppression is enabled.
 				// If it is enabled, check if the suppression file contains the suppressed message.

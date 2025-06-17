@@ -9,19 +9,19 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 	{
 		public string Path { get; }
 
-		public GlobalSuppressionWorkMode SuppressionWorkMode { get; }
+		public AcuminatorWorkMode WorkMode { get; }
 
-		public GlobalSuppressionFileInitInfo(string path, GlobalSuppressionWorkMode suppressionWorkMode)
+		public GlobalSuppressionFileInitInfo(string path, AcuminatorWorkMode workMode)
 		{
 			Path = path.CheckIfNullOrWhiteSpace();
-			SuppressionWorkMode = suppressionWorkMode;
+			WorkMode = workMode;
 		}
 
 		public override bool Equals(object obj) => 
 			obj is GlobalSuppressionFileInitInfo initInfo && Equals(initInfo);
 
 		public bool Equals(GlobalSuppressionFileInitInfo other) => 
-			SuppressionWorkMode == other.SuppressionWorkMode && 
+			WorkMode == other.WorkMode && 
 			string.Equals(Path, other.Path, StringComparison.OrdinalIgnoreCase);
 
 		public override int GetHashCode()
@@ -31,7 +31,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			unchecked
 			{
 				hash = 23 * hash + (Path?.ToUpperInvariant().GetHashCode() ?? 0);
-				hash = 23 * hash + SuppressionWorkMode.GetHashCode();
+				hash = 23 * hash + WorkMode.GetHashCode();
 			}
 
 			return hash;

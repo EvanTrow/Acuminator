@@ -412,7 +412,7 @@ namespace Acuminator.Vsix
 
 		private void SetupSuppressionManager()
 		{
-			SuppressionManager.InitOrReset(_vsWorkspace, GlobalSuppressionWorkMode.ReportUnsuppressedErrors,
+			SuppressionManager.InitOrReset(_vsWorkspace, AcuminatorWorkMode.ReportUnsuppressedErrors,
 										   errorProcessorFabric: () => new VsixIOErrorProcessor(),
 										   buildActionSetterFabric: () => SharedVsSettings.VSVersion?.VS2022OrNewer == true
 																			? new VsixBuildActionSetterVS2022()

@@ -27,7 +27,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression.CodeActions
 			cancellationToken.ThrowIfCancellationRequested();
 			SuppressionFile? suppressionFile = _filePath.IsNullOrWhiteSpace()
 				? null
-				: SuppressionManager.Instance?.LoadSuppressionFileFrom(_filePath, GlobalSuppressionWorkMode.ReportUnsuppressedErrors);
+				: SuppressionManager.Instance?.LoadSuppressionFileFrom(_filePath, AcuminatorWorkMode.ReportUnsuppressedErrors);
 
 			if (suppressionFile == null)
 			{

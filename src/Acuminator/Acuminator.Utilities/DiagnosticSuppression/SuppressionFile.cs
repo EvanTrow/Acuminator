@@ -22,9 +22,9 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 		private readonly ISuppressionFileWatcherService? _fileWatcher;
 
 		/// <summary>
-		/// Suppression work mode for this suppression file.
+		/// Acuminator work mode for this suppression file.
 		/// </summary>
-		internal GlobalSuppressionWorkMode SuppressionWorkMode { get; }
+		internal AcuminatorWorkMode WorkMode { get; }
 
 		/// <summary>
 		/// The suppression messages loaded from existing suppression file. These suppressions are checked against diagnostics.
@@ -75,12 +75,12 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 
 		internal ICollection<SuppressMessage> GetNewSuppressions() => _addedGeneratedMessages.Keys;
 
-		private SuppressionFile(string assemblyName, string path, GlobalSuppressionWorkMode suppressionWorkMode,
-								IReadOnlyCollection<SuppressMessage> loadedMessages, ISuppressionFileWatcherService? watcher)
+		private SuppressionFile(string assemblyName, string path, AcuminatorWorkMode workMode, IReadOnlyCollection<SuppressMessage> loadedMessages,
+								ISuppressionFileWatcherService? watcher)
 		{
 			AssemblyName = assemblyName;
 			Path = path;
-			SuppressionWorkMode = suppressionWorkMode;
+			WorkMode = workMode;
 
 			if (loadedMessages.Count > 0)
 			{
@@ -95,8 +95,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 
 		internal bool ContainsLoadedSuppressedMessage(in SuppressMessage message) => _loadedExistingMessages.ContainsKey(message);
 
-		internal static SuppressionFile Load(ISuppressionFileSystemService fileSystemService, string suppressionFilePath,
-											 GlobalSuppressionWorkMode suppressionWorkMode)
+		internal static SuppressionFile Load(ISuppressionFileSystemService fileSystemService, string suppressionFilePath, AcuminatorWorkMode workMode)
 		{
 			fileSystemService.ThrowOnNull();
 			suppressionFilePath.ThrowOnNullOrWhiteSpace();
@@ -105,7 +104,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 								  throw new FormatException("Acuminator suppression file name cannot be empty");
 
 			IReadOnlyCollection<SuppressMessage> loadedMessages =
-				suppressionWorkMode.HasFlag(GlobalSuppressionWorkMode.ReportUnsuppressedErrors)
+				workMode.HasFlag(AcuminatorWorkMode.ReportUnsuppressedErrors)
 					? LoadMessages(fileSystemService, suppressionFilePath)
 					: [];
 			ISuppressionFileWatcherService? fileWatcher;
@@ -115,7 +114,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				fileWatcher = fileSystemService.CreateWatcher(suppressionFilePath);
 			}
 			
-			return new SuppressionFile(assemblyName, suppressionFilePath, suppressionWorkMode, loadedMessages, fileWatcher);
+			return new SuppressionFile(assemblyName, suppressionFilePath, workMode, loadedMessages, fileWatcher);
 		}
 
 		public void Dispose() => _fileWatcher?.Dispose();
