@@ -149,13 +149,25 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			var oldFile = GetSuppressionFile(assembly);
 
 			// We need to unsubscribe from the old file's event because it can be fired until the link to the file will be collected by GC
+			ICollection<SuppressMessage>? newMessagesInOldFile = null;
+
 			if (oldFile != null)
 			{
+				newMessagesInOldFile = oldFile.GetNewSuppressions();
 				oldFile.Changed -= ReloadFile;
 				oldFile.Dispose();
 			}
 
 			var newFile = LoadFileAndTrackItsChanges(suppressionFilePath: e.FullPath, GlobalSuppressionWorkMode.ReportUnsuppressedErrors);
+
+			if (newMessagesInOldFile?.Count > 0)
+			{
+				foreach (SuppressMessage newMessage in newMessagesInOldFile)
+				{
+					newFile.AddGeneratedSuppressionMessage(newMessage);
+				}
+			}
+
 			_fileByAssembly[assembly] = newFile;
 		}
 
