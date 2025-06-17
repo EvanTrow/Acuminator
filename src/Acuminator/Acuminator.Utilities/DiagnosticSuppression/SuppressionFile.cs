@@ -123,17 +123,19 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 
 		public void Dispose() => _fileWatcher?.Dispose();
 		
-		internal void AddGeneratedSuppressionMessage(SuppressMessage message) => 
-			_addedGeneratedMessages.TryAdd(message, value: null);
-
-        public static XDocument NewDocumentFromMessages(IEnumerable<SuppressMessage> messages)
+		/// <summary>
+		/// Adds a generated suppression message to the suppression file.
+		/// </summary>
+		/// <param name="message">The suppression message.</param>
+		/// <returns>
+		/// True if the message was added successfully.
+		/// </returns>
+		internal bool AddGeneratedSuppressionMessage(in SuppressMessage message)
         {
-            var root = new XElement(RootEmelent);
-            var document = new XDocument(root);
+			if (!message.IsValid || ContainsLoadedSuppressedMessage(message))
+				return false;													// Do not add suppression if it is already among existing suppressions loaded from file
 
-            AddMessagesToDocument(document, messages);
-
-            return document;
+			return _addedGeneratedMessages.TryAdd(message, value: null);
         }
 
 		internal XDocument MessagesToDocument(ISuppressionFileSystemService fileSystemService)

@@ -292,17 +292,18 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			cancellation.ThrowIfCancellationRequested();
 			reportDiagnostic.ThrowOnNull();
 
-			if (!settings.SuppressionMechanismEnabled)
-			{
-				reportDiagnostic(diagnostic);
-				return;
-			}
+			bool isSuppressionEnabled  = settings.SuppressionMechanismEnabled;
+			bool hasSuppressionComment = CheckSuppressedComment(diagnostic, cancellation);
 
-			// Always check suppression with a comment first.
-			// Also we need to avoid modification of the suppression file when Requirement Validation tool runs the Acuminator in a special mode, 
-			// in which every found diagnostic is recorded in the suppression file.
-			if (CheckSuppressedComment(diagnostic, cancellation) ||
-				Instance?.IsSuppressedInSuppressionFile(semanticModel, diagnostic, cancellation) == true)
+			// Always check suppression with a comment first
+			if (isSuppressionEnabled && hasSuppressionComment)
+				return;
+
+			// Then check suppression with a global suppression file.
+			// If a suppression file generation mode is enabled, then the suppression file will be updated with the new suppression message.
+			if (Instance != null && 
+				Instance.IsSuppressedInSuppressionFileAndAddToSuppressionFileInGenerationMode(semanticModel, diagnostic, 
+																							  isSuppressionEnabled, hasSuppressionComment, cancellation))
 			{
 				return;
 			}
@@ -349,7 +350,9 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			return successfulMatch != null;
 		}
 
-		private bool IsSuppressedInSuppressionFile(SemanticModel semanticModel, Diagnostic diagnostic, CancellationToken cancellation)
+		private bool IsSuppressedInSuppressionFileAndAddToSuppressionFileInGenerationMode(SemanticModel semanticModel, Diagnostic diagnostic, 
+																						  bool isSuppressionEnabled, bool hasSuppressionComment, 
+																						  CancellationToken cancellation)
 		{
 			cancellation.ThrowIfCancellationRequested();
 
@@ -363,17 +366,33 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			if (file == null)
 				return false;
 
-			if (file.GenerateSuppressionBase)
-			{
-				if (IsSuppressableSeverity(diagnostic?.Descriptor.DefaultSeverity))
+			// Add new suppression info in suppression file generation mode to the suppression file only if it satisfies several conditions:
+			// - New info isn't already present among the loaded suppressions, we don't want duplicates
+			// - The suppressed diagnostic has suppressable Severity, we don't suppress minor informational diagnostics currently.
+			// - There is no Acuminator suppression comment for the suppressed diagnostic, we don't want to allow creation of suppressions
+			//   for diagnostics suppressed with a comment.
+			bool addSuppressionToSuppressionFile = file.SuppressionWorkMode.HasFlag(GlobalSuppressionWorkMode.GenerateSuppressionFile) && 
+												   !hasSuppressionComment && IsSuppressableSeverity(diagnostic.Descriptor.DefaultSeverity);
+			if (addSuppressionToSuppressionFile)
 				{
-					file.AddGeneratedSuppressionMessage(message);
+				file.AddGeneratedSuppressionMessage(message);   // The check for presence in loaded suppressions will be done by the called method 
 				}
 
+			if (file.SuppressionWorkMode.HasFlag(GlobalSuppressionWorkMode.ReportUnsuppressedErrors))
+			{
+				// Check whether the diagnostic is suppressed by checking if the suppression is enabled.
+				// If it is enabled, check if the suppression file contains the suppressed message.
+				// Also to be consistent with the algorithm and allow to call this method from anywhere,
+				// make a cheap check if the suppression comment is present even though it was already verified in the calling method.
+				bool isSuppressed = isSuppressionEnabled &&
+									(hasSuppressionComment || file.ContainsLoadedSuppressedMessage(message));
+				return isSuppressed;
+			}
+			else
+			{
+				// If the suppression work mode does not include reporting errors, return true for all diagnostics to consider them suppressed and not report them.
 				return true;
 			}
-
-			return file.ContainsSuppressedMessage(message);
 		}
 
 		private static bool IsSuppressableSeverity(DiagnosticSeverity? diagnosticSeverity) =>
