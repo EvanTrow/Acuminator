@@ -13,8 +13,27 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 		private const string RootEmelent = "suppressions";
 		public const string SuppressMessageElement = "suppressMessage";
 
-		public static class XmlUtils
+		private static class XmlUtils
 		{
+			public static XDocument LoadSuppressionFileAndReplaceItsContent(ISuppressionFileSystemService fileSystemService,
+																			string filePath, IEnumerable<SuppressMessage> newMessages)
+			{
+				XDocument? document;
+
+				lock (fileSystemService)
+				{
+					document = fileSystemService.Load(filePath);
+				}
+
+				if (document == null)
+					throw new InvalidOperationException("Failed to open suppression file for edit");
+
+				document.Root.RemoveNodes();
+				AddMessagesToDocument(document, newMessages);
+
+				return document;
+			}
+
 			public static XDocument NewDocumentFromMessages(IEnumerable<SuppressMessage> messages)
 			{
 				var root = new XElement(RootEmelent);

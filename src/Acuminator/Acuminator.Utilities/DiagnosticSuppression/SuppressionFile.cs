@@ -185,19 +185,16 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				return [];
 			}
 
-			var suppressionMessages = new HashSet<SuppressMessage>();
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static XDocument NewDocumentFromMessages(IEnumerable<SuppressMessage> messages) =>
+			XmlUtils.NewDocumentFromMessages(messages);
 
-			foreach (XElement suppressionMessageXml in document.Root.Elements(SuppressMessageElement))
-			{
-				SuppressMessage? suppressMessage = SuppressMessage.MessageFromElement(suppressionMessageXml);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void AddMessagesToDocument(XDocument document, IEnumerable<SuppressMessage> messages) =>
+			XmlUtils.AddMessagesToDocument(document, messages);
 
-				if (suppressMessage != null)
-				{
-					suppressionMessages.Add(suppressMessage.Value);
-				}
-			}
-
-			return suppressionMessages;
-		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static HashSet<SuppressMessage> LoadMessages(ISuppressionFileSystemService fileSystemService, string path) =>
+			XmlUtils.LoadMessages(fileSystemService, path);
 	}
 }
