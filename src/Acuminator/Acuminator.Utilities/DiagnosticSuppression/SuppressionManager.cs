@@ -159,7 +159,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			}
 
 			var newFile = LoadFileAndTrackItsChanges(suppressionFilePath: e.FullPath, GlobalSuppressionWorkMode.ReportUnsuppressedErrors);
-
+			
 			if (newMessagesInOldFile?.Count > 0)
 			{
 				foreach (SuppressMessage newMessage in newMessagesInOldFile)
@@ -217,7 +217,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				: null;
 
 		public static bool SuppressDiagnosticInSuppressionFile(SemanticModel semanticModel, string diagnosticID, TextSpan diagnosticSpan,
-											  DiagnosticSeverity defaultDiagnosticSeverity, CancellationToken cancellation = default)
+															   DiagnosticSeverity defaultDiagnosticSeverity, CancellationToken cancellation = default)
 		{
 			CheckIfInstanceIsInitialized(throwOnNotInitialized: true);
 
@@ -261,12 +261,10 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			return true;
 		}
 
-		public static IEnumerable<SuppressionDiffResult> ValidateSuppressionBaseDiff()
+		public static IReadOnlyCollection<SuppressionDiffResult> ValidateSuppressionBaseDiff()
 		{
 			if (Instance == null)
-			{
-				return Enumerable.Empty<SuppressionDiffResult>();
-			}
+				return [];
 
 			var diffList = new List<SuppressionDiffResult>();
 
@@ -286,14 +284,18 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 
 		private static SuppressionDiffResult CompareFiles(SuppressionFile oldFile, SuppressionFile newFile)
 		{
-			var oldMessages = oldFile.CopyMessages();
-			var newMessages = newFile.CopyMessages();
+			var oldMessages = oldFile.GetAllSuppressions();
+			var newMessages = newFile.GetAllSuppressions();
 
 			var addedMessages = new HashSet<SuppressMessage>(newMessages);
-			addedMessages.ExceptWith(oldMessages);
+
+			if (oldMessages.Count > 0)
+				addedMessages.ExceptWith(oldMessages);
 
 			var deletedMessages = new HashSet<SuppressMessage>(oldMessages);
-			deletedMessages.ExceptWith(newMessages);
+
+			if (newMessages.Count > 0)
+				deletedMessages.ExceptWith(newMessages);
 
 			return new SuppressionDiffResult(oldFile.AssemblyName, oldFile.Path, addedMessages, deletedMessages);
 		}
@@ -310,7 +312,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			// Always check suppression with a comment first
 			if (isSuppressionEnabled && hasSuppressionComment)
 				return;
-
+			
 			// Then check suppression with a global suppression file.
 			// If a suppression file generation mode is enabled, then the suppression file will be updated with the new suppression message.
 			if (Instance != null && 
@@ -386,9 +388,9 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			bool addSuppressionToSuppressionFile = file.SuppressionWorkMode.HasFlag(GlobalSuppressionWorkMode.GenerateSuppressionFile) && 
 												   !hasSuppressionComment && IsSuppressableSeverity(diagnostic.Descriptor.DefaultSeverity);
 			if (addSuppressionToSuppressionFile)
-				{
+			{
 				file.AddGeneratedSuppressionMessage(message);   // The check for presence in loaded suppressions will be done by the called method 
-				}
+			}
 
 			if (file.SuppressionWorkMode.HasFlag(GlobalSuppressionWorkMode.ReportUnsuppressedErrors))
 			{
