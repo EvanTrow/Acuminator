@@ -56,16 +56,39 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			}
 		}
 
+		internal ICollection<SuppressMessage> GetAllSuppressions()
+		{
+			var loadedSuppressionKeys = _loadedExistingMessages.Keys;
+			var addedSuppressionKeys = _loadedExistingMessages.Keys;
+
+			if (addedSuppressionKeys.Count == 0)
+				return loadedSuppressionKeys;
+			else if (loadedSuppressionKeys.Count == 0)
+				return addedSuppressionKeys;
+			else
+			{
+				return loadedSuppressionKeys.Concat(addedSuppressionKeys)
+											.ToList(loadedSuppressionKeys.Count + addedSuppressionKeys.Count);
+			}
+		}
+
+		internal ICollection<SuppressMessage> GetLoadedSuppressions() => _loadedExistingMessages.Keys;
+
+		internal ICollection<SuppressMessage> GetNewSuppressions() => _addedGeneratedMessages.Keys;
+
 		private SuppressionFile(string assemblyName, string path, GlobalSuppressionWorkMode suppressionWorkMode,
-								HashSet<SuppressMessage> messages, ISuppressionFileWatcherService? watcher)
+								IReadOnlyCollection<SuppressMessage> loadedMessages, ISuppressionFileWatcherService? watcher)
 		{
 			AssemblyName = assemblyName;
 			Path = path;
 			SuppressionWorkMode = suppressionWorkMode;
 
-			foreach (SuppressMessage message in messages)
+			if (loadedMessages.Count > 0)
 			{
-				Messages.TryAdd(message, null);
+				foreach (SuppressMessage message in loadedMessages)
+				{
+					_loadedExistingMessages.TryAdd(message, value: null);
+			}
 			}
 
 			_fileWatcher = watcher;

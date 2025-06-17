@@ -223,7 +223,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 					return false;
 
 				file.AddGeneratedSuppressionMessage(suppressMessage);
-				XDocument newSuppressionXmlFile = file.MessagesToDocument(Instance._fileSystemService);
+				XDocument newSuppressionXmlFile = file.ReloadSuppressionFileWithNewMessagesFromMemory(Instance._fileSystemService);
 				Instance._fileSystemService.Save(newSuppressionXmlFile, file.Path);
 			}
 
@@ -373,7 +373,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				return true;
 			}
 
-			return file.ContainsMessage(message);
+			return file.ContainsSuppressedMessage(message);
 		}
 
 		private static bool IsSuppressableSeverity(DiagnosticSeverity? diagnosticSeverity) =>

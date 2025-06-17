@@ -56,7 +56,7 @@ namespace Acuminator.Tests.Tests.DiagnosticSuppression.SuppressionFileIO
 			var messagesToCheck = GetSuppressionMessagesToCheck();
 			string suppressionFilePath = GetFileFullPath(fileName);
 
-			HashSet<SuppressMessage> messages = SuppressionFile.LoadMessages(_fileService, suppressionFilePath);
+			HashSet<SuppressMessage> messages = SuppressionFile.XmlUtils.LoadMessages(_fileService, suppressionFilePath);
 
 			messages.Should().NotBeNull();
 			messages.Should().HaveCount(expectedCount);
@@ -70,8 +70,8 @@ namespace Acuminator.Tests.Tests.DiagnosticSuppression.SuppressionFileIO
 			string suppressionFilePath = GetFileFullPath(fileName);
 			string oldContent = File.ReadAllText(suppressionFilePath);
 
-			HashSet<SuppressMessage> messages = SuppressionFile.LoadMessages(_fileService, suppressionFilePath);
-			var xDocument = SuppressionFile.NewDocumentFromMessages(messages);
+			HashSet<SuppressMessage> messages = SuppressionFile.XmlUtils.LoadMessages(_fileService, suppressionFilePath);
+			var xDocument  = SuppressionFile.XmlUtils.NewDocumentFromMessages(messages);
 			var newContent = xDocument.GetXDocumentStringWithDeclaration();
 
 			newContent.Should().Equals(oldContent);
