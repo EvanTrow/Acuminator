@@ -171,11 +171,11 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 					: filesStore.Files;
 
 				//Create local copy in order to avoid concurency problem when the collection is changed during the iteration
-				var filesLocalCopy = filesWithGeneratedSuppression.ToList(filesStore.Count);
+				var filesListSnapshot = filesWithGeneratedSuppression.ToList(filesStore.Count);
 
-				foreach (var file in filesLocalCopy)
+				foreach (var file in filesListSnapshot)
 				{
-					XDocument newSuppressionXmlFile = file.MessagesToDocument(Instance._fileSystemService);
+					XDocument newSuppressionXmlFile = file.ReloadSuppressionFileWithNewMessagesFromMemory(Instance._fileSystemService);
 					Instance._fileSystemService.Save(newSuppressionXmlFile, file.Path);
 				}
 			}

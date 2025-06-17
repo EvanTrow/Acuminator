@@ -138,51 +138,13 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			return _addedGeneratedMessages.TryAdd(message, value: null);
         }
 
-		internal XDocument MessagesToDocument(ISuppressionFileSystemService fileSystemService)
+		internal XDocument ReloadSuppressionFileWithNewMessagesFromMemory(ISuppressionFileSystemService fileSystemService)
 		{
 			fileSystemService.ThrowOnNull();
-			XDocument? document;
 
-			lock (fileSystemService)
-			{
-				document = fileSystemService.Load(Path);
-			}
-
-			if (document == null)
-				throw new InvalidOperationException("Failed to open suppression file for edit");
-
-			document.Root.RemoveNodes();
-			AddMessagesToDocument(document, Messages.Keys);
-
-			return document;
-		}
-
-		private static void AddMessagesToDocument(XDocument document, IEnumerable<SuppressMessage> messages)
-		{
-			var comparer = new SuppressionMessageComparer();
-			var sortedMessages = messages.OrderBy(m => m, comparer);
-
-			foreach (var message in sortedMessages)
-			{
-				var xmlMessage = message.ToXml();
-
-				if (xmlMessage != null)
-					document.Root.Add(xmlMessage);
-			}
-		}
-
-		public static HashSet<SuppressMessage> LoadMessages(ISuppressionFileSystemService fileSystemService, string path)
-		{
-			XDocument? document;
-
-			lock (fileSystemService)
-			{
-				document = fileSystemService.Load(path);
-			}		
-
-			if (document == null)
-			{
-				return [];
+			var newSuppressionMessages  = GetAllSuppressions();
+			var documentWithNewMessages = XmlUtils.LoadSuppressionFileAndReplaceItsContent(fileSystemService, Path, newSuppressionMessages);
+			return documentWithNewMessages;
 			}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
