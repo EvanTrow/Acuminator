@@ -204,7 +204,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				? Instance._suppressionFileCreator.AddAdditionalSuppressionDocumentToProject(project)
 				: null;
 
-		public static bool SuppressDiagnostic(SemanticModel semanticModel, string diagnosticID, TextSpan diagnosticSpan,
+		public static bool SuppressDiagnosticInSuppressionFile(SemanticModel semanticModel, string diagnosticID, TextSpan diagnosticSpan,
 											  DiagnosticSeverity defaultDiagnosticSeverity, CancellationToken cancellation = default)
 		{
 			CheckIfInstanceIsInitialized(throwOnNotInitialized: true);
@@ -222,7 +222,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				if (!Instance._fileByAssembly.TryGetValue(fileAssemblyName, out var file) || file == null)
 					return false;
 
-				file.AddMessage(suppressMessage);
+				file.AddGeneratedSuppressionMessage(suppressMessage);
 				XDocument newSuppressionXmlFile = file.MessagesToDocument(Instance._fileSystemService);
 				Instance._fileSystemService.Save(newSuppressionXmlFile, file.Path);
 			}
@@ -367,7 +367,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			{
 				if (IsSuppressableSeverity(diagnostic?.Descriptor.DefaultSeverity))
 				{
-					file.AddMessage(message);
+					file.AddGeneratedSuppressionMessage(message);
 				}
 
 				return true;

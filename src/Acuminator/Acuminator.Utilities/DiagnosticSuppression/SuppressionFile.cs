@@ -27,9 +27,16 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 		/// </summary>
 		internal GlobalSuppressionWorkMode SuppressionWorkMode { get; }
 
-		private ConcurrentDictionary<SuppressMessage, object?> Messages { get; } = new ConcurrentDictionary<SuppressMessage, object?>();
+		/// <summary>
+		/// The suppression messages loaded from existing suppression file. These suppressions are checked against diagnostics.
+		/// </summary>
+		private readonly ConcurrentDictionary<SuppressMessage, object?> _loadedExistingMessages = new();
 
-		public HashSet<SuppressMessage> CopyMessages() => Messages.Keys.ToHashSet();
+		/// <summary>
+		/// The suppression messages that were added to the suppression file during the suppression file generation but not yet saved to the file system.<br/>
+		/// These messages are not checked against diagnostics.
+		/// </summary>
+		private readonly ConcurrentDictionary<SuppressMessage, object?> _addedGeneratedMessages = new();
 
 		public event FileSystemEventHandler Changed
 		{
@@ -93,7 +100,8 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 
 		public void Dispose() => _fileWatcher?.Dispose();
 		
-		internal void AddMessage(SuppressMessage message) => Messages.TryAdd(message, null);
+		internal void AddGeneratedSuppressionMessage(SuppressMessage message) => 
+			_addedGeneratedMessages.TryAdd(message, value: null);
 
         public static XDocument NewDocumentFromMessages(IEnumerable<SuppressMessage> messages)
         {
