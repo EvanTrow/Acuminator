@@ -1,8 +1,9 @@
 ﻿using System;
-using System.IO;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
 using Acuminator.Utilities.Common;
@@ -10,10 +11,8 @@ using Acuminator.Utilities.DiagnosticSuppression.IO;
 
 namespace Acuminator.Utilities.DiagnosticSuppression
 {
-	public class SuppressionFile : IDisposable
+	public partial class SuppressionFile : IDisposable
 	{
-        private const string RootEmelent = "suppressions";
-		public const string SuppressMessageElement = "suppressMessage";
 		public const string SuppressionFileExtension = ".acuminator";
 
 		internal string AssemblyName { get; }
@@ -88,13 +87,13 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				foreach (SuppressMessage message in loadedMessages)
 				{
 					_loadedExistingMessages.TryAdd(message, value: null);
-			}
+				}
 			}
 
 			_fileWatcher = watcher;
 		}
 
-		internal bool ContainsMessage(SuppressMessage message) => Messages.ContainsKey(message);
+		internal bool ContainsLoadedSuppressedMessage(in SuppressMessage message) => _loadedExistingMessages.ContainsKey(message);
 
 		internal static SuppressionFile Load(ISuppressionFileSystemService fileSystemService, string suppressionFilePath,
 											 GlobalSuppressionWorkMode suppressionWorkMode)
@@ -104,13 +103,11 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 
 			string assemblyName = fileSystemService.GetFileName(suppressionFilePath).NullIfWhiteSpace() ??
 								  throw new FormatException("Acuminator suppression file name cannot be empty");
-			var messages = new HashSet<SuppressMessage>();
 
-			if (!generateSuppressionBase)
-			{
-				messages = LoadMessages(fileSystemService, suppressionFilePath);
-			}
-
+			IReadOnlyCollection<SuppressMessage> loadedMessages =
+				suppressionWorkMode.HasFlag(GlobalSuppressionWorkMode.ReportUnsuppressedErrors)
+					? LoadMessages(fileSystemService, suppressionFilePath)
+					: [];
 			ISuppressionFileWatcherService? fileWatcher;
 
 			lock (fileSystemService)
@@ -118,11 +115,11 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				fileWatcher = fileSystemService.CreateWatcher(suppressionFilePath);
 			}
 			
-			return new SuppressionFile(assemblyName, suppressionFilePath, suppressionWorkMode, messages, fileWatcher);
+			return new SuppressionFile(assemblyName, suppressionFilePath, suppressionWorkMode, loadedMessages, fileWatcher);
 		}
 
 		public void Dispose() => _fileWatcher?.Dispose();
-		
+
 		/// <summary>
 		/// Adds a generated suppression message to the suppression file.
 		/// </summary>
@@ -131,12 +128,12 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 		/// True if the message was added successfully.
 		/// </returns>
 		internal bool AddGeneratedSuppressionMessage(in SuppressMessage message)
-        {
+		{
 			if (!message.IsValid || ContainsLoadedSuppressedMessage(message))
 				return false;													// Do not add suppression if it is already among existing suppressions loaded from file
 
 			return _addedGeneratedMessages.TryAdd(message, value: null);
-        }
+		}
 
 		internal XDocument ReloadSuppressionFileWithNewMessagesFromMemory(ISuppressionFileSystemService fileSystemService)
 		{
@@ -145,7 +142,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			var newSuppressionMessages  = GetAllSuppressions();
 			var documentWithNewMessages = XmlUtils.LoadSuppressionFileAndReplaceItsContent(fileSystemService, Path, newSuppressionMessages);
 			return documentWithNewMessages;
-			}
+		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static XDocument NewDocumentFromMessages(IEnumerable<SuppressMessage> messages) =>
