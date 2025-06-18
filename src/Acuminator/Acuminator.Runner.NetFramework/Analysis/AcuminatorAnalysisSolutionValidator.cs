@@ -109,7 +109,7 @@ namespace Acuminator.Runner.Analysis
 					return RunResult.RunTimeError;
 				}
 
-				if (analysisContext.GenerateSuppressionFile)
+				if (analysisContext.WorkMode.HasFlag(AcuminatorWorkMode.GenerateSuppressionFile))
 				{
 					SuppressionManager.SaveSuppressionFiles(saveOnlyGeneratedFiles: true);
 				}

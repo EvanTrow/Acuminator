@@ -19,6 +19,8 @@ using Serilog;
 using AnalyzerFileReference = Microsoft.CodeAnalysis.Diagnostics.AnalyzerFileReference;
 using DiagnosticAnalyzer = Microsoft.CodeAnalysis.Diagnostics.DiagnosticAnalyzer;
 
+using static Acuminator.Runner.Constants.CommandLineArgNames.WorkModes;
+
 namespace Acuminator.Runner.Analysis.Initialization
 {
 	internal class AcuminatorAnalysisInitializer
@@ -84,7 +86,7 @@ namespace Acuminator.Runner.Analysis.Initialization
 					return InitializeAcuminatorGlobalSuppressionMechanismForSolution(solution);
 
 				default:
-					if (_analysisContext.GenerateSuppressionFile)
+					if (_analysisContext.WorkMode.HasFlag(AcuminatorWorkMode.GenerateSuppressionFile))
 					{
 						_logger.Error("""
 									  The Acuminator console tool is configured to generate a suppression file for the code source "{CodeSource}" but the code source is not a project or solution.
@@ -107,10 +109,10 @@ namespace Acuminator.Runner.Analysis.Initialization
 		{
 			var acuminatorSuppressionFiles = project.AdditionalDocuments
 													.Where(d => d.FilePath.IsSuppressionFile(checkFileExists: true))
-													.Select(d => new SuppressionManagerInitInfo(d.FilePath!, _analysisContext.GenerateSuppressionFile))
+													.Select(d => new GlobalSuppressionFileInitInfo(d.FilePath!, _analysisContext.WorkMode))
 													.ToList(capacity: 1);
 
-			if (_analysisContext.GenerateSuppressionFile && acuminatorSuppressionFiles.Count == 0)
+			if (_analysisContext.WorkMode.HasFlag(AcuminatorWorkMode.GenerateSuppressionFile) && acuminatorSuppressionFiles.Count == 0)
 			{
 				string errorMsg = CreateErrorMessage();
 				_logger.Error(errorMsg);
@@ -128,7 +130,7 @@ namespace Acuminator.Runner.Analysis.Initialization
 				string suppressionFileName = project.Name + SuppressionFile.SuppressionFileExtension;
 				return $"""
 					   Acuminator console tool is configured to generate a suppression file for the project "{project.Name}" 
-					   because --{CommandLineArgNames.GenerateSuppressionFile} flag was passed among command line arguments.
+					   because "--{CommandLineArgNames.AcuminatorWorkModeLong}" option was set to either "{GenerateSuppressionFile}" or "{ReportErrorsAndGenerateSuppresionFile}".
 					   However, the project does not contain an Acuminator suppression file.
 					   To generate the project's suppression file you need to create an empty suppression file first with the name "{suppressionFileName}" in the project's root folder.
 					   The content of the empty suppression file should be like this:
@@ -152,10 +154,10 @@ namespace Acuminator.Runner.Analysis.Initialization
 			var acuminatorSuppressionFiles = solution.Projects
 													 .SelectMany(project => project.AdditionalDocuments)
 													 .Where(d => d.FilePath.IsSuppressionFile(checkFileExists: true))
-													 .Select(d => new SuppressionManagerInitInfo(d.FilePath!, _analysisContext.GenerateSuppressionFile))
+													 .Select(d => new GlobalSuppressionFileInitInfo(d.FilePath!, _analysisContext.WorkMode))
 													 .ToList(capacity: 1);
 
-			if (_analysisContext.GenerateSuppressionFile && acuminatorSuppressionFiles.Count == 0)
+			if (_analysisContext.WorkMode.HasFlag(AcuminatorWorkMode.GenerateSuppressionFile) && acuminatorSuppressionFiles.Count == 0)
 			{
 				string errorMsg = CreateErrorMessage();
 				_logger.Error(errorMsg);
@@ -172,7 +174,7 @@ namespace Acuminator.Runner.Analysis.Initialization
 			{
 				return $"""
 					   Acuminator console tool is configured to generate a suppression file for projects of the solution "{solution.FilePath}" 
-					   because --{CommandLineArgNames.GenerateSuppressionFile} flag was passed among command line arguments.
+					   because "--{CommandLineArgNames.AcuminatorWorkModeLong}" option was set to either "{GenerateSuppressionFile}" or "{ReportErrorsAndGenerateSuppresionFile}".
 					   However, the solution does not contain any project with an Acuminator suppression file.
 					   To generate a suppression file for a project you need to create an empty suppression file for the project first with the name "<ProjectName>.{SuppressionFile.SuppressionFileExtension}" in the project's root folder:
 					   The content of the empty suppression file should be like this:
