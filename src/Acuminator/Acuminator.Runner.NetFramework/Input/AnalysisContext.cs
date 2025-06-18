@@ -6,6 +6,7 @@ using Acuminator.Runner.Output.Data;
 using Acuminator.Runner.Output.Grouping;
 using Acuminator.Utilities;
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.DiagnosticSuppression;
 
 namespace Acuminator.Runner.Input
 {
@@ -35,8 +36,10 @@ namespace Acuminator.Runner.Input
 		/// <inheritdoc cref="CommandLineOptions.OutputFormat"/>
 		public OutputFormat OutputFormat { get; }
 
-		/// <inheritdoc cref="CommandLineOptions.GenerateSuppressionFile"/>
-		public bool GenerateSuppressionFile { get; }
+		/// <summary>
+		/// The Acuminator work mode.
+		/// </summary>
+		public AcuminatorWorkMode WorkMode { get; }
 
 		/// <summary>
 		/// The grouping mode for Acuminator errors in the report.
@@ -50,7 +53,7 @@ namespace Acuminator.Runner.Input
 
 		public AnalysisContext(ICodeSource codeSource, CodeAnalysisSettings codeAnalysisSettings, BannedApiSettings bannedApiSettings, 
 							   string? msBuildPath, string? outputFileName, bool outputAbsolutePathsToUsages, OutputFormat outputFormat,
-							   bool generateSuppressionFile, GroupingMode groupingMode)
+							   AcuminatorWorkMode workMode, GroupingMode groupingMode)
 		{
 			CodeSource 					= codeSource.CheckIfNull();
 			CodeAnalysisSettings		= codeAnalysisSettings.CheckIfNull();
@@ -59,7 +62,7 @@ namespace Acuminator.Runner.Input
 			OutputFileName				= outputFileName.NullIfWhiteSpace();
 			OutputAbsolutePathsToUsages = outputAbsolutePathsToUsages;
 			OutputFormat				= outputFormat;
-			GenerateSuppressionFile		= generateSuppressionFile;
+			WorkMode					= workMode;
 			GroupingMode				= groupingMode;
 			CaseSensitiveFilePaths		= RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 		}

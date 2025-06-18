@@ -12,6 +12,7 @@ using Acuminator.Runner.Output.Grouping;
 using Acuminator.Runner.Resources;
 using Acuminator.Utilities;
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.DiagnosticSuppression;
 
 namespace Acuminator.Runner.Input
 {
@@ -34,11 +35,12 @@ namespace Acuminator.Runner.Input
 														  commandLineOptions.BannedApiFilePath, 
 														  commandLineOptions.AllowedApisFilePath);
 
-			OutputFormat outputFormat = GetOutputFormat(commandLineOptions.OutputFormat.NullIfWhiteSpace());
-			GroupingMode groupingMode = GetGroupingMode(commandLineOptions.ReportGrouping);
+			OutputFormat outputFormat   = GetOutputFormat(commandLineOptions.OutputFormat.NullIfWhiteSpace());
+			GroupingMode groupingMode   = GetGroupingMode(commandLineOptions.ReportGrouping);
+			AcuminatorWorkMode workMode = GetAcuminatorWorkMode(commandLineOptions.AcuminatorWorkMode);
 			var input = new AnalysisContext(codeSource, codeAnalysisSettings, bannedApiSettings, commandLineOptions.MSBuildPath, 
 											commandLineOptions.OutputFileName, commandLineOptions.OutputAbsolutePathsToUsages, outputFormat,
-											commandLineOptions.GenerateSuppressionFile, groupingMode);
+											workMode, groupingMode);
 			return input;
 		}
 
@@ -110,5 +112,13 @@ namespace Acuminator.Runner.Input
 
 			return grouping;
 		}
+
+		private AcuminatorWorkMode GetAcuminatorWorkMode(string? rawWorkMode) => rawWorkMode switch
+		{
+			CommandLineArgNames.WorkModes.ReportErrors 							=> AcuminatorWorkMode.ReportUnsuppressedErrors,
+			CommandLineArgNames.WorkModes.GenerateSuppressionFile 				=> AcuminatorWorkMode.GenerateSuppressionFile,
+			CommandLineArgNames.WorkModes.ReportErrorsAndGenerateSuppresionFile => AcuminatorWorkMode.BothReportAndGenerate,
+			_ 																	=> AcuminatorWorkMode.ReportUnsuppressedErrors
+		};
 	}
 }
