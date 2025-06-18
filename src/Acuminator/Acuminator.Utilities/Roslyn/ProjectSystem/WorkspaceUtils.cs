@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.Formatting;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 
 namespace Acuminator.Utilities.Roslyn.ProjectSystem
@@ -18,13 +19,14 @@ namespace Acuminator.Utilities.Roslyn.ProjectSystem
     public static class WorkspaceUtils
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<GlobalSuppressionFileInitInfo> GetSuppressionInfo(this Solution solution, AcuminatorWorkMode workMode)
+		public static IEnumerable<GlobalSuppressionFileInitInfo> GetSuppressionInfo(this Solution solution, AcuminatorWorkMode workMode,
+																					bool suppressInformationalDiagnostics)
 		{
 			var suppressionFiles = solution.GetAllAdditionalDocuments()
 										   .Where(additionalDoc => !additionalDoc.FilePath.IsNullOrWhiteSpace() &&
 																	additionalDoc.FilePath.IsSuppressionFile(checkFileExists: false));
 			return suppressionFiles.Where(file => !file.FilePath.IsNullOrWhiteSpace())
-								   .Select(file => new GlobalSuppressionFileInitInfo(file.FilePath!, workMode));
+								   .Select(file => new GlobalSuppressionFileInitInfo(file.FilePath!, workMode, suppressInformationalDiagnostics));
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

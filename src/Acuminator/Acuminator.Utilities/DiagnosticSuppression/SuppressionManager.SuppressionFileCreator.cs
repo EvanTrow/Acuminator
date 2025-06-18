@@ -39,7 +39,8 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				if (roslynSuppressionFile?.FilePath == null || !project.Solution.Workspace.TryApplyChanges(roslynSuppressionFile.Project.Solution))
 					return null;
 
-				return Instance?.LoadSuppressionFileFrom(roslynSuppressionFile.FilePath, AcuminatorWorkMode.ReportUnsuppressedErrors);
+				return Instance?.LoadSuppressionFileFrom(roslynSuppressionFile.FilePath, AcuminatorWorkMode.ReportUnsuppressedErrors, 
+														  suppressInformationalDiagnostics: true);
 			}
 
 			public TextDocument? AddAdditionalSuppressionDocumentToProject(Project project)

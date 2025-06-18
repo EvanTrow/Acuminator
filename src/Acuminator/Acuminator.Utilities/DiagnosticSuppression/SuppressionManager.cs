@@ -14,6 +14,7 @@ using Acuminator.Utilities.Roslyn.ProjectSystem;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Acuminator.Utilities.DiagnosticSuppression
@@ -55,17 +56,17 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 									   Func<ICustomBuildActionSetter>? buildActionSetterFabric = null) =>
 			InitOrReset(additionalFiles, fileSystemServiceFabric: null, errorProcessorFabric, buildActionSetterFabric);
 
-		public static void InitOrReset(Workspace? workspace, AcuminatorWorkMode workMode, 
+		public static void InitOrReset(Workspace? workspace, AcuminatorWorkMode workMode, bool suppressInformationalDiagnostics,
 									   Func<ISuppressionFileSystemService>? fileSystemServiceFabric = null,
 									   Func<ICustomBuildActionSetter>? buildActionSetterFabric = null) =>
-			InitOrReset(workspace?.CurrentSolution?.GetSuppressionInfo(workMode),
+			InitOrReset(workspace?.CurrentSolution?.GetSuppressionInfo(workMode, suppressInformationalDiagnostics),
 						fileSystemServiceFabric, errorProcessorFabric: null, buildActionSetterFabric);
 
-		public static void InitOrReset(Workspace? workspace, AcuminatorWorkMode workMode,
+		public static void InitOrReset(Workspace? workspace, AcuminatorWorkMode workMode, bool suppressInformationalDiagnostics,
 									   Func<IIOErrorProcessor>? errorProcessorFabric = null,
 									   Func<ICustomBuildActionSetter>? buildActionSetterFabric = null)
 		{
-			var suppressionFileInfos = workspace?.CurrentSolution?.GetSuppressionInfo(workMode);
+			var suppressionFileInfos = workspace?.CurrentSolution?.GetSuppressionInfo(workMode, suppressInformationalDiagnostics);
 			InitOrReset(suppressionFileInfos, fileSystemServiceFabric: null, errorProcessorFabric, buildActionSetterFabric);
 		}
 
@@ -124,7 +125,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 					throw new ArgumentException($"File {fileInfo.Path} is not a suppression file");
 				}
 
-				var file = LoadFileAndTrackItsChanges(fileInfo.Path, fileInfo.WorkMode);
+				var file = LoadFileAndTrackItsChanges(fileInfo.Path, fileInfo.WorkMode, fileInfo.SuppressInformationalDiagnostics);
 
 				if (!_fileByAssembly.TryAdd(file.AssemblyName, file))
 				{
@@ -133,11 +134,13 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			}
 		}
 
-		private SuppressionFile LoadFileAndTrackItsChanges(string suppressionFilePath, AcuminatorWorkMode workMode)
+		private SuppressionFile LoadFileAndTrackItsChanges(string suppressionFilePath, AcuminatorWorkMode workMode, 
+														   bool suppressInformationalDiagnostics)
 		{
 			lock (_fileSystemService)
 			{
-				SuppressionFile suppressionFile = SuppressionFile.Load(_fileSystemService, suppressionFilePath, workMode);
+				SuppressionFile suppressionFile = SuppressionFile.Load(_fileSystemService, suppressionFilePath, workMode,
+																		suppressInformationalDiagnostics);
 				suppressionFile.Changed += ReloadFile;
 				return suppressionFile;
 			}
@@ -158,7 +161,9 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				oldFile.Dispose();
 			}
 
-			var newFile = LoadFileAndTrackItsChanges(suppressionFilePath: e.FullPath, AcuminatorWorkMode.ReportUnsuppressedErrors);
+			var workMode = oldFile?.WorkMode ?? AcuminatorWorkMode.ReportUnsuppressedErrors;
+			bool suppressInformationalDiagnostics = oldFile?.SuppressInformationalDiagnostics ?? true;
+			var newFile = LoadFileAndTrackItsChanges(suppressionFilePath: e.FullPath, workMode, suppressInformationalDiagnostics);
 			
 			if (newMessagesInOldFile?.Count > 0)
 			{
@@ -193,9 +198,9 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			}
 		}
 
-		internal SuppressionFile LoadSuppressionFileFrom(string filePath, AcuminatorWorkMode workMode)
+		internal SuppressionFile LoadSuppressionFileFrom(string filePath, AcuminatorWorkMode workMode, bool suppressInformationalDiagnostics)
 		{
-			SuppressionFile suppressionFile = LoadFileAndTrackItsChanges(filePath, workMode);
+			SuppressionFile suppressionFile = LoadFileAndTrackItsChanges(filePath, workMode, suppressInformationalDiagnostics);
 			_fileByAssembly[suppressionFile.AssemblyName] = suppressionFile;
 			return suppressionFile;
 		}
@@ -273,7 +278,8 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				foreach (SuppressionFile currentFile in Instance._fileByAssembly.Files)
 				{
 					var oldFile = SuppressionFile.Load(Instance._fileSystemService, suppressionFilePath: currentFile.Path,
-													   AcuminatorWorkMode.ReportUnsuppressedErrors);
+													   AcuminatorWorkMode.ReportUnsuppressedErrors, 
+													   currentFile.SuppressInformationalDiagnostics);
 
 					diffList.Add(CompareFiles(oldFile, currentFile));
 				}
