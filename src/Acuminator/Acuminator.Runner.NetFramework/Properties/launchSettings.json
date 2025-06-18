@@ -16,13 +16,17 @@
       "commandName": "Project",
       "commandLineArgs": "\"..\\..\\..\\..\\..\\Samples\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo.csproj\" -f report.json  --format json -g d --enable-PX1007 --disable-PX1099"
     },
-    "text + console + grouping by diagnostic and file + PX1007 + PX1099": {
+    "text + console + grouping by diagnostic and file + ISV mode + PX1007 + PX1099": {
       "commandName": "Project",
-      "commandLineArgs": "\"..\\..\\..\\..\\..\\Samples\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo.csproj\" -g FD --enable-PX1007"
+      "commandLineArgs": "\"..\\..\\..\\..\\..\\Samples\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo.csproj\" -g FD --isv-mode --enable-PX1007"
     },
     "suppression file generation + grouping by diagnostic + PX1099": {
       "commandName": "Project",
-      "commandLineArgs": "\"..\\..\\..\\..\\..\\Samples\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo.csproj\" -g D --generateSuppressionFile"
+      "commandLineArgs": "\"..\\..\\..\\..\\..\\Samples\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo.csproj\" -g D --work-mode generate-suppressions"
+    },
+    "report + suppression file generation + grouping by diagnostic + PX1099": {
+      "commandName": "Project",
+      "commandLineArgs": "\"..\\..\\..\\..\\..\\Samples\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo\\PX.Objects.HackathonDemo.csproj\" -g D -w report-and-generate"
     },
     "PXObjects": {
       "commandName": "Project",

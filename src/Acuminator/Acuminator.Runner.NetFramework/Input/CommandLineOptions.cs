@@ -82,7 +82,7 @@ namespace Acuminator.Runner.Input
 		///	By default, file paths in locations are relative to the containing project directory.<br/>
 		///	However, if this flag is set, then the absolute file paths will be used.
 		/// </summary>
-		[Option(longName: CommandLineArgNames.OutputAbsolutePathsToUsages, Default = false,
+		[Option(longName: CommandLineArgNames.OutputAbsolutePathsToErrors, Default = false,
 				HelpText = """
 						   This flag regulates how the locations of found diagnostics will be outputted.
 						   By default, file paths in locations are relative to the containing project directory.
@@ -240,33 +240,58 @@ namespace Acuminator.Runner.Input
 		public string? AllowedApisFilePath { get; }
 
 		/// <summary>
-		/// This flag indicates whether Acuminator should work in a special suppression file generator mode.<br/>
-		/// In this mode Acuminator does not report errors, but instead generates suppression records in Acuminator suppression file for all errors it found in the code.<br/>
-		/// By default, the suppression file generation is disabled. Developers should explicitly enable it by specifying this flag.
+		/// This option specifies the mode in which Acuminator should work. There are three available work modes:<br/>
+		/// <list type="bullet">
+		/// <item>
+		/// "<c>report-errors</c>"(<see cref="CommandLineArgNames.WorkModes.ReportErrors"/>).<br/>
+		/// In this mode Acuminator report errors if they are not suppressed with Acuminator suppression mechanisms,<br/>
+		/// or if the suppression mechanisms are disabled with <see cref="DisableSuppressionMechanism"/> flag.<br/>
+		/// This is the default Acuminator work mode, if no work mode is specified explicitly.
+		/// </item>
+		/// <item>
+		/// "<c>generate-suppressions</c>"(<see cref="CommandLineArgNames.WorkModes.GenerateSuppressionFile"/>).<br/>
+		/// In this mode Acuminator does not report errors. Instead it generates suppression records in Acuminator suppression file for all errors it found in the code.
+		/// </item>
+		/// <item>
+		/// "<c>report-and-generate</c>"(<see cref="CommandLineArgNames.WorkModes.ReportErrorsAndGenerateSuppresionFile"/>).<br/>
+		/// In this mode Acuminator will both report errors and generate suppression records in Acuminator suppression file. It is a combination of two other modes.
+		/// </item>
+		/// </list>
 		/// </summary>
 		/// <remarks>
-		/// Acuminator provides two mechanisms to suppress its diagnostics:
-		///<list type="bullet">
-		/// <item>Local suppression with a suppression comment.</item>
-		/// <item>Global suppression with a suppression file.</item>
-		/// </list>
+		/// Acuminator provides two mechanisms to suppress its diagnostics:<br/>
+		/// - Local suppression with a suppression comment.<br/>
+		/// - Global suppression with a suppression file.<br/>
+		/// <br/>
 		/// Each of the mechanisms is used for different scenarios. Local suppression provides a notice to the reader that there is an Acuminator alert suppressed due to the specified reasons.<br/>
 		/// Global suppression does not provide any information regarding alerts suppressed in the code or the reason for the suppression of the alert to the reader.<br/>
-		/// It is used to suppress errors in our legacy code in an automated way to avoid huge rewrite of the legacy code.<br/>
-		/// <br/>
-		/// This is useful for development processes in large codebases where the number of errors is large and the cost of fixing them is high.<br/>
-		/// For example, you can use the Acuminator console tool in CI scenarios to run automatic tests with Acuminator static analysis<br/>
+		/// It is useful for development processes in large codebases where the number of errors is large and the cost of fixing them is high.<br/>
+		/// For example, you can use the Acuminator console runner in CI scenarios to run automatic tests with Acuminator static analysis<br/>
 		/// which will rely on Acuminator suppression file for the main code base and report Acuminator warnings and errors only for the new code.<br/>
-		///<br/>
-		///	The suppression file generator mode is designed to support such scenarios by implementing automatic generation of the suppression file for a given codebase.<br/>
-		///	It will generate suppression records for all errors it found in the code and add them to the suppression file.<br/>
+		/// <br/>
+		/// Acuminator work modes are designed to provide better support for automated CI scenarios.<br/>
+		/// In most cases the regular analysis is used which simply outputs unsuppressed errors. Therefore, it is a default work mode.<br/>
+		/// <br/>
+		///	The suppression file generator mode is designed to support CI scenarios by implementing automatic generation of the suppression file for a given codebase.<br/>
+		///	It does not output found errors. Instead it will generate suppression records for all errors it found in the code and add them to the suppression file.<br/>
 		/// Note that it does not generate suppression records for errors that are already suppressed in the code with local suppression comments.<br/>
+		/// <br/>
+		/// The third work mode combines both output of errors and suppression file generation. It can be used in scenarios like Acumatica tests<br/>
+		/// where the same integration test can be used both to find errors in the new code and generate new suppression file for a project in a convenient way from the UI.<br/>
+		/// This work mode allows to both enhance the outputted report with precise locations of found errors and keep generating the suppression file all in scope of one test. 
 		/// </remarks>
-		[Option(longName: CommandLineArgNames.GenerateSuppressionFile, Default = false,
-				HelpText = """
-						   This flag indicates whether Acuminator should work in a special suppression file generator mode.
-						   In this mode, Acuminator does not report errors, but instead generates suppression records in the Acuminator suppression file for all errors it found in the code.
-						   By default, the suppression file generation is disabled. Developers should explicitly enable it by specifying this flag.
+		[Option(shortName: CommandLineArgNames.AcuminatorWorkModeShort, longName: CommandLineArgNames.AcuminatorWorkModeLong, 
+				Default = CommandLineArgNames.WorkModes.ReportErrors,
+				HelpText = $"""
+						   This option specifies the mode in which Acuminator should work. There are three available work modes:
+						   - "{CommandLineArgNames.WorkModes.ReportErrors}"
+						   In this mode Acuminator report errors if they are not suppressed with Acuminator suppression mechanisms,
+						   or if the suppression mechanism are disabled with "{CommandLineArgNames.DisableSuppressionMechanism}" flag.
+						   This is the default Acuminator work mode, if no work mode is specified explicitly.
+						   - "{CommandLineArgNames.WorkModes.GenerateSuppressionFile}"
+						   In this mode Acuminator does not report errors. Instead it generates suppression records in Acuminator suppression file for all errors it found in the code.
+						   - "{CommandLineArgNames.WorkModes.ReportErrorsAndGenerateSuppresionFile}"
+						   In this mode Acuminator will both report errors and generate suppression records in Acuminator suppression file. It is a combination of two other modes.
 
 						   Acuminator provides two mechanisms to suppress its diagnostics:
 						   - Local suppression with a suppression comment.
@@ -274,17 +299,22 @@ namespace Acuminator.Runner.Input
 
 						   Each of the mechanisms is used for different scenarios. Local suppression provides a notice to the reader that there is an Acuminator alert suppressed due to the specified reasons.
 						   Global suppression does not provide any information regarding alerts suppressed in the code or the reason for the suppression of the alert to the reader.
-						   It is used to suppress errors in legacy code in an automated way to avoid a huge rewrite of the legacy code.
-
-						   This is useful for development processes in large codebases where the number of errors is large and the cost of fixing them is high.
-						   For example, you can use the Acuminator console tool in CI scenarios to run automatic tests with Acuminator static analysis
-						   which will rely on the Acuminator suppression file for the main code base and report Acuminator warnings and errors only for the new code.
-
-						   The suppression file generator mode is designed to support such scenarios by implementing automatic generation of the suppression file for a given codebase.
-						   It will generate suppression records for all errors it found in the code and add them to the suppression file.
-						   Note that Acuminator does not generate suppression records for errors that are already suppressed in the code with local suppression comments.
+						   It is useful for development processes in large codebases where the number of errors is large and the cost of fixing them is high.
+						   For example, you can use the Acuminator console runner in CI scenarios to run automatic tests with Acuminator static analysis
+						   which will rely on Acuminator suppression file for the main code base and report Acuminator warnings and errors only for the new code.
+						   
+						   Acuminator work modes are designed to provide better support for automated CI scenarios.
+						   In most cases the regular analysis is used which simply outputs unsuppressed errors. Therefore, it is a default work mode.
+						   
+						   The suppression file generator mode is designed to support CI scenarios by implementing automatic generation of the suppression file for a given codebase.
+						   It does not output found errors. Instead it will generate suppression records for all errors it found in the code and add them to the suppression file.
+						   Note that it does not generate suppression records for errors that are already suppressed in the code with local suppression comments.
+						   
+						   The third work mode combines both output of errors and suppression file generation. It can be used in scenarios like Acumatica tests
+						   where the same integration test can be used both to find errors in the new code and generate new suppression file for a project in a convenient way from the UI.
+						   This work mode allows to both enhance the outputted report with precise locations of found errors and keep generating the suppression file all in scope of one test. 
 						   """)]
-		public bool GenerateSuppressionFile { get; }
+		public string? AcuminatorWorkMode { get; }
 
 		/// <summary>
 		/// The report grouping. By default, there is no grouping. You can make grouping by source file paths, diagnostic IDs, or both:<br/>
@@ -316,7 +346,7 @@ namespace Acuminator.Runner.Input
 		public CommandLineOptions(string codeSource, string verbosity, bool disableSuppressionMechanism, string? msBuildPath, string? outputFileName, 
 								  bool outputAbsolutePathsToUsages, string? outputFormat, bool isvSpecificAnalysisIsEnabled, 
 								  bool px1007DiagnosticIsEnabled, bool disablePX1099Diagnostic, string? bannedApiFilePath, string? allowedApisFilePath,
-								  bool generateSuppressionFile, string? reportGrouping)
+								  string? acuminatorWorkMode, string? reportGrouping)
 		{
 			CodeSource 					   = codeSource;
 			Verbosity 					   = verbosity;
@@ -330,7 +360,7 @@ namespace Acuminator.Runner.Input
 			DisablePX1099Diagnostic		   = disablePX1099Diagnostic;
 			BannedApiFilePath			   = bannedApiFilePath;
 			AllowedApisFilePath			   = allowedApisFilePath;
-			GenerateSuppressionFile 	   = generateSuppressionFile;
+			AcuminatorWorkMode 			   = acuminatorWorkMode;
 			ReportGrouping				   = reportGrouping;
 		}
 	}
