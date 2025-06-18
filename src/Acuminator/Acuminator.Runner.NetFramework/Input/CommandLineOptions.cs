@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Serilog.Events;
+using Acuminator.Runner.Constants;
 
 using CommandLine;
 
-using Acuminator.Runner.Constants;
+using Microsoft.CodeAnalysis;
+
+using Serilog.Events;
 
 namespace Acuminator.Runner.Input
 {
@@ -341,12 +343,23 @@ namespace Acuminator.Runner.Input
 		""")]
 		public string? ReportGrouping { get; }
 
+		/// <summary>
+		/// When this optional flag is specified, the code analysis will report Acuminator informational diagnostics with severity <see cref="DiagnosticSeverity.Info"/>.<br/>
+		/// By default, Acuminator does not report such diagnostics.
+		/// </summary>
+		[Option(longName: CommandLineArgNames.EnableInformationalDiagnostics, Default = false,
+				HelpText = $"""
+						   When this optional flag is specified, the code analysis will report Acuminator informational diagnostics with severity "{nameof(DiagnosticSeverity.Info)}".
+						   By default, Acuminator does not report such diagnostics.
+						   """)]
+		public bool EnableInformationalDiagnostics { get; }
+
 		// Constructor arguments order must be the same as the properties order. This allows command line parser to initialize immutable options object via constructor.
 		// See this for details: https://github.com/commandlineparser/commandline/wiki/Immutable-Options-Type
 		public CommandLineOptions(string codeSource, string verbosity, bool disableSuppressionMechanism, string? msBuildPath, string? outputFileName, 
 								  bool outputAbsolutePathsToUsages, string? outputFormat, bool isvSpecificAnalysisIsEnabled, 
 								  bool px1007DiagnosticIsEnabled, bool disablePX1099Diagnostic, string? bannedApiFilePath, string? allowedApisFilePath,
-								  string? acuminatorWorkMode, string? reportGrouping)
+								  string? acuminatorWorkMode, string? reportGrouping, bool enableInformationalDiagnostics)
 		{
 			CodeSource 					   = codeSource;
 			Verbosity 					   = verbosity;
@@ -362,6 +375,7 @@ namespace Acuminator.Runner.Input
 			AllowedApisFilePath			   = allowedApisFilePath;
 			AcuminatorWorkMode 			   = acuminatorWorkMode;
 			ReportGrouping				   = reportGrouping;
+			EnableInformationalDiagnostics = enableInformationalDiagnostics;
 		}
 	}
 }

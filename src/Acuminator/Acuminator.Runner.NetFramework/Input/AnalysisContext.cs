@@ -46,6 +46,9 @@ namespace Acuminator.Runner.Input
 		/// </summary>
 		public GroupingMode GroupingMode { get; }
 
+		/// <inheritdoc cref="CommandLineOptions.EnableInformationalDiagnostics"/>
+		public bool EnableInformationalDiagnostics { get; }
+
 		/// <summary>
 		/// Are file paths on the unnderlying OS case sensitive or not.
 		/// </summary>
@@ -53,18 +56,19 @@ namespace Acuminator.Runner.Input
 
 		public AnalysisContext(ICodeSource codeSource, CodeAnalysisSettings codeAnalysisSettings, BannedApiSettings bannedApiSettings, 
 							   string? msBuildPath, string? outputFileName, bool outputAbsolutePathsToUsages, OutputFormat outputFormat,
-							   AcuminatorWorkMode workMode, GroupingMode groupingMode)
+							   AcuminatorWorkMode workMode, GroupingMode groupingMode, bool enableInformationalDiagnostics)
 		{
-			CodeSource 					= codeSource.CheckIfNull();
-			CodeAnalysisSettings		= codeAnalysisSettings.CheckIfNull();
-			BannedApiSettings			= bannedApiSettings.CheckIfNull();
-			MSBuildPath 				= msBuildPath.NullIfWhiteSpace();
-			OutputFileName				= outputFileName.NullIfWhiteSpace();
-			OutputAbsolutePathsToUsages = outputAbsolutePathsToUsages;
-			OutputFormat				= outputFormat;
-			WorkMode					= workMode;
-			GroupingMode				= groupingMode;
-			CaseSensitiveFilePaths		= RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+			CodeSource 					   = codeSource.CheckIfNull();
+			CodeAnalysisSettings		   = codeAnalysisSettings.CheckIfNull();
+			BannedApiSettings			   = bannedApiSettings.CheckIfNull();
+			MSBuildPath 				   = msBuildPath.NullIfWhiteSpace();
+			OutputFileName				   = outputFileName.NullIfWhiteSpace();
+			OutputAbsolutePathsToUsages    = outputAbsolutePathsToUsages;
+			OutputFormat				   = outputFormat;
+			WorkMode					   = workMode;
+			GroupingMode				   = groupingMode;
+			EnableInformationalDiagnostics = enableInformationalDiagnostics;
+			CaseSensitiveFilePaths		   = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 		}
 	}
 }
