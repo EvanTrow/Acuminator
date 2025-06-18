@@ -400,6 +400,12 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 
 			if (file.WorkMode.HasFlag(AcuminatorWorkMode.ReportUnsuppressedErrors))
 			{
+				// First check whether the diagnostic has informational severity and should be reported.
+				bool isSuppressedInformationalDiagnostic = file.SuppressInformationalDiagnostics &&
+														   diagnostic.Severity is DiagnosticSeverity.Info or DiagnosticSeverity.Hidden;
+				if (isSuppressedInformationalDiagnostic)
+					return true;
+
 				// Check whether the diagnostic is suppressed by checking if the suppression is enabled.
 				// If it is enabled, check if the suppression file contains the suppressed message.
 				// Also to be consistent with the algorithm and allow to call this method from anywhere,
