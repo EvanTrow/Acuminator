@@ -58,7 +58,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 		internal ICollection<SuppressMessage> GetAllSuppressions()
 		{
 			var loadedSuppressionKeys = _loadedExistingMessages.Keys;
-			var addedSuppressionKeys = _loadedExistingMessages.Keys;
+			var addedSuppressionKeys = _addedGeneratedMessages.Keys;
 
 			if (addedSuppressionKeys.Count == 0)
 				return loadedSuppressionKeys;
