@@ -34,11 +34,8 @@
     <DebugType>embedded</DebugType>
     <WarningLevel>9999</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn>1701;1702;CA1707;</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <NoWarn>1701;1702;CA1707;</NoWarn>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);1701;1702;CA1707</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\..\LICENSE">
