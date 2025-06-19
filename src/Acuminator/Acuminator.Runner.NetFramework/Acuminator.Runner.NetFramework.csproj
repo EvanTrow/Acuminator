@@ -33,7 +33,7 @@
 		<AnalysisLevel>latest-recommended</AnalysisLevel>
 	</PropertyGroup>
 	<PropertyGroup>
-	  <NoWarn>1701;1702;CA1822</NoWarn>
+	  <NoWarn>$(NoWarn);1701;1702;CA1822</NoWarn>
 	</PropertyGroup>
 	<ItemGroup>
 	  <Content Include="Resources\acumatica.ico">
