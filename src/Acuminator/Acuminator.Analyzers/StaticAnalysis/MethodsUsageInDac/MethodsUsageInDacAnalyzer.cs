@@ -25,25 +25,25 @@ namespace Acuminator.Analyzers.StaticAnalysis.MethodsUsageInDac
 				Descriptors.PX1032_DacPropertyCannotContainMethodInvocations
 			);
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dac)
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacOrDacExt)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
 			// Node is not null here because DAC aggregated analyzers run only on DACs declared in source code
-			SemanticModel? semanticModel = context.Compilation.GetSemanticModel(dac.Node!.SyntaxTree);
+			SemanticModel? semanticModel = context.Compilation.GetSemanticModel(dacOrDacExt.Node!.SyntaxTree);
 
 			if (semanticModel == null)
 				return;
 
-			foreach (MethodDeclarationSyntax method in dac.GetMemberNodes<MethodDeclarationSyntax>())
+			foreach (MethodDeclarationSyntax method in dacOrDacExt.GetMemberNodes<MethodDeclarationSyntax>())
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
-				AnalyzeMethodDeclarationInDac(method, context, pxContext);
+				AnalyzeMethodDeclarationInDac(method, dacOrDacExt, context, pxContext);
 			}
 
 			HashSet<INamedTypeSymbol> allowedApis = GetAllowedApis(pxContext);
 
-			foreach (DacPropertyInfo property in dac.AllDeclaredProperties)
+			foreach (DacPropertyInfo property in dacOrDacExt.AllDeclaredProperties)
 			{
 				AnalyzeMethodInvocationInDacProperty(property, allowedApis, context, pxContext, semanticModel);
 			}
@@ -70,15 +70,20 @@ namespace Acuminator.Analyzers.StaticAnalysis.MethodsUsageInDac
 			};
 		}
 
-		private void AnalyzeMethodDeclarationInDac(MethodDeclarationSyntax method, SymbolAnalysisContext context, PXContext pxContext)
+		private void AnalyzeMethodDeclarationInDac(MethodDeclarationSyntax method, DacSemanticModel dacOrDacExt, SymbolAnalysisContext context,
+												   PXContext pxContext)
 		{
-			if (!method.IsStatic())
+			if (!method.IsStatic() && !IsToStringMethod(method))
 			{
 				context.ReportDiagnosticWithSuppressionCheck(
 					Diagnostic.Create(Descriptors.PX1031_DacCannotContainInstanceMethods, method.Identifier.GetLocation()),
 					pxContext.CodeAnalysisSettings);
 			}
 		}
+
+		private bool IsToStringMethod(MethodDeclarationSyntax method) =>
+			method.ParameterList?.Parameters.Count == 0 && method.IsOverride() &&
+			method.Identifier.Text == "ToString";
 
 		private void AnalyzeMethodInvocationInDacProperty(DacPropertyInfo property, HashSet<INamedTypeSymbol> allowedApis,
 														  SymbolAnalysisContext context, PXContext pxContext, SemanticModel semanticModel)

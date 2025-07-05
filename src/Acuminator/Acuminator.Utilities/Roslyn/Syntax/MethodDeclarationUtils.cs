@@ -187,6 +187,11 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 				.Modifiers
 				.Any(m => m.IsKind(SyntaxKind.StaticKeyword));
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsOverride(this MethodDeclarationSyntax node) =>
+		node.CheckIfNull()
+			.Modifiers
+			.Any(m => m.IsKind(SyntaxKind.OverrideKeyword));
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsVoidMethod(this MethodDeclarationSyntax methodNode)

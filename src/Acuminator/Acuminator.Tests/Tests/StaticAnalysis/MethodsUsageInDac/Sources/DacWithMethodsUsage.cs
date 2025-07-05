@@ -51,5 +51,7 @@ namespace Acuminator.Tests.Sources
         public static void Update()
         {
         }
-    }
+
+		public override string ToString() => "DAC";
+	}
 }
