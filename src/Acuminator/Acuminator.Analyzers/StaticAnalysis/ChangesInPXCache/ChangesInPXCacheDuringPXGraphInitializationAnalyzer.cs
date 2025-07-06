@@ -19,7 +19,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.ChangesInPXCache
         {
             Walker walker = new Walker(context, pxContext, Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization);
 
-            foreach (GraphInitializerInfo initializer in pxGraph.Initializers)
+            foreach (GraphInitializerInfo initializer in pxGraph.DeclaredInitializers)
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
                 walker.Visit(initializer.Node);

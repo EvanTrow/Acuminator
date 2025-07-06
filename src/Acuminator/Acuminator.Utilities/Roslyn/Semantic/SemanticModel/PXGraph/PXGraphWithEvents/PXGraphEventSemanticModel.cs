@@ -65,8 +65,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <inheritdoc cref="PXGraphSemanticModel.StaticConstructors"/>
 		public ImmutableArray<StaticConstructorInfo> StaticConstructors => BaseGraphModel.StaticConstructors;
 
-		/// <inheritdoc cref="PXGraphSemanticModel.Initializers"/>
-		public ImmutableArray<GraphInitializerInfo> Initializers => BaseGraphModel.Initializers;
+		/// <inheritdoc cref="PXGraphSemanticModel.DeclaredInitializers"/>
+		public ImmutableArray<GraphInitializerInfo> DeclaredInitializers => BaseGraphModel.DeclaredInitializers;
 
 		/// <inheritdoc cref="PXGraphSemanticModel.ViewsByNames"/>
 		public ImmutableDictionary<string, DataViewInfo> ViewsByNames => BaseGraphModel.ViewsByNames;

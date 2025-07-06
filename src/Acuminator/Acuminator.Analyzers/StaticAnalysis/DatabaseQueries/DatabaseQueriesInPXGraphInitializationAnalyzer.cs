@@ -20,7 +20,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DatabaseQueries
         {
             var dbQueriesWalker = new Walker(context, pxContext, Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization);
 
-            foreach (var initializer in pxGraph.Initializers)
+            foreach (var initializer in pxGraph.DeclaredInitializers)
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
                 dbQueriesWalker.Visit(initializer.Node);

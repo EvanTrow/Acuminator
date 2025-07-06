@@ -24,7 +24,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXActionExecution
 
             Walker walker = new Walker(context, pxContext, Descriptors.PX1081_PXGraphExecutesActionDuringInitialization);
 
-            foreach (GraphInitializerInfo initializer in pxGraph.Initializers)
+            foreach (GraphInitializerInfo initializer in pxGraph.DeclaredInitializers)
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
                 walker.Visit(initializer.Node);

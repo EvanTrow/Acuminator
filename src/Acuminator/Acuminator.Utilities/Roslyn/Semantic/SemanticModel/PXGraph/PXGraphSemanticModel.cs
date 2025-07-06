@@ -69,7 +69,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <value>
 		/// The initializers.
 		/// </value>
-		public ImmutableArray<GraphInitializerInfo> Initializers { get; private set; }
+		public ImmutableArray<GraphInitializerInfo> DeclaredInitializers { get; private set; }
 
 		public ImmutableDictionary<string, DataViewInfo> ViewsByNames { get; }
 		public IEnumerable<DataViewInfo> Views => ViewsByNames.Values;
@@ -204,7 +204,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			ConfigureMethodOverride = ConfigureMethodInfo.GetConfigureMethodInfo(Symbol, GraphType, PXContext, _cancellation);
 			InitializeMethodInfo	= InitializeMethodInfo.GetInitializeMethodInfo(Symbol, GraphType, PXContext, _cancellation);
 
-			Initializers 			   = GetDeclaredInitializers().ToImmutableArray();
+			DeclaredInitializers 	   = GetDeclaredInitializers().ToImmutableArray();
 			IsActiveMethodInfo 		   = GetIsActiveMethodInfo();
 			IsActiveForGraphMethodInfo = GetIsActiveForGraphMethodInfo();
 			
@@ -317,7 +317,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <returns>
 		/// The declared initializers in this collection.
 		/// </returns>
-		protected IEnumerable<GraphInitializerInfo> GetDeclaredInitializers()
+		protected List<GraphInitializerInfo> GetDeclaredInitializers()
 		{
 			_cancellation.ThrowIfCancellationRequested();
 
@@ -407,7 +407,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					models.Add(implicitModel);
 				}
 
-				implicitModel.Initializers = implicitModel.Initializers.Add(info);
+				implicitModel.DeclaredInitializers = implicitModel.DeclaredInitializers.Add(info);
 			}
 		}
 
