@@ -52,6 +52,23 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public ITypeSymbol? GraphSymbol { get; }
 
 		public ImmutableArray<StaticConstructorInfo> StaticConstructors { get; }
+
+		/// <summary>
+		/// Gets or sets the initializers.
+		/// </summary>
+		/// <remarks>
+		/// By initializers Acuminator understands special code elements of graph or graph extension that configure graph's initial state.<br/>
+		/// Currently, initalizers consists of:
+		/// <list type="bullet">
+		/// <item>Graph and graph extension constructors.</item>
+		/// <item><c>Initialize</c> method override of a graph extension.</item>
+		/// <item><c>Initialize</c> method of a graph that implements <c>PX.Data.DependencyInjection.IGraphWithInitialization</c> interface.</item>
+		/// <item><c>Configure</c> method override of a graph or graph extension that configure screen workflow.</item>
+		/// </list>
+		/// </remarks>
+		/// <value>
+		/// The initializers.
+		/// </value>
 		public ImmutableArray<GraphInitializerInfo> Initializers { get; private set; }
 
 		public ImmutableDictionary<string, DataViewInfo> ViewsByNames { get; }
@@ -284,28 +301,47 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			return infos.ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 		}
 
+		/// <summary>
+		/// Gets the declared initializers in this collection.
+		/// </summary>
+		/// <remarks>
+		/// By initializer Acuminator understands special code elements of graph or graph extension that configure graph's initial state.<br/>
+		/// Currently, initalizers consists of:
+		/// <list type="bullet">
+		/// <item>Graph and graph extension constructors.</item>
+		/// <item><c>Initialize</c> method override of a graph extension.</item>
+		/// <item><c>Initialize</c> method of a graph that implements <c>PX.Data.DependencyInjection.IGraphWithInitialization</c> interface.</item>
+		/// <item><c>Configure</c> method override of a graph or graph extension that configure screen workflow.</item>
+		/// </list>
+		/// </remarks>
+		/// <returns>
+		/// The declared initializers in this collection.
+		/// </returns>
 		protected IEnumerable<GraphInitializerInfo> GetDeclaredInitializers()
 		{
 			_cancellation.ThrowIfCancellationRequested();
 
-			if (GraphType == GraphType.PXGraph)
-			{
-				return Symbol.GetDeclaredInstanceConstructors(_cancellation)
-							 .Select((ctr, order) => new GraphInitializerInfo(GraphInitializerType.InstanceConstructor, ctr.Node, ctr.Symbol, order));
-			}
-			else
-			{
-				var declaredInitializeMethod = DeclaredInitializeMethodInfo;
+			var constructors = Symbol.GetDeclaredInstanceConstructors(_cancellation)
+									 .Select((ctr, order) => new GraphInitializerInfo(GraphInitializerType.InstanceConstructor, ctr.Node, ctr.Symbol, order));
+			var initializerInfos = constructors.ToList(capacity: 4);
+			int declarationOrder = initializerInfos.Count;
 
-				if (declaredInitializeMethod != null)
-				{
-					var graphInitInfo = new GraphInitializerInfo(GraphInitializerType.InitializeMethod, declaredInitializeMethod.Node,
-																 declaredInitializeMethod.Symbol, declarationOrder: 0);
-					return [graphInitInfo];
-				}
-
-				return [];
+			if (DeclaredInitializeMethodInfo is { } declaredInitializeMethod)
+			{
+				var initializeMethodInfo = new GraphInitializerInfo(GraphInitializerType.InitializeMethod, declaredInitializeMethod.Node,
+																	declaredInitializeMethod.Symbol, declarationOrder);
+				declarationOrder++;
+				initializerInfos.Add(initializeMethodInfo);
 			}
+
+			if (DeclaredConfigureMethodOverride is { } declaredConfigureMethod)
+			{
+				var configureMethodInfo = new GraphInitializerInfo(GraphInitializerType.ConfigureMethod, declaredConfigureMethod.Node,
+																	declaredConfigureMethod.Symbol, declarationOrder);
+				initializerInfos.Add(configureMethodInfo);
+			}
+
+			return initializerInfos;
 		}
 
 		/// <summary>
