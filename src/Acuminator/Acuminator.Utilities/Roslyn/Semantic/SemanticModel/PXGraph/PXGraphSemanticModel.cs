@@ -411,7 +411,20 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			}
 		}
 
-		public static PXGraphSemanticModel? InferExplicitModel(PXContext pxContext, INamedTypeSymbol graphOrGraphExtTypeSymbol,
+		/// <summary>
+		/// Infer semantic model for a given <paramref name="graphOrGraphExtTypeSymbol"/>.
+		/// If <paramref name="graphOrGraphExtTypeSymbol"/> is not a graph or graph extension, returns <see langword="null"/>.
+		/// </summary>
+		/// <param name="pxContext">Acumatica context.</param>
+		/// <param name="graphOrGraphExtTypeSymbol">The graph or graph extension type symbol.</param>
+		/// <param name="modelCreationOptions">Options for controlling the semantic model creation.</param>
+		/// <param name="declarationOrder">(Optional) The declaration order.</param>
+		/// <param name="cancellation">(Optional) Cancellation token.</param>
+		/// <returns>
+		/// A semantic model for a given graph or graph extension <paramref name="graphOrGraphExtTypeSymbol"/>.<br/>
+		/// If <paramref name="graphOrGraphExtTypeSymbol"/> is not graph or graph extension, then returns <see langword="null"/>.
+		/// </returns>
+		public static PXGraphSemanticModel? InferModel(PXContext pxContext, INamedTypeSymbol graphOrGraphExtTypeSymbol,
 															  GraphSemanticModelCreationOptions modelCreationOptions,
 															  int? declarationOrder = null, CancellationToken cancellation = default)
 		{
