@@ -659,7 +659,7 @@
     <EmbeddedResource Include="Tests\Utilities\AttributeInformation\Sources\ExternalAttributes1.cs" />
     <EmbeddedResource Include="Tests\Utilities\AttributeInformation\Sources\ExternalAttributes2.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\GraphCreation\Sources\PXGraphWithCreateInstanceOutsideOfInitialization.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\LongOperationStart\Sources\PXGraph\PXGraphStartsLongOperationInInstanceConstructorViaMethod.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\LongOperationStart\Sources\PXGraph\PXGraphStartsLongOperationInInitializationViaMethod.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\RowChangesInEventHandlers\Sources\Reversed\DirectAssignment.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\RowChangesInEventHandlers\Sources\Reversed\IndirectAssignment.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\RowChangesInEventHandlers\Sources\Reversed\IndirectSetValue.cs" />
@@ -670,9 +670,9 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\SavingChanges\Sources\PXGraph\PXGraphExtensionIsSavingChanges.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\SavingChanges\Sources\PXGraph\PXGraphNotSavingChanges.cs" />
     <Compile Include="Tests\StaticAnalysis\LongOperationStart\LongOperationInPXGraphDuringInitializationTests.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\LongOperationStart\Sources\PXGraph\PXGraphStartsLongOperationInInstanceConstructor.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\LongOperationStart\Sources\PXGraph\PXGraphExtensionStartsLongOperationInInitializationMethod.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\LongOperationStart\Sources\PXGraph\PXGraphDoesntStartLongOperationInInstanceConstructor.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\LongOperationStart\Sources\PXGraph\PXGraphStartsLongOperationInInitialization.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\LongOperationStart\Sources\PXGraph\PXGraphExtensionStartsLongOperationInInitialization.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\LongOperationStart\Sources\PXGraph\PXGraphDoesntStartLongOperationInInitialization.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\SavingChanges\Sources\EventHandlers\ArbitraryCodeInsideRowPersisting.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\RaiseExceptionHandling\Sources\EventHandlers\EventHandlers.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\RaiseExceptionHandling\Sources\EventHandlers\EventHandlersWithExternalMethod.cs" />
