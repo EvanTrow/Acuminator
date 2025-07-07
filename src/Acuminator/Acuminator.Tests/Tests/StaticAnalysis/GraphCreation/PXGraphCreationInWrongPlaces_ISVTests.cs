@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis;
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
@@ -6,8 +7,9 @@ using Acuminator.Analyzers.StaticAnalysis.PXGraphCreationInGraphInWrongPlaces;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
+
 using Microsoft.CodeAnalysis.Diagnostics;
-using System.Threading.Tasks;
+
 using Xunit;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.GraphCreation
@@ -35,18 +37,20 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.GraphCreation
 				Descriptors.PX1056_PXGraphCreationInIsActiveForGraphMethod.CreateFor(34, 8));
 
 		[Theory]
-		[EmbeddedFileData("PXGraphWithCreateInstanceInInstanceConstructor.cs")]
-		public async Task GraphInstanceConstructor(
-			string source) =>
+		[EmbeddedFileData("PXGraphWithCreateInstanceInInitialization.cs")]
+		public async Task GraphInstanceConstructor(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(15, 41));
+				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(13, 32),
+				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(19, 32),
+				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(25, 32));
 
 		[Theory]
-		[EmbeddedFileData("PXGraphExtensionWithCreateInstanceInInitMethod.cs")]
-		public async Task GraphExtensionInitialize(
-			string source) =>
+		[EmbeddedFileData("PXGraphExtensionWithCreateInstanceInInitialization.cs")]
+		public async Task GraphExtensionInitialize(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(14, 41));
+				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(14, 32),
+				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(19, 32),
+				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(26, 32));
 
 		[Theory]
 		[EmbeddedFileData("PXGraphWithCreateInstanceInInitDelegate.cs")]

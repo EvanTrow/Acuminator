@@ -744,8 +744,8 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\DatabaseQueries\Sources\RowSelecting\Lambda.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\DatabaseQueries\Sources\RowSelecting\LambdaWithBody.cs" />
     <Compile Include="Tests\StaticAnalysis\GraphCreation\PXGraphCreationInWrongPlaces_ISVTests.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\GraphCreation\Sources\PXGraphWithCreateInstanceInInstanceConstructor.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\GraphCreation\Sources\PXGraphExtensionWithCreateInstanceInInitMethod.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\GraphCreation\Sources\PXGraphWithCreateInstanceInInitialization.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\GraphCreation\Sources\PXGraphExtensionWithCreateInstanceInInitialization.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\GraphCreation\Sources\PXGraphWithCreateInstanceInInitDelegate.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PXGraphCreateInstance\Sources\EventHandlers\CreateInstance.cs" />
     <Compile Include="Tests\StaticAnalysis\LongOperationStart\LongOperationInEventHandlersTests.cs" />
