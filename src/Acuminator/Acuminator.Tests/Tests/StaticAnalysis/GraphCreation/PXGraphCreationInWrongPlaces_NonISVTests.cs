@@ -27,30 +27,30 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.GraphCreation
 
 		[Theory]
 		[EmbeddedFileData("PXGraphWithCreateInstanceInInitialization.cs")]
-		public async Task GraphInstanceConstructor(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GraphInstanceConstructor(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1057_PXGraphCreationDuringInitialization_NonISV.CreateFor(13, 32),
 				Descriptors.PX1057_PXGraphCreationDuringInitialization_NonISV.CreateFor(19, 32),
 				Descriptors.PX1057_PXGraphCreationDuringInitialization_NonISV.CreateFor(25, 32));
 
 		[Theory]
 		[EmbeddedFileData("PXGraphExtensionWithCreateInstanceInInitialization.cs")]
-		public async Task GraphExtensionInitialize(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GraphExtensionInitialize(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1057_PXGraphCreationDuringInitialization_NonISV.CreateFor(14, 32),
 				Descriptors.PX1057_PXGraphCreationDuringInitialization_NonISV.CreateFor(19, 32),
 				Descriptors.PX1057_PXGraphCreationDuringInitialization_NonISV.CreateFor(26, 32));
 
 		[Theory]
 		[EmbeddedFileData("PXGraphWithCreateInstanceInInitDelegate.cs")]
-		public async Task GraphInitDelegate(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GraphInitDelegate(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1057_PXGraphCreationDuringInitialization_NonISV.CreateFor(20, 14));
 
 		[Theory]
 		[EmbeddedFileData("PXGraphExtensionWithCreateInstanceInIsActiveMethods.cs")]
-		public async Task GraphExtension_IsActiveAndIsActiveForGraph(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GraphExtension_IsActiveAndIsActiveForGraph(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1056_PXGraphCreationInIsActiveMethod.CreateFor(15, 41),
 				Descriptors.PX1056_PXGraphCreationInIsActiveForGraphMethod.CreateFor(19, 4),
 				Descriptors.PX1056_PXGraphCreationInIsActiveForGraphMethod.CreateFor(20, 4),

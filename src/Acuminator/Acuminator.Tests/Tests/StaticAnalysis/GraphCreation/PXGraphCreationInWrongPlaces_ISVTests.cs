@@ -27,8 +27,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.GraphCreation
 
 		[Theory]
 		[EmbeddedFileData("PXGraphExtensionWithCreateInstanceInIsActiveMethods.cs")]
-		public async Task GraphExtension_IsActiveAndIsActiveForGraph(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GraphExtension_IsActiveAndIsActiveForGraph(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1056_PXGraphCreationInIsActiveMethod.CreateFor(15, 41),
 				Descriptors.PX1056_PXGraphCreationInIsActiveForGraphMethod.CreateFor(19, 4),
 				Descriptors.PX1056_PXGraphCreationInIsActiveForGraphMethod.CreateFor(20, 4),
@@ -38,59 +38,59 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.GraphCreation
 
 		[Theory]
 		[EmbeddedFileData("PXGraphWithCreateInstanceInInitialization.cs")]
-		public async Task GraphInstanceConstructor(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GraphInstanceConstructor(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(13, 32),
 				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(19, 32),
 				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(25, 32));
 
 		[Theory]
 		[EmbeddedFileData("PXGraphExtensionWithCreateInstanceInInitialization.cs")]
-		public async Task GraphExtensionInitialize(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GraphExtensionInitialize(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(14, 32),
 				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(19, 32),
 				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(26, 32));
 
 		[Theory]
 		[EmbeddedFileData("PXGraphWithCreateInstanceInInitDelegate.cs")]
-		public async Task GraphInitDelegate(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GraphInitDelegate(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(20, 14));
 
 		[Theory]
 		[EmbeddedFileData("PXGraphWithCreateInstanceOutsideOfInitialization.cs")]
-		public async Task PXGraph_OutsideOfInitialization(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task PXGraph_OutsideOfInitialization(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData("ViewDelegate.cs")]
-		public async Task ViewDelegate(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task ViewDelegate(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1084_GraphCreationInDataViewDelegate.CreateFor(13, 25));
 
 		[Theory]
 		[EmbeddedFileData("ViewDelegateWithParameter.cs")]
-		public async Task ViewDelegateWithParameter(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task ViewDelegateWithParameter(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1084_GraphCreationInDataViewDelegate.CreateFor(13, 30));
 
 		[Theory]
 		[EmbeddedFileData("ViewDelegateInGraphExtensionOwnView.cs")]
-		public async Task ViewDelegateInGraphExtensionOwnView(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task ViewDelegateInGraphExtensionOwnView(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1084_GraphCreationInDataViewDelegate.CreateFor(12, 33));
 
 		[Theory]
 		[EmbeddedFileData("ViewDelegateInGraphExtensionBaseView.cs")]
-		public async Task ViewDelegateInGraphExtensionBaseView(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task ViewDelegateInGraphExtensionBaseView(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1084_GraphCreationInDataViewDelegate.CreateFor(10, 25));
 
 		[Theory]
 		[EmbeddedFileData("ViewDelegateInGraphExtensionOverride.cs")]
-		public async Task ViewDelegateInGraphExtensionOverride(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task ViewDelegateInGraphExtensionOverride(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1084_GraphCreationInDataViewDelegate.CreateFor(10, 33));
 	}
 }

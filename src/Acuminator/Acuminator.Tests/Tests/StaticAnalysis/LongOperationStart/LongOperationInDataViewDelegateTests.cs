@@ -24,27 +24,27 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\DataViewFromGraphStartsLongOperation.cs")]
-		public async Task DataViewDelegateFromGraph_ReportsDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(17, 13));
+		public Task DataViewDelegateFromGraph_ReportsDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(17, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\DataViewFromGraphStartsLongOperationViaMethod.cs")]
-		public async Task DataViewDelegateWithMethodFromGraph_ReportsDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(17, 13));
+		public Task DataViewDelegateWithMethodFromGraph_ReportsDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(17, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\DataViewFromGraphExtensionStartsLongOperation.cs")]
-		public async Task DataViewDelegateFromGraphExtension_ReportsDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(15, 13));
+		public Task DataViewDelegateFromGraphExtension_ReportsDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(15, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\DataViewWithParameterStartsLongOperation.cs")]
-		public async Task DataViewDelegateWithParameter_ReportsDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(19, 17));
+		public Task DataViewDelegateWithParameter_ReportsDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(19, 17));
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\StaticDataViewStartsLongOperation.cs")]
-		public async Task StaticDataViewDelegate_ReportsDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(15, 13));
+		public Task StaticDataViewDelegate_ReportsDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(15, 13));
 	}
 }

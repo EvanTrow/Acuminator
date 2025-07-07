@@ -24,48 +24,48 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.SavingChanges
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\PXGraphIsSavingChanges.cs")]
-		public async Task GraphInstance_InitializationMethod_And_Constructor(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GraphInstance_InitializationMethod_And_Constructor(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1058_PXGraphSavingChangesDuringInitialization.CreateFor(18, 5),
 				Descriptors.PX1058_PXGraphSavingChangesDuringInitialization.CreateFor(23, 4),
 				Descriptors.PX1058_PXGraphSavingChangesDuringInitialization.CreateFor(28, 4));
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\PXGraphExtensionIsSavingChanges.cs")]
-		public async Task GraphExtension_SaveCHanges_InitializationMethod_And_Constructor(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GraphExtension_SaveCHanges_InitializationMethod_And_Constructor(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1058_PXGraphSavingChangesDuringInitialization.CreateFor(16, 5),
 				Descriptors.PX1058_PXGraphSavingChangesDuringInitialization.CreateFor(22, 4),
 				Descriptors.PX1058_PXGraphSavingChangesDuringInitialization.CreateFor(28, 4));
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\PXGraphNotSavingChanges.cs")]
-		public async Task Graph_NotSavingChanges_DoesntReportsDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task Graph_NotSavingChanges_DoesntReportsDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\ViewDelegate.cs")]
-		public async Task ViewDelegate(string source) =>
-			await VerifyCSharpDiagnosticAsync(source, Descriptors.PX1083_SavingChangesInDataViewDelegate.CreateFor(13, 13));
+		public Task ViewDelegate(string source) =>
+			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1083_SavingChangesInDataViewDelegate.CreateFor(13, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\ViewDelegateWithParameter.cs")]
-		public async Task ViewDelegateWithParameter(string source) =>
-			await VerifyCSharpDiagnosticAsync(source, Descriptors.PX1083_SavingChangesInDataViewDelegate.CreateFor(13, 13));
+		public Task ViewDelegateWithParameter(string source) =>
+			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1083_SavingChangesInDataViewDelegate.CreateFor(13, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\ViewDelegateInGraphExtensionOwnView.cs")]
-		public async Task ViewDelegateInGraphExtensionOwnView(string source) =>
-			await VerifyCSharpDiagnosticAsync(source, Descriptors.PX1083_SavingChangesInDataViewDelegate.CreateFor(12, 13));
+		public Task ViewDelegateInGraphExtensionOwnView(string source) =>
+			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1083_SavingChangesInDataViewDelegate.CreateFor(12, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\ViewDelegateInGraphExtensionBaseView.cs")]
-		public async Task ViewDelegateInGraphExtensionBaseView(string source) =>
-			await VerifyCSharpDiagnosticAsync(source, Descriptors.PX1083_SavingChangesInDataViewDelegate.CreateFor(10, 13));
+		public Task ViewDelegateInGraphExtensionBaseView(string source) =>
+			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1083_SavingChangesInDataViewDelegate.CreateFor(10, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\ViewDelegateInGraphExtensionOverride.cs")]
-		public async Task ViewDelegateInGraphExtensionOverride(string source) =>
-			await VerifyCSharpDiagnosticAsync(source, Descriptors.PX1083_SavingChangesInDataViewDelegate.CreateFor(10, 13));
+		public Task ViewDelegateInGraphExtensionOverride(string source) =>
+			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1083_SavingChangesInDataViewDelegate.CreateFor(10, 13));
 	}
 }

@@ -24,84 +24,84 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DatabaseQueries
 
 		[Theory]
 		[EmbeddedFileData(@"Initializers\GraphInitialization.cs")]
-		public async Task DbQuery_In_Graph_Initialization(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual,
+		public Task DbQuery_In_Graph_Initialization(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(17, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(22, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(28, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"Initializers\GraphExtensionInitialization.cs")]
-		public async Task DbQuery_In_GraphExtension_Initialization(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual,
+		public Task DbQuery_In_GraphExtension_Initialization(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(17, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(22, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(28, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"Initializers\CreateInstanceDelegate.cs")]
-		public async Task CreateInstanceDelegate_CausesDiagnostic(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(20, 25));
+		public Task CreateInstanceDelegate_CausesDiagnostic(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(20, 25));
 
 		[Theory]
 		[EmbeddedFileData(@"Initializers\BQLSelect.cs")]
-		public async Task BQLSelect_CausesDiagnostic(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual,
+		public Task BQLSelect_CausesDiagnostic(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(17, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(22, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(28, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"Initializers\BQLSearch.cs")]
-		public async Task BQLSearch_CausesDiagnostic(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual,
+		public Task BQLSearch_CausesDiagnostic(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(17, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(22, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(28, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"Initializers\DataView.cs")]
-		public async Task DataView_CausesDiagnostic(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual,
+		public Task DataView_CausesDiagnostic(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(17, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(22, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(28, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"Initializers\PXView.cs")]
-		public async Task PXView_CausesDiagnostic(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual,
+		public Task PXView_CausesDiagnostic(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(17, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(22, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(28, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"Initializers\PXSelector.cs")]
-		public async Task PXSelector_CausesDiagnostic(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual,
+		public Task PXSelector_CausesDiagnostic(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(17, 12),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(22, 12),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(28, 12));
 
 		[Theory]
 		[EmbeddedFileData(@"Initializers\PXDatabase.cs")]
-		public async Task PXDatabase_CausesDiagnostic(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual,
+		public Task PXDatabase_CausesDiagnostic(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(17, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(22, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(28, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"Initializers\ExternalMethod.cs")]
-		public async Task ExternalMethod_CausesDiagnostic(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual,
+		public Task ExternalMethod_CausesDiagnostic(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(17, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(22, 13),
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(28, 13));
 
 		[Theory]
 		[EmbeddedFileData(@"Initializers\NonDbCrudOperations.cs")]
-		public async Task NonDbCrudOperations_DoesntCauseDiagnostic(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual);
+		public Task NonDbCrudOperations_DoesntCauseDiagnostic(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual);
 	}
 }
