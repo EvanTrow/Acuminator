@@ -665,9 +665,9 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\RowChangesInEventHandlers\Sources\Reversed\SetValue.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\RowChangesInEventHandlers\Sources\Reversed\SetValueExt.cs" />
     <Compile Include="Tests\StaticAnalysis\SavingChanges\SavingChangesInGraphSemanticModelTests.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\SavingChanges\Sources\PXGraph\PXGraphIsSavingChangesInInstanceConstructor.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\SavingChanges\Sources\PXGraph\PXGraphExtensionIsSavingChangesInInitializationMethod.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\SavingChanges\Sources\PXGraph\PXGraphIsntSavingChangesInInstanceConstructor.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\SavingChanges\Sources\PXGraph\PXGraphIsSavingChanges.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\SavingChanges\Sources\PXGraph\PXGraphExtensionIsSavingChanges.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\SavingChanges\Sources\PXGraph\PXGraphNotSavingChanges.cs" />
     <Compile Include="Tests\StaticAnalysis\LongOperationStart\LongOperationInPXGraphDuringInitializationTests.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\LongOperationStart\Sources\PXGraph\PXGraphStartsLongOperationInInstanceConstructor.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\LongOperationStart\Sources\PXGraph\PXGraphExtensionStartsLongOperationInInitializationMethod.cs" />
