@@ -1,4 +1,6 @@
-﻿using Acuminator.Analyzers.StaticAnalysis;
+﻿using System.Threading.Tasks;
+
+using Acuminator.Analyzers.StaticAnalysis;
 using Acuminator.Analyzers.StaticAnalysis.ChangesInPXCache;
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
 using Acuminator.Tests.Helpers;
@@ -22,9 +24,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ChangesInPXCache
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\PXGraphChangesPXCache.cs")]
-		public void Graph_Initialization_ChangesInPXCache(string source)
-		{
-			VerifyCSharpDiagnostic(source,
+		public Task Graph_Initialization_ChangesInPXCache(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				// Constructor
 				Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization.CreateFor(16, 5),
 				Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization.CreateFor(17, 5),
@@ -49,23 +50,19 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ChangesInPXCache
 				Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization.CreateFor(55, 5),
 				Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization.CreateFor(56, 5)
 			);
-		}
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\PXGraphChangesPXCacheViaMethod.cs")]
-		public void Graph_Initialization_ChangesInPXCache_ViaCalledMethod(string source)
-		{
-			VerifyCSharpDiagnostic(source,
+		public Task Graph_Initialization_ChangesInPXCache_ViaCalledMethod(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization.CreateFor(17, 5),
 				Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization.CreateFor(21, 31),
 				Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization.CreateFor(26, 4));
-		}
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\PXGraphExtensionChangesPXCache.cs")]
-		public void GraphExtension_Initialization_ChangesInPXCache(string source)
-		{
-			VerifyCSharpDiagnostic(source,
+		public Task GraphExtension_Initialization_ChangesInPXCache(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				// Constructor
 				Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization.CreateFor(16, 5),
 				Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization.CreateFor(17, 5),
@@ -89,11 +86,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ChangesInPXCache
 				Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization.CreateFor(54, 5),
 				Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization.CreateFor(55, 5),
 				Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization.CreateFor(56, 5));
-		}
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\PXGraphDoesntChangePXCache.cs")]
-		public void Graph_Initialization_DoesNotChangePXCache_DoesntReportsDiagnostic(string source) => 
-			VerifyCSharpDiagnostic(source);
+		public Task Graph_Initialization_DoesNotChangePXCache_DoesntReportsDiagnostic(string source) => 
+			VerifyCSharpDiagnosticAsync(source);
 	}
 }
