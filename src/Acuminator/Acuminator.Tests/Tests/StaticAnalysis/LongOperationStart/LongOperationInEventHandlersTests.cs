@@ -1,25 +1,31 @@
-﻿using Acuminator.Analyzers.StaticAnalysis;
+﻿using System.Threading.Tasks;
+
+using Acuminator.Analyzers.StaticAnalysis;
 using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
 using Acuminator.Analyzers.StaticAnalysis.LongOperationStart;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
+
 using Microsoft.CodeAnalysis.Diagnostics;
+
 using Xunit;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
 {
-    public class LongOperationInEventHandlersTests : DiagnosticVerifier
+	public class LongOperationInEventHandlersTests : DiagnosticVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default.WithRecursiveAnalysisEnabled(),
+			new LooseEventHandlerAggregatorAnalyzer(
+				CodeAnalysisSettings.Default
+									.WithRecursiveAnalysisEnabled()
+									.WithStaticAnalysisEnabled(),
 				new LongOperationInEventHandlersAnalyzer());
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\Invalid.cs")]
-		public void TestDiagnostic(string actual)
-		{
-			VerifyCSharpDiagnostic(actual, 
+		public Task TestDiagnostic(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(14, 4),
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(19, 4),
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(24, 4),
@@ -32,13 +38,11 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(59, 4),
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(64, 4),
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(69, 4));
-		}
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\InvalidWithExternalMethod.cs")]
-		public void TestDiagnostic_WithExternalMethod(string actual)
-		{
-			VerifyCSharpDiagnostic(actual,
+		public Task TestDiagnostic_WithExternalMethod(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(14, 4),
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(19, 4),
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(24, 4),
@@ -51,13 +55,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(59, 4),
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(64, 4),
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(69, 4));
-		}
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\Valid.cs")]
-		public void TestDiagnostic_EventHandlers_ShouldNotShowDiagnostic(string actual)
-		{
-			VerifyCSharpDiagnostic(actual);
-		}
+		public Task TestDiagnostic_EventHandlers_ShouldNotShowDiagnostic(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual);
 	}
 }
