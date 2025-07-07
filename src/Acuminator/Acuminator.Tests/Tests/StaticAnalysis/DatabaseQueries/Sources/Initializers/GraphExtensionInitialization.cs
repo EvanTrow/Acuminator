@@ -14,22 +14,24 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DatabaseQueries.Sources.Initiali
 
 		public UserEntryExt()
 		{
-			_count = PXDatabase.SelectMulti<Users>().Count();
+			_count = PXSelect<Users>.Select(Base).Count;
 		}
 
 		public override void Initialize()
 		{
-			_count = PXDatabase.SelectMulti<Users>().Count();
+			_count = PXSelect<Users>.Select(Base).Count;
 		}
 
-		public override void Configure(PXScreenConfiguration configuration)
+		public override void Configure(PXScreenConfiguration graph)
 		{
-			base.Configure(configuration);
-			_count = PXDatabase.SelectMulti<Users>().Count();
+			base.Configure(graph);
+			_count = PXSelect<Users>.Select(Base).Count;
 		}
 	}
 
-	public class UserEntry : PXGraph
+
+	public class UserEntry : PXGraph<UserEntry>
 	{
+
 	}
 }

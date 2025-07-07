@@ -110,6 +110,7 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\DacFieldAndReferencedFieldMismatch\Sources\MismatchedLengthDac.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\DacFieldAndReferencedFieldMismatch\Sources\MismatchedTypeDac.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\DacFieldAndReferencedFieldMismatch\Sources\DacWithSMDBRecipientAttribute.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\DatabaseQueries\Sources\Initializers\GraphExtensionInitialization.cs" />
     <Compile Include="Tests\StaticAnalysis\ForbidPrivateEventHandlers\ForbidPrivateEventHandlersFixerTests.cs" />
     <Compile Include="Tests\StaticAnalysis\ForbidPrivateEventHandlers\ForbidPrivateEventHandlersTests.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\ForbidPrivateEventHandlers\Sources\PrivateModifier.cs" />
@@ -457,7 +458,7 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\DacUiAttributes\Sources\Dac_Good_CacheName.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\DacUiAttributes\Sources\Dac_Good_Hidden.cs" />
     <Compile Include="Tests\StaticAnalysis\DatabaseQueries\DatabaseQueriesInPXGraphInitializationTests.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\DatabaseQueries\Sources\Initializers\PXGraphConstructor.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\DatabaseQueries\Sources\Initializers\GraphInitialization.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\DatabaseQueries\Sources\Initializers\CreateInstanceDelegate.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\DatabaseQueries\Sources\Initializers\BQLSelect.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\DatabaseQueries\Sources\Initializers\BQLSearch.cs" />
