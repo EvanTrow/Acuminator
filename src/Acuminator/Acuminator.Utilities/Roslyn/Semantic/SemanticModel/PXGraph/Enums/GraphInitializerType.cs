@@ -16,11 +16,6 @@
 		InitializeMethod,
 
 		/// <summary>
-		/// An enum constant representing the instance created delegate.
-		/// </summary>
-		InstanceCreatedDelegate,
-
-		/// <summary>
 		/// An enum constant representing the Configure method.
 		/// </summary>
 		ConfigureMethod
