@@ -57,19 +57,18 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		protected virtual bool TryToInferGraphOrGraphExtensionSemanticModel(INamedTypeSymbol graphSymbol, PXContext context, int? declarationOrder,
 																			GraphSemanticModelCreationOptions modelCreationOptions,
-																			out ISemanticModel? graphSemanticModel,
+																			out ISemanticModel? graphModelForCodeMap,
 																			CancellationToken cancellationToken = default)
 		{
-			var graphSimpleModel = PXGraphEventSemanticModel.InferModels(context, graphSymbol, modelCreationOptions,
-																		 declarationOrder, cancellationToken)
-															.FirstOrDefault();
-			if (graphSimpleModel == null)
+			var graphModelWithEvents = PXGraphEventSemanticModel.InferModel(context, graphSymbol, modelCreationOptions,
+																			declarationOrder, cancellationToken);
+			if (graphModelWithEvents == null)
 			{
-				graphSemanticModel = null;
+				graphModelForCodeMap = null;
 				return false;
 			}
 
-			graphSemanticModel = new GraphSemanticModelForCodeMap(graphSimpleModel);
+			graphModelForCodeMap = new GraphSemanticModelForCodeMap(graphModelWithEvents);
 			return true;
 		}
 
