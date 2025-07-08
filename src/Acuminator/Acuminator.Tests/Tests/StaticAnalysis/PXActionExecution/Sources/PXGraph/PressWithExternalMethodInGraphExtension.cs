@@ -1,29 +1,42 @@
 ﻿using PX.Data;
+using PX.Data.WorkflowAPI;
 
-namespace PX.Objects
+namespace Acuminator.Tests.Tests.StaticAnalysis.PXActionExecution
 {
-    public class SOInvoiceEntryExt : PXGraphExtension<SOInvoiceEntry>
-    {
-        public override void Initialize()
-        {
-            ExecuteRelease();
-        }
+	public class SOInvoiceEntryExt : PXGraphExtension<SOInvoiceEntry>
+	{
+		public SOInvoiceEntryExt()
+		{
+			ExecuteRelease();
+		}
 
-        private void ExecuteRelease()
-        {
-            Base.Release.Press();
-        }
-    }
+		public override void Initialize()
+		{
+			ExecuteRelease();
+		}
 
-    public class SOInvoiceEntry : PXGraph<SOInvoiceEntry, SOInvoice>
-    {
-        public PXAction<SOInvoice> Release;
-    }
+		public override void Configure(PXScreenConfiguration configuration)
+		{
+			base.Configure(configuration);
+			ExecuteRelease();
+		}
 
-    public class SOInvoice : IBqlTable
-    {
-        [PXDBString(8, IsKey = true, InputMask = "")]
-        public string RefNbr { get; set; }
-        public abstract class refNbr : IBqlField { }
-    }
+		private void ExecuteRelease()
+		{
+			Base.Release.Press();
+		}
+	}
+
+	public class SOInvoiceEntry : PXGraph<SOInvoiceEntry, SOInvoice>
+	{
+		public PXAction<SOInvoice> Release;
+	}
+
+	[PXHidden]
+	public class SOInvoice : IBqlTable
+	{
+		[PXDBString(8, IsKey = true, InputMask = "")]
+		public string RefNbr { get; set; }
+		public abstract class refNbr : IBqlField { }
+	}
 }

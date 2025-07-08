@@ -36,7 +36,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreationInGraphInWrongPlace
 					? Descriptors.PX1057_PXGraphCreationDuringInitialization
 					: Descriptors.PX1057_PXGraphCreationDuringInitialization_NonISV);
 
-			foreach (GraphInitializerInfo initializer in graphOrGraphExtension.Initializers)
+			foreach (GraphInitializerInfo initializer in graphOrGraphExtension.DeclaredInitializers)
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
 				graphInitializerWalker.Visit(initializer.Node);

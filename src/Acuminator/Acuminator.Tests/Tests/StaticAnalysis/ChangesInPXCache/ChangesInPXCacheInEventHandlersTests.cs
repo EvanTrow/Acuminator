@@ -29,8 +29,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ChangesInPXCache
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\EventHandlers.cs")]
-		public async Task EventHandlers(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual,
+		public Task EventHandlers(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1044_ChangesInPXCacheInEventHandlers.CreateFor(14, 4, EventType.FieldDefaulting),
 				Descriptors.PX1044_ChangesInPXCacheInEventHandlers.CreateFor(19, 4, EventType.FieldVerifying),
 				Descriptors.PX1044_ChangesInPXCacheInEventHandlers.CreateFor(24, 4, EventType.RowSelecting),
@@ -38,8 +38,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ChangesInPXCache
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\EventHandlersWithExternalMethod.cs")]
-		public async Task EventHandlersWithExternalMethod(string actual) => 
-			await VerifyCSharpDiagnosticAsync(actual,
+		public Task EventHandlersWithExternalMethod(string actual) => 
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1044_ChangesInPXCacheInEventHandlers.CreateFor(14, 4, EventType.FieldDefaulting),
 				Descriptors.PX1044_ChangesInPXCacheInEventHandlers.CreateFor(19, 4, EventType.FieldVerifying),
 				Descriptors.PX1044_ChangesInPXCacheInEventHandlers.CreateFor(24, 4, EventType.RowSelecting),
@@ -47,8 +47,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ChangesInPXCache
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\TypedCache.cs")]
-		public async Task TypedCache(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual, 
+		public Task TypedCache(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual, 
 				Descriptors.PX1044_ChangesInPXCacheInEventHandlers.CreateFor(14, 4, EventType.FieldDefaulting),
 				Descriptors.PX1044_ChangesInPXCacheInEventHandlers.CreateFor(19, 4, EventType.FieldVerifying),
 				Descriptors.PX1044_ChangesInPXCacheInEventHandlers.CreateFor(24, 4, EventType.RowSelecting),
@@ -56,12 +56,12 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ChangesInPXCache
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\ExternalCache.cs")]
-		public async Task ExternalCache(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual);
+		public Task ExternalCache(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual);
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\ValidEventHandlers.cs")]
-		public async Task ValidEventHandlers_ShouldNotShowDiagnostic(string actual) =>
-			await VerifyCSharpDiagnosticAsync(actual);
+		public Task ValidEventHandlers_ShouldNotShowDiagnostic(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual);
 	}
 }

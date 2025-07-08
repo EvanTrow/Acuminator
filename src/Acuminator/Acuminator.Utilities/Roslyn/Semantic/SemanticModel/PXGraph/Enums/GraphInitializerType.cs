@@ -6,18 +6,23 @@
 	public enum GraphInitializerType
 	{
 		/// <summary>
-		/// An enum constant representing the instance constructor option.
+		/// An enum constant representing the instance constructor.
 		/// </summary>
 		InstanceConstructor,
 
 		/// <summary>
-		/// An enum constant representing the initialize method option.
+		/// An enum constant representing the Initialize method.
 		/// </summary>
 		InitializeMethod,
 
 		/// <summary>
-		/// An enum constant representing the instance created delegate option.
+		/// An enum constant representing the instance created delegate.
 		/// </summary>
-		InstanceCreatedDelegate
+		InstanceCreatedDelegate,
+
+		/// <summary>
+		/// An enum constant representing the Configure method.
+		/// </summary>
+		ConfigureMethod
 	}
 }

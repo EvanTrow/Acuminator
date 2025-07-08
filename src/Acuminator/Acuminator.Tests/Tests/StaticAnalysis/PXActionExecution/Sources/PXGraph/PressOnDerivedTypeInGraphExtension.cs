@@ -1,23 +1,34 @@
 ﻿using PX.Data;
+using PX.Data.WorkflowAPI;
 
-namespace PX.Objects
+namespace Acuminator.Tests.Tests.StaticAnalysis.PXActionExecution
 {
-    public class SOInvoiceEntryExt : PXGraphExtension<SOInvoiceEntry>
-    {
-        public override void Initialize()
-        {
-            Base.Cancel.Press();
-        }
-    }
+	public class SOInvoiceEntryExt : PXGraphExtension<SOInvoiceEntry>
+	{
+		public SOInvoiceEntryExt()
+		{
+			Base.Cancel.Press();
+		}
 
-    public class SOInvoiceEntry : PXGraph<SOInvoiceEntry, SOInvoice>
-    {
-    }
+		public override void Initialize() =>
+			Base.Cancel.Press();
 
-    public class SOInvoice : IBqlTable
-    {
-        [PXDBString(8, IsKey = true, InputMask = "")]
-        public string RefNbr { get; set; }
-        public abstract class refNbr : IBqlField { }
-    }
+		public override void Configure(PXScreenConfiguration configuration)
+		{
+			Base.Cancel.Press();
+			base.Configure(configuration);
+		}
+	}
+
+	public class SOInvoiceEntry : PXGraph<SOInvoiceEntry, SOInvoice>
+	{
+		public PXSelect<SOInvoice> MainView;
+	}
+
+	public class SOInvoice : IBqlTable
+	{
+		[PXDBString(8, IsKey = true, InputMask = "")]
+		public string RefNbr { get; set; }
+		public abstract class refNbr : IBqlField { }
+	}
 }

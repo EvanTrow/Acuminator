@@ -26,7 +26,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.SavingChanges
 
             SaveChangesWalker walker = new SaveChangesWalker(context, pxContext, Descriptors.PX1058_PXGraphSavingChangesDuringInitialization);
 
-            foreach (GraphInitializerInfo initializer in pxGraph.Initializers)
+            foreach (GraphInitializerInfo initializer in pxGraph.DeclaredInitializers)
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
                 walker.Visit(initializer.Node);

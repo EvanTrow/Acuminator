@@ -1,7 +1,7 @@
 ﻿using PX.Data;
 using System.Collections;
 
-namespace PX.Objects
+namespace Acuminator.Tests.Tests.StaticAnalysis.PXActionExecution
 {
     public class SOInvoiceEntry : PXGraph<SOInvoiceEntry, SOInvoice>
     {

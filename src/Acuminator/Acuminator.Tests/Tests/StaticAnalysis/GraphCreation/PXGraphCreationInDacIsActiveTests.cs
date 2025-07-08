@@ -24,8 +24,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.GraphCreation
 
 		[Theory]
 		[EmbeddedFileData("DacExtensionWithGraphCreationInIsActiveMethods.cs")]
-		public async Task GraphExtension_IsActiveAndIsActiveForGraph(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GraphExtension_IsActiveAndIsActiveForGraph(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1056_PXGraphCreationInIsActiveMethod.CreateFor(15, 41),
 				Descriptors.PX1056_PXGraphCreationInIsActiveMethod.CreateFor(22, 11),
 				Descriptors.PX1056_PXGraphCreationInIsActiveMethod.CreateFor(23, 8));

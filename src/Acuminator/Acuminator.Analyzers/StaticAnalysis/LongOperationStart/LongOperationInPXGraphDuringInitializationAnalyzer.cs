@@ -22,7 +22,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 
             StartLongOperationWalker walker = new StartLongOperationWalker(context, pxContext, Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization);
 
-            foreach (GraphInitializerInfo initializer in pxGraph.Initializers)
+            foreach (GraphInitializerInfo initializer in pxGraph.DeclaredInitializers)
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
                 walker.Visit(initializer.Node);
