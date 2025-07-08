@@ -131,34 +131,34 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					? handlersByName.Values.Sum(handlers => handlers.Length)
 					: 0;
 
-			public static IDeclaredGraphEventHandlerStorage FromOverridesChainsStorageInNaturalCollectionOrder(INamedTypeSymbol containingType,
+			public static IDeclaredGraphEventHandlerStorage FromOverridesChainsStorageInDerivedToBaseOrder(INamedTypeSymbol containingType,
 																				IGraphEventHandlerOverridesChainsStorage overrideChainsStorage) =>
 				new DeclaredGraphEventHandlerStorage(
-						 rowSelectingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.RowSelectingByName),
-						 rowSelectedByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.RowSelectedByName),
+						 rowSelectingByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.RowSelectingByName),
+						 rowSelectedByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.RowSelectedByName),
 
-						 rowInsertingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.RowInsertingByName),
-						 rowInsertedByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.RowInsertedByName),
+						 rowInsertingByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.RowInsertingByName),
+						 rowInsertedByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.RowInsertedByName),
 
-						 rowUpdatingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.RowUpdatingByName),
-						 rowUpdatedByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.RowUpdatedByName),
+						 rowUpdatingByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.RowUpdatingByName),
+						 rowUpdatedByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.RowUpdatedByName),
 
-						 rowDeletingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.RowDeletingByName),
-						 rowDeletedByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.RowDeletedByName),
+						 rowDeletingByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.RowDeletingByName),
+						 rowDeletedByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.RowDeletedByName),
 
-						 rowPersistingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.RowPersistingByName),
-						 rowPersistedByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.RowPersistedByName),
+						 rowPersistingByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.RowPersistingByName),
+						 rowPersistedByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.RowPersistedByName),
 
-						 cacheAttachedByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.CacheAttachedByName),
+						 cacheAttachedByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.CacheAttachedByName),
 
-						 fieldSelectingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.FieldSelectingByName),
-						 fieldDefaultingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.FieldDefaultingByName),
-						 fieldVerifyingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.FieldVerifyingByName),
-						 fieldUpdatingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.FieldUpdatingByName),
-						 fieldUpdatedByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.FieldUpdatedByName),
+						 fieldSelectingByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.FieldSelectingByName),
+						 fieldDefaultingByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.FieldDefaultingByName),
+						 fieldVerifyingByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.FieldVerifyingByName),
+						 fieldUpdatingByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.FieldUpdatingByName),
+						 fieldUpdatedByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.FieldUpdatedByName),
 
-						 commandPreparingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.CommandPreparingByName),
-						 exceptionHandlingByName: GetDeclaredEventHandlersInNaturalOrder(containingType, overrideChainsStorage.ExceptionHandlingByName)
+						 commandPreparingByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.CommandPreparingByName),
+						 exceptionHandlingByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.ExceptionHandlingByName)
 						);
 
 			public IEnumerable<GraphEventHandlerInfoBase> GetEventHandlersByEventType(EventType eventType) => eventType switch
@@ -228,7 +228,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				}
 			}
 
-			private static ImmutableDictionary<string, ImmutableArray<THandler>> GetDeclaredEventHandlersInNaturalOrder<THandler>(INamedTypeSymbol containingType,
+			private static ImmutableDictionary<string, ImmutableArray<THandler>> GetDeclaredEventHandlersFromDerivedToBase<THandler>(INamedTypeSymbol containingType,
 																								ImmutableDictionary<string, THandler> overridesChainsOfSameEventType)
 			where THandler : GraphEventHandlerInfoBase<THandler>
 			{

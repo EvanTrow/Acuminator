@@ -160,7 +160,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			eventsCollector.CollectGraphEventHandlers(_cancellation);
 
 			AllEventHandlerOverridesChains = AllGraphEventHandlerOverridesChainsStorage.FromCollected(eventsCollector);
-			DeclaredEventHandlers = DeclaredGraphEventHandlerStorage.FromOverridesChainsStorageInNaturalCollectionOrder(Symbol, AllEventHandlerOverridesChains);
+			DeclaredEventHandlers = DeclaredGraphEventHandlerStorage.FromOverridesChainsStorageInDerivedToBaseOrder(Symbol, AllEventHandlerOverridesChains);
 		}
 
 		public static PXGraphEventSemanticModel EnrichGraphModelWithEvents(PXGraphSemanticModel baseGraphModel, 
