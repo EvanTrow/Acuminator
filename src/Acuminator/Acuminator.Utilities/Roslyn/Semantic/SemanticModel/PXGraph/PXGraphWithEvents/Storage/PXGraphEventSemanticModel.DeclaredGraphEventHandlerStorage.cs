@@ -260,7 +260,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				if (!mostDerivedEventHandler.Symbol.IsDeclaredInType(containingType))
 					return null;
 
-				var handlersArrayBuilder = ImmutableArray.CreateBuilder<THandler>(initialCapacity: 1);
+				int estimatedCapacity = mostDerivedEventHandler.Base == null ? 1 : 2;
+				var handlersArrayBuilder = ImmutableArray.CreateBuilder<THandler>(estimatedCapacity);
 				handlersArrayBuilder.Add(mostDerivedEventHandler);
 
 				if (mostDerivedEventHandler.Base == null)     // optimization for most popular case when handler is not an override
