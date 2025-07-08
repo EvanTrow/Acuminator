@@ -345,73 +345,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		}
 
 		/// <summary>
-		/// Returns one or multiple semantic models of the PXGraph and PXGraphExtension descendants which are inferred from <paramref name="typeSymbol"/>.
-		/// </summary>
-		/// <param name="pxContext">Context instance</param>
-		/// <param name="typeSymbol">Symbol which is PXGraph or PXGraphExtension descendant and/or which uses the PXGraph.InstanceCreated AddHandler method</param>
-		/// <param name="semanticModel">Semantic model</param>
-		/// <param name="cancellation">Cancellation token</param>
-		/// <returns></returns>
-		public static IEnumerable<PXGraphSemanticModel> InferModels(PXContext pxContext, INamedTypeSymbol typeSymbol,
-																	GraphSemanticModelCreationOptions modelCreationOptions,
-																	int? declarationOrder = null, CancellationToken cancellation = default)
-		{
-			pxContext.ThrowOnNull();
-			typeSymbol.ThrowOnNull();
-			cancellation.ThrowIfCancellationRequested();
-
-			var models = new List<PXGraphSemanticModel>(capacity: 1);
-			var explicitModel = InferExplicitModel(pxContext, typeSymbol, modelCreationOptions, declarationOrder, cancellation);
-
-			if (explicitModel != null)
-			{
-				models.Add(explicitModel);
-
-				if (declarationOrder.HasValue)
-					declarationOrder = declarationOrder.Value + 1;
-			}
-
-			if (modelCreationOptions.HasFlag(GraphSemanticModelCreationOptions.InferImplicitModels))
-			{
-				InferImplicitModels(pxContext, typeSymbol, modelCreationOptions, models, declarationOrder, cancellation);
-			}
-
-			return models;
-		}
-
-		private static void InferImplicitModels(PXContext pxContext, INamedTypeSymbol typeSymbol,
-												GraphSemanticModelCreationOptions modelCreationOptions,
-												List<PXGraphSemanticModel> models, int? startDeclarationOrder, CancellationToken cancellation)
-		{
-			cancellation.ThrowIfCancellationRequested();
-
-			IEnumerable<InitDelegateInfo> delegates = GetInitDelegates(pxContext, typeSymbol, startDeclarationOrder, cancellation);
-
-			foreach (InitDelegateInfo initDelegateInfo in delegates)
-			{
-				GraphInitializerInfo info = new GraphInitializerInfo(GraphInitializerType.InstanceCreatedDelegate, initDelegateInfo.Node,
-																	 initDelegateInfo.Symbol, initDelegateInfo.DeclarationOrder);
-				PXGraphSemanticModel existingModel = models.FirstOrDefault(m => m.Symbol.Equals(initDelegateInfo.GraphTypeSymbol, 
-																								SymbolEqualityComparer.Default));
-				PXGraphSemanticModel implicitModel;
-
-				if (existingModel != null)
-				{
-					implicitModel = existingModel;
-				}
-				else
-				{
-					var graphOrExtNode = initDelegateInfo.GraphTypeSymbol.GetSyntax(cancellation) as ClassDeclarationSyntax;
-					implicitModel = new PXGraphSemanticModel(pxContext, initDelegateInfo.GraphType, initDelegateInfo.GraphTypeSymbol,
-															 graphOrExtNode, modelCreationOptions, initDelegateInfo.DeclarationOrder, cancellation);
-					models.Add(implicitModel);
-				}
-
-				implicitModel.DeclaredInitializers = implicitModel.DeclaredInitializers.Add(info);
-			}
-		}
-
-		/// <summary>
 		/// Infer semantic model for a given <paramref name="graphOrGraphExtTypeSymbol"/>.
 		/// If <paramref name="graphOrGraphExtTypeSymbol"/> is not a graph or graph extension, returns <see langword="null"/>.
 		/// </summary>
@@ -425,8 +358,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// If <paramref name="graphOrGraphExtTypeSymbol"/> is not graph or graph extension, then returns <see langword="null"/>.
 		/// </returns>
 		public static PXGraphSemanticModel? InferModel(PXContext pxContext, INamedTypeSymbol graphOrGraphExtTypeSymbol,
-															  GraphSemanticModelCreationOptions modelCreationOptions,
-															  int? declarationOrder = null, CancellationToken cancellation = default)
+													   GraphSemanticModelCreationOptions modelCreationOptions,
+													   int? declarationOrder = null, CancellationToken cancellation = default)
 		{
 			pxContext.ThrowOnNull();
 			graphOrGraphExtTypeSymbol.ThrowOnNull();
@@ -448,24 +381,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			var graphOrExtNode = graphOrGraphExtTypeSymbol.GetSyntax(cancellation) as ClassDeclarationSyntax;
 			return new PXGraphSemanticModel(pxContext, graphType, graphOrGraphExtTypeSymbol, graphOrExtNode, modelCreationOptions, 
 											declarationOrder ?? 0, cancellation);
-		}
-
-		protected static IEnumerable<InitDelegateInfo> GetInitDelegates(PXContext pxContext, INamedTypeSymbol typeSymbol,
-																		int? startDeclarationOrder, CancellationToken cancellation)
-		{
-			cancellation.ThrowIfCancellationRequested();
-
-			IEnumerable<SyntaxNode> declaringNodes = typeSymbol.DeclaringSyntaxReferences
-															   .Select(r => r.GetSyntax(cancellation));
-			InstanceCreatedEventsAddHandlerWalker walker = new InstanceCreatedEventsAddHandlerWalker(pxContext, startDeclarationOrder, cancellation);
-
-			foreach (SyntaxNode node in declaringNodes)
-			{
-				cancellation.ThrowIfCancellationRequested();
-				walker.Visit(node);
-			}
-
-			return walker.GraphInitDelegates;
 		}
 
 		protected IsActiveMethodInfo? GetIsActiveMethodInfo() =>
