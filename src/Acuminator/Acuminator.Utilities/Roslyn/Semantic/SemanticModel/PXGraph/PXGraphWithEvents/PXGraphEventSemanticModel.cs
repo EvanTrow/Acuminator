@@ -7,7 +7,6 @@ using System.Threading;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
-using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Semantic.SharedInfo;
 
 using Microsoft.CodeAnalysis;
@@ -154,7 +153,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		private PXGraphEventSemanticModel(PXGraphSemanticModel baseGraphModel, CancellationToken cancellation = default)
 		{
 			_cancellation = cancellation;
-			BaseGraphModel = baseGraphModel;
+			BaseGraphModel = baseGraphModel.CheckIfNull();
 
 			var eventsCollector = new NaturalOrderEventHandlersCollector(this, PXContext);
 			eventsCollector.CollectGraphEventHandlers(_cancellation);
@@ -168,14 +167,15 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			new PXGraphEventSemanticModel(baseGraphModel.CheckIfNull(), 
 										  cancellationToken);
 
-		public static IEnumerable<PXGraphEventSemanticModel> InferModels(PXContext pxContext, INamedTypeSymbol typeSymbol, 
-																		 GraphSemanticModelCreationOptions modelCreationOptions,
-																		 int? declarationOrder = null, CancellationToken cancellation = default)
+		public static PXGraphEventSemanticModel? InferModel(PXContext pxContext, INamedTypeSymbol typeSymbol, 
+															GraphSemanticModelCreationOptions modelCreationOptions,
+															int? declarationOrder = null, CancellationToken cancellation = default)
 		{	
-			var baseGraphModels = PXGraphSemanticModel.InferModels(pxContext, typeSymbol, modelCreationOptions, declarationOrder, cancellation);
-			var eventsGraphModels = baseGraphModels.Select(graph => new PXGraphEventSemanticModel(graph, cancellation))
-												   .ToList();
-			return eventsGraphModels;
+			var baseGraphModel = PXGraphSemanticModel.InferModel(pxContext, typeSymbol, modelCreationOptions, declarationOrder, cancellation);
+
+			return baseGraphModel != null 
+				? new PXGraphEventSemanticModel(baseGraphModel, cancellation)
+				: null;
 		}
 	}
 }
