@@ -459,7 +459,6 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\DacUiAttributes\Sources\Dac_Good_Hidden.cs" />
     <Compile Include="Tests\StaticAnalysis\DatabaseQueries\DatabaseQueriesInPXGraphInitializationTests.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\DatabaseQueries\Sources\Initializers\GraphInitialization.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\DatabaseQueries\Sources\Initializers\CreateInstanceDelegate.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\DatabaseQueries\Sources\Initializers\BQLSelect.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\DatabaseQueries\Sources\Initializers\BQLSearch.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\DatabaseQueries\Sources\Initializers\DataView.cs" />
@@ -747,7 +746,6 @@
     <Compile Include="Tests\StaticAnalysis\GraphCreation\PXGraphCreationInWrongPlaces_ISVTests.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\GraphCreation\Sources\PXGraphWithCreateInstanceInInitialization.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\GraphCreation\Sources\PXGraphExtensionWithCreateInstanceInInitialization.cs" />
-    <EmbeddedResource Include="Tests\StaticAnalysis\GraphCreation\Sources\PXGraphWithCreateInstanceInInitDelegate.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PXGraphCreateInstance\Sources\EventHandlers\CreateInstance.cs" />
     <Compile Include="Tests\StaticAnalysis\LongOperationStart\LongOperationInEventHandlersTests.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\LongOperationStart\Sources\EventHandlers\Valid.cs" />
