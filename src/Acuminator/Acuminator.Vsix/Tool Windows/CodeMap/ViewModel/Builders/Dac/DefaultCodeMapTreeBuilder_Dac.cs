@@ -44,7 +44,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			yield return DacMemberCategory.BaseTypes;
 			yield return DacMemberCategory.InitializationAndActivation;
 			yield return DacMemberCategory.Keys;
-			yield return DacMemberCategory.Property;
+			yield return DacMemberCategory.AllDacFields;
 			yield return DacMemberCategory.FieldsWithoutProperty;
 		}
 
@@ -54,7 +54,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				DacMemberCategory.BaseTypes					  => new DacBaseTypesCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
 				DacMemberCategory.InitializationAndActivation => new DacInitializationAndActivationCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
 				DacMemberCategory.Keys 						  => new KeyDacFieldsCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
-				DacMemberCategory.Property 					  => new AllDacFieldsDacCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
+				DacMemberCategory.AllDacFields 					  => new AllDacFieldsDacCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
 				_ 											  => null,
 			};
 
