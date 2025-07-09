@@ -21,7 +21,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		{
 		}
 
-		public override IEnumerable<DacFieldInfo> GetCategoryDacFields() => DacModel.DeclaredDacFields;
+		public override IEnumerable<DacFieldInfo> GetCategoryDacFields() => DacModel.DeclaredDacFields.Where(dacField => !dacField.IsNonBqlProperty);
 
 		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => treeVisitor.VisitNode(this, input);
 
