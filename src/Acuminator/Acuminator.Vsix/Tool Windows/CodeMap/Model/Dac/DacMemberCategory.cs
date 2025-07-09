@@ -11,8 +11,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap.Dac
 		BaseTypes,
 		Keys,
 		AllDacFields,
-		FieldsWithoutProperty,
-		InitializationAndActivation
+		NonBqlProperties,
+		InitializationAndActivation,
 	}
 
 	internal static class DacMemberTypeTypeUtils
@@ -22,7 +22,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap.Dac
 			{ DacMemberCategory.BaseTypes, "Base Types" },
 			{ DacMemberCategory.Keys, "Keys" },
 			{ DacMemberCategory.AllDacFields, "DAC Fields" },
-			{ DacMemberCategory.FieldsWithoutProperty, "Fields without property" },
+			{ DacMemberCategory.NonBqlProperties, "Non-BQL Properties" },
 			{ DacMemberCategory.InitializationAndActivation, "Initialization & Activation" }
 		};
 
