@@ -12,7 +12,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public class AllDacFieldsDacCategoryNodeViewModel : DacFieldCategoryNodeViewModel
 	{
-		public override Icon NodeIcon => Icon.DacPropertiesCategory;
+		public override Icon NodeIcon => Icon.AllDacFieldsCategory;
 
 		protected override bool AllowNavigation => true;
 

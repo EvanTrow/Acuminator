@@ -334,7 +334,7 @@
     <Resource Include="Resources\CodeMap\DacKeysCategory.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\CodeMap\DacPropertiesCategory.ico">
+    <Resource Include="Resources\CodeMap\AllDacFieldsCategory.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\CodeMap\DAC.ico">
