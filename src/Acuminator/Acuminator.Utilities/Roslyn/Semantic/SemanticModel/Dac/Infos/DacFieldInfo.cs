@@ -113,6 +113,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 		public bool HasAcumaticaAttributes { get; private set; }
 
+		/// <summary>
+		/// A flag indicating whether this info object represents a non-BQL property.
+		/// </summary>
+		/// <remarks>
+		/// A non-BQL propery is a C# property declared in a DAC or a DAC extension that does not have a corresponding BQL field and does not have Acumatica attributes declared on it.
+		/// </remarks>
+		public bool IsNonBqlProperty => HasFieldPropertyDeclared && !HasBqlFieldEffective && !HasAcumaticaAttributes;
+
 		public DacFieldInfo(DacPropertyInfo? dacPropertyInfo, DacBqlFieldInfo? dacBqlFieldInfo, DacFieldInfo baseInfo) :
 					   this(dacPropertyInfo, dacBqlFieldInfo)
 		{
