@@ -45,7 +45,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			yield return DacMemberCategory.InitializationAndActivation;
 			yield return DacMemberCategory.Keys;
 			yield return DacMemberCategory.AllDacFields;
-			yield return DacMemberCategory.FieldsWithoutProperty;
+			yield return DacMemberCategory.NonBqlProperties;
 		}
 
 		protected virtual DacMemberCategoryNodeViewModel? CreateCategory(DacNodeViewModel dac, DacMemberCategory dacMemberCategory) =>
@@ -54,7 +54,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				DacMemberCategory.BaseTypes					  => new DacBaseTypesCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
 				DacMemberCategory.InitializationAndActivation => new DacInitializationAndActivationCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
 				DacMemberCategory.Keys 						  => new KeyDacFieldsCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
-				DacMemberCategory.AllDacFields 					  => new AllDacFieldsDacCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
+				DacMemberCategory.AllDacFields 				  => new AllDacFieldsDacCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
+				DacMemberCategory.NonBqlProperties			  => new NonBqlDacPropertiesCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
 				_ 											  => null,
 			};
 
