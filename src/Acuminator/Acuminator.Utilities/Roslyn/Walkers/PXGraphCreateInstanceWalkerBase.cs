@@ -1,34 +1,28 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.Roslyn.Semantic;
-using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Utilities.Roslyn.Walkers
 {
 	/// <summary>
-	/// A recursive walker that reports graph creation.
+	/// A base class for recursive walkers that report graph creation.
 	/// </summary>
-	public class PXGraphCreateInstanceWalker : NestedInvocationWalker
+	public abstract class PXGraphCreateInstanceWalkerBase : NestedInvocationWalker
 	{
-		private readonly SymbolAnalysisContext _context;
-		private readonly DiagnosticDescriptor _descriptor;
+		protected SymbolAnalysisContext Context { get; }
 
-		public PXGraphCreateInstanceWalker(SymbolAnalysisContext context, PXContext pxContext, DiagnosticDescriptor descriptor)
-			: base(pxContext, context.CancellationToken)
+		protected abstract DiagnosticDescriptor Descriptor { get; }
+
+		public PXGraphCreateInstanceWalkerBase(SymbolAnalysisContext context, PXContext pxContext) : base(pxContext, context.CancellationToken)
 		{
-			_context = context;
-			_descriptor = descriptor.CheckIfNull();
+			Context = context;
 		}
 
 		public override void VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
@@ -39,7 +33,7 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 
 			if (symbol != null && PxContext.PXGraph.CreateInstance.Contains<IMethodSymbol>(symbol.ConstructedFrom, SymbolEqualityComparer.Default))
 			{
-				ReportDiagnostic(_context.ReportDiagnostic, _descriptor, node);
+				ReportDiagnostic(Context.ReportDiagnostic, Descriptor, node);
 			}
 			else
 			{
@@ -59,7 +53,7 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 
 			if (createdObjectType != null && createdObjectType.IsPXGraph(PxContext))
 			{
-				ReportDiagnostic(_context.ReportDiagnostic, _descriptor, node);
+				ReportDiagnostic(Context.ReportDiagnostic, Descriptor, node);
 			}
 			else
 			{
@@ -85,7 +79,7 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 
 			if (constructor?.ContainingType != null && constructor.ContainingType.IsPXGraph(PxContext))
 			{
-				ReportDiagnostic(_context.ReportDiagnostic, _descriptor, node);
+				ReportDiagnostic(Context.ReportDiagnostic, Descriptor, node);
 			}
 			else
 			{
