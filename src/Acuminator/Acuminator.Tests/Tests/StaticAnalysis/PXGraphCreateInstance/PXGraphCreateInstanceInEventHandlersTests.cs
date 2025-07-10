@@ -20,32 +20,27 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreateInstance
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
 			new LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings.Default
 					.WithRecursiveAnalysisEnabled()
+					.WithStaticAnalysisEnabled()
 					.WithIsvSpecificAnalyzersEnabled(),
 				new PXGraphCreateInstanceInEventHandlersAnalyzer());
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\CreateInstance.cs")]
-		public void TestDiagnostic_CreateInstance(string actual)
-		{
-			VerifyCSharpDiagnostic(actual, Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers.CreateFor(16, 21));
-		}
+		public Task CallTo_CreateInstance_InEventHandler(string actual) => 
+			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers.CreateFor(16, 21));
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\Constructor.cs")]
-		public void TestDiagnostic_Constructor(string actual)
-		{
-			VerifyCSharpDiagnostic(actual,
+		public Task CallTo_Constructor_InEventHandler(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers.CreateFor(17, 21),
 				Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers.CreateFor(18, 17));
-		}
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\ConstructorForNonSpecificPXGraph.cs")]
-		public void TestDiagnostic_ConstructorForNonSpecificPXGraph(string actual)
-		{
-			VerifyCSharpDiagnostic(actual,
+		public Task CallTo_ConstructorForNonSpecificPXGraph_InEventHandler(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers.CreateFor(17, 16),
 				Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers.CreateFor(18, 12));
-		}
 	}
 }
