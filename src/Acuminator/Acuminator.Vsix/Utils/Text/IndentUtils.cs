@@ -17,7 +17,7 @@ namespace Acuminator.Vsix.Utilities
 			: 0;
 
 		[return: NotNullIfNotNull(parameterName: nameof(syntaxNode))]
-		public static string? GetSyntaxNodeStringWithRemovedIndent(this SyntaxNode syntaxNode, int tabSize, int prependLength = 0)
+		public static string? GetSyntaxNodeStringWithRemovedIndent(this SyntaxNode? syntaxNode, int tabSize, int prependLength = 0)
 		{
 			if (tabSize <= 0)
 			{
