@@ -45,6 +45,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual TResult VisitNode(DacFieldPropertyNodeViewModel dacFieldProperty, TInput input) => 
 			DefaultVisit(dacFieldProperty, input);
+
+		public virtual TResult VisitNode(NonBqlDacPropertyNodeViewModel nonBqlDacProperty, TInput input) =>
+			DefaultVisit(nonBqlDacProperty, input);
 		#endregion
 
 		#region Attribute Nodes

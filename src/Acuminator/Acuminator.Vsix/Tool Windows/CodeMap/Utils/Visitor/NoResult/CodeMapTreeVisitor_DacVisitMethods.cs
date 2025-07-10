@@ -1,5 +1,4 @@
 ﻿#nullable enable
-
 using System;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
@@ -38,6 +37,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public virtual void VisitNode(DacBqlFieldNodeViewModel dacBqlField) => DefaultVisit(dacBqlField);
 
 		public virtual void VisitNode(DacFieldPropertyNodeViewModel dacFieldProperty) => DefaultVisit(dacFieldProperty);
+
+		public virtual void VisitNode(NonBqlDacPropertyNodeViewModel nonBqlDacProperty) => DefaultVisit(nonBqlDacProperty);
 		#endregion
 
 		#region Attribute Nodes
