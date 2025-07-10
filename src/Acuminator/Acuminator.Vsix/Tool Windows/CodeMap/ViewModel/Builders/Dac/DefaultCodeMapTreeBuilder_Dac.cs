@@ -103,7 +103,20 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		protected virtual IEnumerable<TreeNodeViewModel> CreateDacFieldsCategoryChildren(DacFieldCategoryNodeViewModel dacFieldCategory)
 		{
-			var categorySymbols = dacFieldCategory.CheckIfNull().GetCategoryDacFields();
+			var dacFields = dacFieldCategory?.GetCategoryDacFields();
+
+			if (dacFields == null)
+				yield break;
+
+			foreach (DacFieldInfo fieldInfo in dacFields)
+			{
+				Cancellation.ThrowIfCancellationRequested();
+				var dacFieldNode = new DacFieldNodeViewModel(dacFieldCategory!, parent: dacFieldCategory!, fieldInfo, ExpandCreatedNodes);
+
+				if (dacFieldNode != null)
+					yield return dacFieldNode;
+			}
+		}
 
 			if (categorySymbols == null)
 				yield break;
