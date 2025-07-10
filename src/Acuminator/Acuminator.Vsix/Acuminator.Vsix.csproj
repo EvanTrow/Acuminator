@@ -421,6 +421,9 @@
     <Resource Include="Resources\CodeMap\DacNonBqlPropertiesCategory.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\CodeMap\DacNonBqlProperty.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Content Include="Resources\DacExplorer.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

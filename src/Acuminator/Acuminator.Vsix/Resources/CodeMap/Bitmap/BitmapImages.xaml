@@ -99,8 +99,11 @@
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacBqlField.png"/>
 
 	<BitmapImage x:Key="DacFieldProperty" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
-			 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacFieldProperty.png"/>
+				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacFieldProperty.png"/>
 
+	<BitmapImage x:Key="DacNonBqlProperty" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacNonBqlProperty.png"/>
+	
 	<BitmapImage x:Key="DacKeysCategory" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacKeysCategory.ico"/>
 
@@ -111,7 +114,7 @@
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/InitializationAndActivationCategory.png"/>
 
 	<BitmapImage x:Key="DacNonBqlPropertiesCategory" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
-			 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacNonBqlPropertiesCategory.ico"/>
+				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacNonBqlPropertiesCategory.ico"/>
 
 	<BitmapImage x:Key="ProjectionDacSmall" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/Projection.ico"/>
