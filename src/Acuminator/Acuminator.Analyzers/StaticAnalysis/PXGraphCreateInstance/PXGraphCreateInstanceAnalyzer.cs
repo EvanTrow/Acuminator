@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 using Acuminator.Utilities;
 using Acuminator.Utilities.DiagnosticSuppression;
@@ -20,6 +19,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 			private readonly SyntaxNodeAnalysisContext _context;
 			private readonly PXContext _pxContext;
 			private readonly SemanticModel _semanticModel;
+
+			private static readonly DiagnosticDescriptor _px1001Descriptor = Descriptors.PX1001_PXGraphCreateInstance;
+			private static readonly DiagnosticDescriptor _px1003Descriptor = Descriptors.PX1003_NonSpecificPXGraphCreateInstance;
 
 			public Walker(SyntaxNodeAnalysisContext context, PXContext pxContext, SemanticModel semanticModel)
 			{
@@ -51,30 +53,30 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 			{
 				if (typeSymbol is ITypeParameterSymbol typeParameterSymbol && typeParameterSymbol.IsPXGraph(_pxContext))
 				{
-					return Descriptors.PX1001_PXGraphCreateInstance;
+					return _px1001Descriptor;
 				}
 				else if (typeSymbol.InheritsFrom(_pxContext.PXGraph.Type))
 				{
-					return Descriptors.PX1001_PXGraphCreateInstance;
+					return _px1001Descriptor;
 				}
 				else if (typeSymbol.Equals(_pxContext.PXGraph.Type, SymbolEqualityComparer.Default))
 				{
-					return Descriptors.PX1003_NonSpecificPXGraphCreateInstance;
+					return _px1003Descriptor;
 				}
 
 				return null;
 			}
 		}
 
+		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
+				Descriptors.PX1001_PXGraphCreateInstance,
+				Descriptors.PX1003_NonSpecificPXGraphCreateInstance);
+
 		public PXGraphCreateInstanceAnalyzer() : this(null)
 		{ }
 
 		public PXGraphCreateInstanceAnalyzer(CodeAnalysisSettings? codeAnalysisSettings) : base(codeAnalysisSettings)
 		{ }
-
-		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
-				Descriptors.PX1001_PXGraphCreateInstance,
-				Descriptors.PX1003_NonSpecificPXGraphCreateInstance);
 
 		protected override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, PXContext pxContext)
 		{
