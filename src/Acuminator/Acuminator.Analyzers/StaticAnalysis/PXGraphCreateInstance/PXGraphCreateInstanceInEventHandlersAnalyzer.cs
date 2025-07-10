@@ -1,15 +1,13 @@
-﻿
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 using Acuminator.Analyzers.StaticAnalysis.EventHandlers;
-using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Syntax;
+using Acuminator.Utilities.Roslyn.Walkers;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
@@ -32,59 +30,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 			methodSyntax?.Accept(walker);
 		}
 
-		private class Walker : NestedInvocationWalker
+		private class Walker(SymbolAnalysisContext context, PXContext pxContext) : PXGraphCreateInstanceWalkerBase(context, pxContext)
 		{
-			private const string CreateInstanceMethodName = "CreateInstance";
+			private static readonly DiagnosticDescriptor _px1045_isv	= Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers;
+			private static readonly DiagnosticDescriptor _px1045_nonIsv = Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers_NonISV;
 
-			private readonly SymbolAnalysisContext _context;
-
-			public Walker(SymbolAnalysisContext context, PXContext pxContext)
-				: base(pxContext, context.CancellationToken)
-			{
-				_context = context;
-			}
-
-			public override void VisitInvocationExpression(InvocationExpressionSyntax node)
-			{
-				ThrowIfCancellationRequested();
-
-				var methodSymbol = GetSymbol<IMethodSymbol>(node);
-
-				if (methodSymbol?.ContainingType?.OriginalDefinition != null &&
-					methodSymbol.ContainingType.OriginalDefinition.IsPXGraph() &&
-					methodSymbol.Name == CreateInstanceMethodName)
-				{
-					ReportDiagnostic(
-						_context.ReportDiagnostic,
-						Settings.IsvSpecificAnalyzersEnabled
-							? Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers
-							: Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers_NonISV, node);
-				}
-				else
-				{
-					base.VisitInvocationExpression(node);
-				}
-			}
-
-			public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
-			{
-				if (node.Type != null)
-				{
-					var typeSymbol = GetSymbol<ITypeSymbol>(node.Type);
-
-					if (typeSymbol != null && typeSymbol.IsPXGraph())
-					{
-						ReportDiagnostic(
-							_context.ReportDiagnostic,
-							Settings.IsvSpecificAnalyzersEnabled
-								? Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers
-								: Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers_NonISV,
-							node);
-					}
-				}
-
-				base.VisitObjectCreationExpression(node);
-			}
+			protected override DiagnosticDescriptor Descriptor =>
+				Settings.IsvSpecificAnalyzersEnabled
+					? _px1045_isv
+					: _px1045_nonIsv;
 		}
 	}
 }
