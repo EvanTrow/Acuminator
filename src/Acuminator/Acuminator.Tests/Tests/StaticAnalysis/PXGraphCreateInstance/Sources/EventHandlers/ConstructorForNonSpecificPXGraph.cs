@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using PX.Data;
 
 namespace PX.Objects
@@ -14,6 +15,7 @@ namespace PX.Objects
 			if (e.TranStatus != PXTranStatus.Completed) return;
 
 			var graph = new PXGraph();
+			graph = new();
 		}
 	}
 }

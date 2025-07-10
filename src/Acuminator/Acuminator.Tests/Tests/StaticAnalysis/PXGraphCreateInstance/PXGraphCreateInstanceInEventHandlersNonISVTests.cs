@@ -4,7 +4,9 @@ using Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
+
 using Microsoft.CodeAnalysis.Diagnostics;
+
 using Xunit;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreateInstance
@@ -30,7 +32,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreateInstance
 		public void TestDiagnostic_Constructor(string actual)
 		{
 			VerifyCSharpDiagnostic(actual,
-				Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers_NonISV.CreateFor(16, 21));
+				Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers_NonISV.CreateFor(17, 21),
+				Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers_NonISV.CreateFor(18, 17));
 		}
 
 		[Theory]
@@ -38,7 +41,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreateInstance
 		public void TestDiagnostic_ConstructorForNonSpecificPXGraph(string actual)
 		{
 			VerifyCSharpDiagnostic(actual,
-				Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers_NonISV.CreateFor(16, 16));
+				Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers_NonISV.CreateFor(17, 16),
+				Descriptors.PX1045_PXGraphCreateInstanceInEventHandlers_NonISV.CreateFor(18, 12));
 		}
 	}
 }
