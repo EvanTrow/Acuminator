@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
@@ -111,23 +112,29 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			foreach (DacFieldInfo fieldInfo in dacFields)
 			{
 				Cancellation.ThrowIfCancellationRequested();
+				
 				var dacFieldNode = new DacFieldNodeViewModel(dacFieldCategory!, parent: dacFieldCategory!, fieldInfo, ExpandCreatedNodes);
-
-				if (dacFieldNode != null)
-					yield return dacFieldNode;
+				yield return dacFieldNode;
 			}
 		}
 
-			if (categorySymbols == null)
+		public override IEnumerable<TreeNodeViewModel> VisitNode(NonBqlDacPropertiesCategoryNodeViewModel nonBqlDacPropertiesCategory)
+		{
+			var nonBqlDacFields = nonBqlDacPropertiesCategory?.GetCategoryDacFields();
+
+			if (nonBqlDacFields == null)
 				yield break;
 
-			foreach (DacFieldInfo fieldInfo in categorySymbols)
+			foreach (DacFieldInfo nonBqlDacFieldInfo in nonBqlDacFields)
 			{
 				Cancellation.ThrowIfCancellationRequested();
-				TreeNodeViewModel childNode = new DacFieldNodeViewModel(dacFieldCategory, parent: dacFieldCategory, 
-																		fieldInfo, ExpandCreatedNodes);
-				if (childNode != null)
-					yield return childNode;
+
+				if (nonBqlDacFieldInfo.HasFieldPropertyDeclared)
+				{
+					var nonBqlDacFieldNode = new NonBqlDacPropertyNodeViewModel(nonBqlDacPropertiesCategory!, parent: nonBqlDacPropertiesCategory!,
+																				nonBqlDacFieldInfo.PropertyInfo, ExpandCreatedNodes);
+					yield return nonBqlDacFieldNode;
+				}
 			}
 		}
 
@@ -146,11 +153,20 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			}
 		}
 
-		public override IEnumerable<TreeNodeViewModel> VisitNode(DacFieldPropertyNodeViewModel dacFieldProperty)
+		public override IEnumerable<TreeNodeViewModel> VisitNode(DacFieldPropertyNodeViewModel dacFieldProperty) =>
+			CreateAttributeNodesForProperty(parent: dacFieldProperty, dacFieldProperty?.PropertyInfo);
+
+		public override IEnumerable<TreeNodeViewModel> VisitNode(NonBqlDacPropertyNodeViewModel nonBqlDacProperty) =>
+			CreateAttributeNodesForProperty(parent: nonBqlDacProperty, nonBqlDacProperty?.PropertyInfo);
+
+		private IEnumerable<DacFieldAttributeNodeViewModel> CreateAttributeNodesForProperty(TreeNodeViewModel? parent, DacPropertyInfo? dacPropertyInfo)
 		{
-			var attributes = dacFieldProperty.CheckIfNull().PropertyInfo.Attributes;
+			if (parent == null || dacPropertyInfo == null)
+				return [];
+
+			var attributes = dacPropertyInfo.Attributes;
 			return !attributes.IsDefaultOrEmpty
-				? attributes.Select(attrInfo => new DacFieldAttributeNodeViewModel(dacFieldProperty, attrInfo, ExpandCreatedNodes))
+				? attributes.Select(attrInfo => new DacFieldAttributeNodeViewModel(parent, attrInfo, ExpandCreatedNodes))
 				: [];
 		}
 	}
