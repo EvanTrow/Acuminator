@@ -242,6 +242,18 @@ namespace Acuminator.Utilities.Roslyn
 
 		public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
 		{
+			VisitInstanceConstructorCallExpression(node);
+			base.VisitObjectCreationExpression(node);
+		}
+
+		public override void VisitImplicitObjectCreationExpression(ImplicitObjectCreationExpressionSyntax node)
+		{
+			VisitInstanceConstructorCallExpression(node);
+			base.VisitImplicitObjectCreationExpression(node);
+		}
+
+		private void VisitInstanceConstructorCallExpression(BaseObjectCreationExpressionSyntax node)
+		{
 			ThrowIfCancellationRequested();
 
 			if (RecursiveAnalysisEnabled())
@@ -249,8 +261,6 @@ namespace Acuminator.Utilities.Roslyn
 				var methodSymbol = GetSymbol<IMethodSymbol>(node);
 				VisitCalledMethod(methodSymbol, node);
 			}
-
-			base.VisitObjectCreationExpression(node);
 		}
 
 		public override void VisitConditionalAccessExpression(ConditionalAccessExpressionSyntax node)
