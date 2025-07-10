@@ -193,7 +193,7 @@ namespace Acuminator.Utilities.Roslyn
 		{
 			ThrowIfCancellationRequested();
 
-			if (RecursiveAnalysisEnabled() && node.Parent?.Kind() != SyntaxKind.ConditionalAccessExpression)
+			if (RecursiveAnalysisEnabled() && node.Parent != null && !node.Parent.IsKind(SyntaxKind.ConditionalAccessExpression))
 			{
 				var methodSymbol = GetSymbol<IMethodSymbol>(node);
 				VisitCalledMethod(methodSymbol, node);
