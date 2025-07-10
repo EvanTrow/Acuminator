@@ -48,8 +48,7 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 		}
 
 		/// <summary>
-		/// Called when the visitor visits a ObjectCreationExpressionSyntax node (a constructor call via new).
-		/// We need to check that graphs are not created via "<see langword="new"/> PXGraph()" constructor call.
+		/// Called when the visitor visits a <see cref="ObjectCreationExpressionSyntax"/> node which represents a constructor call via "<c><see langword="new"/> MyGraph()</c>".<br/>
 		/// </summary>
 		/// <param name="node">The node.</param>
 		public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
@@ -65,6 +64,32 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 			else
 			{
 				base.VisitObjectCreationExpression(node);
+			}
+		}
+
+		/// <summary>
+		/// Called when the visitor visits a <see cref="ImplicitObjectCreationExpressionSyntax"/> node which represents a constructor call via "<c><see langword="new"/>()</c>".<br/>
+		/// </summary>
+		/// <param name="node">The node.</param>
+		public override void VisitImplicitObjectCreationExpression(ImplicitObjectCreationExpressionSyntax node)
+		{
+			ThrowIfCancellationRequested();
+
+			var constructor = GetSymbol<IMethodSymbol>(node);
+
+			if (constructor == null || constructor.MethodKind != MethodKind.Constructor)
+			{
+				base.VisitImplicitObjectCreationExpression(node);
+				return;
+			}
+
+			if (constructor?.ContainingType != null && constructor.ContainingType.IsPXGraph(PxContext))
+			{
+				ReportDiagnostic(_context.ReportDiagnostic, _descriptor, node);
+			}
+			else
+			{
+				base.VisitImplicitObjectCreationExpression(node);
 			}
 		}
 	}
