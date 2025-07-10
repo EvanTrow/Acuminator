@@ -42,12 +42,6 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.GraphCreation
 				Descriptors.PX1057_PXGraphCreationDuringInitialization_NonISV.CreateFor(26, 32));
 
 		[Theory]
-		[EmbeddedFileData("PXGraphWithCreateInstanceInInitDelegate.cs")]
-		public Task GraphInitDelegate(string source) =>
-			VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1057_PXGraphCreationDuringInitialization_NonISV.CreateFor(20, 14));
-
-		[Theory]
 		[EmbeddedFileData("PXGraphExtensionWithCreateInstanceInIsActiveMethods.cs")]
 		public Task GraphExtension_IsActiveAndIsActiveForGraph(string source) =>
 			VerifyCSharpDiagnosticAsync(source,

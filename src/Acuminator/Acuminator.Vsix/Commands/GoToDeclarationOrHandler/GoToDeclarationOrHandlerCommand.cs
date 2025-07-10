@@ -161,8 +161,7 @@ namespace Acuminator.Vsix.GoToDeclaration
 			INamedTypeSymbol graphOrExtensionType = memberSymbol.ContainingType;
 			var modelCreationOptions = GraphSemanticModelCreationOptions.CollectGeneralGraphInfo |
 									   GraphSemanticModelCreationOptions.CollectProcessingDelegates;
-			PXGraphSemanticModel? graphSemanticModel = PXGraphSemanticModel.InferModels(context, graphOrExtensionType, modelCreationOptions)
-																		  ?.FirstOrDefault();
+			var graphSemanticModel = PXGraphSemanticModel.InferModel(context, graphOrExtensionType, modelCreationOptions);
 
 			if (graphSemanticModel == null)
 				return;

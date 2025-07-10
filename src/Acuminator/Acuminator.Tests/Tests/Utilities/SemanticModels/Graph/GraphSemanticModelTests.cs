@@ -367,9 +367,9 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			INamedTypeSymbol? graphOrGraphExtSymbol = context.SemanticModel.GetDeclaredSymbol(graphOrGraphExtDeclaration);
 			graphOrGraphExtSymbol.Should().NotBeNull();
 
-			var graphSemanticModel = PXGraphSemanticModel.InferExplicitModel(context.PXContext, graphOrGraphExtSymbol!,
-																			GraphSemanticModelCreationOptions.CollectGeneralGraphInfo,
-																			cancellation: cancellation);
+			var graphSemanticModel = PXGraphSemanticModel.InferModel(context.PXContext, graphOrGraphExtSymbol!,
+																	 GraphSemanticModelCreationOptions.CollectGeneralGraphInfo,
+																	 cancellation: cancellation);
 			graphSemanticModel.Should().NotBeNull();
 			graphSemanticModel!.GraphOrGraphExtInfo.Should().NotBeNull();
 

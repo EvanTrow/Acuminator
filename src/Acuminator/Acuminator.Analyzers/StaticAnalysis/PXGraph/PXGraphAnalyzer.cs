@@ -86,33 +86,23 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 			if (context.Symbol is not INamedTypeSymbol type)
 				return;
 
-			ParallelOptions parallelOptions = new ParallelOptions
-			{
-				CancellationToken = context.CancellationToken
-			};
+			var graphOrGraphExtModel = PXGraphEventSemanticModel.InferModel(pxContext, type, GraphSemanticModelCreationOptions.CollectAll,
+																			cancellation: context.CancellationToken);
+			if (graphOrGraphExtModel == null)
+				return;
 
-			var inferredGraphs = PXGraphSemanticModel.InferModels(pxContext, type, GraphSemanticModelCreationOptions.CollectAll, 
-																  cancellation: context.CancellationToken);
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			var graphsEnrichedWithEvents = from graphOrExtension in inferredGraphs
-										   where graphOrExtension != null
-										   select PXGraphEventSemanticModel.EnrichGraphModelWithEvents(graphOrExtension, context.CancellationToken);
+			var effectiveAnalyzers = _innerAnalyzers.Where(analyzer => analyzer.ShouldAnalyze(pxContext, graphOrGraphExtModel))
+													.ToList(capacity: _innerAnalyzers.Length);
 
-			foreach (var graphOrExtension in graphsEnrichedWithEvents)
+			RunAggregatedAnalyzersInParallel(effectiveAnalyzers, context, aggregatedAnalyserAction: analyzerIndex =>
 			{
-				var effectiveAnalyzers = _innerAnalyzers.Where(analyzer => analyzer.ShouldAnalyze(pxContext, graphOrExtension))
-														.ToList(capacity: _innerAnalyzers.Length);
+				context.CancellationToken.ThrowIfCancellationRequested();
 
-				RunAggregatedAnalyzersInParallel(effectiveAnalyzers, context, aggregatedAnalyserAction: analyzerIndex =>
-				{
-					context.CancellationToken.ThrowIfCancellationRequested();
-
-					var analyzer = effectiveAnalyzers[analyzerIndex];
-					analyzer.Analyze(context, pxContext, graphOrExtension);
-				},
-				parallelOptions);
-			}
+				var analyzer = effectiveAnalyzers[analyzerIndex];
+				analyzer.Analyze(context, pxContext, graphOrGraphExtModel);
+			});
 		}
 	}
 }

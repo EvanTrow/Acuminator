@@ -39,11 +39,6 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DatabaseQueries
 				Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(28, 13));
 
 		[Theory]
-		[EmbeddedFileData(@"Initializers\CreateInstanceDelegate.cs")]
-		public Task CreateInstanceDelegate_CausesDiagnostic(string actual) =>
-			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1085_DatabaseQueriesInPXGraphInitialization.CreateFor(20, 25));
-
-		[Theory]
 		[EmbeddedFileData(@"Initializers\BQLSelect.cs")]
 		public Task BQLSelect_CausesDiagnostic(string actual) =>
 			VerifyCSharpDiagnosticAsync(actual,
