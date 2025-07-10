@@ -32,7 +32,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 
 			public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
 			{
-				if (node.Type == null || _semanticModel.GetSymbolInfo(node.Type).Symbol is not ITypeSymbol typeSymbol)
+				_context.CancellationToken.ThrowIfCancellationRequested();
+
+				if (node.Type == null || _semanticModel.GetSymbolOrFirstCandidate(node.Type, _context.CancellationToken) is not ITypeSymbol typeSymbol)
 				{
 					base.VisitObjectCreationExpression(node);
 					return;
@@ -65,6 +67,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 				}
 
 				return null;
+			}
+
+			public override void DefaultVisit(SyntaxNode node)
+			{
+				_context.CancellationToken.ThrowIfCancellationRequested();
+				base.DefaultVisit(node);
 			}
 		}
 
