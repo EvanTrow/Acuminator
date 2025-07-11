@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using PX.Data;
 
-namespace PX.Analyzers.Test.Sources
+namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreateInstance
 {
 	public class PX1001ClassWithMethod : IPrefetchable
 	{
