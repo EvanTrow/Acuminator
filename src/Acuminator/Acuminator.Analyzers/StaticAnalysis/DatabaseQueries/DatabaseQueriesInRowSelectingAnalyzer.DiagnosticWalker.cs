@@ -20,7 +20,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.DatabaseQueries
 			public DiagnosticWalker(SymbolAnalysisContext context, PXContext pxContext)
 				: base(context, pxContext, Descriptors.PX1042_DatabaseQueriesInRowSelecting)
 			{
-				_connectionScopeVisitor = new PXConnectionScopeVisitor(this, pxContext);
+				_connectionScopeVisitor = new PXConnectionScopeVisitor(this, pxContext, 
+														semanticModelGetter: GetSemanticModel, 
+														CancellationToken);
 			}
 
 			public override void VisitUsingStatement(UsingStatementSyntax node)
@@ -47,18 +49,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.DatabaseQueries
 
 			public override void VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node)
 			{
-				// This method supports expressions like "using var x = new PXConnectionScope();"
+				// Expressions like "using var x = new PXConnectionScope();" are not supported and won't be supported
+				// since PX1042 diagnostic is obsolete and works only for Acumatica 2022R2 and older.
+				// No reason to invest into it.
 				ThrowIfCancellationRequested();
-
-				if (node.UsingKeyword == default || !node.UsingKeyword.IsKind(SyntaxKind.UsingKeyword) || _insideConnectionScope)
-				{
-					base.VisitLocalDeclarationStatement(node);
-					return;
-				}
-
-				_insideConnectionScope = node.Accept(_connectionScopeVisitor);
 				base.VisitLocalDeclarationStatement(node);
-				_insideConnectionScope = false;
 			}
 
 			public override void VisitInvocationExpression(InvocationExpressionSyntax node)
