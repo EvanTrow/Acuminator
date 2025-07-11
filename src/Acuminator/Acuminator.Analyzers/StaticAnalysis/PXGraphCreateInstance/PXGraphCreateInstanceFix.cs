@@ -3,7 +3,6 @@ using System.Composition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.Semantic;
@@ -21,40 +20,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 	[ExportCodeFixProvider(LanguageNames.CSharp), Shared]
 	public class PXGraphCreateInstanceFix : PXCodeFixProvider
 	{
-		private class Rewriter : CSharpSyntaxRewriter
-		{
-			private readonly PXContext _pxContext;
-			private readonly Document _document;
-			private readonly SemanticModel _semanticModel;
-			private readonly CancellationToken _cancellation;
-
-			public Rewriter(PXContext pxContext, Document document, SemanticModel semanticModel, CancellationToken cancellation)
-			{
-				_pxContext = pxContext;
-				_document = document;
-				_semanticModel = semanticModel;
-				_cancellation = cancellation;
-			}
-
-			public override SyntaxNode? VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
-			{
-				_cancellation.ThrowIfCancellationRequested();
-
-				var generator = SyntaxGenerator.GetGenerator(_document);
-				var typeSymbol = _semanticModel.GetSymbolInfo(node.Type, _cancellation).Symbol as ITypeSymbol;
-
-				if (typeSymbol != null)
-				{
-					return generator.InvocationExpression(
-						generator.MemberAccessExpression(
-							generator.TypeExpression(_pxContext.PXGraph.Type),
-							generator.GenericName(DelegateNames.CreateInstance, typeSymbol)));
-				}
-
-				return base.VisitObjectCreationExpression(node);
-			}
-		}
-
 		public override ImmutableArray<string> FixableDiagnosticIds { get; } =
 			ImmutableArray.Create(Descriptors.PX1001_PXGraphCreateInstance.Id);
 
@@ -93,6 +58,41 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 			var newRoot = root!.ReplaceNode(nodeWithDiagnostic, newNode);
 
 			return document.WithSyntaxRoot(newRoot);
+		}
+
+
+		private class Rewriter : CSharpSyntaxRewriter
+		{
+			private readonly PXContext _pxContext;
+			private readonly Document _document;
+			private readonly SemanticModel _semanticModel;
+			private readonly CancellationToken _cancellation;
+
+			public Rewriter(PXContext pxContext, Document document, SemanticModel semanticModel, CancellationToken cancellation)
+			{
+				_pxContext = pxContext;
+				_document = document;
+				_semanticModel = semanticModel;
+				_cancellation = cancellation;
+			}
+
+			public override SyntaxNode? VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
+			{
+				_cancellation.ThrowIfCancellationRequested();
+
+				var generator = SyntaxGenerator.GetGenerator(_document);
+				var typeSymbol = _semanticModel.GetSymbolInfo(node.Type, _cancellation).Symbol as ITypeSymbol;
+
+				if (typeSymbol != null)
+				{
+					return generator.InvocationExpression(
+						generator.MemberAccessExpression(
+							generator.TypeExpression(_pxContext.PXGraph.Type),
+							generator.GenericName(DelegateNames.CreateInstance, typeSymbol)));
+				}
+
+				return base.VisitObjectCreationExpression(node);
+			}
 		}
 	}
 }
