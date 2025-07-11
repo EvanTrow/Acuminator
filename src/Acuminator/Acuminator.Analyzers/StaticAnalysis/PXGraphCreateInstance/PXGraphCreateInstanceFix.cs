@@ -60,33 +60,47 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 		{
 			private readonly PXContext _pxContext;
 			private readonly Document _document;
+			private readonly SyntaxGenerator? _generator;
 			private readonly SemanticModel _semanticModel;
 			private readonly CancellationToken _cancellation;
 
 			public Rewriter(PXContext pxContext, Document document, SemanticModel semanticModel, CancellationToken cancellation)
 			{
-				_pxContext = pxContext;
-				_document = document;
+				_pxContext 	   = pxContext;
+				_document 	   = document;
 				_semanticModel = semanticModel;
-				_cancellation = cancellation;
+				_cancellation  = cancellation;
+				_generator 	   = SyntaxGenerator.GetGenerator(_document);
 			}
 
 			public override SyntaxNode? VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
 			{
 				_cancellation.ThrowIfCancellationRequested();
 
-				var generator = SyntaxGenerator.GetGenerator(_document);
-				var typeSymbol = _semanticModel.GetSymbolInfo(node.Type, _cancellation).Symbol as ITypeSymbol;
+				if (_generator == null) 
+					return base.VisitObjectCreationExpression(node);
 
-				if (typeSymbol != null)
-				{
-					return generator.InvocationExpression(
-						generator.MemberAccessExpression(
-							generator.TypeExpression(_pxContext.PXGraph.Type),
-							generator.GenericName(DelegateNames.CreateInstance, typeSymbol)));
-				}
+				var graphTypeSymbol		   = _semanticModel.GetSymbolInfo(node.Type, _cancellation).Symbol as ITypeSymbol;
+				var createInstanceCallNode = GeneratePXGraphCreateInstanceCall(graphTypeSymbol);
 
-				return base.VisitObjectCreationExpression(node);
+				return createInstanceCallNode ?? base.VisitObjectCreationExpression(node);
+			}
+
+			private SyntaxNode? GeneratePXGraphCreateInstanceCall(ITypeSymbol? graphTypeSymbol)
+			{
+				if (graphTypeSymbol == null)
+					return null;
+
+				return _generator!.InvocationExpression(
+						_generator.MemberAccessExpression(
+							_generator.TypeExpression(_pxContext.PXGraph.Type),
+							_generator.GenericName(DelegateNames.CreateInstance, graphTypeSymbol)));
+			}
+
+			public override SyntaxNode? DefaultVisit(SyntaxNode node)
+			{
+				_cancellation.ThrowIfCancellationRequested();
+				return base.DefaultVisit(node);
 			}
 		}
 	}
