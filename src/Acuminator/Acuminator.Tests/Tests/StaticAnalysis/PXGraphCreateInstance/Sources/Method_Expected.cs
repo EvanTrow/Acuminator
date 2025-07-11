@@ -13,7 +13,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreateInstance
 		public void Prefetch()
 		{
 			var graph = PXGraph.CreateInstance<PX1001MethodGraph>();
-			var graph2 = PXGraph.CreateInstance<PX1001MethodGraph>();
+			PX1001MethodGraph graph2 = PXGraph.CreateInstance<PX1001MethodGraph>();
 		}
 	}
 
