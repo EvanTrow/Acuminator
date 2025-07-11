@@ -107,7 +107,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				BaseDacPlaceholderNodeViewModel	  => false,
 				BaseGraphPlaceholderNodeViewModel => false,
 				DacFieldPropertyNodeViewModel 	  => false,
-				DacBqlFieldNodeViewModel	  	  => false,
+				DacBqlFieldNodeViewModel		  => false,
 
 				DacNodeViewModel dacNode	 when dacNode.Parent != null   => false,
 				GraphNodeViewModel graphNode when graphNode.Parent != null => false,

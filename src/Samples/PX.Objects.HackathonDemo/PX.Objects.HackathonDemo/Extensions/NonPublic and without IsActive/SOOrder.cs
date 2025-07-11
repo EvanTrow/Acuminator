@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,8 +13,8 @@ namespace PX.Objects.HackathonDemo.Extensions.NonPublic
 	[PXHidden]
 	public class SOOrder : IBqlTable
 	{
-        #region OrderType
-        public abstract class orderType : IBqlField { }
+		#region OrderType
+		public abstract class orderType : IBqlField { }
 		[PXDBString(IsKey = true, InputMask = "")]
 		[PXDefault]
 		[PXUIField(DisplayName = "Order Type")]
@@ -59,8 +60,8 @@ namespace PX.Objects.HackathonDemo.Extensions.NonPublic
 		public string Status { get; set; }
 		#endregion
 
-        #region tstamp
-        public abstract class Tstamp : IBqlField
+		#region tstamp
+		public abstract class Tstamp : IBqlField
 		{
 		}
 
@@ -71,5 +72,14 @@ namespace PX.Objects.HackathonDemo.Extensions.NonPublic
 			set;
 		}
 		#endregion
+
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool HasStatus
+		{
+			get 
+			{
+				return !string.IsNullOrWhiteSpace(Status);
+			}
+		}
 	}
 }

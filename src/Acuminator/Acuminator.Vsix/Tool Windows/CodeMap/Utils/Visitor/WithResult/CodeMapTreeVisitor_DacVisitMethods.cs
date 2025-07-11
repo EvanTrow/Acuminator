@@ -24,6 +24,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public virtual TResult VisitNode(DacInitializationAndActivationCategoryNodeViewModel dacInitializationAndActivationCategory) =>
 			DefaultVisit(dacInitializationAndActivationCategory);
 
+		public virtual TResult VisitNode(NonBqlDacPropertiesCategoryNodeViewModel nonBqlDacPropertiesCategory) =>
+			DefaultVisit(nonBqlDacPropertiesCategory);
+
 		public virtual TResult VisitNode(DacBaseTypesCategoryNodeViewModel dacBaseTypesCategory) => DefaultVisit(dacBaseTypesCategory);
 		#endregion
 
@@ -36,6 +39,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public virtual TResult VisitNode(DacBqlFieldNodeViewModel dacBqlField) => DefaultVisit(dacBqlField);
 
 		public virtual TResult VisitNode(DacFieldPropertyNodeViewModel dacFieldProperty) => DefaultVisit(dacFieldProperty);
+
+		public virtual TResult VisitNode(NonBqlDacPropertyNodeViewModel nonBqlDacProperty) => DefaultVisit(nonBqlDacProperty);
 		#endregion
 
 		#region Attribute Nodes

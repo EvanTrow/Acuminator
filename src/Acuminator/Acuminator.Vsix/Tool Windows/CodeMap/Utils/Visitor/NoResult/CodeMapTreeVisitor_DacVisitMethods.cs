@@ -1,5 +1,4 @@
 ﻿#nullable enable
-
 using System;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
@@ -23,6 +22,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public virtual void VisitNode(DacInitializationAndActivationCategoryNodeViewModel dacInitializationAndActivationCategory) =>
 			DefaultVisit(dacInitializationAndActivationCategory);
 
+		public virtual void VisitNode(NonBqlDacPropertiesCategoryNodeViewModel nonBqlDacPropertiesCategory) =>
+			DefaultVisit(nonBqlDacPropertiesCategory);
+
 		public virtual void VisitNode(DacBaseTypesCategoryNodeViewModel dacBaseTypesCategory) => DefaultVisit(dacBaseTypesCategory);
 		#endregion
 
@@ -35,6 +37,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public virtual void VisitNode(DacBqlFieldNodeViewModel dacBqlField) => DefaultVisit(dacBqlField);
 
 		public virtual void VisitNode(DacFieldPropertyNodeViewModel dacFieldProperty) => DefaultVisit(dacFieldProperty);
+
+		public virtual void VisitNode(NonBqlDacPropertyNodeViewModel nonBqlDacProperty) => DefaultVisit(nonBqlDacProperty);
 		#endregion
 
 		#region Attribute Nodes

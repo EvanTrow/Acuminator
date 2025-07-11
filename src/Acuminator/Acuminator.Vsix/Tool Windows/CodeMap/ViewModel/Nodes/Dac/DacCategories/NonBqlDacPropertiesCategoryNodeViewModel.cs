@@ -10,18 +10,19 @@ using Acuminator.Vsix.ToolWindows.CodeMap.Dac;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class AllDacFieldsDacCategoryNodeViewModel : DacFieldCategoryNodeViewModel
+	public class NonBqlDacPropertiesCategoryNodeViewModel : DacFieldCategoryNodeViewModel
 	{
-		public override Icon NodeIcon => Icon.AllDacFieldsCategory;
-
 		protected override bool AllowNavigation => true;
 
-		public AllDacFieldsDacCategoryNodeViewModel(DacNodeViewModel dacViewModel, TreeNodeViewModel parent, bool isExpanded) : 
-												base(dacViewModel, parent, DacMemberCategory.AllDacFields, isExpanded)
+		public override Icon NodeIcon => Icon.DacNonBqlPropertiesCategory;
+
+		public NonBqlDacPropertiesCategoryNodeViewModel(DacNodeViewModel dacViewModel, TreeNodeViewModel parent, bool isExpanded) : 
+												   base(dacViewModel, parent, DacMemberCategory.NonBqlProperties, isExpanded)
 		{
 		}
 
-		public override IEnumerable<DacFieldInfo> GetCategoryDacFields() => DacModel.DeclaredDacFields.Where(dacField => !dacField.IsNonBqlProperty);
+		public override IEnumerable<DacFieldInfo> GetCategoryDacFields() => 
+			DacModel.DeclaredDacFields.Where(field => field.IsNonBqlProperty);
 
 		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => treeVisitor.VisitNode(this, input);
 
