@@ -43,8 +43,35 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 					_context.ReportDiagnosticWithSuppressionCheck(Diagnostic.Create(descriptor, node.GetLocation()),
 						_pxContext.CodeAnalysisSettings);
 				}
+				else
+				{
+					base.VisitObjectCreationExpression(node);
+				}
+			}
 
-				base.VisitObjectCreationExpression(node);
+			public override void VisitImplicitObjectCreationExpression(ImplicitObjectCreationExpressionSyntax node)
+			{
+				_context.CancellationToken.ThrowIfCancellationRequested();
+
+				var constructor = _semanticModel.GetSymbolOrFirstCandidate(node, _context.CancellationToken) as IMethodSymbol;
+
+				if (constructor?.ContainingType == null || constructor.MethodKind != MethodKind.Constructor) 
+				{
+					base.VisitImplicitObjectCreationExpression(node);
+					return;
+				}
+
+				DiagnosticDescriptor? descriptor = GetDiagnosticDescriptor(constructor.ContainingType);
+
+				if (descriptor != null)
+				{
+					_context.ReportDiagnosticWithSuppressionCheck(Diagnostic.Create(descriptor, node.GetLocation()),
+						_pxContext.CodeAnalysisSettings);
+				}
+				else
+				{
+					base.VisitImplicitObjectCreationExpression(node);
+				}
 			}
 
 			private DiagnosticDescriptor? GetDiagnosticDescriptor(ITypeSymbol typeSymbol)
