@@ -1,4 +1,5 @@
-﻿using Acuminator.Utilities.Common;
+﻿using System.Threading;
+
 using Acuminator.Utilities.Roslyn.Semantic;
 
 using Microsoft.CodeAnalysis;
@@ -10,35 +11,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DatabaseQueries
 {
 	public partial class DatabaseQueriesInRowSelectingAnalyzer
 	{
-		private class DiagnosticWalker : Walker
+		private partial class DiagnosticWalker : Walker
 		{
-			private class PXConnectionScopeVisitor : CSharpSyntaxVisitor<bool>
-			{
-				private readonly DiagnosticWalker _parent;
-				private readonly PXContext _pxContext;
-
-				public PXConnectionScopeVisitor(DiagnosticWalker parent, PXContext pxContext)
-				{
-					_parent = parent.CheckIfNull();
-					_pxContext = pxContext.CheckIfNull();
-				}
-
-				public override bool VisitUsingStatement(UsingStatementSyntax node)
-				{
-					return (node.Declaration?.Accept(this) ?? false) || (node.Expression?.Accept(this) ?? false);
-				}
-
-				public override bool VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
-				{
-					var semanticModel = _parent.GetSemanticModel(node.SyntaxTree);
-					if (semanticModel == null)
-						return false;
-
-					var symbolInfo = semanticModel.GetSymbolInfo(node.Type, _parent.CancellationToken);
-					return symbolInfo.Symbol?.OriginalDefinition != null
-					       && symbolInfo.Symbol.OriginalDefinition.Equals(_pxContext.PXConnectionScope, SymbolEqualityComparer.Default);
-				}
-			}
 
 			private readonly PXConnectionScopeVisitor _connectionScopeVisitor;
 			private bool _insideConnectionScope;
@@ -59,10 +33,32 @@ namespace Acuminator.Analyzers.StaticAnalysis.DatabaseQueries
 				}
 				else
 				{
-					_insideConnectionScope = node.Accept(_connectionScopeVisitor);
-					base.VisitUsingStatement(node);
-					_insideConnectionScope = false;
+					try
+					{
+						_insideConnectionScope = node.Accept(_connectionScopeVisitor);
+						base.VisitUsingStatement(node);
+					}
+					finally
+					{
+						_insideConnectionScope = false;
+					}
 				}
+			}
+
+			public override void VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node)
+			{
+				// This method supports expressions like "using var x = new PXConnectionScope();"
+				ThrowIfCancellationRequested();
+
+				if (node.UsingKeyword == default || !node.UsingKeyword.IsKind(SyntaxKind.UsingKeyword) || _insideConnectionScope)
+				{
+					base.VisitLocalDeclarationStatement(node);
+					return;
+				}
+
+				_insideConnectionScope = node.Accept(_connectionScopeVisitor);
+				base.VisitLocalDeclarationStatement(node);
+				_insideConnectionScope = false;
 			}
 
 			public override void VisitInvocationExpression(InvocationExpressionSyntax node)
