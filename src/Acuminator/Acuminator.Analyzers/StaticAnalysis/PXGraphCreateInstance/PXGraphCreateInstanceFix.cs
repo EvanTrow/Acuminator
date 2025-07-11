@@ -86,6 +86,22 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 				return createInstanceCallNode ?? base.VisitObjectCreationExpression(node);
 			}
 
+			public override SyntaxNode? VisitImplicitObjectCreationExpression(ImplicitObjectCreationExpressionSyntax node)
+			{
+				_cancellation.ThrowIfCancellationRequested();
+
+				if (_generator == null)
+					return base.VisitImplicitObjectCreationExpression(node);
+
+				var constructor = _semanticModel.GetSymbolInfo(node, _cancellation).Symbol as IMethodSymbol;
+
+				if (constructor?.ContainingType == null || constructor.MethodKind != MethodKind.Constructor)
+					return base.VisitImplicitObjectCreationExpression(node);
+
+				var createInstanceCallNode = GeneratePXGraphCreateInstanceCall(constructor.ContainingType);
+				return createInstanceCallNode ?? base.VisitImplicitObjectCreationExpression(node);
+			}
+
 			private SyntaxNode? GeneratePXGraphCreateInstanceCall(ITypeSymbol? graphTypeSymbol)
 			{
 				if (graphTypeSymbol == null)
