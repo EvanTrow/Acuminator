@@ -37,15 +37,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 
 		private static async Task<Document> RewriteGraphConstructionAsync(Document document, TextSpan span, CancellationToken cancellation)
 		{
-			var root = await document.GetSyntaxRootAsync(cancellation).ConfigureAwait(false);
+			var (semanticModel, root) = await document.GetSemanticModelAndRootAsync(cancellation).ConfigureAwait(false);
 			var nodeWithDiagnostic = root?.FindNode(span);
 
-			if (nodeWithDiagnostic == null)
-				return document;
-
-			var semanticModel = await document.GetSemanticModelAsync(cancellation).ConfigureAwait(false);
-
-			if (semanticModel == null)
+			if (semanticModel == null || nodeWithDiagnostic == null)
 				return document;
 
 			var pxContext = new PXContext(semanticModel.Compilation, codeAnalysisSettings: null);
