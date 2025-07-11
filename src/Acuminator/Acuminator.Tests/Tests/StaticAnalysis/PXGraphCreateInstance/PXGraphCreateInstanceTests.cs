@@ -25,8 +25,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreateInstance
 
 		[Theory]
 		[EmbeddedFileData("Method.cs")]
-		public Task CallTo_Constructor_In_Method(string actual) => 
-			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1001_PXGraphCreateInstance.CreateFor(14, 25));
+		public Task CallTo_Constructor_In_Method(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
+				Descriptors.PX1001_PXGraphCreateInstance.CreateFor(15, 16),
+				Descriptors.PX1001_PXGraphCreateInstance.CreateFor(16, 17));
 
 		[Theory]
 		[EmbeddedFileData("Field.cs")]
