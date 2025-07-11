@@ -1,6 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 
-using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
 
 using Microsoft.CodeAnalysis;
@@ -15,16 +15,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.DatabaseQueries
 		{
 			private readonly DiagnosticWalker _parent;
 			private readonly PXContext _pxContext;
-			private readonly SemanticModel _semanticModel;
+			private readonly Func<SyntaxTree, SemanticModel?> _semanticModelGetter;
 			private readonly CancellationToken _cancellation;
 
-			public PXConnectionScopeVisitor(DiagnosticWalker parent, PXContext pxContext, SemanticModel semanticModel, 
+			public PXConnectionScopeVisitor(DiagnosticWalker parent, PXContext pxContext, Func<SyntaxTree, SemanticModel?> semanticModelGetter,
 											CancellationToken cancellation)
 			{
-				_parent 	   = parent;
-				_pxContext 	   = pxContext;
-				_semanticModel = semanticModel;
-				_cancellation  = cancellation;
+				_parent 			 = parent;
+				_pxContext 	   		 = pxContext;
+				_semanticModelGetter = semanticModelGetter;
+				_cancellation  		 = cancellation;
 			}
 
 			public override bool VisitUsingStatement(UsingStatementSyntax node)
@@ -34,12 +34,26 @@ namespace Acuminator.Analyzers.StaticAnalysis.DatabaseQueries
 
 			public override bool VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
 			{
-				var symbol = _semanticModel.GetSymbolOrFirstCandidate(node.Type, _cancellation);
-
-				return symbol != null && 
-					   (symbol.Equals(_pxContext.PXConnectionScope, SymbolEqualityComparer.Default) ||
-						symbol.OriginalDefinition?.Equals(_pxContext.PXConnectionScope, SymbolEqualityComparer.Default) == true);
+				var semanticModel = _semanticModelGetter(node.SyntaxTree);
+				var typeSymbol = semanticModel?.GetSymbolOrFirstCandidate(node.Type, _cancellation) as ITypeSymbol;
+				return IsPXConnectionScope(typeSymbol);
 			}
+
+			public override bool VisitImplicitObjectCreationExpression(ImplicitObjectCreationExpressionSyntax node)
+			{
+				var semanticModel = _semanticModelGetter(node.SyntaxTree);
+				var constructor = semanticModel?.GetSymbolOrFirstCandidate(node, _cancellation) as IMethodSymbol;
+
+				if (constructor?.ContainingType == null || constructor.MethodKind != MethodKind.Constructor)
+					return false;
+
+				return IsPXConnectionScope(constructor.ContainingType);
+			}
+
+			private bool IsPXConnectionScope(ITypeSymbol? typeSymbol) =>
+				typeSymbol != null &&
+				(typeSymbol.Equals(_pxContext.PXConnectionScope, SymbolEqualityComparer.Default) ||
+				 typeSymbol.OriginalDefinition?.Equals(_pxContext.PXConnectionScope, SymbolEqualityComparer.Default) == true);
 		}
 	}
 }
