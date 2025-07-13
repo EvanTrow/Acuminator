@@ -10,6 +10,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 using Acuminator.Utilities;
 using Acuminator.Utilities.Roslyn.Semantic;
+using System.Runtime.ExceptionServices;
 
 namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 {
@@ -76,15 +77,55 @@ namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 						aggregatedAnalyserAction(analyzerIndex);
 					}
 #else
-					parallelOptions = parallelOptions ?? new ParallelOptions
-					{
-						CancellationToken = context.CancellationToken
-					};
-
-					Parallel.For(0, effectiveAnalyzers.Count, parallelOptions, aggregatedAnalyserAction);
+					RunInParallel(effectiveAnalyzers, context, aggregatedAnalyserAction, parallelOptions);
 #endif
 					return;
 				}
+			}
+		}
+
+		private void RunInParallel(List<T> effectiveAnalyzers, SymbolAnalysisContext context, Action<int> aggregatedAnalyserAction, 
+								   ParallelOptions? parallelOptions)
+		{
+			parallelOptions = parallelOptions ?? new ParallelOptions
+			{
+				CancellationToken = context.CancellationToken
+			};
+
+			try
+			{
+				Parallel.For(0, effectiveAnalyzers.Count, parallelOptions, aggregatedAnalyserAction);
+			}
+			catch (AggregateException aggregateException)
+			{
+				var unwrappedException = UnwrapAggregatedException(aggregateException);
+				
+				if (unwrappedException != null)
+					 ExceptionDispatchInfo.Capture(unwrappedException).Throw();
+				
+				throw;
+			}
+		}
+
+		private Exception? UnwrapAggregatedException(AggregateException aggregateException)
+		{
+			switch (aggregateException.InnerExceptions.Count)
+			{
+				case 0:
+					return null;
+
+				case 1 
+				when aggregateException.InnerExceptions[0] is not AggregateException:	// Hot path
+					return aggregateException.InnerExceptions[0];
+
+				default:
+					var flattenedException = aggregateException.Flatten();
+					return flattenedException.InnerExceptions.Count switch
+					{
+						0 => null,
+						1 => flattenedException.InnerExceptions[0],
+						_ => flattenedException
+					};
 			}
 		}
 	}
