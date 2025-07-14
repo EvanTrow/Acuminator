@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
+using System.Xml.Linq;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
@@ -168,31 +169,22 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </summary>
 		public ImmutableArray<GraphAttributeInfo> Attributes { get; }
 
-		protected PXGraphSemanticModel(PXContext pxContext, GraphType graphType, INamedTypeSymbol symbol, ClassDeclarationSyntax? node,
-										GraphSemanticModelCreationOptions modelCreationOptions, int declarationOrder,
+		protected PXGraphSemanticModel(PXContext pxContext, GraphType graphType, GraphOrGraphExtInfoBase graphOrGraphExtInfo, ClassDeclarationSyntax? node,
+										ITypeSymbol? graphSymbol, GraphSemanticModelCreationOptions modelCreationOptions, int declarationOrder,
 										CancellationToken cancellation = default)
 		{
 			cancellation.ThrowIfCancellationRequested();
 
-			PXContext = pxContext.CheckIfNull();
-			GraphType = graphType;
-
-			if (GraphType == GraphType.PXGraph)
-			{
-				GraphOrGraphExtInfo = GraphInfo.Create(symbol, node, PXContext, declarationOrder, cancellation).CheckIfNull();
-				GraphSymbol = Symbol;
-			}
-			else
-			{
-				GraphSymbol = symbol.GetGraphFromGraphExtension(PXContext);
-				GraphOrGraphExtInfo = GraphExtensionInfo.Create(symbol, node, GraphSymbol, PXContext, declarationOrder, cancellation).CheckIfNull();
-			}
+			PXContext 			= pxContext.CheckIfNull();
+			GraphType 			= graphType;
+			GraphOrGraphExtInfo = graphOrGraphExtInfo.CheckIfNull();
+			GraphSymbol			= graphSymbol;
 
 			_cancellation 		 = cancellation;
 			ModelCreationOptions = modelCreationOptions;
 			Attributes			 = GetGraphAttributes();
 
-			StaticConstructors 	 = Symbol.GetStaticConstructors(_cancellation);
+			StaticConstructors 	 = GraphOrGraphExtInfo.Symbol.GetStaticConstructors(_cancellation);
 			ViewsByNames 		 = GetDataViews();
 			ViewDelegatesByNames = GetDataViewDelegates();
 
@@ -201,8 +193,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 			InitProcessingDelegatesInfo();
 
-			ConfigureMethodOverride = ConfigureMethodInfo.GetConfigureMethodInfo(Symbol, GraphType, PXContext, _cancellation);
-			InitializeMethodInfo	= InitializeMethodInfo.GetInitializeMethodInfo(Symbol, GraphType, PXContext, _cancellation);
+			ConfigureMethodOverride = ConfigureMethodInfo.GetConfigureMethodInfo(GraphOrGraphExtInfo.Symbol, GraphType, PXContext, _cancellation);
+			InitializeMethodInfo	= InitializeMethodInfo.GetInitializeMethodInfo(GraphOrGraphExtInfo.Symbol, GraphType, PXContext, _cancellation);
 
 			DeclaredInitializers 	   = GetDeclaredInitializers().ToImmutableArray();
 			IsActiveMethodInfo 		   = GetIsActiveMethodInfo();
@@ -359,28 +351,40 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </returns>
 		public static PXGraphSemanticModel? InferModel(PXContext pxContext, INamedTypeSymbol graphOrGraphExtTypeSymbol,
 													   GraphSemanticModelCreationOptions modelCreationOptions,
-													   int? declarationOrder = null, CancellationToken cancellation = default)
+													   int? customDeclarationOrder = null, CancellationToken cancellation = default)
 		{
 			pxContext.ThrowOnNull();
 			graphOrGraphExtTypeSymbol.ThrowOnNull();
 			cancellation.ThrowIfCancellationRequested();
 
 			GraphType graphType;
+			ITypeSymbol? graphSymbol;
 
 			if (graphOrGraphExtTypeSymbol.IsPXGraph(pxContext))
 			{
-				graphType = GraphType.PXGraph;
+				graphType   = GraphType.PXGraph;
+				graphSymbol = graphOrGraphExtTypeSymbol;
 			}
 			else if (graphOrGraphExtTypeSymbol.IsPXGraphExtension(pxContext))
 			{
-				graphType = GraphType.PXGraphExtension;
+				graphType   = GraphType.PXGraphExtension;
+				graphSymbol = graphOrGraphExtTypeSymbol.GetGraphFromGraphExtension(pxContext);
 			}
 			else
 				return null;
 
+			int declarationOrder = customDeclarationOrder ?? 0;
 			var graphOrExtNode = graphOrGraphExtTypeSymbol.GetSyntax(cancellation) as ClassDeclarationSyntax;
-			return new PXGraphSemanticModel(pxContext, graphType, graphOrGraphExtTypeSymbol, graphOrExtNode, modelCreationOptions, 
-											declarationOrder ?? 0, cancellation);
+
+			GraphOrGraphExtInfoBase? graphOrGraphExtInfo = graphType == GraphType.PXGraph
+				? GraphInfo.Create(graphOrGraphExtTypeSymbol, graphOrExtNode, pxContext, declarationOrder, cancellation)
+				: GraphExtensionInfo.Create(graphOrGraphExtTypeSymbol, graphOrExtNode, graphSymbol, pxContext, declarationOrder, cancellation);
+
+			if (graphOrGraphExtInfo == null)
+				return null;
+
+			return new PXGraphSemanticModel(pxContext, graphType, graphOrGraphExtInfo, graphOrExtNode, graphSymbol, modelCreationOptions, 
+											declarationOrder, cancellation);
 		}
 
 		protected IsActiveMethodInfo? GetIsActiveMethodInfo() =>
