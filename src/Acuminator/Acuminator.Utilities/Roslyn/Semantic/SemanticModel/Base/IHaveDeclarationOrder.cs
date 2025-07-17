@@ -1,7 +1,7 @@
 ﻿namespace Acuminator.Utilities.Roslyn.Semantic;
 
 /// <summary>
-/// An interface for a semantic info object that has a declaration order.
+/// An interface for an object that has a declaration order.
 /// </summary>
 public interface IHaveDeclarationOrder
 {

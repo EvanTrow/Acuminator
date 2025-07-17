@@ -3,6 +3,8 @@
 using System;
 using System.Collections.Generic;
 
+using Acuminator.Utilities.Roslyn.Semantic;
+
 namespace Acuminator.Vsix.ToolWindows.CodeMap;
 
 /// <summary>
@@ -19,8 +21,8 @@ internal class NodeDeclarationOrderComparer : IComparer<TreeNodeViewModel>
 		if (ReferenceEquals(x, y)) 
 			return 0;
 
-		var nodeWithOrderX = x as INodeWithDeclarationOrder;
-		var nodeWithOrderY = y as INodeWithDeclarationOrder;
+		var nodeWithOrderX = x as IHaveDeclarationOrder;
+		var nodeWithOrderY = y as IHaveDeclarationOrder;
 
 		if (nodeWithOrderX == null && nodeWithOrderY == null)		//Always place nodes without symbol first
 			return 0;
