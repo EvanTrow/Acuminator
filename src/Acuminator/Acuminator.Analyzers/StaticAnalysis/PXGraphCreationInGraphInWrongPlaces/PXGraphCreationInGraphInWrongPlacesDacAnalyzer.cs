@@ -1,9 +1,6 @@
-﻿
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 using Acuminator.Analyzers.StaticAnalysis.Dac;
-using Acuminator.Utilities;
-using Acuminator.Utilities.Roslyn.Walkers;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 
@@ -28,8 +25,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreationInGraphInWrongPlace
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			var graphIsActiveMethodWalker = new PXGraphCreateInstanceWalker(context, pxContext, Descriptors.PX1056_PXGraphCreationInIsActiveMethod);
-
+			var graphIsActiveMethodWalker = new PXGraphCreateInstanceInGraphInitializationAndDataViewsWalker(context, pxContext, 
+																							Descriptors.PX1056_PXGraphCreationInIsActiveMethod);
 			// Node not null here because it is checked in ShouldAnalyze
 			graphIsActiveMethodWalker.Visit(dacExtension.IsActiveMethodInfo!.Node);
 		}

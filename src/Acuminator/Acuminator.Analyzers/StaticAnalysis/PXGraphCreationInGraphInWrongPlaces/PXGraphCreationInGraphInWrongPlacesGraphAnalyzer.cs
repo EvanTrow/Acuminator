@@ -1,9 +1,6 @@
-﻿
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
-using Acuminator.Utilities;
-using Acuminator.Utilities.Roslyn.Walkers;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
@@ -29,7 +26,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreationInGraphInWrongPlace
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			var graphInitializerWalker = new PXGraphCreateInstanceWalker(
+			var graphInitializerWalker = new PXGraphCreateInstanceInGraphInitializationAndDataViewsWalker(
 				context,
 				pxContext,
 				pxContext.CodeAnalysisSettings.IsvSpecificAnalyzersEnabled
@@ -42,7 +39,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreationInGraphInWrongPlace
 				graphInitializerWalker.Visit(initializer.Node);
 			}
 
-			var graphViewDelegateWalker = new PXGraphCreateInstanceWalker(context, pxContext,
+			var graphViewDelegateWalker = new PXGraphCreateInstanceInGraphInitializationAndDataViewsWalker(context, pxContext,
 				Descriptors.PX1084_GraphCreationInDataViewDelegate);
 
 			foreach (DataViewDelegateInfo del in graphOrGraphExtension.ViewDelegates)
@@ -66,7 +63,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreationInGraphInWrongPlace
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
 
-				var graphIsActiveMethodWalker = new PXGraphCreateInstanceWalker(context, pxContext, descriptor);
+				var graphIsActiveMethodWalker = new PXGraphCreateInstanceInGraphInitializationAndDataViewsWalker(context, pxContext, descriptor);
 				graphIsActiveMethodWalker.Visit(IsActiveMethodInfo.Node);
 			}
 		}

@@ -23,6 +23,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreationInGraphInWrongPla
 		{
 			base.Configure(graph);
 			SWKMapadocConnMaint maint = PXGraph.CreateInstance<SWKMapadocConnMaint>();
+
+			maint = new();
 		}
 	}
 

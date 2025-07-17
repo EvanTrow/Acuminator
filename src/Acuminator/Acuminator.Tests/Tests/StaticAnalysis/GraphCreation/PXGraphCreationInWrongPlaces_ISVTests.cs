@@ -42,7 +42,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.GraphCreation
 			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(13, 32),
 				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(19, 32),
-				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(25, 32));
+				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(25, 32),
+				Descriptors.PX1057_PXGraphCreationDuringInitialization.CreateFor(27, 12));
 
 		[Theory]
 		[EmbeddedFileData("PXGraphExtensionWithCreateInstanceInInitialization.cs")]
