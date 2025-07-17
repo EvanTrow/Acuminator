@@ -376,9 +376,18 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			int declarationOrder = customDeclarationOrder ?? 0;
 			var graphOrExtNode = graphOrGraphExtTypeSymbol.GetSyntax(cancellation) as ClassDeclarationSyntax;
 
-			GraphOrGraphExtInfoBase? graphOrGraphExtInfo = graphType == GraphType.PXGraph
-				? GraphInfo.Create(graphOrGraphExtTypeSymbol, graphOrExtNode, pxContext, declarationOrder, cancellation)
-				: GraphExtensionInfo.Create(graphOrGraphExtTypeSymbol, graphOrExtNode, graphSymbol, pxContext, declarationOrder, cancellation);
+			GraphOrGraphExtInfoBase? graphOrGraphExtInfo;
+
+			if (graphType == GraphType.PXGraph)
+				graphOrGraphExtInfo = GraphInfo.Create(graphOrGraphExtTypeSymbol, graphOrExtNode, pxContext, declarationOrder, cancellation);
+			else
+			{
+				(graphOrGraphExtInfo, bool hasCircularReferences) = 
+					GraphExtensionInfo.Create(graphOrGraphExtTypeSymbol, graphOrExtNode, graphSymbol, pxContext, declarationOrder, cancellation);
+
+				if (hasCircularReferences)
+					return null;
+			}
 
 			if (graphOrGraphExtInfo == null)
 				return null;
