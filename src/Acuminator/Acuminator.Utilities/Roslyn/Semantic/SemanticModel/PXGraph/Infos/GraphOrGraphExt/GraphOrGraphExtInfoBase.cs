@@ -11,15 +11,15 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	{
 		public GraphOrGraphExtInfoBase? Base { get; }
 
-		protected GraphOrGraphExtInfoBase(ClassDeclarationSyntax? node, INamedTypeSymbol dac, int declarationOrder, GraphOrGraphExtInfoBase baseInfo) :
-									 this(node, dac, declarationOrder)
+		protected GraphOrGraphExtInfoBase(ClassDeclarationSyntax? node, INamedTypeSymbol graphOrGraphExt, int declarationOrder, GraphOrGraphExtInfoBase baseInfo) :
+									 this(node, graphOrGraphExt, declarationOrder)
 		{
 			Base = baseInfo.CheckIfNull();
 			CombineWithBaseInfo(baseInfo);
 		}
 
-		protected GraphOrGraphExtInfoBase(ClassDeclarationSyntax? node, INamedTypeSymbol dac, int declarationOrder) :
-									 base(node, dac, declarationOrder)
+		protected GraphOrGraphExtInfoBase(ClassDeclarationSyntax? node, INamedTypeSymbol graphOrGraphExt, int declarationOrder) :
+									 base(node, graphOrGraphExt, declarationOrder)
 		{
 		}
 
