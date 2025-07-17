@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.ProjectSystem;
-using Acuminator.Utilities.Roslyn.Semantic.SharedInfo;
+using Acuminator.Utilities.Roslyn.Semantic.Shared;
 using Acuminator.Utilities.Roslyn.Syntax;
 using Acuminator.Vsix.ToolWindows.Common;
 using Acuminator.Vsix.Utilities;

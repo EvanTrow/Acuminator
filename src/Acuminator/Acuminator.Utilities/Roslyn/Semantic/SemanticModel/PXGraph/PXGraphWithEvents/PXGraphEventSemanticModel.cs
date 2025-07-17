@@ -7,7 +7,7 @@ using System.Threading;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
-using Acuminator.Utilities.Roslyn.Semantic.SharedInfo;
+using Acuminator.Utilities.Roslyn.Semantic.Shared;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

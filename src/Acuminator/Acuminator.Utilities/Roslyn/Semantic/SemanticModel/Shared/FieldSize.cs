@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Acuminator.Utilities.Roslyn.Semantic.SharedInfo
+namespace Acuminator.Utilities.Roslyn.Semantic.Shared
 {
 	/// <summary>
 	/// Information about the DAC field's size

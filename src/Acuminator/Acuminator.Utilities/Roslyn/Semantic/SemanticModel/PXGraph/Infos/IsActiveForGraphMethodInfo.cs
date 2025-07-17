@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Roslyn.Constants;
-using Acuminator.Utilities.Roslyn.Semantic.SharedInfo;
+using Acuminator.Utilities.Roslyn.Semantic.Shared;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;

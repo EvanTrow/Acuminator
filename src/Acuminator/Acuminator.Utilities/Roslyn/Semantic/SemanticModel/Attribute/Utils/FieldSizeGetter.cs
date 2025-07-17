@@ -5,7 +5,7 @@ using System.Linq;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.PXFieldAttributes;
-using Acuminator.Utilities.Roslyn.Semantic.SharedInfo;
+using Acuminator.Utilities.Roslyn.Semantic.Shared;
 
 using Microsoft.CodeAnalysis;
 

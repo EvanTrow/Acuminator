@@ -10,7 +10,7 @@ using Acuminator.Utilities.Roslyn.Syntax;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Acuminator.Utilities.Roslyn.Semantic.SharedInfo
+namespace Acuminator.Utilities.Roslyn.Semantic.Shared
 {
 	/// <summary>
 	/// Information about the IsActive special method in graph and DAC extensions.
