@@ -20,7 +20,7 @@ using Acuminator.Analyzers.StaticAnalysis.NoPrimaryViewForPrimaryDac;
 using Acuminator.Analyzers.StaticAnalysis.ForbidPrivateEventHandlers;
 using Acuminator.Analyzers.StaticAnalysis.PXActionExecution;
 using Acuminator.Analyzers.StaticAnalysis.PXGraphCreationInGraphInWrongPlaces;
-using Acuminator.Analyzers.StaticAnalysis.PXOverrideMismatch;
+using Acuminator.Analyzers.StaticAnalysis.PXOverride;
 using Acuminator.Analyzers.StaticAnalysis.SavingChanges;
 using Acuminator.Analyzers.StaticAnalysis.StaticFieldOrPropertyInGraph;
 using Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions;

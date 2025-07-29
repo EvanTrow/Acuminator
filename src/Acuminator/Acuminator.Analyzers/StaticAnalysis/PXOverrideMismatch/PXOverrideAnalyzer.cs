@@ -11,7 +11,7 @@ using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Acuminator.Analyzers.StaticAnalysis.PXOverrideMismatch
+namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 {
 	public class PXOverrideAnalyzer : PXGraphAggregatedAnalyzerBase
 	{
