@@ -28,37 +28,47 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 			var directBaseTypesAndThis = graphExtension.Symbol.GetBaseTypesAndThis().ToList(capacity: 4);
 
-			var allBaseTypes = graphExtension.Symbol
-				.GetGraphExtensionWithBaseExtensions(pxContext, SortDirection.Ascending, includeGraph: true)
-				.SelectMany(t => t.GetBaseTypesAndThis())
-				.OfType<INamedTypeSymbol>()
-				.Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default)
-				.Where(baseType => !directBaseTypesAndThis.Contains(baseType, SymbolEqualityComparer.Default))
-				.ToList();
+			var allGraphAndGraphExtensionBaseTypes = 
+				graphExtension.Symbol.GetGraphExtensionWithBaseExtensions(pxContext, SortDirection.Ascending, includeGraph: true)
+									.SelectMany(t => t.GetBaseTypesAndThis())
+									.OfType<INamedTypeSymbol>()
+									.Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default)
+									.Where(baseType => !directBaseTypesAndThis.Contains(baseType, SymbolEqualityComparer.Default))
+									.ToList();
 
-			foreach (PXOverrideInfo pxOverride in graphExtension.PXOverrides)
+			foreach (PXOverrideInfo pxOverrideInfo in graphExtension.PXOverrides)
 			{
-				AnalyzeMethod(context, pxContext, allBaseTypes, pxOverride.Symbol);
+				AnalyzePatchMethod(context, pxContext, allGraphAndGraphExtensionBaseTypes, pxOverrideInfo);
 			}
 		}
 
-		private void AnalyzeMethod(SymbolAnalysisContext context, PXContext pxContext, List<INamedTypeSymbol> allBaseTypes, 
-								   IMethodSymbol methodWithPXOverride)
+		private void AnalyzePatchMethod(SymbolAnalysisContext context, PXContext pxContext, List<INamedTypeSymbol> allGraphAndGraphExtensionBaseTypes,
+										PXOverrideInfo pxOverrideInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			if (!methodWithPXOverride.IsStatic && !methodWithPXOverride.IsGenericMethod)
+			context.CancellationToken.ThrowIfCancellationRequested();
+
+			if (!CheckSignatureCompatibility(context, pxContext, allGraphAndGraphExtensionBaseTypes, pxOverrideInfo.Symbol))
+				return;
+		}
+
+		private static bool CheckSignatureCompatibility(SymbolAnalysisContext context, PXContext pxContext,
+														List<INamedTypeSymbol> allGraphAndGraphExtensionBaseTypes,
+														IMethodSymbol patchMethodWithPXOverride)
+		{
+			if (!patchMethodWithPXOverride.IsStatic && !patchMethodWithPXOverride.IsGenericMethod)
 			{
-				foreach (var baseType in allBaseTypes)
+				foreach (var baseType in allGraphAndGraphExtensionBaseTypes)
 				{
-					bool hasSuitablePXOverride = baseType.GetMethods(methodWithPXOverride.Name)
-														 .Any(m => methodWithPXOverride.IsPXOverrideOf(m));
+					bool hasSuitablePXOverride = baseType.GetMethods(patchMethodWithPXOverride.Name)
+														 .Any(m => patchMethodWithPXOverride.IsPXOverrideOf(m));
 					if (hasSuitablePXOverride)
-						return;
+						return true;
 				}
 			}
 
-			var location = methodWithPXOverride.Locations.FirstOrDefault();
+			var location = patchMethodWithPXOverride.Locations.FirstOrDefault();
 
 			if (location != null)
 			{
@@ -66,6 +76,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 			}
+
+			return false;
 		}
 	}
 }
