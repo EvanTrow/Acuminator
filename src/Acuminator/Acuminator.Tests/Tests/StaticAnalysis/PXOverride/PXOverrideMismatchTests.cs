@@ -19,11 +19,11 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 				new PXOverrideAnalyzer());
 
 		[Theory]
-		[EmbeddedFileData("ArgumentsExactlyMatch.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\ArgumentsExactlyMatch.cs")]
 		public void ArgumentsExactlyMatch(string source) => VerifyCSharpDiagnostic(source);
 
 		[Theory]
-		[EmbeddedFileData("ArgumentsDoNotMatch.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\ArgumentsDoNotMatch.cs")]
 		public void ArgumentsDoNotMatch(string source)
 		{
 			VerifyCSharpDiagnostic(source,
@@ -32,7 +32,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
-		[EmbeddedFileData("LastArgumentIsNotDelegate.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\LastArgumentIsNotDelegate.cs")]
 		public void LastArgumentIsNotDelegate(string source)
 		{
 			VerifyCSharpDiagnostic(source,
@@ -42,7 +42,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
-		[EmbeddedFileData("ArgumentTypesDoNotMatch.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\ArgumentTypesDoNotMatch.cs")]
 		public void ArgumentTypesDoNotMatch(string source)
 		{
 			VerifyCSharpDiagnostic(source,
@@ -51,7 +51,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
-		[EmbeddedFileData("ReturnTypesDoNotMatch.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\ReturnTypesDoNotMatch.cs")]
 		public void ReturnTypesDoNotMatch(string source)
 		{
 			VerifyCSharpDiagnostic(source,
@@ -60,7 +60,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
-		[EmbeddedFileData("ArgumentsDoNotMatchWithDelegate.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\ArgumentsDoNotMatchWithDelegate.cs")]
 		public void ArgumentsDoNotMatchWithDelegate(string source)
 		{
 			VerifyCSharpDiagnostic(source,
@@ -69,7 +69,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
-		[EmbeddedFileData("ArgumentsDoNotMatchBaseHasMoreParameters.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\ArgumentsDoNotMatchBaseHasMoreParameters.cs")]
 		public void ArgumentsDoNotMatchBaseHasMoreParameters(string source)
 		{
 			VerifyCSharpDiagnostic(source,
@@ -78,7 +78,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
-		[EmbeddedFileData("BaseMethodIsNotVirtual.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\BaseMethodIsNotVirtual.cs")]
 		public void BaseMethodIsNotVirtual(string source)
 		{
 			VerifyCSharpDiagnostic(source,
@@ -87,7 +87,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
-		[EmbeddedFileData("BaseMethodIsNotAccessible.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\BaseMethodIsNotAccessible.cs")]
 		public void BaseMethodIsNotAccessible(string source)
 		{
 			VerifyCSharpDiagnostic(source,
@@ -96,7 +96,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
-		[EmbeddedFileData("DerivedMethodIsGeneric.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\DerivedMethodIsGeneric.cs")]
 		public void DerivedMethodIsGeneric(string source)
 		{
 			VerifyCSharpDiagnostic(source,
@@ -105,7 +105,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
-		[EmbeddedFileData("DerivedMethodIsStatic.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\DerivedMethodIsStatic.cs")]
 		public void DerivedMethodIsStatic(string source)
 		{
 			VerifyCSharpDiagnostic(source,
@@ -114,11 +114,11 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
-		[EmbeddedFileData("ArgumentsMatchWithDelegate.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\ArgumentsMatchWithDelegate.cs")]
 		public void ArgumentsMatchWithDelegate(string source) => VerifyCSharpDiagnostic(source);
 
 		[Theory]
-		[EmbeddedFileData("DelegateSignatureDoesNotMatch.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\DelegateSignatureDoesNotMatch.cs")]
 		public void DelegateSignatureDoesNotMatch(string source)
 		{
 			VerifyCSharpDiagnostic(source,
@@ -127,7 +127,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
-		[EmbeddedFileData("PxOverrideInADifferentType.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\PxOverrideInADifferentType.cs")]
 		public void PxOverrideInADifferentType(string source)
 		{
 			VerifyCSharpDiagnostic(source,
@@ -136,31 +136,31 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
-		[EmbeddedFileData("ParentMethodAlsoHasTheDelegateSignature.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\ParentMethodAlsoHasTheDelegateSignature.cs")]
 		public void ParentMethodAlsoHasTheDelegateSignature(string source) => VerifyCSharpDiagnostic(source);
 
 		[Theory]
-		[EmbeddedFileData("NoOverridenMethodDoesNotCrash.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\NoOverridenMethodDoesNotCrash.cs")]
 		public void NoOverridenMethodDoesNotCrash(string source) => VerifyCSharpDiagnostic(source);
 
 		[Theory]
-		[EmbeddedFileData("NoPxOverrideAttributeDoNotCrash.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\NoPxOverrideAttributeDoNotCrash.cs")]
 		public void NoPxOverrideAttributeDoNotCrash(string source) => VerifyCSharpDiagnostic(source);
 
 		[Theory]
-		[EmbeddedFileData("MethodHasTheDelegateAsType.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\MethodHasTheDelegateAsType.cs")]
 		public void MethodHasTheDelegateAsType(string source) => VerifyCSharpDiagnostic(source);
 
 		[Theory]
-		[EmbeddedFileData("MethodHasTheDelegateAsTypeAndReturnsVoid.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\MethodHasTheDelegateAsTypeAndReturnsVoid.cs")]
 		public void MethodHasTheDelegateAsTypeAndReturnsVoid(string source) => VerifyCSharpDiagnostic(source);
 
 		[Theory]
-		[EmbeddedFileData("BaseTypeImplementsPxGraphExtension.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\BaseTypeImplementsPxGraphExtension.cs")]
 		public void BaseTypeImplementsPxGraphExtension(string source) => VerifyCSharpDiagnostic(source);
 
 		[Theory]
-		[EmbeddedFileData("BaseTypeImplementsPxGraphExtensionSignatureIsWrong.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\BaseTypeImplementsPxGraphExtensionSignatureIsWrong.cs")]
 		public void BaseTypeImplementsPxGraphExtensionSignatureIsWrong(string source)
 		{
 			VerifyCSharpDiagnostic(source,
@@ -169,7 +169,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
-		[EmbeddedFileData("BaseTypeDefinedAsExtension.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\BaseTypeDefinedAsExtension.cs")]
 		public void BaseTypeDefinedAsExtension(string source)
 		{
 			VerifyCSharpDiagnostic(source,
@@ -178,11 +178,11 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
-		[EmbeddedFileData("BaseTypeDefinedAsExtensionNoError.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\BaseTypeDefinedAsExtensionNoError.cs")]
 		public void BaseTypeDefinedAsExtensionNoError(string source) => VerifyCSharpDiagnostic(source);
 
 		[Theory]
-		[EmbeddedFileData("OverridenMethodIsInTheBaseOfTheBaseExtension.cs")]
+		[EmbeddedFileData(@"SignatureMismatch\OverridenMethodIsInTheBaseOfTheBaseExtension.cs")]
 		public void OverridenMethodIsInTheBaseOfTheBaseExtension(string source) => VerifyCSharpDiagnostic(source);
 	}
 }
