@@ -7,7 +7,7 @@ using Acuminator.Utilities;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Xunit;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverrideMismatch
+namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 {
 	public class PXOverrideMismatchTests : DiagnosticVerifier
 	{
