@@ -1,11 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Title>Acumatica.Analyzers</Title>
-    <AssemblyTitle>Acumatica.Analyzers</AssemblyTitle>
+    <Title>Acuminator Analyzers</Title>
+    <AssemblyTitle>Acuminator.Analyzers</AssemblyTitle>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Version>3.1.4</Version>
-    <RepositoryUrl>https://github.com/Acumatica/Acuminator</RepositoryUrl>
-    <LangVersion>12.0</LangVersion>
+    <LangVersion>13.0</LangVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\key.snk</AssemblyOriginatorKeyFile>
     <Company>Acumatica, Inc.</Company>
@@ -17,6 +16,37 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
   </PropertyGroup>
+  <PropertyGroup>
+    <PackageLicenseUrl>https://github.com/Acumatica/Acuminator/blob/dev/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Acumatica/Acuminator</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Acumatica/Acuminator</RepositoryUrl>
+    <PackageReleaseNotes>https://github.com/Acumatica/Acuminator/blob/dev/docs/ReleaseNotes.md</PackageReleaseNotes>
+    <PackageIcon>packageIcon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>acuminator</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <IncludeSymbols>False</IncludeSymbols>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DebugType>embedded</DebugType>
+    <WarningLevel>9999</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);1701;1702;CA1707</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis" Version="3.11.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
@@ -75,6 +105,8 @@
     </None>
     <None Update="packageIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
     </None>
     <None Update="tools\install.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -85,7 +117,7 @@
   </ItemGroup>
 	<Target Name="CopyAcuminatorDlls" AfterTargets="PostBuildEvent">    
 		<ItemGroup>
-			<AcuminatorDlls Include="$(TargetDir)$(AssemblyName).dll;$(TargetDir)$(AssemblyName).pdb;$(TargetDir)Acuminator.Utilities.dll;$(TargetDir)Acuminator.Utilities.pdb" />
+			<AcuminatorDlls Include="$(TargetDir)$(AssemblyName).dll;$(TargetDir)Acuminator.Utilities.dll" />
 		</ItemGroup>
 
 		<Copy SourceFiles="@(AcuminatorDlls)" SkipUnchangedFiles="True" DestinationFolder="$(SolutionDir)Acuminator\Acuminator.Tests\ExternalRunner\src\Acuminator Libs\" />

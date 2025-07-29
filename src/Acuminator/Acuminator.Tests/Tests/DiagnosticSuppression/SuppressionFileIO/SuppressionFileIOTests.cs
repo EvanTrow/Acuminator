@@ -71,7 +71,7 @@ namespace Acuminator.Tests.Tests.DiagnosticSuppression.SuppressionFileIO
 			string oldContent = File.ReadAllText(suppressionFilePath);
 
 			HashSet<SuppressMessage> messages = SuppressionFile.LoadMessages(_fileService, suppressionFilePath);
-			var xDocument = SuppressionFile.NewDocumentFromMessages(messages);
+			var xDocument  = SuppressionFile.NewDocumentFromMessages(messages);
 			var newContent = xDocument.GetXDocumentStringWithDeclaration();
 
 			newContent.Should().Equals(oldContent);

@@ -1,7 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Text;
 using System.Xml.Linq;
+
 using Acuminator.Utilities.Common;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -47,6 +51,15 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			}
 
 			return builder.ToString();
+		}
+
+		public static bool IsSuppressionFile([NotNullWhen(returnValue: true)] this string? filePath, bool checkFileExists)
+		{
+			if (filePath.IsNullOrWhiteSpace() || (checkFileExists && !File.Exists(filePath)))
+				return false;
+
+			string fileExtension = Path.GetExtension(filePath);
+			return SuppressionFile.SuppressionFileExtension.Equals(fileExtension, StringComparison.OrdinalIgnoreCase);
 		}
 	}
 }

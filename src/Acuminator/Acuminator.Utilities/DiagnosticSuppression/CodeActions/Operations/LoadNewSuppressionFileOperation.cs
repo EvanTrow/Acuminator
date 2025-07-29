@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+
 using Acuminator.Utilities.Common;
+
 using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.DiagnosticSuppression.CodeActions
@@ -25,8 +27,8 @@ namespace Acuminator.Utilities.DiagnosticSuppression.CodeActions
 			cancellationToken.ThrowIfCancellationRequested();
 			SuppressionFile? suppressionFile = _filePath.IsNullOrWhiteSpace()
 				? null
-				: SuppressionManager.Instance?.LoadSuppressionFileFrom(_filePath);
-
+				: SuppressionManager.Instance?.LoadSuppressionFileFrom(_filePath, AcuminatorWorkMode.ReportUnsuppressedErrors, 
+																		suppressInformationalDiagnostics: true);
 			if (suppressionFile == null)
 			{
 				ShowLocalizedError(nameof(Resources.DiagnosticSuppression_FailedToFindSuppressionFile), AssemblyName);

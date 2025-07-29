@@ -9,6 +9,9 @@ Acuminator provides the following functionality to boost developer productivity:
 * The Code Map tool which displays the structure of graphs, DACs, and their extensions
 * Acumatica Code Snippets which contain templates for DACs, DAC fields, and graph events
 
+Acuminator also provides a standalone command-line tool that can be used to run Acuminator code analysis on solutions outside of Visual Studio. This tool is useful for CI/CD pipelines and other automated processes.
+You can find the description of the command-line tool in the [Acuminator CLI](docs/AcuminatorCLI.md) documentation.
+
 ## Diagnostics and Code Fixes
 Acuminator provides diagnostics and code fixes for common developer challenges related to Acumatica Framework.
 Acuminator finds common mistakes and typos that are usually not so easy to find, for example:
@@ -90,7 +93,7 @@ All code snippets are located in the Acumatica [Code Snippets](https://github.co
 
 ## Documentation
 * [Diagnostics](docs/Summary.md#diagnostics)
-* [Code Refactoring](docs/Summary.md#code-refactoring)
+* [Acuminator CLI Documentation](docs/AcuminatorCLI.md)
 * [Troubleshooting](docs/dev/Troubleshooting/Troubleshooting.md)
 
 ## Developer Documentation

@@ -1,0 +1,78 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<Title>Acuminator.Runner.NetFramework</Title>
+		<AssemblyTitle>Acuminator.Runner.NetFramework</AssemblyTitle>
+		<AssemblyName>Acuminator.Runner.NetFramework</AssemblyName>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net48</TargetFramework>
+		<Deterministic>True</Deterministic>
+		<LangVersion>13.0</LangVersion>
+		<Version>3.1.4</Version>
+		<Nullable>enable</Nullable>
+		<WarningLevel>9999</WarningLevel>
+		<NeutralLanguage>en</NeutralLanguage>
+		<RestorePackagesPath>../../packages</RestorePackagesPath>
+	</PropertyGroup>
+	<PropertyGroup>
+		<PackageLicenseUrl>https://github.com/Acumatica/Acuminator/blob/dev/LICENSE</PackageLicenseUrl>
+		<PackageProjectUrl>https://github.com/Acumatica/Acuminator</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/Acumatica/Acuminator</RepositoryUrl>
+		<PackageReleaseNotes>https://github.com/Acumatica/Acuminator/blob/dev/docs/ReleaseNotes.md</PackageReleaseNotes>
+	</PropertyGroup>
+	<PropertyGroup>
+		<Company>Acumatica, Inc.</Company>
+		<Authors>$(Company)</Authors>	
+		<Description>Acuminator console runner that executes Acuminator code analysis diagnostics from the command line.</Description>
+		<Copyright>Copyright © 2017-$([System.DateTime]::Now.Year) $(Company)</Copyright>
+		<ApplicationIcon>Resources\acumatica.ico</ApplicationIcon>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+	</PropertyGroup>
+	<PropertyGroup>
+		<DebugType>embedded</DebugType>
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisLevel>latest-recommended</AnalysisLevel>
+	</PropertyGroup>
+	<PropertyGroup>
+	  <NoWarn>$(NoWarn);1701;1702;CA1822</NoWarn>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Content Include="Resources\acumatica.ico">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CommandLineParser" Version="2.9.1" />
+		<PackageReference Include="Microsoft.Build.Locator" Version="1.9.1" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.13.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.13.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.13.0" />
+		<PackageReference Include="PolySharp" Version="1.14.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Serilog" Version="2.12.0" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+		<PackageReference Include="SerilogAnalyzer" Version="0.15.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Acuminator.Analyzers\Acuminator.Analyzers.csproj" />
+	  <ProjectReference Include="..\Acuminator.Utilities\Acuminator.Utilities.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="Resources\Messages.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Messages.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources\Messages.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+	    <CustomToolNamespace>Acuminator.Runner.Resources</CustomToolNamespace>
+	  </EmbeddedResource>
+	</ItemGroup>
+</Project>

@@ -47,6 +47,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 				return null;
 
 			TypedConstant argument = foreignReferenceAttribute.AttributeData.ConstructorArguments[0];
+
+			// Need to check TypedConstant.Kind first because TypedConstant.Value may throw exception for Array kind
+			if (argument.Kind is not TypedConstantKind.Type)
+				return null;
+
 			INamedTypeSymbol? foreignFieldType = argument.Value switch
 			{
 				INamedTypeSymbol { IsGenericType: true } bqlSearchType => ExtractForeignFieldSymbolFromBqlSearch(bqlSearchType),

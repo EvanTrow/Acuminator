@@ -15,17 +15,22 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingTypeListAttribute
     {
         [Theory]
         [EmbeddedFileData("MissingTypeListAttributeGood.cs")]
-        public async Task TestDiagnostic_Good(string actual) =>
+        public async Task Dac_CorrectStringListAttribute_NoDiagnostic(string actual) =>
             await VerifyCSharpDiagnosticAsync(actual);
 
-        [Theory]
+		[Theory(Skip = "This unit test should be disabled until Acuminator analysis can combine DAC field attributes from base DAC and its DAC extensions")]
+		[EmbeddedFileData("MissingTypeListAttributeDacExtGood.cs")]
+		public async Task DacExtension_InheritedStringList_CorrectStringList_NoDiagnostic(string actual) =>
+			await VerifyCSharpDiagnosticAsync(actual);
+
+		[Theory]
         [EmbeddedFileData("MissingTypeListAttributeInheritedList.cs")]
-        public async Task TestDiagnostic_InheritedList_Good(string actual) =>
+        public async Task Dac_CorrectStringListAttribute_InheritedList_NoDiagnostic(string actual) =>
             await VerifyCSharpDiagnosticAsync(actual);
 
         [Theory] 
         [EmbeddedFileData("MissingTypeListAttributeBad.cs")] 
-        public async Task TestDiagnostic_Bad(string actual) => 
+        public async Task Dac_IncorrectStringListAttribute(string actual) => 
             await VerifyCSharpDiagnosticAsync(actual, 
                                               Descriptors.PX1002_MissingTypeListAttributeAnalyzer.CreateFor(14, 17));
 

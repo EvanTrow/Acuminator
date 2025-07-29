@@ -37,8 +37,8 @@ namespace Acuminator.Utilities.DiagnosticSuppression.CodeActions
 
 			cancellationToken.ThrowIfCancellationRequested();
 
-			if (!SuppressionManager.SuppressDiagnostic(_semanticModel, _diagnosticToSuppress.Id, _diagnosticToSuppress.Location.SourceSpan,
-														_diagnosticToSuppress.DefaultSeverity, cancellationToken))
+			if (!SuppressionManager.SuppressDiagnosticInSuppressionFile(_semanticModel, _diagnosticToSuppress.Id, _diagnosticToSuppress.Location.SourceSpan,
+																		_diagnosticToSuppress.DefaultSeverity, cancellationToken))
 			{
 				ShowLocalizedError(nameof(Resources.DiagnosticSuppression_FailedToAddToSuppressionFile), suppressionFile.Path);
 			}
