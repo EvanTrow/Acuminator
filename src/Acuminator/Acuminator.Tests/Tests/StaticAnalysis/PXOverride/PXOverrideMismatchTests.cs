@@ -1,10 +1,15 @@
-﻿using Acuminator.Analyzers.StaticAnalysis;
+﻿#nullable enable
+using System.Threading.Tasks;
+
+using Acuminator.Analyzers.StaticAnalysis;
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
 using Acuminator.Analyzers.StaticAnalysis.PXOverride;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
+
 using Microsoft.CodeAnalysis.Diagnostics;
+
 using Xunit;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
@@ -20,169 +25,161 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\ArgumentsExactlyMatch.cs")]
-		public void ArgumentsExactlyMatch(string source) => VerifyCSharpDiagnostic(source);
+		public Task ArgumentsExactlyMatch(string source) => VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\ArgumentsDoNotMatch.cs")]
-		public void ArgumentsDoNotMatch(string source)
-		{
-			VerifyCSharpDiagnostic(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 22)
-			);
-		}
+		public Task ArgumentsDoNotMatch(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 22));
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\LastArgumentIsNotDelegate.cs")]
-		public void LastArgumentIsNotDelegate(string source)
-		{
-			VerifyCSharpDiagnostic(source,
+		public Task LastArgumentIsNotDelegate(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 22),
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(23, 22)
-			);
-		}
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(23, 22));
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\ArgumentTypesDoNotMatch.cs")]
-		public void ArgumentTypesDoNotMatch(string source)
-		{
-			VerifyCSharpDiagnostic(source,
+		public Task ArgumentTypesDoNotMatch(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 22)
 			);
-		}
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\ReturnTypesDoNotMatch.cs")]
-		public void ReturnTypesDoNotMatch(string source)
+		public Task ReturnTypesDoNotMatch(string source)
 		{
-			VerifyCSharpDiagnostic(source,
+			return VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 23)
 			);
 		}
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\ArgumentsDoNotMatchWithDelegate.cs")]
-		public void ArgumentsDoNotMatchWithDelegate(string source)
+		public Task ArgumentsDoNotMatchWithDelegate(string source)
 		{
-			VerifyCSharpDiagnostic(source,
+			return VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 25)
 			);
 		}
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\ArgumentsDoNotMatchBaseHasMoreParameters.cs")]
-		public void ArgumentsDoNotMatchBaseHasMoreParameters(string source)
+		public Task ArgumentsDoNotMatchBaseHasMoreParameters(string source)
 		{
-			VerifyCSharpDiagnostic(source,
+			return VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 22)
 			);
 		}
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\BaseMethodIsNotVirtual.cs")]
-		public void BaseMethodIsNotVirtual(string source)
+		public Task BaseMethodIsNotVirtual(string source)
 		{
-			VerifyCSharpDiagnostic(source,
+			return VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 22)
 			);
 		}
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\BaseMethodIsNotAccessible.cs")]
-		public void BaseMethodIsNotAccessible(string source)
+		public Task BaseMethodIsNotAccessible(string source)
 		{
-			VerifyCSharpDiagnostic(source,
+			return VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 22)
 			);
 		}
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\DerivedMethodIsGeneric.cs")]
-		public void DerivedMethodIsGeneric(string source)
+		public Task DerivedMethodIsGeneric(string source)
 		{
-			VerifyCSharpDiagnostic(source,
+			return VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 15)
 			);
 		}
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\DerivedMethodIsStatic.cs")]
-		public void DerivedMethodIsStatic(string source)
+		public Task DerivedMethodIsStatic(string source)
 		{
-			VerifyCSharpDiagnostic(source,
+			return VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 21)
 			);
 		}
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\ArgumentsMatchWithDelegate.cs")]
-		public void ArgumentsMatchWithDelegate(string source) => VerifyCSharpDiagnostic(source);
+		public Task ArgumentsMatchWithDelegate(string source) => VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\DelegateSignatureDoesNotMatch.cs")]
-		public void DelegateSignatureDoesNotMatch(string source)
+		public Task DelegateSignatureDoesNotMatch(string source)
 		{
-			VerifyCSharpDiagnostic(source,
+			return VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 25)
 			);
 		}
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\PxOverrideInADifferentType.cs")]
-		public void PxOverrideInADifferentType(string source)
+		public Task PxOverrideInADifferentType(string source)
 		{
-			VerifyCSharpDiagnostic(source,
+			return VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 26)
 			);
 		}
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\ParentMethodAlsoHasTheDelegateSignature.cs")]
-		public void ParentMethodAlsoHasTheDelegateSignature(string source) => VerifyCSharpDiagnostic(source);
+		public Task ParentMethodAlsoHasTheDelegateSignature(string source) => VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\NoOverridenMethodDoesNotCrash.cs")]
-		public void NoOverridenMethodDoesNotCrash(string source) => VerifyCSharpDiagnostic(source);
+		public Task NoOverridenMethodDoesNotCrash(string source) => VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\NoPxOverrideAttributeDoNotCrash.cs")]
-		public void NoPxOverrideAttributeDoNotCrash(string source) => VerifyCSharpDiagnostic(source);
+		public Task NoPxOverrideAttributeDoNotCrash(string source) => VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\MethodHasTheDelegateAsType.cs")]
-		public void MethodHasTheDelegateAsType(string source) => VerifyCSharpDiagnostic(source);
+		public Task MethodHasTheDelegateAsType(string source) => VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\MethodHasTheDelegateAsTypeAndReturnsVoid.cs")]
-		public void MethodHasTheDelegateAsTypeAndReturnsVoid(string source) => VerifyCSharpDiagnostic(source);
+		public Task MethodHasTheDelegateAsTypeAndReturnsVoid(string source) => VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\BaseTypeImplementsPxGraphExtension.cs")]
-		public void BaseTypeImplementsPxGraphExtension(string source) => VerifyCSharpDiagnostic(source);
+		public Task BaseTypeImplementsPxGraphExtension(string source) => VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\BaseTypeImplementsPxGraphExtensionSignatureIsWrong.cs")]
-		public void BaseTypeImplementsPxGraphExtensionSignatureIsWrong(string source)
+		public Task BaseTypeImplementsPxGraphExtensionSignatureIsWrong(string source)
 		{
-			VerifyCSharpDiagnostic(source,
+			return VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(21, 25)
 			);
 		}
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\BaseTypeDefinedAsExtension.cs")]
-		public void BaseTypeDefinedAsExtension(string source)
+		public Task BaseTypeDefinedAsExtension(string source)
 		{
-			VerifyCSharpDiagnostic(source,
+			return VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(28, 26)
 			);
 		}
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\BaseTypeDefinedAsExtensionNoError.cs")]
-		public void BaseTypeDefinedAsExtensionNoError(string source) => VerifyCSharpDiagnostic(source);
+		public Task BaseTypeDefinedAsExtensionNoError(string source) => VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\OverridenMethodIsInTheBaseOfTheBaseExtension.cs")]
-		public void OverridenMethodIsInTheBaseOfTheBaseExtension(string source) => VerifyCSharpDiagnostic(source);
+		public Task OverridenMethodIsInTheBaseOfTheBaseExtension(string source) => VerifyCSharpDiagnosticAsync(source);
 	}
 }
