@@ -16,7 +16,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverrideMismatch
 									.WithRecursiveAnalysisEnabled()
 									.WithStaticAnalysisEnabled()
 									.WithSuppressionMechanismDisabled(),
-				new PXOverrideMismatchAnalyzer());
+				new PXOverrideAnalyzer());
 
 		[Theory]
 		[EmbeddedFileData("ArgumentsExactlyMatch.cs")]

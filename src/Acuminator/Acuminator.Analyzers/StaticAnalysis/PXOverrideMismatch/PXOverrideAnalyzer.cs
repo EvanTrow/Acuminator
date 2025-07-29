@@ -13,7 +13,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.PXOverrideMismatch
 {
-	public class PXOverrideMismatchAnalyzer : PXGraphAggregatedAnalyzerBase
+	public class PXOverrideAnalyzer : PXGraphAggregatedAnalyzerBase
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(Descriptors.PX1096_PXOverrideMustMatchSignature);

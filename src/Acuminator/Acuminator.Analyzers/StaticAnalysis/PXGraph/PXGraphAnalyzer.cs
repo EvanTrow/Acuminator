@@ -67,7 +67,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 			new InvalidPXActionSignatureAnalyzer(),
 			new StaticFieldOrPropertyInGraphAnalyzer(),
 			new TypoInViewAndActionHandlerNameAnalyzer(),
-			new PXOverrideMismatchAnalyzer(),
+			new PXOverrideAnalyzer(),
 			new ForbidPrivateEventHandlersAnalyzer())
 		{
 		}
