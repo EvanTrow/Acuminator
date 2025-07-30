@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-
-using Acuminator.Utilities.Common;
 
 using Microsoft.CodeAnalysis;
 
@@ -13,13 +10,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	/// A simple information for code map about the px override method in graph. 
 	/// Do not store extra info about a method being overriden or info about other overrides 
 	/// </summary>
-	public class PXOverrideInfo : SymbolItem<IMethodSymbol>
+	public class PXOverrideInfo(IMethodSymbol symbol, int declarationOrder) : SymbolItem<IMethodSymbol>(symbol, declarationOrder)
 	{
-		public PXOverrideInfo(IMethodSymbol symbol, int declarationOrder) : base(symbol, declarationOrder)
-		{
-		}
-
-		internal static IEnumerable<PXOverrideInfo> GetPXOverrides(INamedTypeSymbol graphOrExtension, PXContext context, CancellationToken cancellation)
+		internal static IEnumerable<PXOverrideInfo> GetDeclaredPXOverrides(INamedTypeSymbol graphOrExtension, PXContext context, CancellationToken cancellation)
 		{
 			cancellation.ThrowIfCancellationRequested();
 			var pxOverrideAttribute = context.AttributeTypes.PXOverrideAttribute;
