@@ -20,7 +20,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 		public override bool ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graphExtension) =>
 			base.ShouldAnalyze(pxContext, graphExtension) && graphExtension.GraphType == GraphType.PXGraphExtension &&
-			!graphExtension.PXOverrides.IsDefaultOrEmpty;
+			!graphExtension.DeclaredPXOverrides.IsDefaultOrEmpty;
 
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel graphExtension)
 		{
@@ -36,7 +36,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 									.Where(baseType => !directBaseTypesAndThis.Contains(baseType, SymbolEqualityComparer.Default))
 									.ToList();
 
-			foreach (PXOverrideInfo pxOverrideInfo in graphExtension.PXOverrides)
+			foreach (PXOverrideInfo pxOverrideInfo in graphExtension.DeclaredPXOverrides)
 			{
 				AnalyzePatchMethod(context, pxContext, allGraphAndGraphExtensionBaseTypes, pxOverrideInfo);
 			}

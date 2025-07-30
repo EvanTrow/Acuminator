@@ -83,7 +83,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public ImmutableDictionary<string, ActionHandlerInfo> ActionHandlersByNames { get; }
 		public IEnumerable<ActionHandlerInfo> ActionHandlers => ActionHandlersByNames.Values;
 
-		public ImmutableArray<PXOverrideInfo> PXOverrides { get; }
+		public ImmutableArray<PXOverrideInfo> DeclaredPXOverrides { get; }
 
 		/// <summary>
 		/// Actions which are declared in the graph or the graph extension that is represented by this instance of the semantic model.
@@ -208,7 +208,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			IsActiveMethodInfo 		   = GetIsActiveMethodInfo();
 			IsActiveForGraphMethodInfo = GetIsActiveForGraphMethodInfo();
 			
-			PXOverrides = GetDeclaredPXOverrideInfos();
+			DeclaredPXOverrides = GetDeclaredPXOverrideInfos();
 			HasPXProtectedAccess = IsPXProtectedAccessAttributeDeclared();
 		}
 
