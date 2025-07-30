@@ -780,6 +780,12 @@ public virtual int? SomeDacField{ get; set; }</value>
   <data name="PX1096Title" xml:space="preserve">
     <value>The signature of a method with the PXOverride attribute must match the overridden method</value>
   </data>
+  <data name="PX1097Fix" xml:space="preserve">
+    <value>Make method "{0}" public and non-virtual</value>
+  </data>
+  <data name="PX1097Title" xml:space="preserve">
+    <value>Method with PXOverride attribute must be public and non-virtual</value>
+  </data>
   <data name="PX1099Title" xml:space="preserve">
     <value>The forbidden API is used</value>
   </data>

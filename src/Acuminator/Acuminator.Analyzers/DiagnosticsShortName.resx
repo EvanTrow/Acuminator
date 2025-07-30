@@ -432,6 +432,9 @@
   <data name="PX1096" xml:space="preserve">
     <value>PXOverrideSignatureMismatch</value>
   </data>
+  <data name="PX1097" xml:space="preserve">
+    <value>PXOverrideMethodMustBePublicNonVirtual</value>
+  </data>
   <data name="PX1099" xml:space="preserve">
     <value>UsageOfForbiddenApi</value>
   </data>
