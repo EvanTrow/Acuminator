@@ -16,7 +16,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 	public class PXOverrideAnalyzer : PXGraphAggregatedAnalyzerBase
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-			ImmutableArray.Create(Descriptors.PX1096_PXOverrideMustMatchSignature);
+			ImmutableArray.Create
+			(
+				Descriptors.PX1096_PXOverrideMustMatchSignature,
+				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual
+			);
 
 		public override bool ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graphExtension) =>
 			base.ShouldAnalyze(pxContext, graphExtension) && graphExtension.GraphType == GraphType.PXGraphExtension &&
@@ -29,7 +33,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			var directBaseTypesAndThis = graphExtension.Symbol.GetBaseTypesAndThis().ToList(capacity: 4);
 
 			var allGraphAndGraphExtensionBaseTypes = 
-				graphExtension.Symbol.GetGraphExtensionWithBaseExtensions(pxContext, SortDirection.Ascending, includeGraph: true)
+				graphExtension.Symbol.GetGraphExtensionWithBaseExtensions(pxContext, SortDirection.Descending, includeGraph: true)
 									.SelectMany(t => t.GetBaseTypesAndThis())
 									.OfType<INamedTypeSymbol>()
 									.Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default)
@@ -38,46 +42,50 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 			foreach (PXOverrideInfo pxOverrideInfo in graphExtension.DeclaredPXOverrides)
 			{
-				AnalyzePatchMethod(context, pxContext, allGraphAndGraphExtensionBaseTypes, pxOverrideInfo);
+				context.CancellationToken.ThrowIfCancellationRequested();
+
+				// We do not report generic PXOverrides. Although they are not supported now they can be supported in the future
+				if (!pxOverrideInfo.Symbol.IsGenericMethod)
+				{
+					AnalyzePatchMethod(context, pxContext, allGraphAndGraphExtensionBaseTypes, pxOverrideInfo);
+				}
 			}
 		}
 
 		private void AnalyzePatchMethod(SymbolAnalysisContext context, PXContext pxContext, List<INamedTypeSymbol> allGraphAndGraphExtensionBaseTypes,
 										PXOverrideInfo pxOverrideInfo)
 		{
-			context.CancellationToken.ThrowIfCancellationRequested();
+			
 
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			if (!CheckSignatureCompatibility(context, pxContext, allGraphAndGraphExtensionBaseTypes, pxOverrideInfo.Symbol))
-				return;
+			var baseMethod = GetSuitableBaseMethod(context, pxContext, allGraphAndGraphExtensionBaseTypes, pxOverrideInfo.Symbol);
+
+			if (baseMethod == null)
+				ReportPatchMethodWithIncompatibleSignature(context, pxContext, pxOverrideInfo.Symbol);
 		}
 
-		private static bool CheckSignatureCompatibility(SymbolAnalysisContext context, PXContext pxContext,
-														List<INamedTypeSymbol> allGraphAndGraphExtensionBaseTypes,
-														IMethodSymbol patchMethodWithPXOverride)
+		private IMethodSymbol? GetSuitableBaseMethod(SymbolAnalysisContext context, PXContext pxContext,
+													 List<INamedTypeSymbol> allGraphAndGraphExtensionBaseTypes, IMethodSymbol patchMethodWithPXOverride)
 		{
-			if (!patchMethodWithPXOverride.IsStatic && !patchMethodWithPXOverride.IsGenericMethod)
+			foreach (var baseType in allGraphAndGraphExtensionBaseTypes)
 			{
-				foreach (var baseType in allGraphAndGraphExtensionBaseTypes)
-				{
-					bool hasSuitablePXOverride = baseType.GetMethods(patchMethodWithPXOverride.Name)
-														 .Any(m => patchMethodWithPXOverride.IsPXOverrideOf(m));
-					if (hasSuitablePXOverride)
-						return true;
-				}
+				var suitableBaseMethod = baseType.GetMethods(patchMethodWithPXOverride.Name)
+												 .FirstOrDefault(patchMethodWithPXOverride.IsPXOverrideOf);
+				if (suitableBaseMethod != null)
+					return suitableBaseMethod;
 			}
 
+			return null;
+		}
+
+		private void ReportPatchMethodWithIncompatibleSignature(SymbolAnalysisContext context, PXContext pxContext,
+																IMethodSymbol patchMethodWithPXOverride)
+		{
 			var location = patchMethodWithPXOverride.Locations.FirstOrDefault();
+			var diagnostic = Diagnostic.Create(Descriptors.PX1096_PXOverrideMustMatchSignature, location);
 
-			if (location != null)
-			{
-				var diagnostic = Diagnostic.Create(Descriptors.PX1096_PXOverrideMustMatchSignature, location);
-
-				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
-			}
-
-			return false;
+			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 	}
 }
