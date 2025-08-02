@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -55,14 +56,24 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 		private void AnalyzePatchMethod(SymbolAnalysisContext context, PXContext pxContext, List<INamedTypeSymbol> allGraphAndGraphExtensionBaseTypes,
 										PXOverrideInfo pxOverrideInfo)
 		{
-			
-
 			context.CancellationToken.ThrowIfCancellationRequested();
+			CheckPatchMethodIsPublicNonVirtual(context, pxContext, pxOverrideInfo.Symbol);
 
 			var baseMethod = GetSuitableBaseMethod(context, pxContext, allGraphAndGraphExtensionBaseTypes, pxOverrideInfo.Symbol);
 
 			if (baseMethod == null)
 				ReportPatchMethodWithIncompatibleSignature(context, pxContext, pxOverrideInfo.Symbol);
+		}
+
+		private void CheckPatchMethodIsPublicNonVirtual(SymbolAnalysisContext context, PXContext pxContext, IMethodSymbol patchMethodWithPXOverride)
+		{
+			if (patchMethodWithPXOverride.DeclaredAccessibility != Accessibility.Public || patchMethodWithPXOverride.CanBeOverriden())
+			{
+				var location = patchMethodWithPXOverride.Locations.FirstOrDefault();
+				var diagnostic = Diagnostic.Create(Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual, location);
+
+				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
+			}
 		}
 
 		private IMethodSymbol? GetSuitableBaseMethod(SymbolAnalysisContext context, PXContext pxContext,
