@@ -59,6 +59,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			context.CancellationToken.ThrowIfCancellationRequested();
 			CheckPatchMethodIsPublicNonVirtual(context, pxContext, pxOverrideInfo.Symbol);
 
+			context.CancellationToken.ThrowIfCancellationRequested();
 			var baseMethod = GetSuitableBaseMethod(context, pxContext, allGraphAndGraphExtensionBaseTypes, pxOverrideInfo.Symbol);
 
 			if (baseMethod == null)
@@ -67,13 +68,37 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 		private void CheckPatchMethodIsPublicNonVirtual(SymbolAnalysisContext context, PXContext pxContext, IMethodSymbol patchMethodWithPXOverride)
 		{
-			if (patchMethodWithPXOverride.DeclaredAccessibility != Accessibility.Public || patchMethodWithPXOverride.CanBeOverriden())
+			bool isPublic = patchMethodWithPXOverride.DeclaredAccessibility == Accessibility.Public;
+			var virtualityKind = GetPatchMethodVirtualityKind(patchMethodWithPXOverride);
+
+			if (!isPublic || virtualityKind != MemberVirtualityKind.None)
 			{
 				var location = patchMethodWithPXOverride.Locations.FirstOrDefault();
-				var diagnostic = Diagnostic.Create(Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual, location);
+				var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+				{
+					{ PXOverrideDiagnosticProperties.IsNonPublicPatchMethod,	isPublic.ToString() },
+					{ PXOverrideDiagnosticProperties.PatchMethodVirtualityKind, virtualityKind.ToString() },
+					{ PXOverrideDiagnosticProperties.PatchMethodName,			patchMethodWithPXOverride.Name }
+				}
+				.ToImmutableDictionary();
 
+				var diagnostic = Diagnostic.Create(Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual, location, diagnosticProperties);
 				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 			}
+		}
+
+		private MemberVirtualityKind GetPatchMethodVirtualityKind(IMethodSymbol patchMethodWithPXOverride)
+		{
+			if (patchMethodWithPXOverride.IsVirtual)
+				return MemberVirtualityKind.Virtual;
+			else if (patchMethodWithPXOverride.IsAbstract)
+				return MemberVirtualityKind.Abstract;
+			else if (patchMethodWithPXOverride.IsOverride)
+				return patchMethodWithPXOverride.IsSealed 
+					? MemberVirtualityKind.SealedOverride 
+					: MemberVirtualityKind.Override;
+			else
+				return MemberVirtualityKind.None;
 		}
 
 		private IMethodSymbol? GetSuitableBaseMethod(SymbolAnalysisContext context, PXContext pxContext,

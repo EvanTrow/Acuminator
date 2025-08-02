@@ -3,7 +3,7 @@
 	internal static class PXOverrideDiagnosticProperties
 	{
 		/// <summary>
-		/// Indicates whether the patch method is a non-public method.
+		/// Property indicates whether the patch method is a non-public method.
 		/// </summary>
 		public const string IsNonPublicPatchMethod = nameof(IsNonPublicPatchMethod);
 
@@ -11,5 +11,10 @@
 		/// Property stores the <see cref="MemberVirtualityKind"/> value for a patch method.
 		/// </summary>
 		public const string PatchMethodVirtualityKind = nameof(PatchMethodVirtualityKind);
+
+		/// <summary>
+		/// Property stores the name of the patch method.
+		/// </summary>
+		public const string PatchMethodName = nameof(PatchMethodName);
 	}
 }
