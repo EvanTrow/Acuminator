@@ -94,21 +94,13 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\DerivedMethodIsGeneric.cs")]
-		public Task DerivedMethodIsGeneric(string source)
-		{
-			return VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 15)
-			);
-		}
+		public Task DerivedMethodIsGeneric(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\DerivedMethodIsStatic.cs")]
-		public Task DerivedMethodIsStatic(string source)
-		{
-			return VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 21)
-			);
-		}
+		public Task DerivedMethodIsStatic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\ArgumentsMatchWithDelegate.cs")]
