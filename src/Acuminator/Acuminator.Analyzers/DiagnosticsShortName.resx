@@ -378,6 +378,9 @@
   <data name="PX1078_DifferentTypeSize" xml:space="preserve">
     <value>TypesOfDacFieldAndReferencedFieldHaveDifferentSize</value>
   </data>
+  <data name="PX1079" xml:space="preserve">
+    <value>PXOverrideWithoutDelegateParameter</value>
+  </data>
   <data name="PX1080" xml:space="preserve">
     <value>LongRunOperationInDataViewDelegate</value>
   </data>

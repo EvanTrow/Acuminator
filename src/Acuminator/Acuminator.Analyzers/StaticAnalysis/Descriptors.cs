@@ -446,6 +446,9 @@ namespace Acuminator.Analyzers.StaticAnalysis
 				Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1078_DifferentTypeSize,
 				messageFormat: nameof(Resources.PX1078MessageFormat_TypesOfDacFieldAndReferencedFieldHaveDifferentSize).GetLocalized());
 
+		public static DiagnosticDescriptor PX1079_PXOverrideWithoutDelegateParameter { get; } =
+			Rule("PX1079", nameof(Resources.PX1079Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1079);
+
 		public static DiagnosticDescriptor PX1080_DataViewDelegateLongOperationStart { get; } =
 			Rule("PX1080", nameof(Resources.PX1080Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1080);
 
