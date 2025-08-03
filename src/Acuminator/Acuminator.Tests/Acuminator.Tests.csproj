@@ -442,6 +442,7 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\PublicClassXmlComment\Sources\BadlyFormatted\DAC_NoEmptyLine_NoXml_AddExclude.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PXOverride\Sources\PublicNonVirtual\ExtensionWithNonPublicVirtualPXOverride_Expected.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PXOverride\Sources\PublicNonVirtual\ExtensionWithNonPublicVirtualPXOverride.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\PXOverride\Sources\PublicNonVirtual\ExtensionWithVirtualPXOverrideThatCannotBeFixed.cs" />
     <Compile Include="Tests\StaticAnalysis\StaticFieldOrPropertyInGraph\StaticFieldOrPropertyInGraphTests.cs" />
     <Compile Include="Tests\StaticAnalysis\SuppressionDiagnostics\MultipleSuppressionCodeFixTests.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\SuppressionDiagnostics\Sources\Dac\SuppressMuiltipleDiagnostics_One.cs" />
