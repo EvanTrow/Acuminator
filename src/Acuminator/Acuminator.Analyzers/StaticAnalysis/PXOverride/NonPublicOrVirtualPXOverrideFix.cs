@@ -35,7 +35,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			if (!virtualityKindAllowsChanges)
 				return Task.CompletedTask;
 
-			bool changeVirtualKindToNonVirtual = virtualityKind is MemberVirtualityKind.Virtual or MemberVirtualityKind.Abstract;
+			bool changeVirtualKindToNonVirtual = virtualityKind == MemberVirtualityKind.Virtual;
 			bool changeModifierToPublic = diagnostic.IsFlagSet(PXOverrideDiagnosticProperties.IsNonPublicPatchMethod);
 
 			if (!changeModifierToPublic && !changeVirtualKindToNonVirtual)

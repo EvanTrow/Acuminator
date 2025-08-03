@@ -34,7 +34,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 						return _changeModifierToPublic;
 
 					case SyntaxKind.VirtualKeyword:
-					case SyntaxKind.AbstractKeyword:
 						return _changeVirtualKindToNonVirtual;
 
 					default:
