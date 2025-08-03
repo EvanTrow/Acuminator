@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -19,7 +18,10 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 	{
 		public TMemberNode RewriteModifiers(TMemberNode memberNode)
 		{
-			var modifiers = memberNode.CheckIfNull().Modifiers;
+			if (!ShouldRewriteModifiers(memberNode.CheckIfNull()))
+				return memberNode;
+
+			var modifiers = memberNode.Modifiers;
 			SyntaxToken firstModifier = memberNode.Modifiers.FirstOrDefault();
 			bool hasModifiers = firstModifier != default;
 			bool shouldRemoveFirstModifier = ShouldModifierBeRemoved(firstModifier);
@@ -60,7 +62,7 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			return newMemberNode;
 		}
 
-		protected abstract IReadOnlyCollection<SyntaxKind> GetModifiersToAdd();
+		protected virtual bool ShouldRewriteModifiers(TMemberNode memberNode) => true;
 
 		protected SyntaxToken CopyTriviaForNewFirstModifier(in SyntaxToken newFirstModifier, bool hasModifiers, bool shouldRemoveFirstModifier,
 															in SyntaxToken oldFirstModifier, TMemberNode memberNode)
@@ -166,6 +168,8 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 				}
 			}
 		}
+
+		protected abstract IReadOnlyCollection<SyntaxKind> GetModifiersToAdd();
 
 		protected abstract bool ShouldModifierBeRemoved(in SyntaxToken modifier);
 
