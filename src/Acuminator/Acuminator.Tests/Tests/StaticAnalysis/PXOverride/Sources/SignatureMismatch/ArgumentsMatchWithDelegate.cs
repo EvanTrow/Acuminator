@@ -11,19 +11,19 @@ namespace Acuminator.Tests.Sources
 		}
 
 		[PXOverride]
-		public virtual void TestMethodFromGraph(object a, Action<object> baseAction) { }
+		public void TestMethodFromGraph(object a, Action<object> baseAction) { }
 	}
 
 	public class DerivedExtension : PXGraphExtension<BaseExtension, MyGraph>
 	{
 		[PXOverride]
-		public virtual object TestMethod(int x, bool drilldown, Func<int, bool, object> del)
+		public object TestMethod(int x, bool drilldown, Func<int, bool, object> del)
 		{
 			return new object();
 		}
 
 		[PXOverride]
-		public virtual void TestMethodFromGraph(object a, Action<object> baseAction) { }
+		public void TestMethodFromGraph(object a, Action<object> baseAction) { }
 	}
 
 	public class MyGraph : PXGraph<MyGraph>

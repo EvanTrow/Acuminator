@@ -14,7 +14,7 @@ namespace Acuminator.Tests.Sources
 	public class DerivedExtension : PXGraphExtension<BaseExtension, MyGraph>
 	{
 		[PXOverride]
-		public virtual object TestMethod(int x, double drilldown, Func<int, bool, object> del)
+		public object TestMethod(int x, double drilldown, Func<int, bool, object> del)
 		{
 			return new object();
 		}

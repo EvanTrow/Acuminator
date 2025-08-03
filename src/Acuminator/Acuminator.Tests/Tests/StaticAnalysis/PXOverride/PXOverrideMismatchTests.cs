@@ -31,20 +31,20 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		[EmbeddedFileData(@"SignatureMismatch\ArgumentsDoNotMatch.cs")]
 		public Task ArgumentsDoNotMatch(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 22));
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 14));
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\LastArgumentIsNotDelegate.cs")]
 		public Task LastArgumentIsNotDelegate(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 22),
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(23, 22));
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 14),
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(23, 14));
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\ArgumentTypesDoNotMatch.cs")]
 		public Task ArgumentTypesDoNotMatch(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 22)
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 14)
 			);
 
 		[Theory]
@@ -52,7 +52,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		public Task ReturnTypesDoNotMatch(string source)
 		{
 			return VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 23)
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 15)
 			);
 		}
 
@@ -61,7 +61,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		public Task ArgumentsDoNotMatchWithDelegate(string source)
 		{
 			return VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 25)
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 17)
 			);
 		}
 
@@ -70,7 +70,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		public Task ArgumentsDoNotMatchBaseHasMoreParameters(string source)
 		{
 			return VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 22)
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 14)
 			);
 		}
 
@@ -79,7 +79,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		public Task BaseMethodIsNotVirtual(string source)
 		{
 			return VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 22)
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 14)
 			);
 		}
 
@@ -88,7 +88,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		public Task BaseMethodIsNotAccessible(string source)
 		{
 			return VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 22)
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 14)
 			);
 		}
 
@@ -111,7 +111,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		public Task DelegateSignatureDoesNotMatch(string source)
 		{
 			return VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 25)
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 17)
 			);
 		}
 
@@ -120,7 +120,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		public Task PxOverrideInADifferentType(string source)
 		{
 			return VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 26)
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(17, 17)
 			);
 		}
 
@@ -153,7 +153,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		public Task BaseTypeImplementsPxGraphExtensionSignatureIsWrong(string source)
 		{
 			return VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(21, 25)
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(21, 17)
 			);
 		}
 
@@ -162,7 +162,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		public Task BaseTypeDefinedAsExtension(string source)
 		{
 			return VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(28, 26)
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(28, 17)
 			);
 		}
 
