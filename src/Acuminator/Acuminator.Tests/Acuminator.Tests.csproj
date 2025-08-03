@@ -397,6 +397,7 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\PropertyAndBqlFieldTypesMismatch\Sources\DacExtensionWithInconsistentTypes.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PropertyAndBqlFieldTypesMismatch\Sources\DerivedDacWithInconsistentTypes_Expected.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PropertyAndBqlFieldTypesMismatch\Sources\DerivedDacWithInconsistentTypes.cs" />
+    <Compile Include="Tests\StaticAnalysis\PXOverride\PublicNonVirtualPXOverrideTests.cs" />
     <Compile Include="Tests\StaticAnalysis\PXOverride\PXOverrideMismatchTests.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PXOverride\Sources\SignatureMismatch\ArgumentsExactlyMatch.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PXOverride\Sources\SignatureMismatch\ArgumentsDoNotMatch.cs" />
@@ -439,6 +440,8 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\PublicClassXmlComment\Sources\BadlyFormatted\DAC_NoEmptyLine_NoXml_AddSummary.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PublicClassXmlComment\Sources\BadlyFormatted\DAC_NoEmptyLine_NoXml.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PublicClassXmlComment\Sources\BadlyFormatted\DAC_NoEmptyLine_NoXml_AddExclude.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\PXOverride\Sources\PublicNonVirtual\ExtensionWithNonPublicVirtualPXOverride_Expected.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\PXOverride\Sources\PublicNonVirtual\ExtensionWithNonPublicVirtualPXOverride.cs" />
     <Compile Include="Tests\StaticAnalysis\StaticFieldOrPropertyInGraph\StaticFieldOrPropertyInGraphTests.cs" />
     <Compile Include="Tests\StaticAnalysis\SuppressionDiagnostics\MultipleSuppressionCodeFixTests.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\SuppressionDiagnostics\Sources\Dac\SuppressMuiltipleDiagnostics_One.cs" />
