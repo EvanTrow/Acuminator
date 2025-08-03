@@ -34,9 +34,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			var directBaseTypesAndThis = graphExtension.Symbol.GetBaseTypesAndThis().ToList(capacity: 4);
 
 			var allGraphAndGraphExtensionBaseTypes = 
-				graphExtension.Symbol.GetGraphExtensionWithBaseExtensions(pxContext, SortDirection.Descending, includeGraph: true)
-									.SelectMany(t => t.GetBaseTypesAndThis())
-									.OfType<INamedTypeSymbol>()
+				graphExtension.GraphOrGraphExtInfo.JustOverridenItems()
+												  .Select(info => info.Symbol)
 									.Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default)
 									.Where(baseType => !directBaseTypesAndThis.Contains(baseType, SymbolEqualityComparer.Default))
 									.ToList();
