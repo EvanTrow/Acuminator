@@ -67,15 +67,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 		private void CheckPatchMethodIsPublicNonVirtual(SymbolAnalysisContext context, PXContext pxContext, IMethodSymbol patchMethodWithPXOverride)
 		{
-			bool isPublic = patchMethodWithPXOverride.DeclaredAccessibility == Accessibility.Public;
+			bool isNonPublic = patchMethodWithPXOverride.DeclaredAccessibility != Accessibility.Public;
 			var virtualityKind = GetPatchMethodVirtualityKind(patchMethodWithPXOverride);
 
-			if (!isPublic || virtualityKind != MemberVirtualityKind.None)
+			if (isNonPublic || virtualityKind != MemberVirtualityKind.None)
 			{
 				var location = patchMethodWithPXOverride.Locations.FirstOrDefault();
 				var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
 				{
-					{ PXOverrideDiagnosticProperties.IsNonPublicPatchMethod,	isPublic.ToString() },
+					{ PXOverrideDiagnosticProperties.IsNonPublicPatchMethod,    isNonPublic.ToString() },
 					{ PXOverrideDiagnosticProperties.PatchMethodVirtualityKind, virtualityKind.ToString() },
 					{ PXOverrideDiagnosticProperties.PatchMethodName,			patchMethodWithPXOverride.Name }
 				}
