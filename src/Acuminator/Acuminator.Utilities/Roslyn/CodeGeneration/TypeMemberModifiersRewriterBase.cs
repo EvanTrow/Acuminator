@@ -45,7 +45,8 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 
 			if (hasModifiers)
 			{
-				var modifiersToKeep = GetModifiersToKeep(firstModifier, modifiers, shouldRemoveFirstModifier);
+				var modifiersToKeep = GetModifiersToKeep(firstModifier, modifiers, shouldRemoveFirstModifier, 
+														 hasNewModifiers: modifiersToAdd.Count > 0);
 				newMemberModifiers.AddRange(modifiersToKeep);
 			}
 
@@ -123,16 +124,22 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			}
 		}
 
-		private IEnumerable<SyntaxToken> GetModifiersToKeep(in SyntaxToken firstModifier, in SyntaxTokenList modifiers, bool shouldRemoveFirstModifier)
+		private IEnumerable<SyntaxToken> GetModifiersToKeep(in SyntaxToken firstModifier, in SyntaxTokenList modifiers, bool shouldRemoveFirstModifier,
+															bool hasNewModifiers)
 		{
 			if (!shouldRemoveFirstModifier)
 			{
-				// if the previously first token was not a modifier to be removed, we need to add it back _without_ the leading trivia.
-				// That's why we add it separately first, and then we add the rest.
-				var firstModifierWithoutLeadingTrivia = firstModifier.WithLeadingTrivia(default(SyntaxTriviaList));
 				var modifiersToKeep = FilterModifiers(modifiers, includeFirstModifier: false);
 
-				return modifiersToKeep.PrependItem(firstModifierWithoutLeadingTrivia);
+				if (hasNewModifiers)
+				{
+					// If the previously first token was not a modifier to be removed, and there will be new first modifiers, 
+					// then we need to add it back _without_ the leading trivia. That's why we add it separately first, and then we add the rest.
+					var firstModifierWithoutLeadingTrivia = firstModifier.WithLeadingTrivia(default(SyntaxTriviaList));
+					return modifiersToKeep.PrependItem(firstModifierWithoutLeadingTrivia);
+				}
+				else
+					return modifiersToKeep.PrependItem(firstModifier);
 			}
 			else
 				return FilterModifiers(modifiers, includeFirstModifier: true);
