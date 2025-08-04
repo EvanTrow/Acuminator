@@ -19,6 +19,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create
 			(
+				Descriptors.PX1079_PXOverrideWithoutDelegateParameter,
 				Descriptors.PX1096_PXOverrideMustMatchSignature,
 				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual
 			);
@@ -35,7 +36,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
 
-				// We do not report generic PXOverrides. Although they are not supported now they can be supported in the future
+				// We do not report generic PXOverrides. Although they are not supported now they can be supported in the future.
 				if (!pxOverrideInfo.Symbol.IsGenericMethod)
 				{
 					AnalyzePatchMethod(context, pxContext, pxOverrideInfo);
@@ -47,6 +48,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 			CheckPatchMethodIsPublicNonVirtual(context, pxContext, pxOverrideInfo.Symbol);
+
+			context.CancellationToken.ThrowIfCancellationRequested();
+			CheckPatchMethodHasBaseDelegateParameter(context, pxContext, pxOverrideInfo);
 
 			context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -87,6 +91,17 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 					: MemberVirtualityKind.Override;
 			else
 				return MemberVirtualityKind.None;
+		}
+
+		private void CheckPatchMethodHasBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext, PXOverrideInfo pxOverrideInfo)
+		{
+			if (pxOverrideInfo.OverrideType == PXOverrideType.WithoutBaseDelegate)
+			{
+				var location = pxOverrideInfo.Symbol.Locations.FirstOrDefault();
+				var diagnostic = Diagnostic.Create(Descriptors.PX1079_PXOverrideWithoutDelegateParameter, location);
+
+				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
+			}
 		}
 
 		private void ReportPatchMethodWithIncompatibleSignature(SymbolAnalysisContext context, PXContext pxContext,
