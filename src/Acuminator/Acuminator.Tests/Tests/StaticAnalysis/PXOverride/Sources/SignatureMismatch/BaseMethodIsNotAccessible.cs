@@ -5,7 +5,7 @@ namespace Acuminator.Tests.Sources
 {
 	public class BaseExtension : PXGraphExtension<MyGraph>
 	{
-		public virtual int Add(int x, string y)
+		internal virtual int Add(int x, string y)
 		{
 			return x + Convert.ToInt32(y);
 		}
@@ -14,7 +14,7 @@ namespace Acuminator.Tests.Sources
 	public class DerivedExtension : PXGraphExtension<BaseExtension, MyGraph>
 	{
 		[PXOverride]
-		public virtual int Add(int x, string y)
+		public int Add(int x, string y)
 		{
 			return x + Convert.ToInt32(y) * 2;
 		}

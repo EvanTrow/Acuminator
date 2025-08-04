@@ -9,7 +9,7 @@ namespace Acuminator.Tests.Sources
 		public delegate void DoCreateSalesOrderDelegate();
 
 		[PXOverride]
-		public virtual void DoCreateSalesOrder(DoCreateSalesOrderDelegate baseMethod)
+		public void DoCreateSalesOrder(DoCreateSalesOrderDelegate baseMethod)
 		{
 		}
 	}

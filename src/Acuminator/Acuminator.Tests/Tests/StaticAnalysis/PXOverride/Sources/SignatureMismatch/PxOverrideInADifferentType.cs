@@ -11,14 +11,10 @@ namespace Acuminator.Tests.Sources
 		}
 	}
 
-	public class AuxiliaryExtension<T1, T2> : PXGraphExtension<T1, T2> where T1 : PXGraphExtension<T2> where T2 : PXGraph
-	{
-	}
-
-	public class DerivedExtension : AuxiliaryExtension<BaseExtension, MyGraph>
+	public class DerivedExtension : BaseExtension
 	{
 		[PXOverride]
-		public virtual object TestMethod(int x, bool drilldown, double y, Func<int, bool, double, object> del)
+		public object TestMethod(int x, bool drilldown, double y)
 		{
 			return new object();
 		}

@@ -5,18 +5,18 @@ namespace Acuminator.Tests.Sources
 {
 	public class BaseExtension : PXGraphExtension<MyGraph>
 	{
-		public virtual object TestMethod(int x, bool drilldown, double y)
+		public virtual int Add(int x, string y)
 		{
-			return new object();
+			return x + Convert.ToInt32(y);
 		}
 	}
 
 	public class DerivedExtension : PXGraphExtension<BaseExtension, MyGraph>
 	{
 		[PXOverride]
-		public virtual object TestMethod(int x, bool drilldown, double y, Func<int, bool, object> del)
+		public int Add(int x, string y)
 		{
-			return new object();
+			return x + Convert.ToInt32(y) * 2;
 		}
 	}
 

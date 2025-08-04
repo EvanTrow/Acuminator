@@ -1006,6 +1006,15 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to PXOverrideMethodMustBePublicNonVirtual.
+        /// </summary>
+        public static string PX1097 {
+            get {
+                return ResourceManager.GetString("PX1097", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to UsageOfForbiddenApi.
         /// </summary>
         public static string PX1099 {

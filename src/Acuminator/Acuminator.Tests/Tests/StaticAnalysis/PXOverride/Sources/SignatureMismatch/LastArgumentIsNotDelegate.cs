@@ -14,9 +14,15 @@ namespace Acuminator.Tests.Sources
 	public class DerivedExtension : PXGraphExtension<BaseExtension, MyGraph>
 	{
 		[PXOverride]
-		public virtual long TestMethod(int x, string y)
+		public int TestMethod(int x, string y, int z)
 		{
-			return x + Convert.ToInt64(y);
+			return x + Convert.ToInt32(y)* 2 + z;
+		}
+
+		[PXOverride]
+		public int TestMethod(int x, string y, int[] z)
+		{
+			return x + Convert.ToInt32(y) * 2 + z.Length;
 		}
 	}
 

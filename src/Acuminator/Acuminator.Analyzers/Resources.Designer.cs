@@ -1015,7 +1015,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Async void lambdas and anonymous methods are forbidden in Acumatica.
+        ///   Looks up a localized string similar to Async void lambdas, and anonymous methods are forbidden in Acumatica Framework.
         /// </summary>
         public static string PX1038TitleLambdas {
             get {
@@ -1024,7 +1024,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Async void methods are forbidden in Acumatica.
+        ///   Looks up a localized string similar to Async void methods are forbidden in Acumatica Framework.
         /// </summary>
         public static string PX1038TitleMethods {
             get {
@@ -2028,6 +2028,24 @@ namespace Acuminator.Analyzers {
         public static string PX1096Title {
             get {
                 return ResourceManager.GetString("PX1096Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Make method &quot;{0}&quot; public and non-virtual.
+        /// </summary>
+        public static string PX1097Fix {
+            get {
+                return ResourceManager.GetString("PX1097Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method with PXOverride attribute must be public and non-virtual.
+        /// </summary>
+        public static string PX1097Title {
+            get {
+                return ResourceManager.GetString("PX1097Title", resourceCulture);
             }
         }
         

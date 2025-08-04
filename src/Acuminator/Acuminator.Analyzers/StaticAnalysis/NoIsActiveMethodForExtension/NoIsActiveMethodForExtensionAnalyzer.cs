@@ -66,7 +66,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoIsActiveMethodForExtension
 		{
 			if (graphExtension.DeclaredActions.Any() || graphExtension.DeclaredActionHandlers.Any() ||
 				graphExtension.DeclaredViews.Any()   || graphExtension.DeclaredViewDelegates.Any() ||
-				!graphExtension.PXOverrides.IsDefaultOrEmpty)
+				!graphExtension.DeclaredPXOverrides.IsDefaultOrEmpty)
 			{
 				return true;
 			}

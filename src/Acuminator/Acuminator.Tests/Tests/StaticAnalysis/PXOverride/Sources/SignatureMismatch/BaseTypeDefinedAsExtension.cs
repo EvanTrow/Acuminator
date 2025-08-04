@@ -25,7 +25,7 @@ namespace Acuminator.Tests.Sources
 	public class PickPackShipExt : PickPackShip.ScanExtension
 	{
 		[PXOverride]
-		public override object TestMethod(int x, bool drilldown)
+		public object TestMethod(int x, bool drilldown)
 		{
 			return new object();
 		}
