@@ -199,7 +199,7 @@
     <value>No installed MSBuild version has been found on the machine.</value>
   </data>
   <data name="NoProjectInCodeSourceReferencesAcumaticaPlatformError" xml:space="preserve">
-    <value>No project in the provided "{CodeSource}" references the Acumatica Platform.</value>
+    <value>No project in the provided "{CodeSource}" references the Acumatica Framework.</value>
   </data>
   <data name="NotSupportedCodeSourceType" xml:space="preserve">
     <value>Not supported code source {0}. You can specify only C# projects (*.csproj) and solutions (*.sln) as code sources.</value>
@@ -214,7 +214,7 @@
     <value>Obtaining Roslyn compilation data for the project "{ProjectName}".</value>
   </data>
   <data name="ProjectDoesNotReferenceAcumaticaPlatformValidationError" xml:space="preserve">
-    <value>The {ProjectName} project does not reference Acumatica Platform. Validation can not be performed</value>
+    <value>The {ProjectName} project does not reference Acumatica Framework. Validation can not be performed</value>
   </data>
   <data name="RegisteringMSBuildAtTheProvidedPathStatusMessage" xml:space="preserve">
     <value>Registering MSBuild instance at the provided path "{MSBuildPath}".</value>
@@ -226,13 +226,13 @@
     <value>Searching for MSBuild instances installed on the current machine.</value>
   </data>
   <data name="StartAnalyzingTheCodeSourceStatusMessage" xml:space="preserve">
-    <value>Start analyzing the code source "{CodeSource}".</value>
+    <value>Analyzing the code source "{CodeSource}"...</value>
   </data>
   <data name="StartLoadingTheCodeSourceAtPathStatusMessage" xml:space="preserve">
-    <value>Start loading the code source "{CodeSource}".</value>
+    <value>Loading the code source "{CodeSource}"...</value>
   </data>
   <data name="StartValidatingSolutionStatusMessage" xml:space="preserve">
-    <value>Start validating the solution.</value>
+    <value>Validating the solution...</value>
   </data>
   <data name="StartedAcuminatorValidationOfTheProjectInfo" xml:space="preserve">
     <value>Started Acuminator validation of the project "{ProjectName}".</value>
