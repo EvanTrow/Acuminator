@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis;
@@ -7,7 +8,10 @@ using Acuminator.Analyzers.StaticAnalysis.PXOverride;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
+using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -22,7 +26,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 									.WithRecursiveAnalysisEnabled()
 									.WithStaticAnalysisEnabled()
 									.WithSuppressionMechanismDisabled(),
-				new PXOverrideAnalyzer());
+				new PXOverrideAnalyzerForPublicNonVirtualPXOverrideTests());
 
 		protected override CodeFixProvider GetCSharpCodeFixProvider() => new NonPublicOrVirtualPXOverrideFix();
 
@@ -58,5 +62,17 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 						  @"PublicNonVirtual\ExtensionWithVirtualPXOverrideThatCannotBeFixed.cs")]
 		public Task Abstract_And_Overriden_PXOverrides_Cannot_Apply_CodeFix(string actual, string expected) =>
 			VerifyCSharpFixAsync(actual, expected);
+
+
+		private sealed class PXOverrideAnalyzerForPublicNonVirtualPXOverrideTests : PXOverrideAnalyzer
+		{
+			protected override void ReportPatchMethodWithIncompatibleSignature(SymbolAnalysisContext context, PXContext pxContext, 
+																			   IMethodSymbol patchMethodWithPXOverride)
+			{ }
+
+			protected override void CheckPatchMethodHasBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext, 
+																			 PXOverrideInfo pxOverrideInfo) 
+			{ }
+		}
 	}
 }

@@ -16,7 +16,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 {
 	public class PXOverrideAnalyzer : PXGraphAggregatedAnalyzerBase
 	{
-		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
 			ImmutableArray.Create
 			(
 				Descriptors.PX1079_PXOverrideWithoutDelegateParameter,
@@ -58,7 +58,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 				ReportPatchMethodWithIncompatibleSignature(context, pxContext, pxOverrideInfo.Symbol);
 		}
 
-		private void CheckPatchMethodIsPublicNonVirtual(SymbolAnalysisContext context, PXContext pxContext, IMethodSymbol patchMethodWithPXOverride)
+		protected virtual void CheckPatchMethodIsPublicNonVirtual(SymbolAnalysisContext context, PXContext pxContext, 
+																  IMethodSymbol patchMethodWithPXOverride)
 		{
 			bool isNonPublic = patchMethodWithPXOverride.DeclaredAccessibility != Accessibility.Public;
 			var virtualityKind = GetPatchMethodVirtualityKind(patchMethodWithPXOverride);
@@ -93,7 +94,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 				return MemberVirtualityKind.None;
 		}
 
-		private void CheckPatchMethodHasBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext, PXOverrideInfo pxOverrideInfo)
+		protected virtual void CheckPatchMethodHasBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext, PXOverrideInfo pxOverrideInfo)
 		{
 			if (pxOverrideInfo.OverrideType == PXOverrideType.WithoutBaseDelegate)
 			{
@@ -104,8 +105,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			}
 		}
 
-		private void ReportPatchMethodWithIncompatibleSignature(SymbolAnalysisContext context, PXContext pxContext,
-																IMethodSymbol patchMethodWithPXOverride)
+		protected virtual void ReportPatchMethodWithIncompatibleSignature(SymbolAnalysisContext context, PXContext pxContext,
+																		  IMethodSymbol patchMethodWithPXOverride)
 		{
 			var location = patchMethodWithPXOverride.Locations.FirstOrDefault();
 			var diagnostic = Diagnostic.Create(Descriptors.PX1096_PXOverrideMustMatchSignature, location);
