@@ -99,7 +99,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			if (pxOverrideInfo.OverrideType == PXOverrideType.WithoutBaseDelegate)
 			{
 				var location = pxOverrideInfo.Symbol.Locations.FirstOrDefault();
-				var diagnostic = Diagnostic.Create(Descriptors.PX1079_PXOverrideWithoutDelegateParameter, location);
+				var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+				{
+					{ PXOverrideDiagnosticProperties.PatchMethodName, pxOverrideInfo.Symbol.Name }
+				}
+				.ToImmutableDictionary();
+				var diagnostic = Diagnostic.Create(Descriptors.PX1079_PXOverrideWithoutDelegateParameter, location, diagnosticProperties);
 
 				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 			}
