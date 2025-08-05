@@ -44,7 +44,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			var document = context.Document;
 			var codeAction = CodeAction.Create(title,
 											   cToken => AddBaseDelegateParameterToPatchMethod(document, context.Span, patchMethodName, 
-																							   replaceLastParameter: true, cToken),
+																							   replaceLastParameter: false, cToken),
 											   equivalenceKey: nameof(Resources.PX1079Fix));
 			context.RegisterCodeFix(codeAction, diagnostic);
 			return Task.CompletedTask;
