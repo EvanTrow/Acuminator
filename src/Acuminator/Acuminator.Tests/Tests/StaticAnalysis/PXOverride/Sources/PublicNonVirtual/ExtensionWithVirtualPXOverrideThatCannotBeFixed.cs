@@ -27,11 +27,11 @@ namespace Acuminator.Tests.Sources
 
 	public class MyGraph : PXGraph<MyGraph>
 	{
-		public virtual void TestMethod1(int x)
+		protected internal virtual void TestMethod1(int x)
 		{	
 		}
 
-		public virtual void TestMethod2()
+		protected virtual void TestMethod2()
 		{
 		}
 	}
