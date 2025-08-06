@@ -70,8 +70,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 																			   IMethodSymbol patchMethodWithPXOverride)
 			{ }
 
-			protected override void CheckPatchMethodHasBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext, 
-																			 PXOverrideInfo pxOverrideInfo) 
+			protected override void CheckPatchMethodBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext, 
+																		  PXOverrideInfo pxOverrideInfo) 
 			{ }
 		}
 	}

@@ -16,5 +16,10 @@
 		/// Property stores the name of the patch method.
 		/// </summary>
 		public const string PatchMethodName = nameof(PatchMethodName);
+
+		/// <summary>
+		/// Property indicates whether the code fix shared by PX1079 and PX1101 diagnostics should replace the last delegate parameter.
+		/// </summary>
+		public const string ReplaceLastDelegateParameter = nameof(ReplaceLastDelegateParameter);
 	}
 }

@@ -21,7 +21,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			(
 				Descriptors.PX1079_PXOverrideWithoutDelegateParameter,
 				Descriptors.PX1096_PXOverrideMustMatchSignature,
-				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual
+				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual,
+				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter
 			);
 
 		public override bool ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graphExtension) =>
@@ -50,7 +51,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			CheckPatchMethodIsPublicNonVirtual(context, pxContext, pxOverrideInfo.Symbol);
 
 			context.CancellationToken.ThrowIfCancellationRequested();
-			CheckPatchMethodHasBaseDelegateParameter(context, pxContext, pxOverrideInfo);
+			CheckPatchMethodBaseDelegateParameter(context, pxContext, pxOverrideInfo);
 
 			context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -94,20 +95,39 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 				return MemberVirtualityKind.None;
 		}
 
-		protected virtual void CheckPatchMethodHasBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext, PXOverrideInfo pxOverrideInfo)
+		protected virtual void CheckPatchMethodBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext, PXOverrideInfo pxOverrideInfo)
 		{
-			if (pxOverrideInfo.OverrideType == PXOverrideType.WithoutBaseDelegate)
-			{
-				var location = pxOverrideInfo.Symbol.Locations.FirstOrDefault();
-				var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
-				{
-					{ PXOverrideDiagnosticProperties.PatchMethodName, pxOverrideInfo.Symbol.Name }
-				}
-				.ToImmutableDictionary();
-				var diagnostic = Diagnostic.Create(Descriptors.PX1079_PXOverrideWithoutDelegateParameter, location, diagnosticProperties);
+			DiagnosticDescriptor descriptor;
+			bool replaceLastDelegateParameter;
 
-				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
+			switch (pxOverrideInfo.OverrideType)
+			{
+				case PXOverrideType.WithoutBaseDelegate:
+					descriptor = Descriptors.PX1079_PXOverrideWithoutDelegateParameter;
+
+					replaceLastDelegateParameter = false;
+					break;
+
+				case PXOverrideType.WithInvalidBaseDelegate:
+					descriptor = Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter;
+					replaceLastDelegateParameter = true;
+					break;
+
+				default:
+					return;
 			}
+
+			var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+			{
+				{ PXOverrideDiagnosticProperties.PatchMethodName, pxOverrideInfo.Symbol.Name },
+				{ PXOverrideDiagnosticProperties.ReplaceLastDelegateParameter, replaceLastDelegateParameter.ToString() }
+			}
+			.ToImmutableDictionary();
+
+			var location = pxOverrideInfo.Symbol.Locations.FirstOrDefault();
+			var diagnostic = Diagnostic.Create(descriptor, location, diagnosticProperties);
+
+			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 
 		protected virtual void ReportPatchMethodWithIncompatibleSignature(SymbolAnalysisContext context, PXContext pxContext,
