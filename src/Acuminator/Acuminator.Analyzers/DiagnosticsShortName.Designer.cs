@@ -1031,5 +1031,14 @@ namespace Acuminator.Analyzers {
                 return ResourceManager.GetString("PX1099", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PXOverrideWithInvalidDelegateParameter.
+        /// </summary>
+        public static string PX1101 {
+            get {
+                return ResourceManager.GetString("PX1101", resourceCulture);
+            }
+        }
     }
 }

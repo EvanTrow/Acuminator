@@ -820,6 +820,12 @@ Reason: {2}</value>
   <data name="PX1099Title_TypeFormatArg" xml:space="preserve">
     <value>type</value>
   </data>
+  <data name="PX1101Fix" xml:space="preserve">
+    <value>Fix the signature of the additional delegate parameter</value>
+  </data>
+  <data name="PX1101Title" xml:space="preserve">
+    <value>The additional delegate parameter for calling the base method of a PXOverride method has incorrect signature that does not match the base method</value>
+  </data>
   <data name="SuppressDiagnosticGroupCodeActionTitle" xml:space="preserve">
     <value>Suppress the {0} diagnostic with Acuminator</value>
   </data>
