@@ -711,6 +711,12 @@ public virtual int? SomeDacField{ get; set; }</value>
   <data name="PX1078Title_TypesOfDacFieldAndReferencedFieldMismatch" xml:space="preserve">
     <value>DAC field and referenced field have different types</value>
   </data>
+  <data name="PX1079Fix" xml:space="preserve">
+    <value>Add a delegate for calling a base method as the last parameter of the "{0}" method</value>
+  </data>
+  <data name="PX1079Title" xml:space="preserve">
+    <value>A method with the PXOverride attribute must declare a delegate for calling its base method as the last parameter</value>
+  </data>
   <data name="PX1080Title" xml:space="preserve">
     <value>Data view delegates should not start long-running operations</value>
   </data>

@@ -16,9 +16,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 {
 	public class PXOverrideAnalyzer : PXGraphAggregatedAnalyzerBase
 	{
-		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
 			ImmutableArray.Create
 			(
+				Descriptors.PX1079_PXOverrideWithoutDelegateParameter,
 				Descriptors.PX1096_PXOverrideMustMatchSignature,
 				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual
 			);
@@ -31,41 +32,34 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			var directBaseTypesAndThis = graphExtension.Symbol.GetBaseTypesAndThis().ToList(capacity: 4);
-
-			var allGraphAndGraphExtensionBaseTypes = 
-				graphExtension.GraphOrGraphExtInfo.JustOverridenItems()
-												  .Select(info => info.Symbol)
-												  .Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default)
-												  .Where(baseType => !directBaseTypesAndThis.Contains(baseType, SymbolEqualityComparer.Default))
-												  .ToList();
-
 			foreach (PXOverrideInfo pxOverrideInfo in graphExtension.DeclaredPXOverrides)
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
 
-				// We do not report generic PXOverrides. Although they are not supported now they can be supported in the future
+				// We do not report generic PXOverrides. Although they are not supported now they can be supported in the future.
 				if (!pxOverrideInfo.Symbol.IsGenericMethod)
 				{
-					AnalyzePatchMethod(context, pxContext, allGraphAndGraphExtensionBaseTypes, pxOverrideInfo);
+					AnalyzePatchMethod(context, pxContext, pxOverrideInfo);
 				}
 			}
 		}
 
-		private void AnalyzePatchMethod(SymbolAnalysisContext context, PXContext pxContext, List<INamedTypeSymbol> allGraphAndGraphExtensionBaseTypes,
-										PXOverrideInfo pxOverrideInfo)
+		private void AnalyzePatchMethod(SymbolAnalysisContext context, PXContext pxContext, PXOverrideInfo pxOverrideInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 			CheckPatchMethodIsPublicNonVirtual(context, pxContext, pxOverrideInfo.Symbol);
 
 			context.CancellationToken.ThrowIfCancellationRequested();
-			var baseMethod = GetSuitableBaseMethod(context, pxContext, allGraphAndGraphExtensionBaseTypes, pxOverrideInfo.Symbol);
+			CheckPatchMethodHasBaseDelegateParameter(context, pxContext, pxOverrideInfo);
 
-			if (baseMethod == null)
+			context.CancellationToken.ThrowIfCancellationRequested();
+
+			if (pxOverrideInfo.BaseMethod == null)
 				ReportPatchMethodWithIncompatibleSignature(context, pxContext, pxOverrideInfo.Symbol);
 		}
 
-		private void CheckPatchMethodIsPublicNonVirtual(SymbolAnalysisContext context, PXContext pxContext, IMethodSymbol patchMethodWithPXOverride)
+		protected virtual void CheckPatchMethodIsPublicNonVirtual(SymbolAnalysisContext context, PXContext pxContext, 
+																  IMethodSymbol patchMethodWithPXOverride)
 		{
 			bool isNonPublic = patchMethodWithPXOverride.DeclaredAccessibility != Accessibility.Public;
 			var virtualityKind = GetPatchMethodVirtualityKind(patchMethodWithPXOverride);
@@ -100,22 +94,24 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 				return MemberVirtualityKind.None;
 		}
 
-		private IMethodSymbol? GetSuitableBaseMethod(SymbolAnalysisContext context, PXContext pxContext,
-													 List<INamedTypeSymbol> allGraphAndGraphExtensionBaseTypes, IMethodSymbol patchMethodWithPXOverride)
+		protected virtual void CheckPatchMethodHasBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext, PXOverrideInfo pxOverrideInfo)
 		{
-			foreach (var baseType in allGraphAndGraphExtensionBaseTypes)
+			if (pxOverrideInfo.OverrideType == PXOverrideType.WithoutBaseDelegate)
 			{
-				var suitableBaseMethod = baseType.GetMethods(patchMethodWithPXOverride.Name)
-												 .FirstOrDefault(patchMethodWithPXOverride.IsPXOverrideOf);
-				if (suitableBaseMethod != null)
-					return suitableBaseMethod;
-			}
+				var location = pxOverrideInfo.Symbol.Locations.FirstOrDefault();
+				var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+				{
+					{ PXOverrideDiagnosticProperties.PatchMethodName, pxOverrideInfo.Symbol.Name }
+				}
+				.ToImmutableDictionary();
+				var diagnostic = Diagnostic.Create(Descriptors.PX1079_PXOverrideWithoutDelegateParameter, location, diagnosticProperties);
 
-			return null;
+				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
+			}
 		}
 
-		private void ReportPatchMethodWithIncompatibleSignature(SymbolAnalysisContext context, PXContext pxContext,
-																IMethodSymbol patchMethodWithPXOverride)
+		protected virtual void ReportPatchMethodWithIncompatibleSignature(SymbolAnalysisContext context, PXContext pxContext,
+																		  IMethodSymbol patchMethodWithPXOverride)
 		{
 			var location = patchMethodWithPXOverride.Locations.FirstOrDefault();
 			var diagnostic = Diagnostic.Create(Descriptors.PX1096_PXOverrideMustMatchSignature, location);

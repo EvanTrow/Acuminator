@@ -1825,6 +1825,24 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add delegate for calling base methods as the last parameter of the &quot;{0}&quot; method.
+        /// </summary>
+        public static string PX1079Fix {
+            get {
+                return ResourceManager.GetString("PX1079Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method with the PXOverride attribute must declare a delegate for calling its base methods as the last parameter.
+        /// </summary>
+        public static string PX1079Title {
+            get {
+                return ResourceManager.GetString("PX1079Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Data view delegates should not start long-running operations.
         /// </summary>
         public static string PX1080Title {

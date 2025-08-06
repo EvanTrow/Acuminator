@@ -844,6 +844,15 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to PXOverrideWithoutDelegateParameter.
+        /// </summary>
+        public static string PX1079 {
+            get {
+                return ResourceManager.GetString("PX1079", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to LongRunOperationInDataViewDelegate.
         /// </summary>
         public static string PX1080 {

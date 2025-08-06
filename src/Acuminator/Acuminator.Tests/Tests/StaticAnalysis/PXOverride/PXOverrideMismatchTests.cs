@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis;
@@ -7,7 +8,10 @@ using Acuminator.Analyzers.StaticAnalysis.PXOverride;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
+using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 using Xunit;
@@ -21,7 +25,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 									.WithRecursiveAnalysisEnabled()
 									.WithStaticAnalysisEnabled()
 									.WithSuppressionMechanismDisabled(),
-				new PXOverrideAnalyzer());
+				new PXOverrideAnalyzerForSignatureMismatchTests());
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\ArgumentsExactlyMatch.cs")]
@@ -173,5 +177,17 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\OverridenMethodIsInTheBaseOfTheBaseExtension.cs")]
 		public Task OverridenMethodIsInTheBaseOfTheBaseExtension(string source) => VerifyCSharpDiagnosticAsync(source);
+
+
+		private sealed class PXOverrideAnalyzerForSignatureMismatchTests : PXOverrideAnalyzer
+		{
+			protected override void CheckPatchMethodIsPublicNonVirtual(SymbolAnalysisContext context, PXContext pxContext, 
+																	   IMethodSymbol patchMethodWithPXOverride)
+			{ }
+
+			protected override void CheckPatchMethodHasBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext,
+																			 PXOverrideInfo pxOverrideInfo)
+			{ }
+		}
 	}
 }
