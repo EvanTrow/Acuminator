@@ -27,7 +27,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		protected override CodeFixProvider GetCSharpCodeFixProvider() => new AddOrReplaceBaseDelegateParameterFix();
 
 		[Theory]
-		[EmbeddedFileData(@"HasBaseDelegateParameter\PXOverrideWithoutBaseDelegateParameter.cs")]
+		[EmbeddedFileData(@"BaseDelegateParameter\WithoutParameter\PXOverrideWithoutBaseDelegateParameter.cs")]
 		public Task PXOverrides_Without_BaseDelegate_Parameter(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1079_PXOverrideWithoutDelegateParameter.CreateFor(12, 16, "TestMethod1"),
@@ -36,18 +36,18 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 				Descriptors.PX1079_PXOverrideWithoutDelegateParameter.CreateFor(26, 15, "TestMethod4"));
 
 		[Theory]
-		[EmbeddedFileData(@"HasBaseDelegateParameter\PXOverrideWithCustomBaseDelegateParameter.cs")]
+		[EmbeddedFileData(@"BaseDelegateParameter\WithoutParameter\PXOverrideWithCustomBaseDelegateParameter.cs")]
 		public Task PXOverrides_With_BaseDelegateParameter_WithCustomDelegateTypes(string source) =>
 			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData(@"HasBaseDelegateParameter\PXOverrideWithoutBaseDelegateParameter_Expected.cs")]
+		[EmbeddedFileData(@"BaseDelegateParameter\WithoutParameter\PXOverrideWithoutBaseDelegateParameter_Expected.cs")]
 		public Task PXOverrides_Without_BaseDelegate_Parameter_AfterCodeFix(string source) =>
 			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData(@"HasBaseDelegateParameter\PXOverrideWithoutBaseDelegateParameter.cs",
-						  @"HasBaseDelegateParameter\PXOverrideWithoutBaseDelegateParameter_Expected.cs")]
+		[EmbeddedFileData(@"BaseDelegateParameter\WithoutParameter\PXOverrideWithoutBaseDelegateParameter.cs",
+						  @"BaseDelegateParameter\WithoutParameter\PXOverrideWithoutBaseDelegateParameter_Expected.cs")]
 		public Task PXOverrides_Without_BaseDelegate_Parameter_CodeFix(string actual, string expected) => 
 			VerifyCSharpFixAsync(actual, expected);
 	}
