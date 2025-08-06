@@ -25,7 +25,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 		public override ImmutableArray<string> FixableDiagnosticIds { get; } =
 			ImmutableArray.Create
 			(
-				Descriptors.PX1079_PXOverrideWithoutDelegateParameter.Id
+				Descriptors.PX1079_PXOverrideWithoutDelegateParameter.Id,
+				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.Id
 			);
 
 		protected override Task RegisterCodeFixesForDiagnosticAsync(CodeFixContext context, Diagnostic diagnostic)
@@ -40,14 +41,31 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			string title = nameof(Resources.PX1079Fix).GetLocalized(patchMethodName).ToString();
+			bool replaceLastParameter = diagnostic.IsFlagSet(PXOverrideDiagnosticProperties.ReplaceLastDelegateParameter);
+			context.CancellationToken.ThrowIfCancellationRequested();
+
+			string? title = GetCodeFixTitle(diagnostic, patchMethodName);
+
+			if (title == null)
+				return Task.CompletedTask;
+
 			var document = context.Document;
 			var codeAction = CodeAction.Create(title,
 											   cToken => AddBaseDelegateParameterToPatchMethod(document, context.Span, patchMethodName, 
-																							   replaceLastParameter: false, cToken),
+																							   replaceLastParameter, cToken),
 											   equivalenceKey: nameof(Resources.PX1079Fix));
 			context.RegisterCodeFix(codeAction, diagnostic);
 			return Task.CompletedTask;
+		}
+
+		private static string? GetCodeFixTitle(Diagnostic diagnostic, string patchMethodName)
+		{
+			if (diagnostic.Id == Descriptors.PX1079_PXOverrideWithoutDelegateParameter.Id)
+				return nameof(Resources.PX1079Fix).GetLocalized(patchMethodName).ToString();
+			else if (diagnostic.Id == Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.Id)
+				return nameof(Resources.PX1101Fix).GetLocalized().ToString();
+			else
+				return null;
 		}
 
 		private static async Task<Document> AddBaseDelegateParameterToPatchMethod(Document document, TextSpan span, string patchMethodName,
