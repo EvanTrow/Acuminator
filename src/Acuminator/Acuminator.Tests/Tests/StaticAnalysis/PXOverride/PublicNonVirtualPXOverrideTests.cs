@@ -66,6 +66,9 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 
 		private sealed class PXOverrideAnalyzerForPublicNonVirtualPXOverrideTests : PXOverrideAnalyzer
 		{
+			public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+				ImmutableArray.Create(Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual);
+
 			protected override void ReportPatchMethodWithIncompatibleSignature(SymbolAnalysisContext context, PXContext pxContext, 
 																			   IMethodSymbol patchMethodWithPXOverride)
 			{ }
