@@ -24,7 +24,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 									.WithSuppressionMechanismDisabled(),
 				new PXOverrideAnalyzer());
 
-		protected override CodeFixProvider GetCSharpCodeFixProvider() => new AddBaseDelegateParameterFix();
+		protected override CodeFixProvider GetCSharpCodeFixProvider() => new AddOrReplaceBaseDelegateParameterFix();
 
 		[Theory]
 		[EmbeddedFileData(@"HasBaseDelegateParameter\PXOverrideWithoutBaseDelegateParameter.cs")]
