@@ -86,6 +86,7 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1076](diagnostics/PX1076.md) | This code calls Acumatica internal API marked with PXInternalUseOnlyAttribute which is not intended for public use | Warning | Unavailable |
 | [PX1077](diagnostics/PX1077.md) | Event handlers in graphs and graph extensions should have the `protected` and `virtual` modifiers | Error | Available |
 | [PX1078](diagnostics/PX1078.md) | The DAC field and the referenced DAC field have different types or sizes. | Error | Unavailable |
+| [PX1079](diagnostics/PX1079.md) | Methods with the `PXOverride` attribute must have an additional delegate parameter for calling base methods. | Error | Available |
 | [PX1080](diagnostics/PX1080.md) | Data view delegates should not start long-running operations. | Error | Unavailable |
 | [PX1081](diagnostics/PX1081.md) | Actions cannot be executed during the `PXGraph` initialization. | Error | Unavailable |
 | [PX1082](diagnostics/PX1082.md) | Actions cannot be executed within data view delegates. | Error | Unavailable |
