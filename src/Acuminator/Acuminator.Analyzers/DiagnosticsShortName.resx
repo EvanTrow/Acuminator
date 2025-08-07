@@ -441,6 +441,9 @@
   <data name="PX1099" xml:space="preserve">
     <value>UsageOfForbiddenApi</value>
   </data>
+  <data name="PX1100" xml:space="preserve">
+    <value>ExtensionOfObsoleteElement</value>
+  </data>
   <data name="PX1101" xml:space="preserve">
     <value>PXOverrideWithInvalidDelegateParameter</value>
   </data>
