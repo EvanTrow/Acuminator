@@ -11,13 +11,14 @@ using Acuminator.Analyzers.StaticAnalysis.CallingBaseDataViewDelegate;
 using Acuminator.Analyzers.StaticAnalysis.ChangesInPXCache;
 using Acuminator.Analyzers.StaticAnalysis.ConstructorInGraphExtension;
 using Acuminator.Analyzers.StaticAnalysis.DatabaseQueries;
+using Acuminator.Analyzers.StaticAnalysis.ForbidPrivateEventHandlers;
 using Acuminator.Analyzers.StaticAnalysis.InvalidPXActionSignature;
 using Acuminator.Analyzers.StaticAnalysis.LongOperationStart;
 using Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGraphExtensions;
 using Acuminator.Analyzers.StaticAnalysis.NoIsActiveMethodForExtension;
 using Acuminator.Analyzers.StaticAnalysis.NonPublicGraphsDacsAndExtensions;
 using Acuminator.Analyzers.StaticAnalysis.NoPrimaryViewForPrimaryDac;
-using Acuminator.Analyzers.StaticAnalysis.ForbidPrivateEventHandlers;
+using Acuminator.Analyzers.StaticAnalysis.ObsoleteElementsUsage;
 using Acuminator.Analyzers.StaticAnalysis.PXActionExecution;
 using Acuminator.Analyzers.StaticAnalysis.PXGraphCreationInGraphInWrongPlaces;
 using Acuminator.Analyzers.StaticAnalysis.PXOverride;
@@ -68,6 +69,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 			new StaticFieldOrPropertyInGraphAnalyzer(),
 			new TypoInViewAndActionHandlerNameAnalyzer(),
 			new PXOverrideAnalyzer(),
+			new ObsoleteElementsUsageAnalyzer(),
 			new ForbidPrivateEventHandlersAnalyzer())
 		{
 		}
