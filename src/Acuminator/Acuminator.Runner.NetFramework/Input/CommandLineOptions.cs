@@ -286,7 +286,7 @@ namespace Acuminator.Runner.Input
 		[Option(shortName: CommandLineArgNames.AcuminatorWorkModeShort, longName: CommandLineArgNames.AcuminatorWorkModeLong, 
 				Default = CommandLineArgNames.WorkModes.ReportErrors,
 				HelpText = $"""
-						   Required. The mode in which Acuminator should work. The following work modes are available:
+						   Optional. The mode in which Acuminator should work. The following work modes are available:
 						   - "{CommandLineArgNames.WorkModes.ReportErrors}"
 						   In this mode, Acuminator report errors if they are not suppressed with Acuminator suppression mechanisms,
 						   or if the suppression mechanism is disabled with the "{CommandLineArgNames.DisableSuppressionMechanism}" flag.
