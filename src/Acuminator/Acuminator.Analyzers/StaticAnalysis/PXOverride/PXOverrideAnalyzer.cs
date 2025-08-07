@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
+using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
@@ -21,7 +24,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			(
 				Descriptors.PX1079_PXOverrideWithoutDelegateParameter,
 				Descriptors.PX1096_PXOverrideMustMatchSignature,
-				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual
+				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual,
+				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter
 			);
 
 		public override bool ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graphExtension) =>
@@ -50,7 +54,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			CheckPatchMethodIsPublicNonVirtual(context, pxContext, pxOverrideInfo.Symbol);
 
 			context.CancellationToken.ThrowIfCancellationRequested();
-			CheckPatchMethodHasBaseDelegateParameter(context, pxContext, pxOverrideInfo);
+			CheckPatchMethodBaseDelegateParameter(context, pxContext, pxOverrideInfo);
 
 			context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -94,20 +98,57 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 				return MemberVirtualityKind.None;
 		}
 
-		protected virtual void CheckPatchMethodHasBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext, PXOverrideInfo pxOverrideInfo)
+		protected virtual void CheckPatchMethodBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext, PXOverrideInfo pxOverrideInfo)
 		{
-			if (pxOverrideInfo.OverrideType == PXOverrideType.WithoutBaseDelegate)
-			{
-				var location = pxOverrideInfo.Symbol.Locations.FirstOrDefault();
-				var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
-				{
-					{ PXOverrideDiagnosticProperties.PatchMethodName, pxOverrideInfo.Symbol.Name }
-				}
-				.ToImmutableDictionary();
-				var diagnostic = Diagnostic.Create(Descriptors.PX1079_PXOverrideWithoutDelegateParameter, location, diagnosticProperties);
+			DiagnosticDescriptor descriptor;
+			Location? location;
+			bool replaceLastDelegateParameter;
 
-				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
+			switch (pxOverrideInfo.OverrideType)
+			{
+				case PXOverrideType.WithoutBaseDelegate:
+					descriptor = Descriptors.PX1079_PXOverrideWithoutDelegateParameter;
+					location = pxOverrideInfo.Symbol.Locations.FirstOrDefault();
+					replaceLastDelegateParameter = false;
+					break;
+
+				case PXOverrideType.WithInvalidBaseDelegate:
+					descriptor = Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter;
+					location = GetLocationForIncorrectDelegateParameter(pxOverrideInfo.Symbol, context.CancellationToken);
+					replaceLastDelegateParameter = true;
+					break;
+
+				default:
+					return;
 			}
+
+			var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+			{
+				{ PXOverrideDiagnosticProperties.PatchMethodName, pxOverrideInfo.Symbol.Name },
+				{ PXOverrideDiagnosticProperties.ReplaceLastDelegateParameter, replaceLastDelegateParameter.ToString() }
+			}
+			.ToImmutableDictionary();
+
+			 
+			var diagnostic = Diagnostic.Create(descriptor, location, diagnosticProperties);
+
+			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
+		}
+
+		private Location? GetLocationForIncorrectDelegateParameter(IMethodSymbol patchMethodWithPXOverride, CancellationToken cancellation)
+		{
+			var parameters = patchMethodWithPXOverride.Parameters;
+
+			if (parameters.IsDefaultOrEmpty)
+				return patchMethodWithPXOverride.Locations.FirstOrDefault();
+
+			if (patchMethodWithPXOverride.GetSyntax(cancellation) is not MethodDeclarationSyntax methodNode)
+				return patchMethodWithPXOverride.Locations.FirstOrDefault();
+
+			var lastParameterNode = methodNode.ParameterList.Parameters[^1];
+			return lastParameterNode.GetLocation().NullIfLocationKindIsNone() ??
+				   parameters[^1].Locations.FirstOrDefault()?.NullIfLocationKindIsNone() ??
+				   patchMethodWithPXOverride.Locations.FirstOrDefault();
 		}
 
 		protected virtual void ReportPatchMethodWithIncompatibleSignature(SymbolAnalysisContext context, PXContext pxContext,

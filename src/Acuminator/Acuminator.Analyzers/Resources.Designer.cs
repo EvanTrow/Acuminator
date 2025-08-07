@@ -1825,7 +1825,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add delegate for calling base methods as the last parameter of the &quot;{0}&quot; method.
+        ///   Looks up a localized string similar to Add a delegate for calling a base method as the last parameter of the &quot;{0}&quot; method.
         /// </summary>
         public static string PX1079Fix {
             get {
@@ -1834,7 +1834,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Method with the PXOverride attribute must declare a delegate for calling its base methods as the last parameter.
+        ///   Looks up a localized string similar to A method with the PXOverride attribute must declare a delegate for calling its base method as the last parameter.
         /// </summary>
         public static string PX1079Title {
             get {
@@ -2050,7 +2050,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Make method &quot;{0}&quot; public and non-virtual.
+        ///   Looks up a localized string similar to Make the &quot;{0}&quot; method public and non-virtual.
         /// </summary>
         public static string PX1097Fix {
             get {
@@ -2059,7 +2059,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Method with PXOverride attribute must be public and non-virtual.
+        ///   Looks up a localized string similar to A method with the PXOverride attribute must be public and non-virtual.
         /// </summary>
         public static string PX1097Title {
             get {
@@ -2146,6 +2146,24 @@ namespace Acuminator.Analyzers {
         public static string PX1099TitleFormatWithReason {
             get {
                 return ResourceManager.GetString("PX1099TitleFormatWithReason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fix the signature of the additional delegate parameter.
+        /// </summary>
+        public static string PX1101Fix {
+            get {
+                return ResourceManager.GetString("PX1101Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The additional delegate parameter for calling the base method of a PXOverride method has incorrect signature that does not match the base method.
+        /// </summary>
+        public static string PX1101Title {
+            get {
+                return ResourceManager.GetString("PX1101Title", resourceCulture);
             }
         }
         

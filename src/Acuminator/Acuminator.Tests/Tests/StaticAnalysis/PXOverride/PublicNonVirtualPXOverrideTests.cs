@@ -34,17 +34,17 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		[EmbeddedFileData(@"PublicNonVirtual\ExtensionWithNonPublicVirtualPXOverride.cs")]
 		public Task NonPublic_And_Virtual_PXOverrides(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual.CreateFor(11, 25, "TestMethod1"),
-				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual.CreateFor(17, 27, "TestMethod2"),
-				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual.CreateFor(23, 35, "TestMethod3"),
-				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual.CreateFor(29, 8, "TestMethod4"));
+				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual.CreateFor(11, 25),
+				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual.CreateFor(17, 27),
+				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual.CreateFor(23, 35),
+				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual.CreateFor(29, 8));
 
 		[Theory]
 		[EmbeddedFileData(@"PublicNonVirtual\ExtensionWithVirtualPXOverrideThatCannotBeFixed.cs")]
 		public Task Abstract_And_Overriden_PXOverrides(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual.CreateFor(11, 24, "TestMethod1"),
-				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual.CreateFor(16, 24, "TestMethod2"));
+				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual.CreateFor(11, 24),
+				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual.CreateFor(16, 24));
 
 		[Theory]
 		[EmbeddedFileData(@"PublicNonVirtual\ExtensionWithNonPublicVirtualPXOverride_Expected.cs")]
@@ -66,12 +66,15 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 
 		private sealed class PXOverrideAnalyzerForPublicNonVirtualPXOverrideTests : PXOverrideAnalyzer
 		{
+			public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+				ImmutableArray.Create(Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual);
+
 			protected override void ReportPatchMethodWithIncompatibleSignature(SymbolAnalysisContext context, PXContext pxContext, 
 																			   IMethodSymbol patchMethodWithPXOverride)
 			{ }
 
-			protected override void CheckPatchMethodHasBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext, 
-																			 PXOverrideInfo pxOverrideInfo) 
+			protected override void CheckPatchMethodBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext, 
+																		  PXOverrideInfo pxOverrideInfo) 
 			{ }
 		}
 	}

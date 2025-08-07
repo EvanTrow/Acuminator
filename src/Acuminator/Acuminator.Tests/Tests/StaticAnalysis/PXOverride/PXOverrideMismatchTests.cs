@@ -181,12 +181,18 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 
 		private sealed class PXOverrideAnalyzerForSignatureMismatchTests : PXOverrideAnalyzer
 		{
+			public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+				ImmutableArray.Create
+				(
+					Descriptors.PX1096_PXOverrideMustMatchSignature
+				);
+
 			protected override void CheckPatchMethodIsPublicNonVirtual(SymbolAnalysisContext context, PXContext pxContext, 
 																	   IMethodSymbol patchMethodWithPXOverride)
 			{ }
 
-			protected override void CheckPatchMethodHasBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext,
-																			 PXOverrideInfo pxOverrideInfo)
+			protected override void CheckPatchMethodBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext,
+																		  PXOverrideInfo pxOverrideInfo)
 			{ }
 		}
 	}
