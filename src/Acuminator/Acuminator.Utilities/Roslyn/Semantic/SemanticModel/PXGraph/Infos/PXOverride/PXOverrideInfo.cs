@@ -58,7 +58,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				if (!method.HasPXOverrideAttribute(pxOverrideAttribute))
 					continue;
 
-				var baseMethod = GetSuitableBaseMethod(method, graphAndGraphExtensionBaseTypes);
+				var baseMethod = GetBaseMethod(method, graphAndGraphExtensionBaseTypes, pxOverrideAttribute);
 				var pxOverrideType = GetPXOverrideType(method, baseMethod);
 
 				if (pxOverrideType != PXOverrideType.None)
@@ -69,14 +69,19 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			}
 		}
 
-		private static IMethodSymbol? GetSuitableBaseMethod(IMethodSymbol patchMethodWithPXOverride, List<INamedTypeSymbol> graphAndGraphExtensionBaseTypes)
+		private static IMethodSymbol? GetBaseMethod(IMethodSymbol patchMethodWithPXOverride, List<INamedTypeSymbol> graphAndGraphExtensionBaseTypes,
+													INamedTypeSymbol pxOverrideAttribute)
 		{
 			foreach (var baseType in graphAndGraphExtensionBaseTypes)
 			{
-				var suitableBaseMethod = baseType.GetMethods(patchMethodWithPXOverride.Name)
-												 .FirstOrDefault(patchMethodWithPXOverride.IsPXOverrideOf);
-				if (suitableBaseMethod != null)
-					return suitableBaseMethod;
+				// Base method search should look for the first suitable method in the base type hierarchy from the most derived type to the least derived type.
+				// The base method is the first one with the suitable signature that is not marked with PXOverrideAttribute.
+				// The additional condition is required to filter out overrides of the base method in base extensions.
+				var baseMethod = baseType.GetMethods(patchMethodWithPXOverride.Name)
+												 .FirstOrDefault(baseMethod => patchMethodWithPXOverride.IsPXOverrideOf(baseMethod) && 
+																			   !baseMethod.HasPXOverrideAttribute(pxOverrideAttribute));
+				if (baseMethod != null)
+					return baseMethod;
 			}
 
 			return null;
