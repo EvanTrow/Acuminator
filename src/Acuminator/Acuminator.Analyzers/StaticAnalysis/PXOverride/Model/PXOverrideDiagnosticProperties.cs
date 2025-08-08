@@ -18,8 +18,8 @@
 		public const string PatchMethodName = nameof(PatchMethodName);
 
 		/// <summary>
-		/// Property indicates whether the code fix shared by PX1079 and PX1101 diagnostics should replace the last delegate parameter.
+		/// Property stores the <see cref="BaseDelegateParameterFixMode"/> value for a patch method.
 		/// </summary>
-		public const string ReplaceLastDelegateParameter = nameof(ReplaceLastDelegateParameter);
+		public const string DelegateParameterFixMode = nameof(DelegateParameterFixMode);
 	}
 }

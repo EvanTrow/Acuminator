@@ -41,7 +41,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			bool replaceLastParameter = diagnostic.IsFlagSet(PXOverrideDiagnosticProperties.ReplaceLastDelegateParameter);
+			bool replaceLastParameter = diagnostic.IsFlagSet(PXOverrideDiagnosticProperties.DelegateParameterFixMode);
 			context.CancellationToken.ThrowIfCancellationRequested();
 
 			string? title = GetCodeFixTitle(diagnostic, patchMethodName);
