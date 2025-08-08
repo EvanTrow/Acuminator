@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AcuminatorValidationPassedMessage" xml:space="preserve">
-    <value>The project "{0}" passed Acuminator validation successfully</value>
+    <value>The "{0}" project passed Acuminator validation successfully.</value>
   </data>
   <data name="AcuminatorVersionInfo" xml:space="preserve">
     <value>Acuminator version "{Version}" is used for the analysis.</value>
@@ -127,67 +127,67 @@
     <value>An error happened during the Acuminator analysis of "{CodeSource}".</value>
   </data>
   <data name="CancelledCodeSourceValidationInfo" xml:space="preserve">
-    <value>Cancelled Acuminator validation of the "{CodeSource}". Project "{ProjectName}" validation result: {Result}.</value>
+    <value>Acuminator validation of the "{CodeSource}" has been cancelled. The result of the "{ProjectName}" project validation: {Result}.</value>
   </data>
   <data name="CodeSourceFailedValidationMessage" xml:space="preserve">
-    <value>The validation is finished. "{CodeSource}" failed the validation.</value>
+    <value>The validation has been finished. "{CodeSource}" has failed the validation.</value>
   </data>
   <data name="CodeSourceNotFoundError" xml:space="preserve">
-    <value>Code source to use for Acuminator validation is not found at {0}</value>
+    <value>Code source to use for Acuminator validation has not been found at {0}.</value>
   </data>
   <data name="CodeSourceNotSpecifiedError" xml:space="preserve">
-    <value>Code source is not specified</value>
+    <value>The code source is not specified.</value>
   </data>
   <data name="CodeSourceValidationWasCancelled" xml:space="preserve">
-    <value>The Acuminator validation of "{CodeSource}" was cancelled.</value>
+    <value>The Acuminator validation of "{CodeSource}" has been cancelled.</value>
   </data>
   <data name="DistinctDiagnosticsReportTitlePart" xml:space="preserve">
     <value>Distinct Diagnostics</value>
   </data>
   <data name="ErrorDuringAcuminatorAnalyzersCollection" xml:space="preserve">
-    <value>Error during the collection of Acuminator analyzers</value>
+    <value>An error occured during the collection of Acuminator analyzers.</value>
   </data>
   <data name="ErrorsCountReportTitlePart" xml:space="preserve">
     <value>Errors Count</value>
   </data>
   <data name="FailedToInitializeAcuminatorGlobalSuppressionMechanismError" xml:space="preserve">
-    <value>Failed to initialize Acuminator global suppression mechanism for the code source "{CodeSource}".</value>
+    <value>Failed to initialize the Acuminator global suppression mechanism for the code source "{CodeSource}".</value>
   </data>
   <data name="FailedToLoadAcuminatorAnalyzersError" xml:space="preserve">
-    <value>Failed to load Acuminator analyzers. The analysis of the code source "{CodeSource}" cannot be performed</value>
+    <value>Failed to load Acuminator analyzers. The analysis of the code source "{CodeSource}" cannot be performed.</value>
   </data>
   <data name="FailedToLoadSolutionFromCodeSourceError" xml:space="preserve">
-    <value>Failed to load solution from the code source "{CodeSource}".</value>
+    <value>Failed to load the solution from the code source "{CodeSource}".</value>
   </data>
   <data name="FailedToObtainAcuminatorVersionWarning" xml:space="preserve">
-    <value>Failed to obtain Acuminator version. The analysis will be performed without Acuminator version information.</value>
+    <value>Failed to obtain the Acuminator version. The analysis will be performed without Acuminator version information.</value>
   </data>
   <data name="FailedToObtainCompilationWithAnalyzersError" xml:space="preserve">
-    <value>Failed to obtain compilation with analyzers</value>
+    <value>Failed to obtain the compilation with analyzers.</value>
   </data>
   <data name="FailedToObtainRoslynCompilationDataForTheProjectError" xml:space="preserve">
-    <value>Failed to obtain Roslyn compilation data for the project with name "{ProjectName}" and path "{ProjectPath}".</value>
+    <value>Failed to obtain the Roslyn compilation data for the project with the "{ProjectName}" name and the "{ProjectPath}" path.</value>
   </data>
   <data name="FinishedAcuminatorValidationOfTheProjectInfo" xml:space="preserve">
-    <value>Finished Acuminator validation of the project "{ProjectName}". Project validation result: {Result}.</value>
+    <value>Finished Acuminator validation of the "{ProjectName}" project. The result of the project validation: {Result}.</value>
   </data>
   <data name="FoundErrorsReportSubtitle" xml:space="preserve">
     <value>Found Errors</value>
   </data>
   <data name="InitializeAcuminatorAnalyzersStatusMessage" xml:space="preserve">
-    <value>Initialize Acuminator analyzers.</value>
+    <value>Initializing Acuminator analyzers...</value>
   </data>
   <data name="LoadedProjectsCount_Information" xml:space="preserve">
-    <value>Count of loaded projects: {ProjectsCount}.</value>
+    <value>The number of loaded projects: {ProjectsCount}.</value>
   </data>
   <data name="MSBuildInstanceRegistrationError" xml:space="preserve">
-    <value>Error during registration of MSBuild instance.</value>
+    <value>An error occured during registration of the MSBuild instance.</value>
   </data>
   <data name="MSBuildPath_Info" xml:space="preserve">
     <value>MSBuildPath: "{MSBuildPath}".</value>
   </data>
   <data name="MSBuildRegistrationAtProvidedPathFailedError" xml:space="preserve">
-    <value>Error during the registration of MSBuild instance. Failed to register MSBuild using a provided path "{MSBuildPath}".</value>
+    <value>An error occured during the registration of the MSBuild instance. Failed to register MSBuild by using the provided path "{MSBuildPath}".</value>
   </data>
   <data name="MSBuild_VisualStudioNameAndVersion_Info" xml:space="preserve">
     <value>Found MSBuild instance with name "{VisualStudioName}", version "{VisualStudioVersion}".</value>
@@ -196,61 +196,61 @@
     <value>No file</value>
   </data>
   <data name="NoInstalledMSBuildFoundError" xml:space="preserve">
-    <value>No installed MSBuild version was found on the machine.</value>
+    <value>No installed MSBuild version has been found on the machine.</value>
   </data>
   <data name="NoProjectInCodeSourceReferencesAcumaticaPlatformError" xml:space="preserve">
-    <value>No project in the provided "{CodeSource}" references Acumatica Platform</value>
+    <value>No project in the provided "{CodeSource}" references the Acumatica Framework.</value>
   </data>
   <data name="NotSupportedCodeSourceType" xml:space="preserve">
     <value>Not supported code source {0}. You can specify only C# projects (*.csproj) and solutions (*.sln) as code sources.</value>
   </data>
   <data name="NotSupportedOutputFormat" xml:space="preserve">
-    <value>Not supported output format "{0}". You can specify only "{1}" and "{2}" values as output formats.</value>
+    <value>Not supported output format "{0}". You can specify only the "{1}" and "{2}" values as output formats.</value>
   </data>
   <data name="ObtainedRoslynCompilationDataForTheProjectDebug" xml:space="preserve">
-    <value>Obtained Roslyn compilation data for the project "{ProjectName}" successfully.</value>
+    <value>Roslyn compilation data for the project "{ProjectName}" has been obtained successfully.</value>
   </data>
   <data name="ObtainingRoslynCompilationDataForTheProjectDebug" xml:space="preserve">
     <value>Obtaining Roslyn compilation data for the project "{ProjectName}".</value>
   </data>
   <data name="ProjectDoesNotReferenceAcumaticaPlatformValidationError" xml:space="preserve">
-    <value>The project {ProjectName} does not reference Acumatica Platform. Validation can not be performed</value>
+    <value>The {ProjectName} project does not reference Acumatica Framework. Validation can not be performed</value>
   </data>
   <data name="RegisteringMSBuildAtTheProvidedPathStatusMessage" xml:space="preserve">
     <value>Registering MSBuild instance at the provided path "{MSBuildPath}".</value>
   </data>
   <data name="RuntimeErrorHappenedDuringValidationMessage" xml:space="preserve">
-    <value>A runtime error was encountered during the validation.</value>
+    <value>A runtime error has been encountered during the validation.</value>
   </data>
   <data name="SearchingForMSBuildInstancesStatusMessage" xml:space="preserve">
     <value>Searching for MSBuild instances installed on the current machine.</value>
   </data>
   <data name="StartAnalyzingTheCodeSourceStatusMessage" xml:space="preserve">
-    <value>Start analyzing the code source "{CodeSource}".</value>
+    <value>Analyzing the code source "{CodeSource}"...</value>
   </data>
   <data name="StartLoadingTheCodeSourceAtPathStatusMessage" xml:space="preserve">
-    <value>Start loading the code source "{CodeSource}".</value>
+    <value>Loading the code source "{CodeSource}"...</value>
   </data>
   <data name="StartValidatingSolutionStatusMessage" xml:space="preserve">
-    <value>Start validating the solution.</value>
+    <value>Validating the solution...</value>
   </data>
   <data name="StartedAcuminatorValidationOfTheProjectInfo" xml:space="preserve">
     <value>Started Acuminator validation of the project "{ProjectName}".</value>
   </data>
   <data name="SuccessfullyFinishedSolutionValidationStatusMessage" xml:space="preserve">
-    <value>Successfully finished validating the solution.</value>
+    <value>Validation of the solution has been finished successfully.</value>
   </data>
   <data name="SuccessfullyLoadedCodeSourceAtPathStatusMessage" xml:space="preserve">
-    <value>Successfully loaded the code source "{CodeSource}".</value>
+    <value>The code source "{CodeSource}" has been loaded successfully.</value>
   </data>
   <data name="SuccessfullyRegisteredMSBuildAtProvidedPathStatusMessage" xml:space="preserve">
-    <value>Successfully registered MSBuild instance at the provided path "{MSBuildPath}".</value>
+    <value>The MSBuild instance at the provided path "{MSBuildPath}" has been registered successfully.</value>
   </data>
   <data name="TotalErrorsCountReportTitlePart" xml:space="preserve">
-    <value>Total Errors Count</value>
+    <value>Total Error Count</value>
   </data>
   <data name="UnregisterMSBuildInstanceError" xml:space="preserve">
-    <value>Error on attempt to unregister MSBuild.</value>
+    <value>An error has occurred on attempt to unregister MSBuild.</value>
   </data>
   <data name="ValidationPassedSuccessfullyMessage" xml:space="preserve">
     <value>The validation passed successfully!</value>
