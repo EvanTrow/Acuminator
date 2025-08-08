@@ -20,7 +20,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 {
 	[ExportCodeFixProvider(LanguageNames.CSharp), Shared]
-	public class AddOrReplaceBaseDelegateParameterFix : PXCodeFixProvider
+	public class AddOrReplaceOrRenameBaseDelegateParameterFix : PXCodeFixProvider
 	{
 		public override ImmutableArray<string> FixableDiagnosticIds { get; } =
 			ImmutableArray.Create
