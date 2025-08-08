@@ -829,6 +829,12 @@ Reason: {2}</value>
   <data name="PX1101Title" xml:space="preserve">
     <value>The additional delegate parameter for calling the base method of the PXOverride method has incorrect signature that does not match the base method</value>
   </data>
+  <data name="PX1102Fix" xml:space="preserve">
+    <value>Fix the name of the additional delegate parameter</value>
+  </data>
+  <data name="PX1102Title" xml:space="preserve">
+    <value>The name of the additional delegate parameter for calling the base method of the PXOverride method breaks Acumatica naming conventions </value>
+  </data>
   <data name="SuppressDiagnosticGroupCodeActionTitle" xml:space="preserve">
     <value>Suppress the {0} diagnostic with Acuminator</value>
   </data>
