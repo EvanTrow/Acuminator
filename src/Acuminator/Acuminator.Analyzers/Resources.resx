@@ -820,6 +820,9 @@ Reason: {2}</value>
   <data name="PX1099Title_TypeFormatArg" xml:space="preserve">
     <value>type</value>
   </data>
+  <data name="PX1100TitlePXOverride" xml:space="preserve">
+    <value>A method with the PXOverride attribute overrides an obsolete method</value>
+  </data>
   <data name="PX1101Fix" xml:space="preserve">
     <value>Fix the signature of the additional delegate parameter</value>
   </data>

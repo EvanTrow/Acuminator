@@ -2150,6 +2150,15 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A method with the PXOverride attribute overrides an obsolete method.
+        /// </summary>
+        public static string PX1100TitlePXOverride {
+            get {
+                return ResourceManager.GetString("PX1100TitlePXOverride", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fix the signature of the additional delegate parameter.
         /// </summary>
         public static string PX1101Fix {

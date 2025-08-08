@@ -83,8 +83,8 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1073](diagnostics/PX1073.md) | Exceptions cannot be thrown in the `RowPersisted` and `FieldUpdating` event handlers. | Error | Unavailable |
 | [PX1074](diagnostics/PX1074.md) | `PXSetupNotEnteredException` cannot be thrown in any event handlers except for the `RowSelected` event handlers. | Warning (ISV Level 1: Significant) | Unavailable |
 | [PX1075](diagnostics/PX1075.md) | `PXCache.RaiseExceptionHandling` cannot be invoked from the `FieldDefaulting`, `FieldSelecting`, `FieldUpdating`, `RowSelecting`, and `RowPersisted` event handlers. | Error | Unavailable |
-| [PX1076](diagnostics/PX1076.md) | This code calls Acumatica internal API marked with PXInternalUseOnlyAttribute which is not intended for public use | Warning | Unavailable |
-| [PX1077](diagnostics/PX1077.md) | Event handlers in graphs and graph extensions should have the `protected` and `virtual` modifiers | Error | Available |
+| [PX1076](diagnostics/PX1076.md) | This code calls Acumatica internal API marked with PXInternalUseOnlyAttribute which is not intended for public use. | Warning | Unavailable |
+| [PX1077](diagnostics/PX1077.md) | Event handlers in graphs and graph extensions should have the `protected` and `virtual` modifiers. | Error | Available |
 | [PX1078](diagnostics/PX1078.md) | The DAC field and the referenced DAC field have different types or sizes. | Error | Unavailable |
 | [PX1079](diagnostics/PX1079.md) | Methods with the `PXOverride` attribute must have an additional delegate parameter for calling base methods. | Error | Available |
 | [PX1080](diagnostics/PX1080.md) | Data view delegates should not start long-running operations. | Error | Unavailable |
@@ -105,4 +105,5 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1096](diagnostics/PX1096.md) | The signature of a method with the `PXOverride` attribute must match the overridden method. | Error | Unavailable |
 | [PX1097](diagnostics/PX1097.md) | Methods with the `PXOverride` attribute must be `public` and non-virtual. | Error | Available |
 | [PX1099](diagnostics/PX1099.md) | The API reported by the diagnostic should not be used with the Acumatica Framework. | Warning | Unavailable |
+| [PX1100](diagnostics/PX1100.md) | An element of a graph or a DAC extension extends or overrides an obsolete code element. | Warning | Unavailable |
 | [PX1101](diagnostics/PX1101.md) | The additional delegate parameter of the method with the `PXOverride` attribute must have the same signature as the base method. | Error | Available |

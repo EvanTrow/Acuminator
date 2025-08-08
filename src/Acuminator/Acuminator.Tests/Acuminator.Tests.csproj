@@ -388,6 +388,8 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\NonPublicGraphsDacsAndExtensions\Sources\NonPublicGraphWithBadModifiers.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\NonPublicGraphsDacsAndExtensions\Sources\NonPublicPartialGraph_Expected.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\NonPublicGraphsDacsAndExtensions\Sources\NonPublicPartialGraph.cs" />
+    <Compile Include="Tests\StaticAnalysis\ObsoleteElementsUsage\ObsoleteElementsUsageTests.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\ObsoleteElementsUsage\Sources\PXOverride\PXOverrideOfObsoleteMethods.cs" />
     <Compile Include="Tests\StaticAnalysis\PropertyAndBqlFieldTypesMismatch\PropertyAndBqlFieldTypesMismatchTests.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PropertyAndBqlFieldTypesMismatch\Sources\DacWithInconsistentTypes_BqlFieldFirst_Expected.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PropertyAndBqlFieldTypesMismatch\Sources\DacWithInconsistentTypes_BqlFieldFirst.cs" />

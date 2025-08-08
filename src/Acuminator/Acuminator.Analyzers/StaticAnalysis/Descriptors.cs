@@ -511,6 +511,9 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			Rule("PX1099", nameof(Resources.PX1099Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1099,
 				 messageFormat: nameof(Resources.PX1099TitleFormatWithReason).GetLocalized());
 
+		public static DiagnosticDescriptor PX1100_PXOverrideOverridesObsoleteMethod { get; } =
+			Rule("PX1100", nameof(Resources.PX1100TitlePXOverride).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1100);
+
 		public static DiagnosticDescriptor PX1101_PXOverrideWithInvalidDelegateParameter { get; } =
 			Rule("PX1101", nameof(Resources.PX1101Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1101);
 	}

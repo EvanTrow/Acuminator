@@ -1033,6 +1033,15 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ExtensionOfObsoleteElement.
+        /// </summary>
+        public static string PX1100 {
+            get {
+                return ResourceManager.GetString("PX1100", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to PXOverrideWithInvalidDelegateParameter.
         /// </summary>
         public static string PX1101 {
