@@ -25,7 +25,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 				Descriptors.PX1079_PXOverrideWithoutDelegateParameter,
 				Descriptors.PX1096_PXOverrideMustMatchSignature,
 				Descriptors.PX1097_PXOverrideMethodMustBePublicNonVirtual,
-				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter
+				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter,
+				Descriptors.PX1102_PXOverrideInvalidNameOfDelegateParameter
 			);
 
 		public override bool ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graphExtension) =>
@@ -102,20 +103,27 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 		{
 			DiagnosticDescriptor descriptor;
 			Location? location;
-			bool replaceLastDelegateParameter;
+			BaseDelegateParameterFixMode fixMode;
 
 			switch (pxOverrideInfo.OverrideType)
 			{
 				case PXOverrideType.WithoutBaseDelegate:
 					descriptor = Descriptors.PX1079_PXOverrideWithoutDelegateParameter;
 					location = pxOverrideInfo.Symbol.Locations.FirstOrDefault();
-					replaceLastDelegateParameter = false;
+					fixMode = BaseDelegateParameterFixMode.AddDelegateParameter;
 					break;
 
 				case PXOverrideType.WithInvalidBaseDelegate:
 					descriptor = Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter;
 					location = GetLocationForIncorrectDelegateParameter(pxOverrideInfo.Symbol, context.CancellationToken);
-					replaceLastDelegateParameter = true;
+					fixMode = BaseDelegateParameterFixMode.ReplaceDelegateParameter;
+					break;
+
+				case PXOverrideType.WithValidBaseDelegate
+				when !IsCorrectDelegateParameterName(pxOverrideInfo.Symbol):
+					descriptor = Descriptors.PX1102_PXOverrideInvalidNameOfDelegateParameter;
+					location   = GetLocationForDelegateParameterWithIncorrectName(pxOverrideInfo.Symbol, context.CancellationToken);
+					fixMode    = BaseDelegateParameterFixMode.RenameDelegateParameter;
 					break;
 
 				default:
@@ -125,7 +133,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
 			{
 				{ PXOverrideDiagnosticProperties.PatchMethodName, pxOverrideInfo.Symbol.Name },
-				{ PXOverrideDiagnosticProperties.ReplaceLastDelegateParameter, replaceLastDelegateParameter.ToString() }
+				{ PXOverrideDiagnosticProperties.DelegateParameterFixMode, fixMode.ToString() }
 			}
 			.ToImmutableDictionary();
 
@@ -148,6 +156,28 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			var lastParameterNode = methodNode.ParameterList.Parameters[^1];
 			return lastParameterNode.GetLocation().NullIfLocationKindIsNone() ??
 				   parameters[^1].Locations.FirstOrDefault()?.NullIfLocationKindIsNone() ??
+				   patchMethodWithPXOverride.Locations.FirstOrDefault();
+		}
+
+		private bool IsCorrectDelegateParameterName(IMethodSymbol patchMethodWithPXOverride)
+		{
+			if (patchMethodWithPXOverride.Parameters.IsDefaultOrEmpty)
+				return true;
+
+			var lastParameter = patchMethodWithPXOverride.Parameters[^1];
+			string properName = $"base_{patchMethodWithPXOverride.Name}";
+
+			return lastParameter.Name.Equals(properName, StringComparison.OrdinalIgnoreCase);
+		}
+
+		private Location? GetLocationForDelegateParameterWithIncorrectName(IMethodSymbol patchMethodWithPXOverride, CancellationToken cancellation)
+		{
+			var parameters = patchMethodWithPXOverride.Parameters;
+
+			if (parameters.IsDefaultOrEmpty)
+				return patchMethodWithPXOverride.Locations.FirstOrDefault();
+
+			return parameters[^1].Locations.FirstOrDefault()?.NullIfLocationKindIsNone() ??
 				   patchMethodWithPXOverride.Locations.FirstOrDefault();
 		}
 
