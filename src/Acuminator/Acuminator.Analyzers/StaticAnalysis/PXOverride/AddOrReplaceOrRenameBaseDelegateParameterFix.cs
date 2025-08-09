@@ -7,12 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Rename;
 using Microsoft.CodeAnalysis.Text;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -26,11 +28,18 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			ImmutableArray.Create
 			(
 				Descriptors.PX1079_PXOverrideWithoutDelegateParameter.Id,
-				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.Id
+				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.Id,
+				Descriptors.PX1102_PXOverrideInvalidNameOfDelegateParameter.Id
 			);
 
 		protected override Task RegisterCodeFixesForDiagnosticAsync(CodeFixContext context, Diagnostic diagnostic)
 		{
+			context.CancellationToken.ThrowIfCancellationRequested();
+			var fixMode = GetFixMode(diagnostic);
+
+			if (!fixMode.HasValue)
+				return Task.CompletedTask;
+
 			context.CancellationToken.ThrowIfCancellationRequested();
 
 			if (!diagnostic.TryGetPropertyValue(PXOverrideDiagnosticProperties.PatchMethodName, out string? patchMethodName) ||
@@ -40,36 +49,37 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			}
 
 			context.CancellationToken.ThrowIfCancellationRequested();
-
-			bool replaceLastParameter = diagnostic.IsFlagSet(PXOverrideDiagnosticProperties.DelegateParameterFixMode);
-			context.CancellationToken.ThrowIfCancellationRequested();
-
-			string? title = GetCodeFixTitle(diagnostic, patchMethodName);
+			string? title = GetCodeFixTitle(fixMode.Value, patchMethodName);
 
 			if (title == null)
 				return Task.CompletedTask;
 
 			var document = context.Document;
 			var codeAction = CodeAction.Create(title,
-											   cToken => AddBaseDelegateParameterToPatchMethod(document, context.Span, patchMethodName, 
-																							   replaceLastParameter, cToken),
+											   cToken => FixBaseDelegateParameterAsync(document, context.Span, patchMethodName,
+																					   fixMode.Value, cToken),
 											   equivalenceKey: nameof(Resources.PX1079Fix));
 			context.RegisterCodeFix(codeAction, diagnostic);
 			return Task.CompletedTask;
 		}
 
-		private static string? GetCodeFixTitle(Diagnostic diagnostic, string patchMethodName)
-		{
-			if (diagnostic.Id == Descriptors.PX1079_PXOverrideWithoutDelegateParameter.Id)
-				return nameof(Resources.PX1079Fix).GetLocalized(patchMethodName).ToString();
-			else if (diagnostic.Id == Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.Id)
-				return nameof(Resources.PX1101Fix).GetLocalized().ToString();
-			else
-				return null;
-		}
+		private BaseDelegateParameterFixMode? GetFixMode(Diagnostic diagnostic) =>
+			diagnostic.TryGetPropertyValue(PXOverrideDiagnosticProperties.DelegateParameterFixMode, out string? fixModeString) &&
+			!fixModeString.IsNullOrWhiteSpace() && Enum.TryParse(fixModeString, out BaseDelegateParameterFixMode fixMode)
+				? fixMode
+				: null;
 
-		private static async Task<Document> AddBaseDelegateParameterToPatchMethod(Document document, TextSpan span, string patchMethodName,
-																				   bool replaceLastParameter, CancellationToken cancellation)
+		private static string? GetCodeFixTitle(BaseDelegateParameterFixMode fixMode, string patchMethodName) =>
+			fixMode switch
+			{
+				BaseDelegateParameterFixMode.AddDelegateParameter 	  => nameof(Resources.PX1079Fix).GetLocalized(patchMethodName).ToString(),
+				BaseDelegateParameterFixMode.ReplaceDelegateParameter => nameof(Resources.PX1101Fix).GetLocalized().ToString(),
+				BaseDelegateParameterFixMode.RenameDelegateParameter  => nameof(Resources.PX1102Fix).GetLocalized().ToString(),
+				_ 													  => null
+			};
+
+		private static async Task<Solution> FixBaseDelegateParameterAsync(Document document, TextSpan span, string patchMethodName,
+																		  BaseDelegateParameterFixMode fixMode, CancellationToken cancellation)
 		{
 			cancellation.ThrowIfCancellationRequested();
 
@@ -77,23 +87,86 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			var patchMethodNode = root?.FindNode(span)?.FirstAncestorOrSelf<MethodDeclarationSyntax>();
 
 			if (patchMethodNode == null)
-				return document;
+				return document.Project.Solution;
 
-			var patchMethodWithDelegateParameter = AddBaseDelegateParameter(patchMethodNode, patchMethodName, replaceLastParameter);
-
-			if (patchMethodWithDelegateParameter == null)
-				return document;
-
-			cancellation.ThrowIfCancellationRequested();
-
-			var newRoot = root!.ReplaceNode(patchMethodNode, patchMethodWithDelegateParameter);
-			return document.WithSyntaxRoot(newRoot);
+			string baseDelegateParameterName = CreateBaseDelegateParameterName(patchMethodName, patchMethodNode);
+			var newSolution = await FixBaseDelegateParameterAsync(document, root!, patchMethodNode, baseDelegateParameterName, fixMode, cancellation)
+										.ConfigureAwait(false);
+			return newSolution;
 		}
 
-		private static MethodDeclarationSyntax? AddBaseDelegateParameter(MethodDeclarationSyntax patchMethodNode, string patchMethodName, 
-																		 bool replaceLastParameter)
+		private static string CreateBaseDelegateParameterName(string patchMethodName, MethodDeclarationSyntax patchMethodNode)
 		{
-			string baseDelegateParameterName = CreateBaseDelegateParameterName(patchMethodName, patchMethodNode);
+			patchMethodName = patchMethodName.NullIfWhiteSpace() ?? patchMethodNode.Identifier.Text;
+			return !patchMethodName.IsNullOrWhiteSpace()
+				? $"base_{patchMethodName}"
+				: "baseDelegate";
+		}
+
+		private static Task<Solution> FixBaseDelegateParameterAsync(Document document, SyntaxNode root, MethodDeclarationSyntax patchMethodNode,
+																	string baseDelegateParameterName, BaseDelegateParameterFixMode fixMode, 
+																	CancellationToken cancellation)
+		{
+			switch (fixMode)
+			{
+				case BaseDelegateParameterFixMode.AddDelegateParameter:
+					{
+						var newSolution = FixBaseDelegateParameterType(document, root, patchMethodNode, baseDelegateParameterName,
+																		replaceLastParameter: false);
+						return Task.FromResult(newSolution);
+					}
+				case BaseDelegateParameterFixMode.ReplaceDelegateParameter:
+					{
+						var newSolution = FixBaseDelegateParameterType(document, root, patchMethodNode, baseDelegateParameterName,
+																		replaceLastParameter: true);
+						return Task.FromResult(newSolution);
+					}
+				case BaseDelegateParameterFixMode.RenameDelegateParameter:
+					return RenameBaseDelegateParameterAsync(document, patchMethodNode, baseDelegateParameterName, cancellation);
+				default:
+					return Task.FromResult(document.Project.Solution);
+			}
+		}
+
+		private static Solution FixBaseDelegateParameterType(Document document, SyntaxNode root, MethodDeclarationSyntax patchMethodNode,
+															 string baseDelegateParameterName, bool replaceLastParameter)
+		{
+			var fixedMethodNode = GetMethodNodeWithFixedBaseDelegateParameterType(document, patchMethodNode, baseDelegateParameterName,
+																				  replaceLastParameter);
+			if (fixedMethodNode == null)
+				return document.Project.Solution;
+
+			var newRoot = root!.ReplaceNode(patchMethodNode, fixedMethodNode);
+			var newDocument = document.WithSyntaxRoot(newRoot);
+			return newDocument.Project.Solution;
+		}
+
+		private static async Task<Solution> RenameBaseDelegateParameterAsync(Document document, MethodDeclarationSyntax patchMethodNode, 
+																			 string baseDelegateParameterName, CancellationToken cancellation)
+		{
+			if (patchMethodNode.ParameterList.Parameters.Count == 0 || patchMethodNode.Identifier.Text == baseDelegateParameterName)
+				return document.Project.Solution;
+
+			var semanticModel = await document.GetSemanticModelAsync(cancellation).ConfigureAwait(false);
+			
+			if (semanticModel == null)
+				return document.Project.Solution;
+
+			var lastParameterNode = patchMethodNode.ParameterList.Parameters[^1];
+			var lastParameterSymbol = semanticModel.GetSymbolOrFirstCandidate(lastParameterNode, cancellation);
+
+			if (lastParameterSymbol == null)
+				return document.Project.Solution;
+
+			var renamedSolution = await Renamer.RenameSymbolAsync(document.Project.Solution, lastParameterSymbol, baseDelegateParameterName,
+																  document.Project.Solution.Options, cancellation)
+											   .ConfigureAwait(false);
+			return renamedSolution;
+		}
+
+		private static MethodDeclarationSyntax? GetMethodNodeWithFixedBaseDelegateParameterType(Document document, MethodDeclarationSyntax patchMethodNode,
+																								string baseDelegateParameterName, bool replaceLastParameter)
+		{
 			var baseDelegateType = CreateBaseDelegateParameterType(patchMethodNode, replaceLastParameter);
 
 			if (baseDelegateType == null)
@@ -112,14 +185,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			}
 			else
 				return patchMethodNode.AddParameterListParameters(delegateParameter);
-		}
-
-		private static string CreateBaseDelegateParameterName(string patchMethodName, MethodDeclarationSyntax patchMethodNode)
-		{
-			patchMethodName = patchMethodName.NullIfWhiteSpace() ?? patchMethodNode.Identifier.Text;
-			return !patchMethodName.IsNullOrWhiteSpace()
-				? $"base_{patchMethodName}"
-				: "baseDelegate";
 		}
 
 		private static TypeSyntax? CreateBaseDelegateParameterType(MethodDeclarationSyntax patchMethodNode, bool replaceLastParameter)
