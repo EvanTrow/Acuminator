@@ -153,7 +153,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 				return document.Project.Solution;
 
 			var lastParameterNode = patchMethodNode.ParameterList.Parameters[^1];
-			var lastParameterSymbol = semanticModel.GetSymbolOrFirstCandidate(lastParameterNode, cancellation);
+			var lastParameterSymbol = semanticModel.GetDeclaredSymbol(lastParameterNode, cancellation);
 
 			if (lastParameterSymbol == null)
 				return document.Project.Solution;
