@@ -329,8 +329,8 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string? GetDocTagName(this XmlNodeSyntax docTagNode) => docTagNode switch
 		{
-			XmlElementSyntax docTagWithContent	 => docTagWithContent.StartTag?.Name?.ToString(),
-			XmlEmptyElementSyntax oneLinerDocTag => oneLinerDocTag.Name?.ToString(),
+			XmlElementSyntax docTagWithContent	 => docTagWithContent.StartTag?.Name?.LocalName.ToString(),
+			XmlEmptyElementSyntax oneLinerDocTag => oneLinerDocTag.Name?.LocalName.ToString(),
 			_									 => null
 		};
 
