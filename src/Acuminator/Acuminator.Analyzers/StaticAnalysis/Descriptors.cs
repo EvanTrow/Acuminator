@@ -503,6 +503,9 @@ namespace Acuminator.Analyzers.StaticAnalysis
 		public static DiagnosticDescriptor PX1097_PXOverrideMethodMustBePublicNonVirtual { get; } =
 			Rule("PX1097", nameof(Resources.PX1097Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1097);
 
+		public static DiagnosticDescriptor PX1098_PXOverrideMethodWithoutXmlDocComment { get; } =
+			Rule("PX1098", nameof(Resources.PX1098Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1098);
+
 		public static DiagnosticDescriptor PX1099_ForbiddenApiUsage_WithoutReason { get; } =
 			Rule("PX1099", nameof(Resources.PX1099Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1099,
 				 messageFormat: nameof(Resources.PX1099TitleFormat).GetLocalized());

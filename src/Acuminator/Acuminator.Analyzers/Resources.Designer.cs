@@ -2068,6 +2068,25 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add the XML documentation comment with the reference to the base method.
+        /// </summary>
+        public static string PX1098Fix {
+            get {
+                return ResourceManager.GetString("PX1098Fix", resourceCulture);
+            }
+        }
+
+		/// <summary>
+		///   Looks up a localized string similar to A method with the PXOverride attribute must declare an XML documentation comment with a reference to the base method. The format of the comment is:<br/>
+		/// &#47;&#47;&#47; Overrides &lt;seealso cref=&quot;{Base method}&quot;/&gt;.
+		/// </summary>
+		public static string PX1098Title {
+            get {
+                return ResourceManager.GetString("PX1098Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The forbidden API is used.
         /// </summary>
         public static string PX1099Title {
