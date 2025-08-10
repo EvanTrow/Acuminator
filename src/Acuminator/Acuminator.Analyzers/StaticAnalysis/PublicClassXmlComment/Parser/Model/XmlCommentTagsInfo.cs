@@ -39,22 +39,21 @@ namespace Acuminator.Analyzers.StaticAnalysis.PublicClassXmlComment
 		public IEnumerable<XmlNodeSyntax> GetTagNodes(bool includeSummaryTag, bool includeInheritdocTag, bool includeExcludeTag)
 		{
 			if (NoXmlComments || (!includeSummaryTag && !includeInheritdocTag && !includeExcludeTag))
-				return Enumerable.Empty<XmlNodeSyntax>();
+				return [];
 
-			return GetTagNodesImplementation(includeSummaryTag, includeInheritdocTag, includeExcludeTag);
-		}
-
-		private IEnumerable<XmlNodeSyntax> GetTagNodesImplementation(bool includeSummaryTag, bool includeInheritdocTag, bool includeExcludeTag)
-		{
-			var tags = HasSummaryTag && includeSummaryTag
+			IEnumerable<XmlNodeSyntax> tags = HasSummaryTag && includeSummaryTag
 				? SummaryTags
-				: Enumerable.Empty<XmlNodeSyntax>();
+				: [];
 
 			if (HasInheritdocTag && includeInheritdocTag)
-				tags.Concat(InheritdocTagInfos.Select(info => info.Tag));
+			{
+				var inheritdocTags = InheritdocTagInfos.Where(info => info.HasInheritdocTag)
+													   .Select(info => info.Tag!);
+				tags = tags.Concat(inheritdocTags);
+			}
 
 			if (HasExcludeTag && includeExcludeTag)
-				tags.Concat(ExcludeTags);
+				tags = tags.Concat(ExcludeTags);
 
 			return tags;
 		}
