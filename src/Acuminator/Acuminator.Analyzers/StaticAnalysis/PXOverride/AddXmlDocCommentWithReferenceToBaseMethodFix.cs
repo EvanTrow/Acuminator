@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
@@ -169,9 +170,53 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 		private static QualifiedNameSyntax? AddXmlDocCommentToQualifiedName(QualifiedNameSyntax qualifiedTypeName)
 		{
-			 
+			var prefixQualifiedNameSyntaxes = new Stack<QualifiedNameSyntax>(capacity: 4);
+			prefixQualifiedNameSyntaxes.Push(qualifiedTypeName);
 
-		
+			NameSyntax? currentLeftPart = qualifiedTypeName.Left;
+			NameSyntax? newMostLeftPart = null;
+
+			while (currentLeftPart != null)
+			{
+				switch (currentLeftPart)
+				{
+					case QualifiedNameSyntax qualifiedNameLeftPart:
+						prefixQualifiedNameSyntaxes.Push(qualifiedNameLeftPart);
+						currentLeftPart = qualifiedNameLeftPart.Left;
+						continue;
+
+					case SimpleNameSyntax identifierNameSyntax:
+						currentLeftPart = null;
+						newMostLeftPart = AddXmlDocCommentToSimpleName(identifierNameSyntax);
+						continue;
+
+					case AliasQualifiedNameSyntax aliasQualifiedName:
+						currentLeftPart = null;
+						var newAliasNode = AddXmlDocCommentToSimpleName(aliasQualifiedName.Alias) as IdentifierNameSyntax;
+						newMostLeftPart = newAliasNode != null
+							? aliasQualifiedName.WithAlias(newAliasNode)
+							: null;
+						continue;
+
+					default:
+						break;
+				}
+			}
+
+			if (newMostLeftPart == null)
+				return null;
+
+			NameSyntax currentMostLeftNewQualifiedName = newMostLeftPart;
+			QualifiedNameSyntax? newReturnType = null;
+
+			while (prefixQualifiedNameSyntaxes.Count > 0)
+			{
+				var currentMostLeftOldNode = prefixQualifiedNameSyntaxes.Pop();
+				newReturnType = currentMostLeftOldNode.WithLeft(currentMostLeftNewQualifiedName);
+				currentMostLeftNewQualifiedName = newReturnType;
+			}
+
+			return newReturnType;
 		}
 
 		private static SimpleNameSyntax? AddXmlDocCommentToSimpleName(SimpleNameSyntax simpleOrGenericTypeName)
