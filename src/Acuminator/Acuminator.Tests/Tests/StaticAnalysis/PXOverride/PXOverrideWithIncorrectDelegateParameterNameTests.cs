@@ -18,44 +18,44 @@ using Xunit;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 {
-	public class PXOverrideWithIncorrectBaseDelegateParameterTests : CodeFixVerifier
+	public class PXOverrideWithIncorrectDelegateParameterNameTests : CodeFixVerifier
 	{
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new PXGraphAnalyzer(
 				CodeAnalysisSettings.Default
 									.WithRecursiveAnalysisEnabled()
 									.WithStaticAnalysisEnabled()
 									.WithSuppressionMechanismDisabled(),
-				new PXOverrideAnalyzerForIncorrectBaseDelegateParameterTests());
+				new PXOverrideAnalyzerForIncorrectDelegateParameterNameTests());
 
 		protected override CodeFixProvider GetCSharpCodeFixProvider() => new AddOrReplaceOrRenameBaseDelegateParameterFix();
 
 		[Theory]
-		[EmbeddedFileData(@"BaseDelegateParameter\IncorrectParameter\PXOverrideWithIncorrectBaseDelegateParameter.cs")]
-		public Task PXOverrides_With_Incorrect_BaseDelegate_Parameter(string source) =>
+		[EmbeddedFileData(@"BaseDelegateParameter\InvalidParameterName\PXOverrideWithIncorrectDelegateParameterName.cs")]
+		public Task PXOverrides_With_Incorrect_DelegateParameter_Name(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.CreateFor(14, 63),
-				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.CreateFor(18, 9),
-				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.CreateFor(24, 10),
-				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.CreateFor(30, 27));
+				Descriptors.PX1102_PXOverrideInvalidNameOfDelegateParameter.CreateFor(14, 96),
+				Descriptors.PX1102_PXOverrideInvalidNameOfDelegateParameter.CreateFor(17, 132),
+				Descriptors.PX1102_PXOverrideInvalidNameOfDelegateParameter.CreateFor(23, 152),
+				Descriptors.PX1102_PXOverrideInvalidNameOfDelegateParameter.CreateFor(29, 58));
 
 		[Theory]
-		[EmbeddedFileData(@"BaseDelegateParameter\IncorrectParameter\PXOverrideWithIncorrectBaseDelegateParameter_Expected.cs")]
-		public Task PXOverrides_With_Incorrect_BaseDelegate_Parameter_AfterCodeFix(string source) =>
+		[EmbeddedFileData(@"BaseDelegateParameter\InvalidParameterName\PXOverrideWithIncorrectDelegateParameterName_Expected.cs")]
+		public Task PXOverrides_With_Incorrect_DelegateParameter_Name_AfterCodeFix(string source) =>
 			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData(@"BaseDelegateParameter\IncorrectParameter\PXOverrideWithIncorrectBaseDelegateParameter.cs",
-						  @"BaseDelegateParameter\IncorrectParameter\PXOverrideWithIncorrectBaseDelegateParameter_Expected.cs")]
-		public Task PXOverrides_Without_BaseDelegate_Parameter_CodeFix(string actual, string expected) =>
+		[EmbeddedFileData(@"BaseDelegateParameter\InvalidParameterName\PXOverrideWithIncorrectDelegateParameterName.cs",
+						  @"BaseDelegateParameter\InvalidParameterName\PXOverrideWithIncorrectDelegateParameterName_Expected.cs")]
+		public Task PXOverrides_With_Incorrect_DelegateParameter_Name_CodeFix(string actual, string expected) =>
 			VerifyCSharpFixAsync(actual, expected);
 
 
-		private sealed class PXOverrideAnalyzerForIncorrectBaseDelegateParameterTests : PXOverrideAnalyzer
+		private sealed class PXOverrideAnalyzerForIncorrectDelegateParameterNameTests : PXOverrideAnalyzer
 		{
 			public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
 				ImmutableArray.Create
 				(
-					Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter
+					Descriptors.PX1102_PXOverrideInvalidNameOfDelegateParameter
 				);
 
 			protected override void ReportPatchMethodWithIncompatibleSignature(SymbolAnalysisContext context, PXContext pxContext,

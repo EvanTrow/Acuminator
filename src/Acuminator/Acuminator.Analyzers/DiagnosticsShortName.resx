@@ -447,4 +447,7 @@
   <data name="PX1101" xml:space="preserve">
     <value>PXOverrideWithInvalidDelegateParameter</value>
   </data>
+  <data name="PX1102" xml:space="preserve">
+    <value>PXOverrideInvalidNameOfDelegateParameter</value>
+  </data>
 </root>

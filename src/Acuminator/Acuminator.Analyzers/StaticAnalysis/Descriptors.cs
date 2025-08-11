@@ -516,5 +516,8 @@ namespace Acuminator.Analyzers.StaticAnalysis
 
 		public static DiagnosticDescriptor PX1101_PXOverrideWithInvalidDelegateParameter { get; } =
 			Rule("PX1101", nameof(Resources.PX1101Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1101);
+
+		public static DiagnosticDescriptor PX1102_PXOverrideInvalidNameOfDelegateParameter { get; } =
+			Rule("PX1102", nameof(Resources.PX1102Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1102);
 	}
 }

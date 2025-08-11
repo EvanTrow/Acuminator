@@ -107,3 +107,4 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1099](diagnostics/PX1099.md) | The API reported by the diagnostic should not be used with the Acumatica Framework. | Warning | Unavailable |
 | [PX1100](diagnostics/PX1100.md) | An element of a graph or a DAC extension extends or overrides an obsolete code element. | Warning | Unavailable |
 | [PX1101](diagnostics/PX1101.md) | The additional delegate parameter of the method with the `PXOverride` attribute must have the same signature as the base method. | Error | Available |
+| [PX1102](diagnostics/PX1102.md) | The additional delegate parameter of the method with the `PXOverride` attribute must have a name conforming Acumatica naming conventions. | Warning | Available |

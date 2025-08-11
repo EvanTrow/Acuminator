@@ -2168,11 +2168,29 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The additional delegate parameter for calling the base method of a PXOverride method has incorrect signature that does not match the base method.
+        ///   Looks up a localized string similar to The additional delegate parameter for calling the base method of the PXOverride method has incorrect signature that does not match the base method.
         /// </summary>
         public static string PX1101Title {
             get {
                 return ResourceManager.GetString("PX1101Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fix the name of the additional delegate parameter.
+        /// </summary>
+        public static string PX1102Fix {
+            get {
+                return ResourceManager.GetString("PX1102Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The name of the additional delegate parameter for calling the base method of the PXOverride method breaks Acumatica naming conventions .
+        /// </summary>
+        public static string PX1102Title {
+            get {
+                return ResourceManager.GetString("PX1102Title", resourceCulture);
             }
         }
         
