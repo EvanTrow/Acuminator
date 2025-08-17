@@ -216,13 +216,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 				return;
 			}
 
-			var location = patchMethodNode.Identifier.GetLocation().NullIfLocationKindIsNone() ??
-						   pxOverrideInfo.Symbol.Locations.FirstOrDefault();
-			var baseMethodContaiingTypeClrName = pxOverrideInfo.BaseMethod.ContainingType.GetCLRTypeNameFromType();
+			var location = pxOverrideInfo.Symbol.Locations.FirstOrDefault();
+			
+			var baseMethodDocCommentID = pxOverrideInfo.BaseMethod.GetDocumentationCommentId().NullIfWhiteSpace();
+			baseMethodDocCommentID = baseMethodDocCommentID?.Length > 2
+				? baseMethodDocCommentID.Substring(2) 
+				: null;
 
 			var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
 			{
-				{ PXOverrideDiagnosticProperties.BaseMethodContainingTypeClrName, pxOverrideInfo.Symbol.Name }
+				{ PXOverrideDiagnosticProperties.BaseMethodDocCommentId, baseMethodDocCommentID }
 			}
 			.ToImmutableDictionary();
 			var diagnostic = Diagnostic.Create(Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment, location, diagnosticProperties);

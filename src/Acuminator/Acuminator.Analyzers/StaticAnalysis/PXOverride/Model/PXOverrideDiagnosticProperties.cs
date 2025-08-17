@@ -23,8 +23,8 @@
 		public const string DelegateParameterFixMode = nameof(DelegateParameterFixMode);
 
 		/// <summary>
-		/// Property stores the name of the type containing the base method in a CLR format.
+		/// Property stores the XML documentation comment ID name of the base method.
 		/// </summary>
-		public const string BaseMethodContainingTypeClrName = nameof(BaseMethodContainingTypeClrName);
+		public const string BaseMethodDocCommentId = nameof(BaseMethodDocCommentId);
 	}
 }
