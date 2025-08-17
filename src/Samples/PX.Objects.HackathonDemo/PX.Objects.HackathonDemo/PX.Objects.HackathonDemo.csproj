@@ -15,6 +15,7 @@
     <AssemblyName>PX.Objects.HackathonDemo</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <LangVersion>12.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -136,6 +137,7 @@
     <Compile Include="CallsToInternalAPI\GraphUsingInternalApi.cs" />
     <Compile Include="Graph\Graph with workflow\SOInvoiceEntry_Workflow.cs" />
     <Compile Include="Graph\OverrideTest\GraphExtensionsWithOverrides.cs" />
+    <Compile Include="Graph\OverrideTest\PXOverridesExample.cs" />
     <Compile Include="Graph\Start row reset for paging\LEPMaint.cs" />
     <Compile Include="Graph\Static fields and properties in graph\POCustomOrderEntry.cs" />
     <Compile Include="Graph\View Order\DAC\ARTran.cs" />
