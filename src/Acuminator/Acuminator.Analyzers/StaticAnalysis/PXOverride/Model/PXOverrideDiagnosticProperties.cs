@@ -21,5 +21,10 @@
 		/// Property stores the <see cref="BaseDelegateParameterFixMode"/> value for a patch method.
 		/// </summary>
 		public const string DelegateParameterFixMode = nameof(DelegateParameterFixMode);
+
+		/// <summary>
+		/// Property stores the name of the type containing the base method in a CLR format.
+		/// </summary>
+		public const string BaseMethodContainingTypeClrName = nameof(BaseMethodContainingTypeClrName);
 	}
 }

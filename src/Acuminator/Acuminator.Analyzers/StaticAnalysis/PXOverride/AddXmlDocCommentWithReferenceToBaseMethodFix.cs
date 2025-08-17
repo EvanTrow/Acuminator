@@ -33,6 +33,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
+			if (!diagnostic.TryGetPropertyValue(PXOverrideDiagnosticProperties.BaseMethodContainingTypeClrName, out var baseMethodContainingTypeClrName) ||
+				baseMethodContainingTypeClrName.IsNullOrWhiteSpace())
+			{
+				return Task.CompletedTask;
+			}
+
 			string title = nameof(Resources.PX1098Fix).GetLocalized().ToString();
 			var document = context.Document;
 			var codeAction = CodeAction.Create(title,

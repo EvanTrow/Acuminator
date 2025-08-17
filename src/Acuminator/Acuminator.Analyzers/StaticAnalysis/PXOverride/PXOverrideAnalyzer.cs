@@ -218,7 +218,14 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 			var location = patchMethodNode.Identifier.GetLocation().NullIfLocationKindIsNone() ??
 						   pxOverrideInfo.Symbol.Locations.FirstOrDefault();
-			var diagnostic = Diagnostic.Create(Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment, location);
+			var baseMethodContaiingTypeClrName = pxOverrideInfo.BaseMethod.ContainingType.GetCLRTypeNameFromType();
+
+			var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+			{
+				{ PXOverrideDiagnosticProperties.BaseMethodContainingTypeClrName, pxOverrideInfo.Symbol.Name }
+			}
+			.ToImmutableDictionary();
+			var diagnostic = Diagnostic.Create(Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment, location, diagnosticProperties);
 
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
