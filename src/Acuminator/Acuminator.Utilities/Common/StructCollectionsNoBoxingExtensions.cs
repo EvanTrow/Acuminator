@@ -12,6 +12,52 @@ namespace Acuminator.Utilities.Common
 	public static class StructCollectionsNoBoxingExtensions
 	{
 		/// <summary>
+		/// Prepends struct collection <paramref name="source"/> with an <paramref name="itemToAdd"/>.<br/>
+		/// This methods prevents additional boxing on convertation of a <typeparamref name="TStructCollection"/> collection to <see cref="IEnumerable{T}"/>.
+		/// </summary>
+		/// <typeparam name="TStructCollection">Type of the structure collection.</typeparam>
+		/// <typeparam name="TItem">Type of the item.</typeparam>
+		/// <param name="source">The struct collection to act on.</param>
+		/// <param name="itemToAdd">The item to add.</param>
+		/// <returns>
+		/// An <see cref="IEnumerable{TItem}"/> that contains the <paramref name="itemToAdd"/> followed by the items in <paramref name="source"/>.
+		/// </returns>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<TItem> PrependItem<TStructCollection, TItem>(this TStructCollection source, TItem itemToAdd)
+		where TStructCollection : struct, IEnumerable<TItem> =>
+			source.PrependOrAppend(itemToAdd, isAppending: false);
+
+		/// <summary>
+		/// Appends struct collection <paramref name="source"/> with an <paramref name="item"/>.<br/>
+		/// This methods prevents additional boxing on convertation of a <typeparamref name="TStructCollection"/> collection to <see cref="IEnumerable{T}"/>.
+		/// </summary>
+		/// <typeparam name="TItem">Type of the item.</typeparam>
+		/// <param name="source">The struct collection to act on.</param>
+		/// <param name="itemToAdd">The item to add.</param>
+		/// <returns>
+		/// An <see cref="IEnumerable{TItem}"/> that contains the items in <paramref name="source"/> followed by the <paramref name="itemToAdd"/>.
+		/// </returns>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<TItem> AppendItem<TStructCollection, TItem>(this TStructCollection source, TItem itemToAdd)
+		where TStructCollection : struct, IReadOnlyCollection<TItem> =>
+			source.PrependOrAppend(itemToAdd, isAppending: true);
+
+		[DebuggerStepThrough]
+		private static IEnumerable<TItem> PrependOrAppend<TStructCollection, TItem>(this TStructCollection source, TItem itemToAdd, bool isAppending)
+		where TStructCollection : struct, IEnumerable<TItem>
+		{
+			if (!isAppending)
+				yield return itemToAdd;
+
+			foreach (var item in source)
+				yield return item;
+
+			if (isAppending)
+				yield return itemToAdd;
+		}
+		/// <summary>
 		/// Concatenate structure list to this collection. This is an optimization method which allows to avoid boxing for collections implemented as structs.
 		/// </summary>
 		/// <typeparam name="TItem">Type of the item.</typeparam>
