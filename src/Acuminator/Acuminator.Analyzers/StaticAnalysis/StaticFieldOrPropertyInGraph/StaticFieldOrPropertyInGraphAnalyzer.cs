@@ -71,7 +71,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.StaticFieldOrPropertyInGraph
 			var fieldOrPropertyNode = staticFieldOrProperty.GetSyntax(cancellation);
 			var fieldOrPropertyDeclaration = fieldOrPropertyNode?.ParentOrSelf<MemberDeclarationSyntax>();
 			var staticModifier = fieldOrPropertyDeclaration?.GetModifiers()
-															.FirstOrDefault(modifier => modifier.IsKind(SyntaxKind.StaticKeyword));
+															.FirstOrDefault((in SyntaxToken modifier) => modifier.IsKind(SyntaxKind.StaticKeyword));
 
 			if (staticModifier != null && staticModifier != default(SyntaxToken))
 				return staticModifier.Value.GetLocation().NullIfLocationKindIsNone();

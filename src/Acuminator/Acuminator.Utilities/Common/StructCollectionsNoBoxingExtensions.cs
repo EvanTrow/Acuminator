@@ -11,6 +11,10 @@ namespace Acuminator.Utilities.Common
 {
 	public static class StructCollectionsNoBoxingExtensions
 	{
+		public delegate bool PredicateWithInputByReadOnlyRef<TItem>(in TItem item);
+		public delegate TResult FuncWithInputByReadOnlyRef<TItem, TResult>(in TItem item);
+		public delegate void ActionWithInputByReadOnlyRef<TItem>(in TItem item);
+
 		/// <summary>
 		/// Prepends struct collection <paramref name="source"/> with an <paramref name="itemToAdd"/>.<br/>
 		/// This methods prevents additional boxing on convertation of a <typeparamref name="TStructCollection"/> collection to <see cref="IEnumerable{T}"/>.
@@ -57,6 +61,7 @@ namespace Acuminator.Utilities.Common
 			if (isAppending)
 				yield return itemToAdd;
 		}
+
 		/// <summary>
 		/// Concatenate structure list to this collection. This is an optimization method which allows to avoid boxing for collections implemented as structs.
 		/// </summary>
@@ -114,7 +119,7 @@ namespace Acuminator.Utilities.Common
 		/// <returns/>
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<SyntaxToken> Where(this SyntaxTokenList source, Func<SyntaxToken, bool> predicate)
+		public static IEnumerable<SyntaxToken> Where(this SyntaxTokenList source, PredicateWithInputByReadOnlyRef<SyntaxToken> predicate)
 		{
 			predicate.ThrowOnNull();
 			return WhereForSyntaxTokenListImplementation();
@@ -141,7 +146,7 @@ namespace Acuminator.Utilities.Common
 		/// <returns/>
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static SyntaxToken FirstOrDefault(this SyntaxTokenList source, Func<SyntaxToken, bool> predicate)
+		public static SyntaxToken FirstOrDefault(this SyntaxTokenList source, PredicateWithInputByReadOnlyRef<SyntaxToken> predicate)
 		{
 			predicate.ThrowOnNull();
 
@@ -189,12 +194,12 @@ namespace Acuminator.Utilities.Common
 		/// Select method for <see cref="SyntaxTriviaList"/>. This is an optimization method which allows to avoid boxing.
 		/// </summary>
 		/// <typeparam name="TResult">Type of the result.</typeparam>
-		/// <param name="triviaList">The triviaList to act on.</param>
+		/// <param name="triviaList">The trivia list to act on.</param>
 		/// <param name="selector">The selector.</param>
 		/// <returns/>
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<TResult> Select<TResult>(this SyntaxTriviaList triviaList, Func<SyntaxTrivia, TResult> selector)
+		public static IEnumerable<TResult> Select<TResult>(this SyntaxTriviaList triviaList, FuncWithInputByReadOnlyRef<SyntaxTrivia, TResult> selector)
 		{
 			selector.ThrowOnNull();
 			return SelectForStructListImplementation();
@@ -205,6 +210,86 @@ namespace Acuminator.Utilities.Common
 				{
 					yield return selector(triviaList[i]);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Where method for <see cref="SyntaxTriviaList"/>. 
+		/// This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="triviaList">The trivia list to act on.</param>
+		/// <param name="predicate">The selector.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<SyntaxTrivia> Where(this SyntaxTriviaList triviaList,
+													  PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate) =>
+			WhereImplementation(triviaList, predicate.CheckIfNull());
+
+		/// <summary>
+		/// Where method for <see cref="SyntaxTriviaList.Reversed"/>.
+		/// This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="reversedTrivia">The reversedTrivia to act on.</param>
+		/// <param name="predicate">The selector.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<SyntaxTrivia> Where(this SyntaxTriviaList.Reversed reversedTrivia,
+													  PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate) =>
+			WhereImplementation(reversedTrivia, predicate.CheckIfNull());
+
+		private static IEnumerable<SyntaxTrivia> WhereImplementation<TStructCollection>(TStructCollection source,
+																						PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate)
+		where TStructCollection : struct, IEnumerable<SyntaxTrivia>
+		{
+			foreach (SyntaxTrivia item in source)
+			{
+				if (predicate(item))
+					yield return item;
+			}
+		}
+
+		/// <summary>
+		/// TakeWhile method for <see cref="SyntaxTriviaList"/>. This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="triviaList">The trivia list to act on.</param>
+		/// <param name="predicate">The selector.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<SyntaxTrivia> TakeWhile(this SyntaxTriviaList triviaList,
+														  PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate)
+		{
+			predicate.ThrowOnNull();
+			return TakeWhileImplementation(triviaList, predicate);
+		}
+
+		/// <summary>
+		/// TakeWhile method for <see cref="SyntaxTriviaList.Reversed"/>. This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="reversedTrivia">The reversedTrivia to act on.</param>
+		/// <param name="predicate">The selector.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<SyntaxTrivia> TakeWhile(this SyntaxTriviaList.Reversed reversedTrivia,
+														  PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate)
+		{
+			predicate.ThrowOnNull();
+			return TakeWhileImplementation(reversedTrivia, predicate);			
+		}
+
+		private static IEnumerable<SyntaxTrivia> TakeWhileImplementation<TStructCollection>(TStructCollection source,
+																							PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate)
+		where TStructCollection : struct, IEnumerable<SyntaxTrivia>
+		{
+			foreach (SyntaxTrivia item in source)
+			{
+				if (predicate(item))
+					yield return item;
+				else
+					yield break;
 			}
 		}
 

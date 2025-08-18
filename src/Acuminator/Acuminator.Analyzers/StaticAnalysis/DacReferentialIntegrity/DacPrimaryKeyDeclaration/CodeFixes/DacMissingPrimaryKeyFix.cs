@@ -154,7 +154,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 				// Node checked earlier
 				var trivia = dacSemanticModel.Node!.GetLeadingTrivia()
 												   .Add(Whitespace("\t\t"))
-												   .Where(trivia => trivia.IsKind(SyntaxKind.WhitespaceTrivia));
+												   .Where((in SyntaxTrivia trivia) => trivia.IsKind(SyntaxKind.WhitespaceTrivia));
 
 				findByInvocation = findByInvocation.WithLeadingTrivia(trivia);
 			}
