@@ -265,97 +265,41 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			};
 		}
 
-		///// Overrides <seealso cref="WorksheetPicking.IsWorksheetMode(string)"/>
-		//public bool IsWorksheetMode(string modeCode, Func<string, bool> base_IsWorksheetMode) => base_IsWorksheetMode(modeCode);
-
 		private static SyntaxToken? AddXmlDocCommentToToken(SyntaxToken tokenToAddTrivia, string baseMethodDocCommentId)
 		{
-			////var n = SyntaxFactory.Comment(comment);
-			//var xmlTextNodeWithOverridesPrefix = XmlText(
-			//										XmlTextLiteral(XmlDocCommentOverridesPrefix));
-			//var seeAlsoElement = CreateSeeAlsoElementWithReferenceToBaseMethod(patchMethodNode, );
-			//var xmlTextSuffixWithNewLine = XmlText(
-			//									XmlTextNewLine(Environment.NewLine, continueXmlDocumentationComment: false));
-			//XmlNodeSyntax[] xmlDocComments =
-			//[
-			//	xmlTextNodeWithOverridesPrefix,
-			//	seeAlsoElement,
-			//	xmlTextSuffixWithNewLine
-			//];
-
-			//var documentationTrivia =
-			//	DocumentationCommentTrivia(
-			//		SyntaxKind.SingleLineDocumentationCommentTrivia,
-			//		List(xmlDocComments))
-			//	.WithEndOfComment(
-			//		Token(SyntaxKind.EndOfDocumentationCommentToken));
-
 			string comment = $"/// {XmlDocCommentOverridesPrefix} <seealso cref=\"{baseMethodDocCommentId}\"/>";
-			SyntaxTrivia commentTrivia = Comment(comment).WithAdditionalAnnotations(Simplifier.Annotation);
+			var triviaList = ParseLeadingTrivia(comment);
+			var commentTrivia = triviaList.FirstOrDefault(triviaList => triviaList.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia));
 
-			var whiteSpaceIndentationTrivia = tokenToAddTrivia.LeadingTrivia.Reverse()
-																			.TakeWhile(t => !t.IsKind(SyntaxKind.EndOfLineTrivia))
-																			.Where(t => t.IsKind(SyntaxKind.WhitespaceTrivia));
-			var newTrivia = TriviaList(EndOfLine(Environment.NewLine))
-								.AddRange(whiteSpaceIndentationTrivia)
-								.Add(commentTrivia)
-								.AddRange(tokenToAddTrivia.LeadingTrivia);
-			var newToken = tokenToAddTrivia.WithLeadingTrivia(newTrivia)
+			if (commentTrivia == default)
+				return null;
+
+			if (commentTrivia.HasStructure && commentTrivia.GetStructure() is DocumentationCommentTriviaSyntax xmlDocCommentNode)
+			{
+				var crefNode = xmlDocCommentNode.DescendantNodes()
+												.OfType<CrefSyntax>()
+												.FirstOrDefault();
+				if (crefNode != null)
+				{
+					crefNode = crefNode.WithAdditionalAnnotations(Simplifier.Annotation);
+					xmlDocCommentNode = xmlDocCommentNode.ReplaceNode(crefNode, crefNode);
+				}
+
+				xmlDocCommentNode = xmlDocCommentNode.WithAdditionalAnnotations(Simplifier.Annotation);
+				commentTrivia = Trivia(xmlDocCommentNode).WithAdditionalAnnotations(Simplifier.Annotation);
+			}
+
+			var oldLeadingTrivia = tokenToAddTrivia.LeadingTrivia;var x = oldLeadingTrivia.Reverse();
+			var whiteSpaceIndentationTrivia = oldLeadingTrivia.Reverse()
+															  .TakeWhile((in SyntaxTrivia t) => !t.IsKind(SyntaxKind.EndOfLineTrivia))
+															  .Where(t => t.IsKind(SyntaxKind.WhitespaceTrivia));
+			var newTrivias = whiteSpaceIndentationTrivia.PrependItem(EndOfLine(Environment.NewLine))
+														.AppendItem(commentTrivia)
+														.Concat(oldLeadingTrivia);
+			var newLeadingTrivia = TriviaList(newTrivias);
+			var newToken = tokenToAddTrivia.WithLeadingTrivia(newLeadingTrivia)
 										   .WithAdditionalAnnotations(Simplifier.Annotation);
 			return newToken;
 		}
-
-		//private static XmlEmptyElementSyntax? CreateSeeAlsoElementWithReferenceToBaseMethod(MethodDeclarationSyntax patchMethodNode)
-		//{
-			
-
-
-
-		//	XmlCrefAttribute(
-		//		QualifiedCref(
-		//			IdentifierName("WorksheetPicking"),
-		//			NameMemberCref(
-		//				IdentifierName("IsWorksheetMode"))
-		//			.WithParameters(
-		//				CrefParameterList(
-		//					SingletonSeparatedList(
-		//						CrefParameter(
-		//							PredefinedType(
-		//								Token(SyntaxKind.StringKeyword)))))
-		//				.WithOpenParenToken(
-		//					Token(SyntaxKind.OpenParenToken))
-		//				.WithCloseParenToken(
-		//					Token(SyntaxKind.CloseParenToken))))
-		//		.WithDotToken(
-		//			Token(SyntaxKind.DotToken)))
-		//	.WithName(
-		//		XmlName(
-		//			Identifier(
-		//				TriviaList(
-		//					Space),
-		//				"cref",
-		//				TriviaList())))
-		//	.WithEqualsToken(
-		//		Token(SyntaxKind.EqualsToken))
-		//	.WithStartQuoteToken(
-		//		Token(SyntaxKind.DoubleQuoteToken))
-		//	.WithEndQuoteToken(
-		//		Token(SyntaxKind.DoubleQuoteToken))
-
-
-		//	var seeAlsoElement = XmlSeeAlsoElement(cRefAttribute); XmlEmptyElement(
-		//		   XmlName(
-		//			   Identifier("seealso")))
-		//	   .WithLessThanToken(
-		//		   Token(SyntaxKind.LessThanToken))
-		//	   .WithAttributes(
-		//		   SingletonList<XmlAttributeSyntax>(
-
-		//			   ))
-		//	   .WithSlashGreaterThanToken(
-		//		   Token(SyntaxKind.SlashGreaterThanToken));
-
-		//	return seeAlsoElement;
-		//}
 	}
 }
