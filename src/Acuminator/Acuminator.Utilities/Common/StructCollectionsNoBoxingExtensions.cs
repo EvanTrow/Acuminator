@@ -119,12 +119,13 @@ namespace Acuminator.Utilities.Common
 		/// <returns/>
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<SyntaxToken> Where(this SyntaxTokenList source, PredicateWithInputByReadOnlyRef<SyntaxToken> predicate)
+		public static IEnumerable<SyntaxToken> Where(this in SyntaxTokenList source, PredicateWithInputByReadOnlyRef<SyntaxToken> predicate)
 		{
 			predicate.ThrowOnNull();
-			return WhereForSyntaxTokenListImplementation();
+			return WhereForSyntaxTokenListImplementation(source, predicate);
 
-			IEnumerable<SyntaxToken> WhereForSyntaxTokenListImplementation()
+			static IEnumerable<SyntaxToken> WhereForSyntaxTokenListImplementation(SyntaxTokenList source, 
+																				  PredicateWithInputByReadOnlyRef<SyntaxToken> predicate)
 			{
 				for (int i = 0; i < source.Count; i++)
 				{
@@ -146,7 +147,7 @@ namespace Acuminator.Utilities.Common
 		/// <returns/>
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static SyntaxToken FirstOrDefault(this SyntaxTokenList source, PredicateWithInputByReadOnlyRef<SyntaxToken> predicate)
+		public static SyntaxToken FirstOrDefault(this in SyntaxTokenList source, PredicateWithInputByReadOnlyRef<SyntaxToken> predicate)
 		{
 			predicate.ThrowOnNull();
 
@@ -199,12 +200,14 @@ namespace Acuminator.Utilities.Common
 		/// <returns/>
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<TResult> Select<TResult>(this SyntaxTriviaList triviaList, FuncWithInputByReadOnlyRef<SyntaxTrivia, TResult> selector)
+		public static IEnumerable<TResult> Select<TResult>(this in SyntaxTriviaList triviaList, 
+														  FuncWithInputByReadOnlyRef<SyntaxTrivia, TResult> selector)
 		{
 			selector.ThrowOnNull();
-			return SelectForStructListImplementation();
+			return SelectForStructListImplementation(triviaList, selector);
 
-			IEnumerable<TResult> SelectForStructListImplementation()
+			static IEnumerable<TResult> SelectForStructListImplementation(SyntaxTriviaList triviaList, 
+																		  FuncWithInputByReadOnlyRef<SyntaxTrivia, TResult> selector)
 			{
 				for (int i = 0; i < triviaList.Count; i++)
 				{
@@ -222,7 +225,7 @@ namespace Acuminator.Utilities.Common
 		/// <returns/>
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<SyntaxTrivia> Where(this SyntaxTriviaList triviaList,
+		public static IEnumerable<SyntaxTrivia> Where(this in SyntaxTriviaList triviaList,
 													  PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate) =>
 			WhereImplementation(triviaList, predicate.CheckIfNull());
 
@@ -235,7 +238,7 @@ namespace Acuminator.Utilities.Common
 		/// <returns/>
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<SyntaxTrivia> Where(this SyntaxTriviaList.Reversed reversedTrivia,
+		public static IEnumerable<SyntaxTrivia> Where(this in SyntaxTriviaList.Reversed reversedTrivia,
 													  PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate) =>
 			WhereImplementation(reversedTrivia, predicate.CheckIfNull());
 
@@ -258,7 +261,7 @@ namespace Acuminator.Utilities.Common
 		/// <returns/>
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<SyntaxTrivia> TakeWhile(this SyntaxTriviaList triviaList,
+		public static IEnumerable<SyntaxTrivia> TakeWhile(this in SyntaxTriviaList triviaList,
 														  PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate)
 		{
 			predicate.ThrowOnNull();
@@ -273,7 +276,7 @@ namespace Acuminator.Utilities.Common
 		/// <returns/>
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<SyntaxTrivia> TakeWhile(this SyntaxTriviaList.Reversed reversedTrivia,
+		public static IEnumerable<SyntaxTrivia> TakeWhile(this in SyntaxTriviaList.Reversed reversedTrivia,
 														  PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate)
 		{
 			predicate.ThrowOnNull();
@@ -290,6 +293,33 @@ namespace Acuminator.Utilities.Common
 					yield return item;
 				else
 					yield break;
+			}
+		}
+
+		/// <summary>
+		/// Concat method that appends <see cref="SyntaxTriviaList"/> collection without boxing.<br/>
+		/// This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="source">The source collection to act on.</param>
+		/// <param name="triviasToAdd">The <see cref="SyntaxTriviaList"/> trivias to add.</param>
+		/// <returns/>
+		public static IEnumerable<SyntaxTrivia> Concat(this IEnumerable<SyntaxTrivia>? source, in SyntaxTriviaList triviasToAdd)
+		{
+			if (source == null)
+				return triviasToAdd;
+			else if (triviasToAdd.Count == 0)
+				return source;
+
+			return ConcatImpl(source, triviasToAdd);
+
+			//------------------------------------Local Function-----------------------------------------
+			static IEnumerable<SyntaxTrivia> ConcatImpl(IEnumerable<SyntaxTrivia> source, SyntaxTriviaList triviasToAdd)
+			{
+				foreach (SyntaxTrivia trivia in source)
+					yield return trivia;
+
+				for (int i = 0; i < triviasToAdd.Count; i++)
+					yield return triviasToAdd[i];
 			}
 		}
 
@@ -375,7 +405,7 @@ namespace Acuminator.Utilities.Common
 
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static int FindIndex<TNode>(this SeparatedSyntaxList<TNode> source, Func<TNode, bool> condition)
+		public static int FindIndex<TNode>(this in SeparatedSyntaxList<TNode> source, Func<TNode, bool> condition)
 		where TNode : SyntaxNode
 		{
 			return FindIndex(source, startInclusive: 0, endExclusive: source.Count, condition);
@@ -383,14 +413,15 @@ namespace Acuminator.Utilities.Common
 
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static int FindIndex<TNode>(this SeparatedSyntaxList<TNode> source, int startInclusive, Func<TNode, bool> condition)
+		public static int FindIndex<TNode>(this in SeparatedSyntaxList<TNode> source, int startInclusive, Func<TNode, bool> condition)
 		where TNode : SyntaxNode
 		{
 			return FindIndex(source, startInclusive, endExclusive: source.Count, condition);
 		}
 
 		[DebuggerStepThrough]
-		public static int FindIndex<TNode>(this SeparatedSyntaxList<TNode> source, int startInclusive, int endExclusive, Func<TNode, bool> condition)
+		public static int FindIndex<TNode>(this in SeparatedSyntaxList<TNode> source, int startInclusive, int endExclusive, 
+										   Func<TNode, bool> condition)
 		where TNode : SyntaxNode
 		{
 			condition.ThrowOnNull();
@@ -410,7 +441,7 @@ namespace Acuminator.Utilities.Common
 		}
 
 		[DebuggerStepThrough]
-		public static bool All<TNode>(this SeparatedSyntaxList<TNode> source, Func<TNode, bool> condition)
+		public static bool All<TNode>(this in SeparatedSyntaxList<TNode> source, Func<TNode, bool> condition)
 		where TNode : SyntaxNode
 		{
 			condition.ThrowOnNull();
@@ -425,7 +456,7 @@ namespace Acuminator.Utilities.Common
 		}
 
 		[DebuggerStepThrough]
-		public static bool Any<TNode>(this SeparatedSyntaxList<TNode> source, Func<TNode, bool> condition)
+		public static bool Any<TNode>(this in SeparatedSyntaxList<TNode> source, Func<TNode, bool> condition)
 		where TNode : SyntaxNode
 		{
 			condition.ThrowOnNull();
@@ -440,7 +471,7 @@ namespace Acuminator.Utilities.Common
 		}
 
 		[DebuggerStepThrough]
-		public static bool Contains<TNode>(this SyntaxList<TNode> source, TNode node)
+		public static bool Contains<TNode>(this in SyntaxList<TNode> source, TNode node)
 		where TNode : SyntaxNode
 		{
 			for (int i = 0; i < source.Count; i++)
