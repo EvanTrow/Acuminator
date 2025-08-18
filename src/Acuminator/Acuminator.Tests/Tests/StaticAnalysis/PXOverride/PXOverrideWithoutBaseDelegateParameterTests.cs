@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis;
@@ -7,7 +8,10 @@ using Acuminator.Analyzers.StaticAnalysis.PXOverride;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
+using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -22,7 +26,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 									.WithRecursiveAnalysisEnabled()
 									.WithStaticAnalysisEnabled()
 									.WithSuppressionMechanismDisabled(),
-				new PXOverrideAnalyzer());
+				new PXOverrideAnalyzerForNoDelegateParameterTests());
 
 		protected override CodeFixProvider GetCSharpCodeFixProvider() => new AddOrReplaceOrRenameBaseDelegateParameterFix();
 
@@ -50,5 +54,26 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 						  @"BaseDelegateParameter\WithoutParameter\PXOverrideWithoutBaseDelegateParameter_Expected.cs")]
 		public Task PXOverrides_Without_BaseDelegate_Parameter_CodeFix(string actual, string expected) => 
 			VerifyCSharpFixAsync(actual, expected);
+
+		private sealed class PXOverrideAnalyzerForNoDelegateParameterTests : PXOverrideAnalyzer
+		{
+			public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+				ImmutableArray.Create
+				(
+					Descriptors.PX1079_PXOverrideWithoutDelegateParameter
+				);
+
+			protected override void CheckPatchMethodIsPublicNonVirtual(SymbolAnalysisContext context, PXContext pxContext,
+																	   IMethodSymbol patchMethodWithPXOverride)
+			{ }
+
+			protected override void ReportPatchMethodWithIncompatibleSignature(SymbolAnalysisContext context, PXContext pxContext,
+																				IMethodSymbol patchMethodWithPXOverride)
+			{ }
+
+			protected override void CheckPatchMethodForXmlDocComment(SymbolAnalysisContext context, PXContext pxContext,
+																	 PXOverrideInfo pxOverrideInfo)
+			{ }
+		}
 	}
 }
