@@ -205,7 +205,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			if (pxOverrideInfo.BaseMethod.GetSyntax(context.CancellationToken) is not MethodDeclarationSyntax patchMethodNode)
+			if (pxOverrideInfo.Symbol.GetSyntax(context.CancellationToken) is not MethodDeclarationSyntax patchMethodNode)
 				return;
 
 			var semanticModel = context.Compilation.GetSemanticModel(patchMethodNode.SyntaxTree);
@@ -216,21 +216,30 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 				return;
 			}
 
-			var location = pxOverrideInfo.Symbol.Locations.FirstOrDefault();
-			
-			var baseMethodDocCommentID = pxOverrideInfo.BaseMethod.GetDocumentationCommentId().NullIfWhiteSpace();
-			baseMethodDocCommentID = baseMethodDocCommentID?.Length > 2
-				? baseMethodDocCommentID.Substring(2) 
-				: null;
-
+			var location = patchMethodNode.Identifier.GetLocation().NullIfLocationKindIsNone() ?? 
+						   pxOverrideInfo.Symbol.Locations.FirstOrDefault();
+			var baseMethodDocCommentID = GetPreparedReferenceToMethodText(pxOverrideInfo.BaseMethod);
 			var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
 			{
 				{ PXOverrideDiagnosticProperties.BaseMethodDocCommentId, baseMethodDocCommentID }
 			}
 			.ToImmutableDictionary();
+
 			var diagnostic = Diagnostic.Create(Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment, location, diagnosticProperties);
 
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
+		}
+
+		private static string? GetPreparedReferenceToMethodText(IMethodSymbol method)
+		{
+			string? methodDocCommentID = method.GetDocumentationCommentId().NullIfWhiteSpace();
+			methodDocCommentID = methodDocCommentID?.Length > 2
+				? methodDocCommentID.Substring(2)						 // Remove "M:" prefix
+				: null;
+
+			return methodDocCommentID != null
+				? methodDocCommentID.Replace(",", ", ")		// make parameters list more readable and look like the one VS inserts
+				: null;
 		}
 	}
 }
