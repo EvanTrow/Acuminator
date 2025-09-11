@@ -282,6 +282,34 @@ namespace Acuminator.Utilities.Common
 		}
 
 		/// <summary>
+		/// Skip method for <see cref="SyntaxTriviaList"/>. This is an optimization method which allows to avoid boxing and allocations in many cases.
+		/// </summary>
+		/// <param name="triviaList">The trivia list to act on.</param>
+		/// <param name="countToSkip">The count of elements to skip.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static SyntaxTriviaList Skip(this in SyntaxTriviaList triviaList, int countToSkip)
+		{
+			if (countToSkip >= triviaList.Count)
+				return SyntaxTriviaList.Empty;
+			else if (countToSkip <= 0)
+				return triviaList;
+			else if (countToSkip == triviaList.Count - 1)		// Hot path to avoid some allocations
+				return new SyntaxTriviaList(triviaList[^1]);
+			else
+			{
+				int countOfElementsToTake = triviaList.Count - countToSkip;
+				var slice = new SyntaxTrivia[countOfElementsToTake];
+
+				for (int i = 0; i < slice.Length; i++)
+					slice[i] = triviaList[i + countToSkip];
+
+				return new SyntaxTriviaList(slice);
+			}
+		}
+
+		/// <summary>
 		/// TakeWhile method for <see cref="SyntaxTriviaList"/>. This is an optimization method which allows to avoid boxing.
 		/// </summary>
 		/// <param name="triviaList">The trivia list to act on.</param>
