@@ -104,6 +104,7 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1095](diagnostics/PX1095.md) | A field with the `PXDBCalced` or `PXDBScalar` attribute must have an unbound type attribute, such as `PXDate` or `PXDecimal`. | Error | Unavailable |
 | [PX1096](diagnostics/PX1096.md) | The signature of a method with the `PXOverride` attribute must match the overridden method. | Error | Unavailable |
 | [PX1097](diagnostics/PX1097.md) | Methods with the `PXOverride` attribute must be `public` and non-virtual. | Error | Available |
+| [PX1098](diagnostics/PX1098.md) | Methods with the `PXOverride` attribute must declare an XML documentation comment with a reference to the base method and the format `/// Overrides <seealso cref="{Base method}">`. | Warning | Available |
 | [PX1099](diagnostics/PX1099.md) | The API reported by the diagnostic should not be used with the Acumatica Framework. | Warning | Unavailable |
 | [PX1100](diagnostics/PX1100.md) | An element of a graph or a DAC extension extends or overrides an obsolete code element. | Warning | Unavailable |
 | [PX1101](diagnostics/PX1101.md) | The additional delegate parameter of the method with the `PXOverride` attribute must have the same signature as the base method. | Error | Available |
