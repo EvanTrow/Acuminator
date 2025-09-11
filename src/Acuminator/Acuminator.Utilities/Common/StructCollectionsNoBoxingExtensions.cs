@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 using Microsoft.CodeAnalysis;
@@ -377,6 +378,58 @@ namespace Acuminator.Utilities.Common
 				for (int i = 0; i < triviasToAdd.Count; i++)
 					yield return triviasToAdd[i];
 			}
+		}
+
+		/// <summary>
+		/// Concat method that appends trivias collection to <see cref="SyntaxTriviaList"/> without boxing.<br/>
+		/// This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="triviaList">The trivia list to act on.</param>
+		/// <param name="triviasToAdd">The collection of trivias to add.</param>
+		/// <returns/>
+		public static IEnumerable<SyntaxTrivia> Concat(this in SyntaxTriviaList triviaList, IEnumerable<SyntaxTrivia>? triviasToAdd)
+		{
+			if (triviaList.Count == 0)
+				return triviasToAdd ?? [];
+			else if (triviasToAdd == null)
+				return triviaList;
+
+			return ConcatImpl(triviaList, triviasToAdd);
+
+			//------------------------------------Local Function-----------------------------------------
+			static IEnumerable<SyntaxTrivia> ConcatImpl(SyntaxTriviaList triviaList, IEnumerable<SyntaxTrivia> triviasToAdd)
+			{
+				for (int i = 0; i < triviaList.Count; i++)
+					yield return triviaList[i];
+
+				foreach (SyntaxTrivia trivia in triviasToAdd)
+					yield return trivia;
+			}
+		}
+
+		/// <summary>
+		/// Concat method that appends <see cref="SyntaxTriviaList"/> collection without boxing.<br/>
+		/// This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="triviaList">The trivia list to act on.</param>
+		/// <param name="triviasToAdd">The <see cref="SyntaxTriviaList"/> trivias to add.</param>
+		/// <returns/>
+		public static SyntaxTriviaList Concat(this in SyntaxTriviaList triviaList, in SyntaxTriviaList triviasToAdd)
+		{
+			if (triviaList.Count == 0)
+				return triviasToAdd;
+			else if (triviasToAdd.Count == 0)
+				return triviaList;
+
+			var unitedTrivia = new SyntaxTrivia[triviaList.Count + triviasToAdd.Count];
+
+			for (int i = 0; i < triviaList.Count; i++)
+				unitedTrivia[i] = triviaList[i];
+
+			for (int i = 0; i < triviasToAdd.Count; i++)
+				unitedTrivia[triviaList.Count + i] = triviasToAdd[i];
+
+			return new SyntaxTriviaList(unitedTrivia);
 		}
 
 		/// <summary>
