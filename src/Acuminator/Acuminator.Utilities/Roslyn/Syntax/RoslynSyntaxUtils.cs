@@ -373,6 +373,19 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 			return regionTrivias;
 		}
 
+		/// <summary>
+		/// Check if <paramref name="trivia"/> represents a comment.
+		/// </summary>
+		/// <param name="trivia">The trivia to act on.</param>
+		/// <returns>
+		/// <see langword="true"/> if trivia is a comment, <see langword="false"/> if not.
+		/// </returns>
+		public static bool IsCommentTrivia(this in SyntaxTrivia trivia) =>
+			trivia.Kind() is SyntaxKind.SingleLineDocumentationCommentTrivia or 
+							 SyntaxKind.MultiLineDocumentationCommentTrivia or
+							 SyntaxKind.SingleLineCommentTrivia or 
+							 SyntaxKind.MultiLineCommentTrivia;
+
 		public static IEnumerable<SingleVariableDesignationSyntax> GetAllVariableDesignations(this PatternSyntax? pattern)
 		{
 			switch (pattern)
