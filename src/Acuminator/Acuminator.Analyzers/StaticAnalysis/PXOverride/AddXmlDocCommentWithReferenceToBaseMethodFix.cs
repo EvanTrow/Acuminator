@@ -294,8 +294,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 															  .TakeWhile((in SyntaxTrivia t) => !t.IsKind(SyntaxKind.EndOfLineTrivia))
 															  .Where(t => t.IsKind(SyntaxKind.WhitespaceTrivia));
 			var newTrivias = whiteSpaceIndentationTrivia.PrependItem(EndOfLine(Environment.NewLine))
-														.AppendItem(commentTrivia)
-														.Concat(oldLeadingTrivia);
+														.AppendItem(commentTrivia);
+
+			if (!oldLeadingTrivia.Any(SyntaxKind.EndOfLineTrivia))
+				newTrivias = newTrivias.AppendItem(EndOfLine(Environment.NewLine));
+
+			newTrivias = newTrivias.Concat(oldLeadingTrivia);
+
 			var newLeadingTrivia = TriviaList(newTrivias);
 			var newToken = tokenToAddTrivia.WithLeadingTrivia(newLeadingTrivia)
 										   .WithAdditionalAnnotations(Simplifier.Annotation);
