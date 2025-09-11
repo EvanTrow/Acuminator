@@ -289,7 +289,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 				commentTrivia = Trivia(xmlDocCommentNode).WithAdditionalAnnotations(Simplifier.Annotation);
 			}
 
-			var oldLeadingTrivia = tokenToAddTrivia.LeadingTrivia;var x = oldLeadingTrivia.Reverse();
+			var oldLeadingTrivia = tokenToAddTrivia.LeadingTrivia;
 			var whiteSpaceIndentationTrivia = oldLeadingTrivia.Reverse()
 															  .TakeWhile((in SyntaxTrivia t) => !t.IsKind(SyntaxKind.EndOfLineTrivia))
 															  .Where(t => t.IsKind(SyntaxKind.WhitespaceTrivia));
