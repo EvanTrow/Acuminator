@@ -1,10 +1,9 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+
 using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Common
@@ -250,6 +249,35 @@ namespace Acuminator.Utilities.Common
 			{
 				if (predicate(item))
 					yield return item;
+			}
+		}
+
+		/// <summary>
+		/// Take method for <see cref="SyntaxTriviaList"/>. This is an optimization method which allows to avoid boxing and allocations in some cases.
+		/// </summary>
+		/// <param name="triviaList">The trivia list to act on.</param>
+		/// <param name="countToTake">The count of elements to take.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static SyntaxTriviaList Take(this in SyntaxTriviaList triviaList, int countToTake)
+		{
+			if (countToTake >= triviaList.Count)
+				return triviaList;
+
+			switch (countToTake)
+			{
+				case <= 0:
+					return SyntaxTriviaList.Empty;
+				case 1:
+					return new SyntaxTriviaList(triviaList[0]);     // Hot path to avoid some allocations
+				default:
+					var slice = new SyntaxTrivia[countToTake];
+
+					for (int i = 0; i < countToTake; i++)
+						slice[i] = triviaList[i];
+
+					return new SyntaxTriviaList(slice);
 			}
 		}
 
