@@ -290,9 +290,77 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			}
 
 			var oldLeadingTrivia = tokenToAddTrivia.LeadingTrivia;
+			int? indexOfExistingTriviaWithCommentOrDirective = FindIndexOfLastTriviaWithCommentOrPreprocessorDirective(oldLeadingTrivia);
+			IEnumerable<SyntaxTrivia> newTrivias;
+
+			if (indexOfExistingTriviaWithCommentOrDirective != null)
+			{
+				int existingCommentTriviasCount = indexOfExistingTriviaWithCommentOrDirective.Value + 1;
+				newTrivias = InsertNewXmlCommentAfterExistingCommentsAndDirectives(commentTrivia, existingCommentTriviasCount, oldLeadingTrivia);
+			}
+			else
+			{
+				newTrivias = InsertNewXmlCommentWhenNoCommentsAndDirectivesExisted(commentTrivia, oldLeadingTrivia);
+			}
+
+			var newLeadingTrivia = TriviaList(newTrivias);
+			var newToken = tokenToAddTrivia.WithLeadingTrivia(newLeadingTrivia)
+										   .WithAdditionalAnnotations(Simplifier.Annotation);
+			return newToken;
+		}
+
+		private static int? FindIndexOfLastTriviaWithCommentOrPreprocessorDirective(in SyntaxTriviaList triviaList)
+		{
+			for (int i = triviaList.Count - 1; i >= 0; i--)
+			{
+				SyntaxTrivia trivia = triviaList[i];
+
+				if (trivia.IsDirective || trivia.HasStructure || trivia.IsCommentTrivia())
+					return i;
+			}
+
+			return null;
+		}
+
+		private static IEnumerable<SyntaxTrivia> InsertNewXmlCommentAfterExistingCommentsAndDirectives(in SyntaxTrivia commentTrivia,
+																										int countOfExistingCommentTrivia,
+																										in SyntaxTriviaList oldLeadingTrivia)
+		{
+			// for existing comments or preprocessor directives we add new comment after them
+			var existingCommentsAndDirectives = oldLeadingTrivia.Take(countOfExistingCommentTrivia);
+			var remainingExistingTrivias = oldLeadingTrivia.Skip(countOfExistingCommentTrivia);
+
+			if (remainingExistingTrivias.Count == 0)
+			{
+				var newTrivias = existingCommentsAndDirectives.AppendItem(commentTrivia);
+				return newTrivias;
+			}
+			else
+			{
+				var whiteSpaceIndentationTrivia = remainingExistingTrivias.Reverse()
+																		  .TakeWhile((in SyntaxTrivia t) => !t.IsKind(SyntaxKind.EndOfLineTrivia))
+																		  .Where(t => t.IsKind(SyntaxKind.WhitespaceTrivia))
+																		  .Reverse();
+
+				var newTrivias = existingCommentsAndDirectives.Concat(whiteSpaceIndentationTrivia)
+															  .AppendItem(commentTrivia);
+
+				if (!remainingExistingTrivias.Any(SyntaxKind.EndOfLineTrivia))
+					newTrivias = newTrivias.AppendItem(EndOfLine(Environment.NewLine));
+
+				newTrivias = newTrivias.Concat(remainingExistingTrivias);
+				return newTrivias;
+			}
+		}
+
+		private static IEnumerable<SyntaxTrivia> InsertNewXmlCommentWhenNoCommentsAndDirectivesExisted(in SyntaxTrivia commentTrivia, 
+																									   in SyntaxTriviaList oldLeadingTrivia)
+		{
 			var whiteSpaceIndentationTrivia = oldLeadingTrivia.Reverse()
 															  .TakeWhile((in SyntaxTrivia t) => !t.IsKind(SyntaxKind.EndOfLineTrivia))
-															  .Where(t => t.IsKind(SyntaxKind.WhitespaceTrivia));
+															  .Where(t => t.IsKind(SyntaxKind.WhitespaceTrivia))
+															  .Reverse();
+
 			var newTrivias = whiteSpaceIndentationTrivia.PrependItem(EndOfLine(Environment.NewLine))
 														.AppendItem(commentTrivia);
 
@@ -300,11 +368,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 				newTrivias = newTrivias.AppendItem(EndOfLine(Environment.NewLine));
 
 			newTrivias = newTrivias.Concat(oldLeadingTrivia);
-
-			var newLeadingTrivia = TriviaList(newTrivias);
-			var newToken = tokenToAddTrivia.WithLeadingTrivia(newLeadingTrivia)
-										   .WithAdditionalAnnotations(Simplifier.Annotation);
-			return newToken;
+			return newTrivias;
 		}
 	}
 }
