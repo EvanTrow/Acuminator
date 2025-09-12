@@ -34,10 +34,12 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		[EmbeddedFileData(@"XmlComment\PXOverrideWithoutXmlComment.cs")]
 		public Task PXOverrides_WithoutXmlDocComment(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment.CreateFor(13, 17),
-				Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment.CreateFor(19, 15),
-				Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment.CreateFor(25, 27),
-				Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment.CreateFor(32, 15));
+				Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment.CreateFor(23, 17),
+				Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment.CreateFor(29, 15),
+				Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment.CreateFor(35, 27),
+				Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment.CreateFor(43, 15),
+				Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment.CreateFor(50, 14),
+				Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment.CreateFor(62, 15));
 
 		[Theory]
 		[EmbeddedFileData(@"XmlComment\PXOverrideWithoutXmlComment_Expected.cs")]
