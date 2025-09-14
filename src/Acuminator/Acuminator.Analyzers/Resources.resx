@@ -796,7 +796,7 @@ public virtual int? SomeDacField{ get; set; }</value>
     <value>Add the XML documentation comment with the reference to the base method</value>
   </data>
   <data name="PX1098Title" xml:space="preserve">
-    <value>A method with the PXOverride attribute must declare an XML documentation comment with a reference to the base method. The format of the comment is:
+    <value>A method with the PXOverride attribute must declare an XML documentation comment with a reference to the base method. The format of the comment:
 /// Overrides &lt;seealso cref="{Base method}"/&gt;</value>
   </data>
   <data name="PX1099Title" xml:space="preserve">

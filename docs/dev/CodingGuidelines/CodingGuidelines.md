@@ -472,11 +472,13 @@ The first option is much simpler but you have to check that your diagnostic work
 
 #### Parallel Execution of Diagnostics Under Debug
 
- Acuminator analyzers in general are executed in parallel. This may lead to confusion when you debug your analyzer because the debugger may switch between different threads executing different analyzers. 
+ Acuminator analyzers are generally executed in parallel. This may lead to confusion when you debug your analyzer because the debugger may switch between different threads that execute different analyzers. 
  To avoid this confusion, Acuminator contains checks in various places that detect whether the debugger is attached to the process. If the debugger is attached, Acuminator forces sequential execution of analyzers.
 
  Usually, this is a desired behavior. However, in some scenarios you may want to analyze a big solution with the debugger attached. For example, you may want to investigate an unhandled exception thrown by some analyzer on a big solution.
- In this case you can disable the sequential execution of analyzers by finding all usages of the `System.Diagnostics.Debugger.IsAttached` property in the Acuminator codebase and replacing them with appropriate boolean constants.
+ In this case, you can disable the sequential execution of analyzers by doing the following:
+ 1. Find all uses of the `System.Diagnostics.Debugger.IsAttached` property in the Acuminator codebase.
+ 2. Replace the property with appropriate boolean constant.
 
 ### Checking Acumatica DLL Version
 
