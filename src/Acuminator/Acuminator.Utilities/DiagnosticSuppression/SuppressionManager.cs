@@ -363,7 +363,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			if (trivias.Count == 0)
 				return false;
 
-			var successfulMatch = trivias.Where(x => x.IsKind(SyntaxKind.SingleLineCommentTrivia))
+			var successfulMatch = trivias.Where((in SyntaxTrivia x) => x.IsKind(SyntaxKind.SingleLineCommentTrivia))
 										 .Select(trivia => _suppressPattern.Match(trivia.ToString()))
 										 .FirstOrDefault(match => match.Success && diagnostic.Id == match.Groups[1].Value &&
 																  (diagnosticShortName == null || diagnosticShortName == match.Groups[2].Value));

@@ -30,7 +30,11 @@
     },
     "PXObjects": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\Repos\\Acumatica2\\WebSites\\Pure\\PX.Objects\\PX.Objects.csproj -g D --enable-PX1007"
+      "commandLineArgs": "D:\\Repos\\Acumatica4\\WebSites\\Pure\\PX.Objects\\PX.Objects.csproj -g D --enable-PX1007"
+    },
+    "Pure": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\Repos\\Acumatica4\\WebSites\\Pure\\Pure.sln -g D --enable-PX1007"
     }
   }
 }

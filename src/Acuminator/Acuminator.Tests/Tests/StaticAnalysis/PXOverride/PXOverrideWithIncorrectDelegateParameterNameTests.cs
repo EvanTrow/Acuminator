@@ -9,6 +9,7 @@ using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -64,6 +65,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 
 			protected override void CheckPatchMethodIsPublicNonVirtual(SymbolAnalysisContext context, PXContext pxContext, 
 																		IMethodSymbol patchMethodWithPXOverride)
+			{ }
+
+			protected override void CheckPatchMethodForXmlDocComment(SymbolAnalysisContext context, PXContext pxContext, 
+																	 PXOverrideInfo pxOverrideInfo)
 			{ }
 		}
 	}

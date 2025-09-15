@@ -10,6 +10,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 using Acuminator.Utilities;
 using Acuminator.Utilities.Roslyn.Semantic;
+using System.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 {
@@ -68,23 +69,25 @@ namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 				case 1:
 					aggregatedAnalyserAction(0);
 					return;
-				default:
-				{
-#if DEBUG
-					for (int analyzerIndex = 0; analyzerIndex < effectiveAnalyzers.Count; analyzerIndex++)
+				default:	
+					if (Debugger.IsAttached)
 					{
-						aggregatedAnalyserAction(analyzerIndex);
+						for (int analyzerIndex = 0; analyzerIndex < effectiveAnalyzers.Count; analyzerIndex++)
+						{
+							aggregatedAnalyserAction(analyzerIndex);
+						}
 					}
-#else
-					parallelOptions = parallelOptions ?? new ParallelOptions
+					else
 					{
-						CancellationToken = context.CancellationToken
-					};
+						parallelOptions = parallelOptions ?? new ParallelOptions
+						{
+							CancellationToken = context.CancellationToken
+						};
 
-					Parallel.For(0, effectiveAnalyzers.Count, parallelOptions, aggregatedAnalyserAction);
-#endif
+						Parallel.For(0, effectiveAnalyzers.Count, parallelOptions, aggregatedAnalyserAction);
+					}
+
 					return;
-				}
 			}
 		}
 	}

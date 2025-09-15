@@ -148,7 +148,7 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 		private IEnumerable<SyntaxToken> FilterModifiers(in SyntaxTokenList modifiers, bool includeFirstModifier)
 		{
 			if (includeFirstModifier)
-				return modifiers.Where(m => !ShouldModifierBeRemoved(m));
+				return modifiers.Where((in SyntaxToken m) => !ShouldModifierBeRemoved(m));
 
 			switch (modifiers.Count)
 			{

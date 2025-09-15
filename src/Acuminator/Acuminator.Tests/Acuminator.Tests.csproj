@@ -399,6 +399,7 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\PropertyAndBqlFieldTypesMismatch\Sources\DacExtensionWithInconsistentTypes.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PropertyAndBqlFieldTypesMismatch\Sources\DerivedDacWithInconsistentTypes_Expected.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PropertyAndBqlFieldTypesMismatch\Sources\DerivedDacWithInconsistentTypes.cs" />
+    <Compile Include="Tests\StaticAnalysis\PXOverride\PXOverrideWithoutXmlCommentTests.cs" />
     <Compile Include="Tests\StaticAnalysis\PXOverride\PXOverrideWithIncorrectDelegateParameterNameTests.cs" />
     <Compile Include="Tests\StaticAnalysis\PXOverride\PXOverrideWithIncorrectBaseDelegateParameterTests.cs" />
     <Compile Include="Tests\StaticAnalysis\PXOverride\PXOverrideWithoutBaseDelegateParameterTests.cs" />
@@ -455,6 +456,8 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\PXOverride\Sources\BaseDelegateParameter\IncorrectParameter\PXOverrideWithIncorrectBaseDelegateParameter.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PXOverride\Sources\BaseDelegateParameter\InvalidParameterName\PXOverrideWithIncorrectDelegateParameterName_Expected.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\PXOverride\Sources\BaseDelegateParameter\InvalidParameterName\PXOverrideWithIncorrectDelegateParameterName.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\PXOverride\Sources\XmlComment\PXOverrideWithoutXmlComment_Expected.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\PXOverride\Sources\XmlComment\PXOverrideWithoutXmlComment.cs" />
     <Compile Include="Tests\StaticAnalysis\StaticFieldOrPropertyInGraph\StaticFieldOrPropertyInGraphTests.cs" />
     <Compile Include="Tests\StaticAnalysis\SuppressionDiagnostics\MultipleSuppressionCodeFixTests.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\SuppressionDiagnostics\Sources\Dac\SuppressMuiltipleDiagnostics_One.cs" />

@@ -116,7 +116,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PublicClassXmlComment
 
 		private IEnumerable<DocumentationCommentTriviaSyntax> GetXmlComments(MemberDeclarationSyntax member) =>
 			member.GetLeadingTrivia()
-				  .Select(t => t.GetStructure())
+				  .Select((in SyntaxTrivia t) => t.GetStructure())
 				  .OfType<DocumentationCommentTriviaSyntax>();
 
 		private XmlCommentTagsInfo GetDocumentationTags(DocumentationCommentTriviaSyntax xmlComment)

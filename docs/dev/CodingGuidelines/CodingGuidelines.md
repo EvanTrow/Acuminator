@@ -28,6 +28,8 @@
     * [Async Anonymous Delegates](#async-anonymous-delegates)
     * [Value Tuples (Obsolete)](#value-tuples-obsolete)
     * [Debugging Hints](#debugging-hints)
+        * [Out-Of-Process Analysis](#out-of-process-analysis)
+        * [Parallel Execution of Diagnostics Under Debug](#parallel-execution-of-diagnostics-under-debug)
     * [Checking Acumatica DLL Version](#checking-acumatica-dll-version)
 
 ## Code Style
@@ -459,12 +461,24 @@ Therefore, until we drop the support for Visual Studio 2017, do not declare publ
 
 ### Debugging Hints
 
+#### Out-Of-Process Analysis
+
 There is an unobvious issue with debugging observed on the latest versions of Visual Studio 2019 (starting from 16.8.0). The breakpoints set inside Roslyn analyzers are not hit for no obvious reason. The root cause of this problem lies in a new Visual Studio perfomance optimization which moves execution of all Roslyn analyzers out of the Visual Studio process into a separate 64-bit process. This action is regulated by the  following Visual Studio setting: *Tools -> Options -> Text Editor -> C# -> Advanced -> Use 64-bit process for code analysis*.
 You need to do one of the following:
 * Disable this setting in an experimental instance of Visual Studio.
 * Perform a multiprocess debugging by attaching your debugger to a second process with loaded Roslyn analyzers. The name of the process should look like the following: *ServiceHub.RoslynCodeAnalysisService.exe*.
 
 The first option is much simpler but you have to check that your diagnostic works correctly when the out of process analysis is enabled for Visual Studio.
+
+#### Parallel Execution of Diagnostics Under Debug
+
+ Acuminator analyzers are generally executed in parallel. This may lead to confusion when you debug your analyzer because the debugger may switch between different threads that execute different analyzers. 
+ To avoid this confusion, Acuminator contains checks in various places that detect whether the debugger is attached to the process. If the debugger is attached, Acuminator forces sequential execution of analyzers.
+
+ Usually, this is a desired behavior. However, in some scenarios you may want to analyze a big solution with the debugger attached. For example, you may want to investigate an unhandled exception thrown by some analyzer on a big solution.
+ In this case, you can disable the sequential execution of analyzers by doing the following:
+ 1. Find all uses of the `System.Diagnostics.Debugger.IsAttached` property in the Acuminator codebase.
+ 2. Replace the property with appropriate boolean constant.
 
 ### Checking Acumatica DLL Version
 

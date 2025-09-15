@@ -21,5 +21,10 @@
 		/// Property stores the <see cref="BaseDelegateParameterFixMode"/> value for a patch method.
 		/// </summary>
 		public const string DelegateParameterFixMode = nameof(DelegateParameterFixMode);
+
+		/// <summary>
+		/// Property stores the XML documentation comment ID name of the base method.
+		/// </summary>
+		public const string BaseMethodDocCommentId = nameof(BaseMethodDocCommentId);
 	}
 }

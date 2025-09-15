@@ -194,6 +194,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 			protected override void CheckPatchMethodBaseDelegateParameter(SymbolAnalysisContext context, PXContext pxContext,
 																		  PXOverrideInfo pxOverrideInfo)
 			{ }
+
+			protected override void CheckPatchMethodForXmlDocComment(SymbolAnalysisContext context, PXContext pxContext, 
+																	 PXOverrideInfo pxOverrideInfo)
+			{ }
 		}
 	}
 }
