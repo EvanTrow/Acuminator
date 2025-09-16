@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -121,6 +119,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// </remarks>
 		public bool IsNonBqlProperty => HasFieldPropertyDeclared && !HasBqlFieldEffective && !HasAcumaticaAttributes;
 
+		/// <summary>
+		/// The DAC field kind.
+		/// </summary>
+		public DacFieldKind FieldKind { get; }
+
 		public DacFieldInfo(DacPropertyInfo? dacPropertyInfo, DacBqlFieldInfo? dacBqlFieldInfo, DacFieldInfo baseInfo) :
 					   this(dacPropertyInfo, dacBqlFieldInfo)
 		{
@@ -137,6 +140,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			BqlFieldInfo = dacBqlFieldInfo;
 			Name 		 = PropertyInfo?.Name ?? BqlFieldInfo!.Name.ToPascalCase();
 			DacType 	 = PropertyInfo?.Symbol.ContainingType ?? BqlFieldInfo!.Symbol.ContainingType;
+			FieldKind	 = DacFieldKindExtensions.GetDacFieldKind(Name);
 
 			if (dacBqlFieldInfo != null)
 			{
