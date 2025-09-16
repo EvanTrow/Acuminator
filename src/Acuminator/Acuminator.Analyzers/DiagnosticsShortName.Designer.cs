@@ -745,6 +745,15 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to MissingMandatoryDacFields.
+        /// </summary>
+        public static string PX1069 {
+            get {
+                return ResourceManager.GetString("PX1069", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to UiPresentationLogicInEventHandlers.
         /// </summary>
         public static string PX1070 {

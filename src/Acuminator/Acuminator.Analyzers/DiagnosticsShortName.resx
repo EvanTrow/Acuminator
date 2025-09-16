@@ -345,6 +345,9 @@
   <data name="PX1068" xml:space="preserve">
     <value>PropertyAndBqlFieldTypesMismatch</value>
   </data>
+  <data name="PX1069" xml:space="preserve">
+    <value>MissingMandatoryDacFields</value>
+  </data>
   <data name="PX1070" xml:space="preserve">
     <value>UiPresentationLogicInEventHandlers</value>
   </data>
