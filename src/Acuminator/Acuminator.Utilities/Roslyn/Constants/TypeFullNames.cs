@@ -184,6 +184,7 @@
 		public const string PXParentAttribute = "PX.Data.PXParentAttribute";
 		public const string PXForeignReferenceAttribute = "PX.Data.ReferentialIntegrity.Attributes.PXForeignReferenceAttribute";
 		public const string PXDBDefaultAttribute = "PX.Data.PXDBDefaultAttribute";
+		public const string PXAccumulatorAttribute = "PX.Data.PXAccumulatorAttribute";
 
 		public const string PXView = "PX.Data.PXView";
 
