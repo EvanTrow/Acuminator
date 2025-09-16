@@ -50,6 +50,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CA9909CB-EB85-43E3-8C21-0EFA82420B30}
-		RESX_ResXSortingComparison = Ordinal
 	EndGlobalSection
 EndGlobal
