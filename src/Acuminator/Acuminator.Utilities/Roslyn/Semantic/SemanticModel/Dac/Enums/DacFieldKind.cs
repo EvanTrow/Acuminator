@@ -8,7 +8,7 @@ public enum DacFieldKind : byte
 	Regular,
 
 	NoteID,
-	Tstamp,
+	tstamp,
 	GroupMask,
 	Attributes,
 

@@ -11,7 +11,7 @@ public static class DacFieldKindExtensions
 	private static readonly Dictionary<string, DacFieldKind> _systemDacFieldNamesToKinds = new(StringComparer.OrdinalIgnoreCase)
 	{
 		{ DacFieldNames.System.NoteID,	   DacFieldKind.NoteID },
-		{ DacFieldNames.System.Timestamp,  DacFieldKind.Tstamp },
+		{ DacFieldNames.System.Timestamp,  DacFieldKind.tstamp },
 		{ DacFieldNames.System.GroupMask,  DacFieldKind.GroupMask },
 		{ DacFieldNames.System.Attributes, DacFieldKind.Attributes },
 
