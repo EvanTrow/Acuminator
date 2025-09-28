@@ -130,6 +130,16 @@
     <EmbeddedResource Include="Tests\StaticAnalysis\MissingBqlFieldRedeclarationInDerivedDac\Sources\DacWithNotRedeclaredBqlFields_MoreThan5_Expected.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\MissingBqlFieldRedeclarationInDerivedDac\Sources\DacWithNotRedeclaredBqlFields_MoreThan5.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\MissingTypeListAttribute\Sources\MissingTypeListAttributeDacExtGood.cs" />
+    <Compile Include="Tests\StaticAnalysis\MissingMandatoryDacFields\MissingMandatoryDacFieldsTests.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\MissingMandatoryDacFields\Sources\AccumulatorDac.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\MissingMandatoryDacFields\Sources\DacExtension.cs" />
+    <Compile Include="Tests\StaticAnalysis\MissingMandatoryDacFields\Sources\DacMissingMultipleAuditFields.cs" />
+    <Compile Include="Tests\StaticAnalysis\MissingMandatoryDacFields\Sources\DacMissingOnlyCreatedByID.cs" />
+    <Compile Include="Tests\StaticAnalysis\MissingMandatoryDacFields\Sources\DacMissingOnlyTimestampField.cs" />
+    <Compile Include="Tests\StaticAnalysis\MissingMandatoryDacFields\Sources\DacWithAllMandatoryFields.cs" />
+    <Compile Include="Tests\StaticAnalysis\MissingMandatoryDacFields\Sources\DacWithoutAnyMandatoryFields.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\MissingMandatoryDacFields\Sources\EmptyDac.cs" />
+    <EmbeddedResource Include="Tests\StaticAnalysis\MissingMandatoryDacFields\Sources\UnboundDac.cs" />
     <Compile Include="Tests\StaticAnalysis\NameConventionEventsInGraphsAndGraphExtensions\NameConventionEventsInGraphsAndGraphExtensionsTests.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\NameConventionEventsInGraphsAndGraphExtensions\Sources\CacheAttached.cs" />
     <EmbeddedResource Include="Tests\StaticAnalysis\NameConventionEventsInGraphsAndGraphExtensions\Sources\CacheAttached_Expected.cs" />
