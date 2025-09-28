@@ -69,10 +69,36 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 			await VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
+		[EmbeddedFileData("DacMissingOnlyCreatedByID_Expected.cs")]
+		public async Task DacMissingOnlyCreatedByID_AfterCodeFix_NoDiagnostic(string source) =>
+			await VerifyCSharpDiagnosticAsync(source);
+
+		[Theory]
 		[EmbeddedFileData("DacMissingMultipleAuditFields_Expected.cs")]
 		public async Task DacMissingMultipleAuditFields_AfterCodeFix_NoDiagnostic(string source) =>
 			await VerifyCSharpDiagnosticAsync(source);
 		#endregion
 		
+		#region Code Fix Tests
+		[Theory]
+		[EmbeddedFileData("DacWithoutAnyMandatoryFields.cs", "DacWithoutAnyMandatoryFields_Expected.cs")]
+		public async Task DacWithoutAnyMandatoryFields_CodeFix_ShouldAddAllMandatoryFields(string source, string expected) =>
+			await VerifyCSharpFixAsync(source, expected);
+
+		[Theory]
+		[EmbeddedFileData("DacMissingOnlyTimestampField.cs", "DacMissingOnlyTimestampField_Expected.cs")]
+		public async Task DacMissingOnlyTimestampField_CodeFix_ShouldAddTimestampField(string source, string expected) =>
+			await VerifyCSharpFixAsync(source, expected);
+
+		[Theory]
+		[EmbeddedFileData("DacMissingOnlyCreatedByID.cs", "DacMissingOnlyCreatedByID_Expected.cs")]
+		public async Task DacMissingOnlyCreatedByID_CodeFix_ShouldCreatedByIDField(string source, string expected) =>
+			await VerifyCSharpFixAsync(source, expected);
+
+		[Theory]
+		[EmbeddedFileData("DacMissingMultipleAuditFields.cs", "DacMissingMultipleAuditFields_Expected.cs")]
+		public async Task DacMissingMultipleAuditFields_CodeFix_ShouldAddMissingFields(string source, string expected) =>
+			await VerifyCSharpFixAsync(source, expected);
+		#endregion
 	}
 }
