@@ -144,12 +144,12 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 								.WithOpenBraceToken(
 									Token(leading: TriviaList(), SyntaxKind.OpenBraceToken, TriviaList()));
 
-			var clostBracketToken = isFirstField
+			var closeBracketToken = isFirstField
 				? Token(leading: TriviaList(Space), SyntaxKind.CloseBraceToken,
 						TriviaList(CarriageReturn, LineFeed, CarriageReturn, LineFeed))
 				: Token(leading: TriviaList(Space), SyntaxKind.CloseBraceToken, TriviaList(CarriageReturn, LineFeed));
 
-			bqlFieldNode = bqlFieldNode.WithCloseBraceToken(clostBracketToken);
+			bqlFieldNode = bqlFieldNode.WithCloseBraceToken(closeBracketToken);
 
 			if (adjacentMemberToCopyRegions != null)
 				bqlFieldNode = CopyRegionsFromMember(bqlFieldNode, adjacentMemberToCopyRegions);
