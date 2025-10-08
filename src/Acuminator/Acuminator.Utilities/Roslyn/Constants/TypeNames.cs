@@ -106,6 +106,7 @@ namespace Acuminator.Utilities.Roslyn.Constants
 		}
 
 		public const string StringArray = "string[]";
+		public const string ByteArray = "byte[]";
 
 		public const string PXView = "PXView";
 
