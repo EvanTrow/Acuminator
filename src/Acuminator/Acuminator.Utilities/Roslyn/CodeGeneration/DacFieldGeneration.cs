@@ -28,10 +28,8 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 		/// <returns>
 		/// The DAC field.
 		/// </returns>
-		public static (PropertyDeclarationSyntax FieldProperty, ClassDeclarationSyntax BqlField)? GenerateDacField(
-																						string? dacFieldName, 
-																						DacFieldGenerationOptions fieldGenerationOptions,
-																						IEnumerable<AttributeListSyntax>? propertyAttributeLists)
+		public static GeneratedDacFieldNodeInfo? GenerateDacField(string? dacFieldName, DacFieldGenerationOptions fieldGenerationOptions,
+																  IEnumerable<AttributeListSyntax>? propertyAttributeLists)
 		{
 			if (dacFieldName.IsNullOrWhiteSpace() || fieldGenerationOptions == null)
 				return null;
@@ -53,7 +51,7 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 				: bqlFieldName;
 			bqlFieldNode = AddRegionDirectiveToBqlNode(bqlFieldNode, regionName);
 
-			return (propertyNode, bqlFieldNode);
+			return new GeneratedDacFieldNodeInfo(propertyNode, bqlFieldNode);
 		}
 
 		private static string GetBqlFieldName(string dataFieldName) =>
