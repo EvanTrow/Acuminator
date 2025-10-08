@@ -10,4 +10,9 @@ internal static class PX1069Properties
 	/// Property stores comma-separated <see cref="DacFieldKind"/> values that represent mandatory DAC fields missing in the DAC.
 	/// </summary>
 	public const string MissingMandatoryDacFields = nameof(MissingMandatoryDacFields);
+
+	/// <summary>
+	/// Flag indicating whether the DAC is sealed.
+	/// </summary>
+	public const string IsSealedDac = nameof(IsSealedDac);
 }

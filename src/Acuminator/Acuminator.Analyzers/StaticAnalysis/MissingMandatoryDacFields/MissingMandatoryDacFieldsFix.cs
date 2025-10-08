@@ -46,11 +46,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 			if (missingDacFieldKinds?.Count is null or 0)
 				return Task.CompletedTask;
 
+			bool isSealedDac = diagnostic.IsFlagSet(PX1069Properties.IsSealedDac);
 			context.CancellationToken.ThrowIfCancellationRequested();
 
 			string codeActionName = nameof(Resources.PX1069Fix).GetLocalized().ToString();
 			var codeAction = CodeAction.Create(codeActionName,
-											   cToken => AddMissingDacFieldsAsync(context.Document, missingDacFieldKinds, context.Span, cToken),
+											   cToken => AddMissingDacFieldsAsync(context.Document, missingDacFieldKinds, context.Span, 
+																				  isSealedDac, cToken),
 											   equivalenceKey: codeActionName);
 			context.RegisterCodeFix(codeAction, diagnostic);
 			return Task.CompletedTask;
@@ -79,7 +81,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 		}
 
 		private async Task<Document> AddMissingDacFieldsAsync(Document document, List<DacFieldKind> missingDacFieldKinds, TextSpan span,
-															  CancellationToken cancellationToken)
+															  bool isSealedDac, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 

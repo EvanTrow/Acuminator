@@ -29,22 +29,22 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 		base.ShouldAnalyze(pxContext, dac) && dac.DacType == DacType.Dac &&
 		!dac.IsFullyUnbound && !dac.HasAccumulatorAttribute && dac.DacFieldsByNames.Count > 0;
 
-	public override void Analyze(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dacOrDacExt)
+	public override void Analyze(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dac)
 	{
-		var missingMandatoryDacFieldKinds = GetMissingMandatoryDacFieldKinds(dacOrDacExt, symbolContext.CancellationToken);
+		var missingMandatoryDacFieldKinds = GetMissingMandatoryDacFieldKinds(dac, symbolContext.CancellationToken);
 
 		if (missingMandatoryDacFieldKinds.Count > 0)
 		{
-			ReportMissingMandatoryDacFields(symbolContext, pxContext, dacOrDacExt, missingMandatoryDacFieldKinds);
+			ReportMissingMandatoryDacFields(symbolContext, pxContext, dac, missingMandatoryDacFieldKinds);
 		}
 	}
 
-	private static List<DacFieldKind> GetMissingMandatoryDacFieldKinds(DacSemanticModel dacOrDacExt, CancellationToken cancellation)
+	private static List<DacFieldKind> GetMissingMandatoryDacFieldKinds(DacSemanticModel dac, CancellationToken cancellation)
 	{
 		var missingMandatoryDacFieldKinds = GetMandatoryDacFieldKinds();
 
 		// Check every DAC field in this DAC and its base DACs if there are any to see that if all mandatory DAC fields are present
-		foreach (var dacField in dacOrDacExt.DacFields)
+		foreach (var dacField in dac.DacFields)
 		{
 			cancellation.ThrowIfCancellationRequested();
 
@@ -66,13 +66,13 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 			DacFieldKind.LastModifiedDateTime
 		];
 
-	private static void ReportMissingMandatoryDacFields(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dacOrDacExt, 
+	private static void ReportMissingMandatoryDacFields(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dac, 
 														List<DacFieldKind> missingMandatoryDacFieldKinds)
 	{
 		symbolContext.CancellationToken.ThrowIfCancellationRequested();
 
-		var location = dacOrDacExt.Node!.Identifier.GetLocation().NullIfLocationKindIsNone() ?? 
-					   dacOrDacExt.Symbol.Locations.FirstOrDefault();
+		var location = dac.Node!.Identifier.GetLocation().NullIfLocationKindIsNone() ?? 
+					   dac.Symbol.Locations.FirstOrDefault();
 		Diagnostic diagnostic;
 
 		if (missingMandatoryDacFieldKinds.Count == 1)
@@ -80,11 +80,12 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 			string missingDacField = missingMandatoryDacFieldKinds[0].ToString();
 			var properties = new Dictionary<string, string?>
 			{
-				{ PX1069Properties.MissingMandatoryDacFields, missingDacField }
+				{ PX1069Properties.MissingMandatoryDacFields, missingDacField  },
+				{ PX1069Properties.IsSealedDac,				  dac.Symbol.IsSealed.ToString() }
 			}
 			.ToImmutableDictionary();
 
-			string[] messageArgs = [dacOrDacExt.Name, $"\"{missingDacField}\"" ];
+			string[] messageArgs = [dac.Name, $"\"{missingDacField}\"" ];
 			diagnostic = Diagnostic.Create(Descriptors.PX1069_MissingSingleMandatoryDacField, location, properties, messageArgs);
 		}
 		else
@@ -93,13 +94,14 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 																	   .ToList(missingMandatoryDacFieldKinds.Count);
 			var properties = new Dictionary<string, string?>
 			{
-				{ PX1069Properties.MissingMandatoryDacFields, missingDacFieldsStrings.Join(",") }
+				{ PX1069Properties.MissingMandatoryDacFields, missingDacFieldsStrings.Join(",") },
+				{ PX1069Properties.IsSealedDac,				  dac.Symbol.IsSealed.ToString() }
 			}
 			.ToImmutableDictionary();
 
 			var missingFieldsFormatArg = missingDacFieldsStrings.Select(dacField => $"\"{dacField}\"")
 																.Join(", ");
-			string[] messageArgs = [dacOrDacExt.Name, missingFieldsFormatArg];
+			string[] messageArgs = [dac.Name, missingFieldsFormatArg];
 			diagnostic = Diagnostic.Create(Descriptors.PX1069_MissingMultipleMandatoryDacFields, location, properties, messageArgs);
 		}
 
