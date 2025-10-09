@@ -6,7 +6,6 @@
     <TargetFramework>net481</TargetFramework>
     <Version>3.1.4</Version>
     <LangVersion>13.0</LangVersion>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Nullable>enable</Nullable>
     <WarningLevel>9999</WarningLevel>
     <NeutralLanguage>en</NeutralLanguage>
@@ -72,11 +71,25 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <!--Add exclusions because SDK projects include all .cs files for compilation by default and embedded resources record doesn't affect it -->
+    <Compile Remove="Tests\StaticAnalysis\**\Sources\**\*.cs" />
+    <Compile Remove="Tests\Utilities\**\Sources\**\*.cs" />
+    <Compile Remove="Tests\Formatter\**\Sources\**\*.cs" />
+
     <!--Simplify all embedded resources via glob pattern 
       https://mykeels.medium.com/using-glob-patterns-in-csproj-files-95122c7f0870-->
     <EmbeddedResource Include="Tests\StaticAnalysis\**\Sources\**\*.cs" />
     <EmbeddedResource Include="Tests\Utilities\**\Sources\**\*.cs" />
     <EmbeddedResource Include="Tests\Formatter\**\Sources\**\*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+     <!--Add exclusions because SDK projects include all .cs files for compilation by default and None record doesn't affect it -->
+    <Compile Remove="ExternalRunner\**\*.*" />
+    <Compile Remove="ExternalDependency\**\*.*" />
+
+    <None Include="ExternalRunner\**\*.*" />
+    <None Include="ExternalDependency\**\*.*" />
+    <None Include="FormatterTests.playlist" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ExternalRunner\App\ExternalRunner.exe" />
@@ -86,7 +99,6 @@
     <Content Include="Tests\StaticAnalysis\BannedApi\BannedData\CustomAllowedApis.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="FormatterTests.playlist" />
     <Content Include="ExternalDependency\Dll\ExternalDependency.dll" />
     <Content Include="Tests\DiagnosticSuppression\SuppressionFileIO\Examples\PX.Objects.acuminator" />
   </ItemGroup>
