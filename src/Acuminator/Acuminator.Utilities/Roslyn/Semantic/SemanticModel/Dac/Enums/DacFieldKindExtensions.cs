@@ -61,7 +61,28 @@ public static class DacFieldKindExtensions
 	/// True if the DAC field is an audit field, false if not.
 	/// </returns>
 	public static bool IsAuditField(this DacFieldKind kind) =>
+		kind >= DacFieldKind.CreatedByID && kind <= DacFieldKind.CreatedDateTime;
+
+
+	/// <summary>
+	/// Check if this is Created audit DAC field.
+	/// </summary>
+	/// <param name="kind">The DAC field kind to act on.</param>
+	/// <returns>
+	/// True if the DAC field is Created audit field, false if not.
+	/// </returns>
+	public static bool IsCreatedAuditField(this DacFieldKind kind) =>
 		kind >= DacFieldKind.CreatedByID && kind <= DacFieldKind.LastModifiedDateTime;
+
+	/// <summary>
+	/// Check if this is LastModified audit DAC field.
+	/// </summary>
+	/// <param name="kind">The DAC field kind to act on.</param>
+	/// <returns>
+	/// True if the DAC field is LastModified audit field, false if not.
+	/// </returns>
+	public static bool IsLastModifiedAuditField(this DacFieldKind kind) =>
+		kind >= DacFieldKind.LastModifiedByID && kind <= DacFieldKind.LastModifiedDateTime;
 
 	/// <summary>
 	/// Check if this DAC field is reserved by runtime and forbidden in the application code.

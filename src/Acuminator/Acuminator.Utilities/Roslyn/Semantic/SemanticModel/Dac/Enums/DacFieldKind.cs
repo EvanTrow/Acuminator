@@ -14,7 +14,8 @@ public enum DacFieldKind : byte
 
 	CreatedByID,
 	CreatedByScreenID,
-	CreatedDateTime	,
+	CreatedDateTime,
+
 	LastModifiedByID,
 	LastModifiedByScreenID,
 	LastModifiedDateTime,
