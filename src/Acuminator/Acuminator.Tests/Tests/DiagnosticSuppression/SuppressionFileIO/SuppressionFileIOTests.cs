@@ -80,7 +80,15 @@ namespace Acuminator.Tests.Tests.DiagnosticSuppression.SuppressionFileIO
 		private string GetFileFullPath(string shortFileName)
 		{
 			DirectoryInfo debugOrReleaseDir = new DirectoryInfo(Environment.CurrentDirectory);
-			string solutionDir = debugOrReleaseDir.Parent.Parent.FullName;
+			var debugOrReleaseDir2LevelsUp = debugOrReleaseDir.Parent.Parent;
+			string solutionDir = debugOrReleaseDir2LevelsUp.FullName;
+
+			var oldCsProjFilePath = Path.Combine(solutionDir, RelativeTestPath, shortFileName);
+
+			if (File.Exists(oldCsProjFilePath))
+				return oldCsProjFilePath;
+
+			solutionDir = debugOrReleaseDir2LevelsUp.Parent.FullName;
 			return Path.Combine(solutionDir, RelativeTestPath, shortFileName);
 		}
 
