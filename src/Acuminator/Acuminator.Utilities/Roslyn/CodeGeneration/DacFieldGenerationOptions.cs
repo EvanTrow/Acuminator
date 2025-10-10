@@ -1,10 +1,6 @@
 ﻿using System;
 
-using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Constants;
-using Acuminator.Utilities.Roslyn.Syntax;
-
-using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Acuminator.Utilities.Roslyn.CodeGeneration
 {
@@ -15,6 +11,7 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 	/// <param name="IsNullablePropertyType">True if is nullable property type, false if not. Nullable here include nullable reference types</param>
 	/// <param name="IsSealedDac">True if containing DAC is sealed, false if not.</param>
 	/// <param name="IsFirstField">True if generated DAC field will be a first field in the DAC, false if not.</param>
+	/// <param name="CSharpVersion">(Optional) Effective C# language version.</param>
 	public record DacFieldGenerationOptions(DataTypeName NonNullablePropertyTypeName, bool IsNullablePropertyType, bool IsSealedDac,
-											bool IsFirstField);
+											bool IsFirstField, LanguageVersion? CSharpVersion = null);
 }
