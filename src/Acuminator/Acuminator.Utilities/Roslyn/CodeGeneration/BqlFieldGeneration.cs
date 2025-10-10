@@ -15,6 +15,9 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 	/// <summary>
 	/// Roslyn utils for BQL Field generation.
 	/// </summary>
+	/// <remarks>
+	/// TODO After updated of Roslyn to 4.x.x to use C# language version to generate BQL fields without braces.
+	/// </remarks>
 	public static class BqlFieldGeneration
 	{
 		public static ClassDeclarationSyntax? GenerateWeaklyTypedBqlField(string bqlFieldName, bool isFirstField, bool isRedeclaration,
