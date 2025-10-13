@@ -123,32 +123,105 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 			return document.WithSyntaxRoot(newRoot);
 		}
 
-		private List<MemberDeclarationSyntax> GenerateMissingDacFieldNodes(List<DacFieldKind> missingDacFieldKinds, CancellationToken cancellation)
+		private List<(GeneratedDacFieldNodeInfo FieldNodesInfo, DacFieldInsertMode InsertMode)> GenerateMissingDacFieldNodes(
+																	ClassDeclarationSyntax dacNode, SemanticModel semanticModel,
+																	List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)> missingDacFieldInfos,
+																	bool isSealedDac, CancellationToken cancellation)
 		{
-			List<MemberDeclarationSyntax> newDacFieldNodes = new(capacity: missingDacFieldKinds.Count * 2);
+			var dacMembers = dacNode.Members;
+			var (isFirstInModifiedDac, indexInFieldInfos) = PredictInfoAboutFirstNewFieldInModifiedDac(missingDacFieldInfos, dacMembers);
+			var newDacFieldNodes = new List<(GeneratedDacFieldNodeInfo FieldNodesInfo, DacFieldInsertMode InsertMode)>(missingDacFieldInfos.Count);
 
-			foreach (DacFieldKind missingDacFieldKind in missingDacFieldKinds)
+			for (int i = 0; i < missingDacFieldInfos.Count; i++)
 			{
 				cancellation.ThrowIfCancellationRequested();
 
-				var (fieldProperty, bqlField) = missingDacFieldKind switch
+				var (missingDacFieldKind, insertMode) = missingDacFieldInfos[i];
+				bool isFirstField = isFirstInModifiedDac && i == indexInFieldInfos;
+
+				var generatedPropertyAndField = missingDacFieldKind switch
 				{
-					DacFieldKind.tstamp 				=> ,
-					DacFieldKind.CreatedByID 			=> ,
-					DacFieldKind.CreatedByScreenID 		=> ,
-					DacFieldKind.CreatedDateTime 		=> ,
-					DacFieldKind.LastModifiedByID 		=> ,
-					DacFieldKind.LastModifiedByScreenID => ,
-					DacFieldKind.LastModifiedDateTime 	=> ,
+					DacFieldKind.tstamp 				=> GenerateTimestampField(isSealedDac, isFirstField),
+					DacFieldKind.CreatedByID 			=> GenerateCreatedByIdField(isSealedDac, isFirstField),
+					DacFieldKind.CreatedByScreenID 		=> GenerateCreatedByScreenIdField(isSealedDac, isFirstField),
+					DacFieldKind.CreatedDateTime 		=> GenerateCreatedDateTimeField(isSealedDac, isFirstField),
+					DacFieldKind.LastModifiedByID 		=> GenerateLastModifiedByIdField(isSealedDac, isFirstField),
+					DacFieldKind.LastModifiedByScreenID => GenerateLastModifiedByScreenIDField(isSealedDac, isFirstField),
+					DacFieldKind.LastModifiedDateTime 	=> GenerateLastModifiedDateTimeField(isSealedDac, isFirstField),
 					_ 									=> null
 				};
 
-				if (fieldProperty != null && bqlField != null)
+				if (generatedPropertyAndField == null)
+					continue;
+
+				newDacFieldNodes.Add((generatedPropertyAndField.Value, insertMode));
+			}
+
+			return newDacFieldNodes;
+		}
+
+		private static (bool IsFirstInModifiedDac, int IndexInFieldInfos) PredictInfoAboutFirstNewFieldInModifiedDac( 
+																		List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)> missingDacFieldInfos,
+																		SyntaxList<MemberDeclarationSyntax> dacMembers)
+		{
+			// Try to predict which field will be first in the modified DAC and whether it will be a new DAC field
+			bool isEmptyDac = dacMembers.Count == 0;
+			bool isFirstFieldInModifiedDac = isEmptyDac;
+			bool isFirstMemberCreatedAuditField;
+			bool isFirstMemberLastModifiedAuditField;
+			int firstNewFieldIndexInModifiedDac;
+
+			InsertionOfFirstField();
+
+			for (int i = 1; i < missingDacFieldInfos.Count; i++)
+			{
+				InsertionOfNonFirstField(i);
+			}
+
+			return (isFirstFieldInModifiedDac, firstNewFieldIndexInModifiedDac);
+
+			//--------------------------------------------------Local Function------------------------------------------------------------
+			void InsertionOfFirstField()
+			{
+				var firstFieldInfo = missingDacFieldInfos[0];
+
+				if (!isEmptyDac)
 				{
-					newDacFieldNodes.Add(bqlField);
-					newDacFieldNodes.Add(fieldProperty);
+					firstNewFieldIndexInModifiedDac = -1;
+
+					var firstDacMember = dacMembers[0];
+					isFirstMemberCreatedAuditField = IsCreatedAuditField(firstDacMember);
+					isFirstMemberLastModifiedAuditField = IsLastModifiedAuditField(firstDacMember);
+
+					// For non-empty DAC use the regular iteration of the insertion prediction cycle
+					InsertionOfNonFirstField(index: 0);
+				}
+				else
+				{
+					// For empty DAC the first field will always be in the beginning of the DAC no matter the insertion mode
+					// isFirstFieldInModifiedDac is already true thanks to the isEmptyDac assignment above
+					firstNewFieldIndexInModifiedDac = 0;
+
+					isFirstMemberCreatedAuditField = firstFieldInfo.FieldKind.IsCreatedAuditField();
+					isFirstMemberLastModifiedAuditField = !isFirstMemberCreatedAuditField && firstFieldInfo.FieldKind.IsLastModifiedAuditField();
 				}
 			}
+
+			void InsertionOfNonFirstField(int index)
+			{
+				var (fieldKind, insertMode) = missingDacFieldInfos[index];
+
+				if (insertMode == DacFieldInsertMode.AtTheBeginning ||
+					(isFirstMemberCreatedAuditField && insertMode == DacFieldInsertMode.BeforeFirstCreatedAuditField) ||
+					(isFirstMemberLastModifiedAuditField && insertMode == DacFieldInsertMode.BeforeFirstLastModifiedAuditField))
+				{
+					isFirstFieldInModifiedDac 			= true;
+					firstNewFieldIndexInModifiedDac 	= index;
+					isFirstMemberCreatedAuditField 		= fieldKind.IsCreatedAuditField();
+					isFirstMemberLastModifiedAuditField = !isFirstMemberCreatedAuditField && fieldKind.IsLastModifiedAuditField();
+				}
+			}
+		}
 
 			return newDacFieldNodes;
 		}
