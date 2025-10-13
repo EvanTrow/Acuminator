@@ -10,6 +10,7 @@ using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.CodeGeneration;
 using Acuminator.Utilities.Roslyn.Constants;
+using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 using Acuminator.Utilities.Roslyn.Syntax;
 
@@ -78,7 +79,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 				return null;
 
 			var parts = dacFieldInfoString.Split(Constants.FieldKindAndInsertModeSeparatorArray, StringSplitOptions.RemoveEmptyEntries);
-			
+
 			if (parts.Length != 2)
 				return null;
 
@@ -94,25 +95,29 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 		}
 
 		private async Task<Document> AddMissingDacFieldsAsync(Document document, TextSpan span,
-													List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)> missingDacFieldInfos, 
+													List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)> missingDacFieldInfos,
 													bool isSealedDac, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-			SyntaxNode? nodeWithDiagnostic = root?.FindNode(span);
+			var (semanticModel, root) = await document.GetSemanticModelAndRootAsync(cancellationToken).ConfigureAwait(false);
+
+			if (semanticModel == null || root == null)
+				return document;
+
+			SyntaxNode? nodeWithDiagnostic = root.FindNode(span);
 			var dacNode = (nodeWithDiagnostic as ClassDeclarationSyntax) ??
 						   nodeWithDiagnostic?.Parent<ClassDeclarationSyntax>();
 
 			if (dacNode == null)
 				return document;
 
-			List<MemberDeclarationSyntax> newDacFieldNodes = GenerateMissingDacFieldNodes(missingDacFieldKinds, cancellationToken);
+			var newDacFieldNodes = GenerateMissingDacFieldNodes(dacNode, semanticModel, missingDacFieldInfos, isSealedDac, cancellationToken);
 
 			if (newDacFieldNodes.Count == 0)
 				return document;
 
-			var newDacNode = dacNode.AddMembers(newDacFieldNodes.ToArray());
+			var newDacNode = InsertGeneratedFieldsIntoDac(dacNode, newDacFieldNodes);
 			var newRoot = root!.ReplaceNode(dacNode, newDacNode);
 
 			return document.WithSyntaxRoot(newRoot);
@@ -151,32 +156,73 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 		private SyntaxList<MemberDeclarationSyntax>? CreateMembersListWithBqlField(ClassDeclarationSyntax dacNode, 
 																				   PropertyDeclarationSyntax propertyWithoutBqlFieldNode,
 																				   string bqlFieldName, DataTypeName propertyDataType)
+		private ClassDeclarationSyntax InsertGeneratedFieldsIntoDac(ClassDeclarationSyntax dacNode,
+													List<(GeneratedDacFieldNodeInfo FieldNodesInfo, DacFieldInsertMode InsertMode)> newDacFieldNodes)
 		{
-			var members = dacNode.Members;
-
-			if (members.Count == 0)
+			if (dacNode.Members.Count == 0)
 			{
-				var newSingleBqlFieldNode = BqlFieldGeneration.GenerateTypedBqlField(propertyDataType, bqlFieldName, isFirstField: true, 
-																					 isRedeclaration: false, propertyWithoutBqlFieldNode);
-				return newSingleBqlFieldNode != null
-					? SingletonList<MemberDeclarationSyntax>(newSingleBqlFieldNode)
-					: null;
+				var newFieldNodes = newDacFieldNodes.SelectMany(m => m.FieldNodesInfo.GetNodes());
+				return dacNode.WithMembers(
+								List(newFieldNodes));
 			}
 
-			int propertyMemberIndex = dacNode.Members.IndexOf(propertyWithoutBqlFieldNode);
+			var newDacMembers = dacNode.Members.ToList(2 * newDacFieldNodes.Count + dacNode.Members.Count);
 
-			if (propertyMemberIndex < 0)
-				propertyMemberIndex = 0;
+			foreach (var (newDacFieldInfo, insertMode) in newDacFieldNodes)
+			{
+				var newFieldNodes = newDacFieldInfo.GetNodes();
+				int indexToInsert = insertMode switch
+				{
+					DacFieldInsertMode.AtTheBeginning 					 => 0,
+					DacFieldInsertMode.AtTheEnd		  					 => -1,
+					DacFieldInsertMode.BeforeFirstCreatedAuditField 	 => newDacMembers.FindIndex(IsCreatedAuditField),
+					DacFieldInsertMode.AfterLastCreatedAuditField 		 => newDacMembers.FindLastIndex(IsCreatedAuditField) + 1,
+					DacFieldInsertMode.BeforeFirstLastModifiedAuditField => newDacMembers.FindIndex(IsLastModifiedAuditField),
+					DacFieldInsertMode.AfterLastLastModifiedAuditField 	 => newDacMembers.FindLastIndex(IsLastModifiedAuditField) + 1,
+					_ 													 => -1
+				};
 
-			var newBqlFieldNode = BqlFieldGeneration.GenerateTypedBqlField(propertyDataType, bqlFieldName, isFirstField: propertyMemberIndex == 0,
-																		   isRedeclaration: false, propertyWithoutBqlFieldNode);
-			if (newBqlFieldNode == null)
-				return null;
+				if (indexToInsert < 0 || indexToInsert >= newDacMembers.Count)
+					newDacMembers.AddRange(newFieldNodes);
+				else
+					newDacMembers.InsertRange(indexToInsert, newFieldNodes);
+			}
 
-			var propertyWithoutRegions = CodeGeneration.RemoveRegionsFromLeadingTrivia(propertyWithoutBqlFieldNode);
-			var newMembers = members.Replace(propertyWithoutBqlFieldNode, propertyWithoutRegions)
-									.Insert(propertyMemberIndex, newBqlFieldNode);
-			return newMembers;
+			var newDacNode = dacNode.WithMembers(
+										List(newDacMembers));
+			return newDacNode;
+		}
+
+		private static bool IsCreatedAuditField(MemberDeclarationSyntax memberNode) =>
+			NodeBelongsToAuditFieldsSet(memberNode, useCreatedAuditFieldsSet: true);
+
+		private static bool IsLastModifiedAuditField(MemberDeclarationSyntax memberNode) =>
+			NodeBelongsToAuditFieldsSet(memberNode, useCreatedAuditFieldsSet: false);
+
+		private static bool NodeBelongsToAuditFieldsSet(MemberDeclarationSyntax memberNode, bool useCreatedAuditFieldsSet)
+		{
+			string? memberName = memberNode switch
+			{
+				PropertyDeclarationSyntax propertyNode => propertyNode.Identifier.Text,
+				ClassDeclarationSyntax bqlFieldNode    => bqlFieldNode.Identifier.Text,
+				_ 									   => null
+			};
+
+			if (memberName == null)
+				return false;
+
+			if (useCreatedAuditFieldsSet)
+			{
+				return string.Equals(memberName, DacFieldNames.System.CreatedByID, StringComparison.OrdinalIgnoreCase) ||
+					   string.Equals(memberName, DacFieldNames.System.CreatedByScreenID, StringComparison.OrdinalIgnoreCase) ||
+					   string.Equals(memberName, DacFieldNames.System.CreatedDateTime, StringComparison.OrdinalIgnoreCase);
+			}
+			else
+			{
+				return string.Equals(memberName, DacFieldNames.System.LastModifiedByID, StringComparison.OrdinalIgnoreCase) ||
+					   string.Equals(memberName, DacFieldNames.System.LastModifiedByScreenID, StringComparison.OrdinalIgnoreCase) ||
+					   string.Equals(memberName, DacFieldNames.System.LastModifiedDateTime, StringComparison.OrdinalIgnoreCase);
+			}
 		}
 	}
 }
