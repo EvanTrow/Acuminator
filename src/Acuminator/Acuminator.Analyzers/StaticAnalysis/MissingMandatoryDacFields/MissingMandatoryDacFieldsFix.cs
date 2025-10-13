@@ -26,8 +26,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 	[ExportCodeFixProvider(LanguageNames.CSharp), Shared]
 	public class MissingMandatoryDacFieldsFix : PXCodeFixProvider
 	{
-		private static readonly char[] _commaSeparator = { ',' };
-
 		public override ImmutableArray<string> FixableDiagnosticIds { get; } =
 			new[]
 			{
@@ -41,9 +39,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			var missingDacFieldKinds = GetMissingDacFieldKinds(diagnostic);
+			var missingDacFieldInfos = GetMissingDacFieldInfos(diagnostic);
 
-			if (missingDacFieldKinds?.Count is null or 0)
+			if (missingDacFieldInfos?.Count is null or 0)
 				return Task.CompletedTask;
 
 			bool isSealedDac = diagnostic.IsFlagSet(PX1069Properties.IsSealedDac);
@@ -51,37 +49,53 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 
 			string codeActionName = nameof(Resources.PX1069Fix).GetLocalized().ToString();
 			var codeAction = CodeAction.Create(codeActionName,
-											   cToken => AddMissingDacFieldsAsync(context.Document, missingDacFieldKinds, context.Span, 
+											   cToken => AddMissingDacFieldsAsync(context.Document, context.Span, missingDacFieldInfos,
 																				  isSealedDac, cToken),
 											   equivalenceKey: codeActionName);
 			context.RegisterCodeFix(codeAction, diagnostic);
 			return Task.CompletedTask;
 		}
 
-		private List<DacFieldKind>? GetMissingDacFieldKinds(Diagnostic diagnostic)
+		private List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)>? GetMissingDacFieldInfos(Diagnostic diagnostic)
 		{
-			if (!diagnostic.TryGetPropertyValue(PX1069Properties.MissingMandatoryDacFields, out string? missingDacFields) ||
-				missingDacFields.IsNullOrWhiteSpace())
+			if (!diagnostic.TryGetPropertyValue(PX1069Properties.MissingMandatoryDacFieldsInfos, out string? missingDacFieldsInfos) ||
+				missingDacFieldsInfos.IsNullOrWhiteSpace())
 			{
 				return null;
 			}
 
-			var dacFieldKindStrings = missingDacFields.Split(_commaSeparator, StringSplitOptions.RemoveEmptyEntries);
-			List<DacFieldKind> dacFieldKinds = new(dacFieldKindStrings.Length);
-
-			foreach (string kindString in dacFieldKindStrings)
-			{
-				if (Enum.TryParse(kindString.Trim(), out DacFieldKind kind))
-				{
-					dacFieldKinds.Add(kind);
-				}
-			}
-
-			return dacFieldKinds;
+			var dacFieldInfosStrings = missingDacFieldsInfos.Split(Constants.FieldKindsSeparatorArray, StringSplitOptions.RemoveEmptyEntries);
+			var dacFieldInfos = (from parsedInfo in dacFieldInfosStrings.Select(ParseDacFieldInfo)
+								 where parsedInfo != null
+								 select parsedInfo.Value
+								).ToList(dacFieldInfosStrings.Length);
+			return dacFieldInfos;
 		}
 
-		private async Task<Document> AddMissingDacFieldsAsync(Document document, List<DacFieldKind> missingDacFieldKinds, TextSpan span,
-															  bool isSealedDac, CancellationToken cancellationToken)
+		private static (DacFieldKind FieldKind, DacFieldInsertMode InsertMode)? ParseDacFieldInfo(string dacFieldInfoString)
+		{
+			if (dacFieldInfoString.IsNullOrWhiteSpace())
+				return null;
+
+			var parts = dacFieldInfoString.Split(Constants.FieldKindAndInsertModeSeparatorArray, StringSplitOptions.RemoveEmptyEntries);
+			
+			if (parts.Length != 2)
+				return null;
+
+			var (fieldKindStr, insertModeStr) = (parts[0].NullIfWhiteSpace()?.Trim(), parts[1].NullIfWhiteSpace()?.Trim());
+
+			if (fieldKindStr == null || !Enum.TryParse(fieldKindStr, ignoreCase: true, out DacFieldKind fieldKind))
+				return null;
+
+			if (insertModeStr == null || !Enum.TryParse(insertModeStr, ignoreCase: true, out DacFieldInsertMode insertMode))
+				return null;
+
+			return (fieldKind, insertMode);
+		}
+
+		private async Task<Document> AddMissingDacFieldsAsync(Document document, TextSpan span,
+													List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)> missingDacFieldInfos, 
+													bool isSealedDac, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 

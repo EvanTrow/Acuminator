@@ -31,7 +31,7 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 
 	public override void Analyze(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dac)
 	{
-		var missingMandatoryDacFieldKinds = GetMissingMandatoryDacFieldKinds(dac, symbolContext.CancellationToken);
+		var missingMandatoryDacFieldKinds = GetMissingMandatoryDacFieldsInfos(dac, symbolContext.CancellationToken);
 
 		if (missingMandatoryDacFieldKinds.Count > 0)
 		{
@@ -39,7 +39,8 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 		}
 	}
 
-	private static List<DacFieldKind> GetMissingMandatoryDacFieldKinds(DacSemanticModel dac, CancellationToken cancellation)
+	private static List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)> GetMissingMandatoryDacFieldsInfos(DacSemanticModel dac, 
+																									  CancellationToken cancellation)
 	{
 		var missingMandatoryDacFieldKinds = GetMandatoryDacFieldKinds();
 
@@ -52,7 +53,29 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 				missingMandatoryDacFieldKinds.Remove(dacField.FieldKind);
 		}
 
-		return missingMandatoryDacFieldKinds;
+		// cheap check for presence of declared DAC fields
+		if (dac.Node == null || dac.Node.Members.Count == 0)
+		{
+			return missingMandatoryDacFieldKinds.Select(fieldKind => (FieldKind: fieldKind, InsertMode: DacFieldInsertMode.AtTheEnd))
+												.ToList(missingMandatoryDacFieldKinds.Count);
+		}
+
+		var (hasCreatedAuditFields, hasLastModifiedAuditFields) = CheckForDeclaredAuditFields(dac);
+
+		var missingMandatoryDacFieldKindsWithIndexes = 
+			new List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)>(missingMandatoryDacFieldKinds.Count);
+
+		foreach (DacFieldKind missingFieldKind in missingMandatoryDacFieldKinds)
+		{
+			var insertMode = GetInsertModeForFieldKind(missingFieldKind, hasCreatedAuditFields, hasLastModifiedAuditFields);
+
+			if (insertMode != null)
+			{
+				missingMandatoryDacFieldKindsWithIndexes.Add((FieldKind: missingFieldKind, InsertMode: insertMode.Value)); 
+			}
+		}
+
+		return missingMandatoryDacFieldKindsWithIndexes;
 	}
 
 	private static List<DacFieldKind> GetMandatoryDacFieldKinds() =>
@@ -66,8 +89,53 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 			DacFieldKind.LastModifiedDateTime
 		];
 
-	private static void ReportMissingMandatoryDacFields(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dac, 
-														List<DacFieldKind> missingMandatoryDacFieldKinds)
+	private static (bool HasCreatedAuditFields, bool HasLastModifiedAuditFields) CheckForDeclaredAuditFields(DacSemanticModel dac)
+	{
+		bool hasCreatedAuditFields = false;
+		bool hasLastModifiedAuditFields = false;
+
+		foreach (var dacField in dac.DeclaredDacFields)
+		{
+			if (dacField.FieldKind.IsCreatedAuditField())
+				hasCreatedAuditFields = true;
+			else if (dacField.FieldKind.IsLastModifiedAuditField())
+				hasLastModifiedAuditFields = true;
+
+			if (hasCreatedAuditFields && hasLastModifiedAuditFields)
+				break;
+		}
+
+		return (hasCreatedAuditFields, hasLastModifiedAuditFields);
+	}
+
+	private static DacFieldInsertMode? GetInsertModeForFieldKind(DacFieldKind missingFieldKind, bool hasCreatedAuditFields, 
+																bool hasLastModifiedAuditFields) =>
+		missingFieldKind switch
+		{
+			DacFieldKind.CreatedByID or
+			DacFieldKind.CreatedByScreenID or
+			DacFieldKind.CreatedDateTime 	  => hasCreatedAuditFields
+													? (missingFieldKind == DacFieldKind.CreatedByID
+														? DacFieldInsertMode.BeforeFirstCreatedAuditField
+														: DacFieldInsertMode.AfterLastCreatedAuditField)
+													: (hasLastModifiedAuditFields
+														? DacFieldInsertMode.BeforeFirstLastModifiedAuditField
+														: DacFieldInsertMode.AtTheEnd),
+			DacFieldKind.LastModifiedByID or
+			DacFieldKind.LastModifiedByScreenID or
+			DacFieldKind.LastModifiedDateTime => hasLastModifiedAuditFields
+														? (missingFieldKind == DacFieldKind.LastModifiedByID
+															? DacFieldInsertMode.BeforeFirstLastModifiedAuditField
+															: DacFieldInsertMode.AfterLastLastModifiedAuditField)
+														: (hasCreatedAuditFields 
+															? DacFieldInsertMode.AfterLastCreatedAuditField
+															: DacFieldInsertMode.AtTheEnd),
+			DacFieldKind.tstamp 			  => DacFieldInsertMode.AtTheEnd,
+			_								  => null
+		};
+
+	private static void ReportMissingMandatoryDacFields(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dac,
+														List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)> missingMandatoryDacFieldInfos)
 	{
 		symbolContext.CancellationToken.ThrowIfCancellationRequested();
 
@@ -75,13 +143,13 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 					   dac.Symbol.Locations.FirstOrDefault();
 		Diagnostic diagnostic;
 
-		if (missingMandatoryDacFieldKinds.Count == 1)
+		if (missingMandatoryDacFieldInfos.Count == 1)
 		{
-			string missingDacField = missingMandatoryDacFieldKinds[0].ToString();
+			var (missingDacField, insertMode) = missingMandatoryDacFieldInfos[0];
 			var properties = new Dictionary<string, string?>
 			{
-				{ PX1069Properties.MissingMandatoryDacFields, missingDacField  },
-				{ PX1069Properties.IsSealedDac,				  dac.Symbol.IsSealed.ToString() }
+				{ PX1069Properties.MissingMandatoryDacFieldsInfos, $"{missingDacField}{Constants.FieldKindAndInsertModeSeparator}{insertMode}" },
+				{ PX1069Properties.IsSealedDac,					   dac.Symbol.IsSealed.ToString() }
 			}
 			.ToImmutableDictionary();
 
@@ -90,12 +158,13 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 		}
 		else
 		{
-			var missingDacFieldsStrings = missingMandatoryDacFieldKinds.Select(kind => kind.ToString())
-																	   .ToList(missingMandatoryDacFieldKinds.Count);
+			var missingDacFieldsStrings = 
+				missingMandatoryDacFieldInfos.Select(info => $"{info.FieldKind}{Constants.FieldKindAndInsertModeSeparator}{info.InsertMode}")
+											 .ToList(missingMandatoryDacFieldInfos.Count);
 			var properties = new Dictionary<string, string?>
 			{
-				{ PX1069Properties.MissingMandatoryDacFields, missingDacFieldsStrings.Join(",") },
-				{ PX1069Properties.IsSealedDac,				  dac.Symbol.IsSealed.ToString() }
+				{ PX1069Properties.MissingMandatoryDacFieldsInfos, missingDacFieldsStrings.Join(Constants.FieldKindsSeparator) },
+				{ PX1069Properties.IsSealedDac,					   dac.Symbol.IsSealed.ToString() }
 			}
 			.ToImmutableDictionary();
 
