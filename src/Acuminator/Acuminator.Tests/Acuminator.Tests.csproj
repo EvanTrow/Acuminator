@@ -26,7 +26,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
-    <NoWarn>$(NoWarn);VSTHRD200</NoWarn>
+    <NoWarn>$(NoWarn);VSTHRD200;CA1707;CA1708</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <DebugType>embedded</DebugType>
@@ -89,6 +89,8 @@
 
     <None Include="ExternalRunner\**\*.*" />
     <None Include="ExternalDependency\**\*.*" />
+    <EmbeddedResource Remove="Tests\StaticAnalysis\MissingMandatoryDacFields\Sources\DacWithoutAnyMandatoryField_Expected.cs" />
+    <Compile Include="Tests\StaticAnalysis\MissingMandatoryDacFields\Sources\DacWithoutAnyMandatoryField_Expected.cs" />
     <None Include="FormatterTests.playlist" />
   </ItemGroup>
   <ItemGroup>
