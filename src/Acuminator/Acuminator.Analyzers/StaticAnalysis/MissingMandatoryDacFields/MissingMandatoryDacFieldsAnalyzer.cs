@@ -158,18 +158,18 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 		}
 		else
 		{
-			var missingDacFieldsStrings = 
+			var missingDacFieldsInfos = 
 				missingMandatoryDacFieldInfos.Select(info => $"{info.FieldKind}{Constants.FieldKindAndInsertModeSeparator}{info.InsertMode}")
 											 .ToList(missingMandatoryDacFieldInfos.Count);
 			var properties = new Dictionary<string, string?>
 			{
-				{ PX1069Properties.MissingMandatoryDacFieldsInfos, missingDacFieldsStrings.Join(Constants.FieldKindsSeparator) },
+				{ PX1069Properties.MissingMandatoryDacFieldsInfos, missingDacFieldsInfos.Join(Constants.FieldKindsSeparator) },
 				{ PX1069Properties.IsSealedDac,					   dac.Symbol.IsSealed.ToString() }
 			}
 			.ToImmutableDictionary();
 
-			var missingFieldsFormatArg = missingDacFieldsStrings.Select(dacField => $"\"{dacField}\"")
-																.Join(", ");
+			var missingFieldsFormatArg = missingMandatoryDacFieldInfos.Select(info => $"\"{info.FieldKind}\"")
+																	  .Join(", ");
 			string[] messageArgs = [dac.Name, missingFieldsFormatArg];
 			diagnostic = Diagnostic.Create(Descriptors.PX1069_MissingMultipleMandatoryDacFields, location, properties, messageArgs);
 		}
