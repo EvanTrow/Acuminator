@@ -10,6 +10,7 @@ using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.CodeGeneration;
 using Acuminator.Utilities.Roslyn.Constants;
+using Acuminator.Utilities.Roslyn.CSharpVersion;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 using Acuminator.Utilities.Roslyn.Syntax;
@@ -17,9 +18,11 @@ using Acuminator.Utilities.Roslyn.Syntax;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
+using static Acuminator.Utilities.Roslyn.Constants.TypeNames.SystemFieldsAttributes.ShortNames;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
@@ -112,8 +115,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 			if (dacNode == null)
 				return document;
 
-			var newDacFieldNodes = GenerateMissingDacFieldNodes(dacNode, semanticModel, missingDacFieldInfos, isSealedDac, cancellationToken);
-
+			var languageVersion = document.EffectiveCSharpVersion();
+			var newDacFieldNodes = GenerateMissingDacFieldNodes(dacNode, semanticModel, missingDacFieldInfos, isSealedDac, 
+																languageVersion, cancellationToken);
 			if (newDacFieldNodes.Count == 0)
 				return document;
 
@@ -126,7 +130,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 		private List<(GeneratedDacFieldNodeInfo FieldNodesInfo, DacFieldInsertMode InsertMode)> GenerateMissingDacFieldNodes(
 																	ClassDeclarationSyntax dacNode, SemanticModel semanticModel,
 																	List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)> missingDacFieldInfos,
-																	bool isSealedDac, CancellationToken cancellation)
+																	bool isSealedDac, LanguageVersion? languageVersion, CancellationToken cancellation)
 		{
 			var dacMembers = dacNode.Members;
 			var (isFirstInModifiedDac, indexInFieldInfos) = PredictInfoAboutFirstNewFieldInModifiedDac(missingDacFieldInfos, dacMembers);
@@ -138,19 +142,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 
 				var (missingDacFieldKind, insertMode) = missingDacFieldInfos[i];
 				bool isFirstField = isFirstInModifiedDac && i == indexInFieldInfos;
-
-				var generatedPropertyAndField = missingDacFieldKind switch
-				{
-					DacFieldKind.tstamp 				=> GenerateTimestampField(isSealedDac, isFirstField),
-					DacFieldKind.CreatedByID 			=> GenerateCreatedByIdField(isSealedDac, isFirstField),
-					DacFieldKind.CreatedByScreenID 		=> GenerateCreatedByScreenIdField(isSealedDac, isFirstField),
-					DacFieldKind.CreatedDateTime 		=> GenerateCreatedDateTimeField(isSealedDac, isFirstField),
-					DacFieldKind.LastModifiedByID 		=> GenerateLastModifiedByIdField(isSealedDac, isFirstField),
-					DacFieldKind.LastModifiedByScreenID => GenerateLastModifiedByScreenIDField(isSealedDac, isFirstField),
-					DacFieldKind.LastModifiedDateTime 	=> GenerateLastModifiedDateTimeField(isSealedDac, isFirstField),
-					_ 									=> null
-				};
-
+				var generatedPropertyAndField = GenerateMissingDacField(missingDacFieldKind, insertMode, semanticModel, isSealedDac, 
+																		isFirstField, languageVersion, dacNode);
 				if (generatedPropertyAndField == null)
 					continue;
 
@@ -219,6 +212,87 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 					firstNewFieldIndexInModifiedDac 	= index;
 					isFirstMemberCreatedAuditField 		= fieldKind.IsCreatedAuditField();
 					isFirstMemberLastModifiedAuditField = !isFirstMemberCreatedAuditField && fieldKind.IsLastModifiedAuditField();
+				}
+			}
+		}
+
+		private GeneratedDacFieldNodeInfo? GenerateMissingDacField(DacFieldKind missingDacFieldKind, DacFieldInsertMode insertMode,
+																   SemanticModel semanticModel, bool isSealedDac, bool isFirstField, 
+																   LanguageVersion? languageVersion, ClassDeclarationSyntax dacNode)
+		{
+			switch (missingDacFieldKind)
+			{
+				case DacFieldKind.tstamp:
+				{
+					bool isNullablePropertyType = IsNullableRefTypeForDacProperty(semanticModel, insertMode, dacNode);
+					return GenerateTimestampField(isSealedDac, isFirstField, languageVersion, isNullablePropertyType);
+				}
+				case DacFieldKind.CreatedByID:
+					return GenerateCreatedByIdField(isSealedDac, isFirstField, languageVersion);
+				case DacFieldKind.CreatedByScreenID:
+				{
+					bool isNullablePropertyType = IsNullableRefTypeForDacProperty(semanticModel, insertMode, dacNode);
+					return GenerateCreatedByScreenIdField(isSealedDac, isFirstField, languageVersion, isNullablePropertyType);
+				}
+				case DacFieldKind.CreatedDateTime:
+					return GenerateCreatedDateTimeField(isSealedDac, isFirstField, languageVersion);
+				case DacFieldKind.LastModifiedByID:
+					return GenerateLastModifiedByIdField(isSealedDac, isFirstField, languageVersion);
+				case DacFieldKind.LastModifiedByScreenID:
+				{
+					bool isNullablePropertyType = IsNullableRefTypeForDacProperty(semanticModel, insertMode, dacNode);
+					return GenerateLastModifiedByScreenIdField(isSealedDac, isFirstField, languageVersion, isNullablePropertyType);
+				}
+				case DacFieldKind.LastModifiedDateTime:  
+					return GenerateLastModifiedDateTimeField(isSealedDac, isFirstField, languageVersion);
+				default:
+					return null;
+			}
+		}
+
+		private static bool IsNullableRefTypeForDacProperty(SemanticModel semanticModel, DacFieldInsertMode insertMode,
+															ClassDeclarationSyntax dacNode)
+		{
+			var dacMembers = dacNode.Members;
+
+			if (dacMembers.Count == 0)
+			{
+				NullableContext nullableContext = semanticModel.GetNullableContext(dacNode.SpanStart);
+				return nullableContext.AreNullableAnnotationsEnabled();
+			}
+
+			switch (insertMode)
+			{
+				case DacFieldInsertMode.AtTheBeginning:
+				{
+					NullableContext nullableContext = semanticModel.GetNullableContext(dacMembers[0].SpanStart);
+					return nullableContext.AreNullableAnnotationsEnabled();
+				}
+				case DacFieldInsertMode.BeforeFirstCreatedAuditField:
+				case DacFieldInsertMode.AfterLastCreatedAuditField:
+				case DacFieldInsertMode.BeforeFirstLastModifiedAuditField:
+				case DacFieldInsertMode.AfterLastLastModifiedAuditField:
+				{
+					int memberIndex = insertMode switch
+					{
+						DacFieldInsertMode.BeforeFirstCreatedAuditField 	 => dacMembers.IndexOf(IsCreatedAuditField),
+						DacFieldInsertMode.AfterLastCreatedAuditField 		 => dacMembers.LastIndexOf(IsCreatedAuditField) + 1,
+						DacFieldInsertMode.BeforeFirstLastModifiedAuditField => dacMembers.IndexOf(IsLastModifiedAuditField),
+						DacFieldInsertMode.AfterLastLastModifiedAuditField   => dacMembers.LastIndexOf(IsLastModifiedAuditField) + 1,
+						_ 													 => -1
+					}; 
+
+					int position = memberIndex >= 0 && memberIndex < dacMembers.Count
+						? dacMembers[memberIndex].SpanStart 
+						: dacMembers[^1].SpanStart;
+					NullableContext nullableContext = semanticModel.GetNullableContext(position);
+					return nullableContext.AreNullableAnnotationsEnabled();
+				}
+				case DacFieldInsertMode.AtTheEnd:
+				default:
+				{
+					NullableContext nullableContext = semanticModel.GetNullableContext(dacMembers[^1].SpanStart);
+					return nullableContext.AreNullableAnnotationsEnabled();
 				}
 			}
 		}
