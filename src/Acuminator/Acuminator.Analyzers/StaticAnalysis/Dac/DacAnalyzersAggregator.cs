@@ -16,6 +16,7 @@ using Acuminator.Analyzers.StaticAnalysis.InheritanceFromPXCacheExtension;
 using Acuminator.Analyzers.StaticAnalysis.LegacyBqlField;
 using Acuminator.Analyzers.StaticAnalysis.MethodsUsageInDac;
 using Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDerived;
+using Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields;
 using Acuminator.Analyzers.StaticAnalysis.MissingTypeListAttribute;
 using Acuminator.Analyzers.StaticAnalysis.NoBqlFieldForDacFieldProperty;
 using Acuminator.Analyzers.StaticAnalysis.NoIsActiveMethodForExtension;
@@ -52,6 +53,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 			new InheritanceFromPXCacheExtensionAnalyzer(),
 			new NoBqlFieldForDacFieldPropertyAnalyzer(),
 			new MissingBqlFieldRedeclarationInDerivedDacAnalyzer(),
+			new MissingMandatoryDacFieldsAnalyzer(),
 			new PropertyAndBqlFieldTypesMismatchAnalyzer(),
 			new LegacyBqlFieldAnalyzer(),
 			new MethodsUsageInDacAnalyzer(),
