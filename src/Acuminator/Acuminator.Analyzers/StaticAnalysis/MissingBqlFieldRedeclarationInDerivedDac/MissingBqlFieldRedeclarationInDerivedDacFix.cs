@@ -226,7 +226,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDeri
 				}
 
 				var newBqlFieldNodeWithTrivia = ReferenceEquals(lastFieldInsertedAtTheEnd.NewBqlNode, newBqlFieldNode)
-					? CodeGeneration.CopyRegionsFromTrivia(newBqlFieldNode, dacNode.CloseBraceToken.LeadingTrivia, copyBeforeNode: true)
+					? CodeGeneration.CopyRegionsFromTrivia(newBqlFieldNode, dacNode.CloseBraceToken.LeadingTrivia, 
+														   copyBeforeNode: true, insertCopiedRegionsAfterNodeTrivia: true)
 					: newBqlFieldNode;
 
 				bool insertAtTheEnd = indexToInsert == dacMembersCount;

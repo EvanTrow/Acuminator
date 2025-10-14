@@ -168,7 +168,8 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			if (leadingTrivia.Count == 0)
 				return bqlFieldNode;
 
-			var bqlFieldNodeWithCopiedRegions = CodeGeneration.CopyRegionsFromTrivia(bqlFieldNode, leadingTrivia, copyBeforeNode: true);
+			var bqlFieldNodeWithCopiedRegions = CodeGeneration.CopyRegionsFromTrivia(bqlFieldNode, leadingTrivia,
+													copyBeforeNode: true, insertCopiedRegionsAfterNodeTrivia: true);
 			return bqlFieldNodeWithCopiedRegions;
 		}
 	}

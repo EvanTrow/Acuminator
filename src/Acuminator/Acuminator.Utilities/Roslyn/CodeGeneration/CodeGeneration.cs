@@ -71,7 +71,7 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 		}
 
 		public static TNode CopyRegionsFromTrivia<TNode>(TNode nodeToCopyTrivia, in SyntaxTriviaList leadingTrivia, 
-														 bool copyBeforeNode)
+														 bool copyBeforeNode, bool insertCopiedRegionsAfterNodeTrivia)
 		where TNode : SyntaxNode
 		{
 			nodeToCopyTrivia.ThrowOnNull();
@@ -81,19 +81,21 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			if (regionTrivias.Count == 0)
 				return nodeToCopyTrivia;
 
-			var regionsTrivia = TriviaList(regionTrivias);
-
 			if (copyBeforeNode)
 			{
 				var bqlFieldNodeLeadingTrivia = nodeToCopyTrivia.GetLeadingTrivia();
-				var newBqlFieldNodeTrivia = bqlFieldNodeLeadingTrivia.AddRange(regionsTrivia);
+				var newBqlFieldNodeTrivia = insertCopiedRegionsAfterNodeTrivia
+					? bqlFieldNodeLeadingTrivia.AddRange(regionTrivias)
+					: bqlFieldNodeLeadingTrivia.InsertRange(0, regionTrivias);
 
 				return nodeToCopyTrivia.WithLeadingTrivia(newBqlFieldNodeTrivia);
 			}
 			else
 			{
 				var bqlFieldNodeTrailingTrivia = nodeToCopyTrivia.GetTrailingTrivia();
-				var newBqlFieldNodeTrivia = bqlFieldNodeTrailingTrivia.AddRange(regionsTrivia);
+				var newBqlFieldNodeTrivia = insertCopiedRegionsAfterNodeTrivia
+					? bqlFieldNodeTrailingTrivia.AddRange(regionTrivias)
+					: bqlFieldNodeTrailingTrivia.InsertRange(0, regionTrivias);
 
 				return nodeToCopyTrivia.WithTrailingTrivia(newBqlFieldNodeTrivia);
 			}
