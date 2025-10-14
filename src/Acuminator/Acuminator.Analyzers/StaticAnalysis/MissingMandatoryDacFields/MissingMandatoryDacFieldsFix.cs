@@ -223,12 +223,54 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 			}
 		}
 
-			return newDacFieldNodes;
+		private GeneratedDacFieldNodeInfo? GenerateTimestampField(bool isSealedDac, bool isFirstField, LanguageVersion? languageVersion,
+																  bool isNullablePropertyType) =>
+			GenerateDacField(DacFieldNames.System.Timestamp, TypeNames.ByteArray, isNullablePropertyType,
+							 PXDBTimestamp, isSealedDac, isFirstField, languageVersion);
+		
+		private GeneratedDacFieldNodeInfo? GenerateCreatedByIdField(bool isSealedDac, bool isFirstField, LanguageVersion? languageVersion) =>
+			GenerateDacField(DacFieldNames.System.CreatedByID, nameof(Guid), isNullablePropertyType: true,
+							 PXDBCreatedByID, isSealedDac, isFirstField, languageVersion);
+
+		private GeneratedDacFieldNodeInfo? GenerateLastModifiedByIdField(bool isSealedDac, bool isFirstField, LanguageVersion? languageVersion) =>
+			GenerateDacField(DacFieldNames.System.LastModifiedByID, nameof(Guid), isNullablePropertyType: true,
+							 PXDBLastModifiedByID, isSealedDac, isFirstField, languageVersion);
+
+		private GeneratedDacFieldNodeInfo? GenerateCreatedByScreenIdField(bool isSealedDac, bool isFirstField, LanguageVersion? languageVersion,
+																		  bool isNullablePropertyType) =>
+			GenerateDacField(DacFieldNames.System.CreatedByScreenID, TypeNames.CSharpPredefinedTypes.String, isNullablePropertyType,
+							 PXDBCreatedByScreenID, isSealedDac, isFirstField, languageVersion);
+
+		private GeneratedDacFieldNodeInfo? GenerateLastModifiedByScreenIdField(bool isSealedDac, bool isFirstField, LanguageVersion? languageVersion,
+																			   bool isNullablePropertyType) =>
+			GenerateDacField(DacFieldNames.System.LastModifiedByScreenID, TypeNames.CSharpPredefinedTypes.String, isNullablePropertyType,
+							 PXDBLastModifiedByScreenID, isSealedDac, isFirstField, languageVersion);
+
+		private GeneratedDacFieldNodeInfo? GenerateCreatedDateTimeField(bool isSealedDac, bool isFirstField, LanguageVersion? languageVersion) =>
+			GenerateDacField(DacFieldNames.System.CreatedDateTime, nameof(DateTime), isNullablePropertyType: true,
+							 PXDBCreatedDateTime, isSealedDac, isFirstField, languageVersion);
+
+		private GeneratedDacFieldNodeInfo? GenerateLastModifiedDateTimeField(bool isSealedDac, bool isFirstField, LanguageVersion? languageVersion) =>
+			GenerateDacField(DacFieldNames.System.LastModifiedDateTime, nameof(DateTime), isNullablePropertyType: true,
+							 PXDBLastModifiedDateTime, isSealedDac, isFirstField, languageVersion);
+
+		private GeneratedDacFieldNodeInfo? GenerateDacField(string dacFieldName, string propertyTypeName, bool isNullablePropertyType,
+															string attributeTypeName, bool isSealedDac, bool isFirstField, LanguageVersion? languageVersion)
+		{
+			var propertyType = new DataTypeName(propertyTypeName);
+			var fieldGenerationOptions = new DacFieldGenerationOptions(propertyType, isNullablePropertyType, isSealedDac,
+																		isFirstField, languageVersion);
+			AttributeListSyntax[] attributeLists =
+			[
+				AttributeList(
+					SingletonSeparatedList(
+						Attribute(IdentifierName(attributeTypeName))))
+			];
+
+			var generatedField = DacFieldGeneration.GenerateDacField(dacFieldName, fieldGenerationOptions, attributeLists);
+			return generatedField;
 		}
 
-		private SyntaxList<MemberDeclarationSyntax>? CreateMembersListWithBqlField(ClassDeclarationSyntax dacNode, 
-																				   PropertyDeclarationSyntax propertyWithoutBqlFieldNode,
-																				   string bqlFieldName, DataTypeName propertyDataType)
 		private ClassDeclarationSyntax InsertGeneratedFieldsIntoDac(ClassDeclarationSyntax dacNode,
 													List<(GeneratedDacFieldNodeInfo FieldNodesInfo, DacFieldInsertMode InsertMode)> newDacFieldNodes)
 		{
