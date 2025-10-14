@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Constants;
-using Acuminator.Utilities.Roslyn.Syntax;
 
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -65,7 +62,11 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 											.WithEndOfDirectiveToken(
 												Token
 												(
-													TriviaList(PreprocessingMessage(regionName)),
+													TriviaList
+													(
+														Space,
+														PreprocessingMessage(regionName)
+													),
 													SyntaxKind.EndOfDirectiveToken,
 													TriviaList()
 												));
@@ -102,6 +103,21 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			if (!propertyAttributeLists.IsNullOrEmpty())
 			{
 				propertyNode = propertyNode.WithAttributeLists(List(propertyAttributeLists));
+			}
+
+			if (propertyNode.AccessorList == null)
+			{
+				propertyNode = propertyNode.WithAccessorList(
+												AccessorList(
+													List(
+													[
+														AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+															.WithSemicolonToken(
+																Token(SyntaxKind.SemicolonToken)),
+														AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
+															.WithSemicolonToken(
+																Token(SyntaxKind.SemicolonToken))
+													])));
 			}
 
 			if (propertyNode.AccessorList == null)
