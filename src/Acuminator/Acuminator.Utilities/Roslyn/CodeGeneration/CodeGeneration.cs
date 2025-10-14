@@ -120,18 +120,39 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 				: member;
 		}
 
-		public static IEnumerable<SyntaxTrivia>? RemoveRegionsFromTrivia(in SyntaxTriviaList leadingTrivia)
+		/// <summary>
+		/// Removes the regions from the type member node trailing trivia.
+		/// </summary>
+		/// <param name="member">The type member node.</param>
+		/// <returns>
+		/// Type member node with removed regions from trailing trivia.
+		/// </returns>
+		[return: NotNullIfNotNull(nameof(member))]
+		public static MemberDeclarationSyntax? RemoveRegionsFromTrailingTrivia(MemberDeclarationSyntax? member)
 		{
-			if (leadingTrivia.Count == 0)
+			if (member == null)
+				return member;
+
+			var trailingTrivia	  = member.GetTrailingTrivia();
+			var newTrailingTrivia = RemoveRegionsFromTrivia(trailingTrivia);
+
+			return newTrailingTrivia != null
+				? member.WithTrailingTrivia(newTrailingTrivia)
+				: member;
+		}
+
+		public static IEnumerable<SyntaxTrivia>? RemoveRegionsFromTrivia(in SyntaxTriviaList trivia)
+		{
+			if (trivia.Count == 0)
 				return null;
 
-			var regionTrivias = leadingTrivia.GetRegionDirectiveLinesFromTrivia();
+			var regionTrivias = trivia.GetRegionDirectiveLinesFromTrivia();
 
 			if (regionTrivias.Count == 0)
 				return null;
 
-			var newLeadingTrivia = leadingTrivia.Except(regionTrivias);
-			return newLeadingTrivia;
+			var newTriviaWithoutRegions = trivia.Except(regionTrivias);
+			return newTriviaWithoutRegions;
 		}
 	}
 }
