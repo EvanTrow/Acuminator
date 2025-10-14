@@ -499,5 +499,13 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 				}
 			}
 		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool AreNullableAnnotationsEnabled(this NullableContext nullableContext) =>
+			nullableContext.IsFlagSet(NullableContext.AnnotationsEnabled);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsFlagSet(this NullableContext nullableContext, NullableContext flagToCheck) =>
+			(nullableContext & flagToCheck) == flagToCheck;
 	}
 }
