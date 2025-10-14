@@ -64,17 +64,20 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 												(
 													TriviaList
 													(
-														Space,
+														ElasticSpace,
 														PreprocessingMessage(regionName)
 													),
 													SyntaxKind.EndOfDirectiveToken,
 													TriviaList()
 												));
 
-			var regionStartTrivia 	 = Trivia(regionStartDirectiveNode);
+			var regionStartTrivia = Trivia(regionStartDirectiveNode);
 			var firstBqlNodeModifier = bqlFieldNode.Modifiers[0];
-			var newLeadingTrivia 	 = firstBqlNodeModifier.LeadingTrivia.PrependItem(regionStartTrivia);
-			var newFirstModifier	 = firstBqlNodeModifier.WithLeadingTrivia(newLeadingTrivia);
+			var newFirstModifier = 
+				firstBqlNodeModifier.WithLeadingTrivia(
+					TriviaList(
+							[LineFeed, CarriageReturn, regionStartTrivia, .. firstBqlNodeModifier.LeadingTrivia]
+						));
 
 			var newModifiers = bqlFieldNode.Modifiers.RemoveAt(0)
 													 .Insert(0, newFirstModifier);
