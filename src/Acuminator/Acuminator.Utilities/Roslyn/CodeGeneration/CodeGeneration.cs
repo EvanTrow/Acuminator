@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -26,10 +27,12 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 		/// </summary>
 		/// <param name="root">The root node.</param>
 		/// <param name="namespaceName">Name of the namespace.</param>
+		/// <param name="insertSystemNamespaceFirst">True to insert <see cref="System"/> namespace first.</param>
 		/// <returns>
 		/// The root node with added using directive.
 		/// </returns>
-		public static CompilationUnitSyntax AddMissingUsingDirectiveForNamespace(this CompilationUnitSyntax root, string namespaceName)
+		public static CompilationUnitSyntax AddMissingUsingDirectiveForNamespace(this CompilationUnitSyntax root, string namespaceName, 
+																				 bool insertSystemNamespaceFirst)
 		{
 			root.ThrowOnNull();
 			namespaceName.ThrowOnNullOrWhiteSpace();
@@ -39,9 +42,18 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			if (alreadyHasUsing)
 				return root;
 
-			return root.AddUsings(
-							UsingDirective(
-								ParseName(namespaceName)));
+			bool isSystemNamespace = namespaceName == NamespaceNames.System ||
+									 namespaceName.StartsWith($"{NamespaceNames.System}.", StringComparison.Ordinal);
+			var usingDirective = UsingDirective(
+									ParseName(namespaceName));
+
+			if (isSystemNamespace && insertSystemNamespaceFirst)
+			{
+				var newUsings =	root.Usings.Insert(0, usingDirective);
+				return root.WithUsings(newUsings);
+			}
+			else
+				return root.AddUsings(usingDirective);
 		}
 
 		/// <summary>
@@ -70,13 +82,13 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			return list;
 		}
 
-		public static TNode CopyRegionsFromTrivia<TNode>(TNode nodeToCopyTrivia, in SyntaxTriviaList leadingTrivia, 
+		public static TNode CopyRegionsFromTrivia<TNode>(TNode nodeToCopyTrivia, in SyntaxTriviaList triviaWithRegions,
 														 bool copyBeforeNode, bool insertCopiedRegionsAfterNodeTrivia)
 		where TNode : SyntaxNode
 		{
 			nodeToCopyTrivia.ThrowOnNull();
 
-			var regionTrivias = leadingTrivia.GetRegionDirectiveLinesFromTrivia();
+			var regionTrivias = triviaWithRegions.GetRegionDirectiveLinesFromTrivia();
 
 			if (regionTrivias.Count == 0)
 				return nodeToCopyTrivia;
