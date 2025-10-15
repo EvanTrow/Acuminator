@@ -4,18 +4,18 @@ using PX.Data;
 namespace Acuminator.Tests.Sources
 {
 	/// <exclude/>
-	[PXCacheName("DAC without any mandatory fields")]
-	public class DacWithoutAnyMandatoryField : IBqlTable
+	[PXCacheName("Sealed DAC without any mandatory fields")]
+	public sealed class SealedDacWithoutAnyMandatoryField : IBqlTable
 	{
 		#region ID
 		[PXDBIdentity(IsKey = true)]
-		public virtual int? ID { get; set; }
+		public int? ID { get; set; }
 		public abstract class iD : PX.Data.BQL.BqlInt.Field<iD> { }
 		#endregion
 
 		#region Description
 		[PXDBString(255)]
-		public virtual string? Description { get; set; }
+		public string? Description { get; set; }
 		public abstract class description : PX.Data.BQL.BqlString.Field<description> { }
 		#endregion
 	}

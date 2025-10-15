@@ -63,8 +63,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 			await VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData("DacWithoutAnyMandatoryFields_Expected.cs")]
-		public async Task DacWithoutAnyMandatoryFields_AfterCodeFix_NoDiagnostic(string source) =>
+		[EmbeddedFileData("SealedDacWithoutAnyMandatoryField_Expected.cs")]
+		public async Task SealedDac_WithoutAnyMandatoryField_AfterCodeFix_NoDiagnostic(string source) =>
 			await VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
@@ -84,11 +84,11 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 		#endregion
 
 		[Theory]
-		[EmbeddedFileData("DacWithoutAnyMandatoryFields.cs")]
-		public async Task DacWithoutAnyMandatoryFields_ShouldReport_AllMissingFields(string source) =>
+		[EmbeddedFileData("SealedDacWithoutAnyMandatoryField.cs")]
+		public async Task SealedDac_WithoutAnyMandatoryField_ShouldReport_AllMissingFields(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1069_MissingMultipleMandatoryDacFields
-							.CreateFor(8, 15, 
+							.CreateFor(8, 22, "SealedDacWithoutAnyMandatoryField",
 									  CreateMissingFieldsFormatArg(
 									  [
 											DacFieldKind.tstamp,
@@ -105,14 +105,14 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 		public async Task Dac_MissingOnlyTimestampField_ShouldReport_OnlyMissingTimestamp(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1069_MissingSingleMandatoryDacField
-							.CreateFor(7, 15, "\"tstamp\""));
+							.CreateFor(7, 15, "DacMissingOnlyTimestampField", "\"tstamp\""));
 
 		[Theory]
 		[EmbeddedFileData("DacMissingMultipleAuditFields.cs")]
 		public async Task DacMissingMultipleAuditFields_ShouldReport_MultipleMissingFields(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1069_MissingMultipleMandatoryDacFields
-							.CreateFor(10, 15,
+							.CreateFor(10, 15, "DacMissingMultipleAuditFields",
 									  CreateMissingFieldsFormatArg(
 									  [
 											DacFieldKind.CreatedByScreenID,
@@ -126,12 +126,13 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 		public async Task DacMissingOnlyCreatedByID_ShouldReport_OnlyMissingCreatedByID(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1069_MissingSingleMandatoryDacField
-							.CreateFor(8, 15, "\"CreatedByID\""));
+							.CreateFor(8, 15, "DacMissingOnlyCreatedByID", "\"CreatedByID\""));
 
 		#region Code Fix Tests
 		[Theory]
-		[EmbeddedFileData("DacWithoutAnyMandatoryFields.cs", "DacWithoutAnyMandatoryFields_Expected.cs")]
-		public async Task DacWithoutAnyMandatoryFields_CodeFix_ShouldAdd_AllMandatoryFields(string source, string expected) =>
+		[EmbeddedFileData("SealedDacWithoutAnyMandatoryField.cs", "SealedDacWithoutAnyMandatoryField_Expected.cs")]
+		public async Task SealedDac_WithoutAnyMandatoryField_CodeFix_ShouldAdd_AllMandatoryFields_AsNonVirtual(
+																				string source, string expected) =>
 			await VerifyCSharpFixAsync(source, expected);
 
 		[Theory]

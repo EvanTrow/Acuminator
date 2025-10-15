@@ -4,8 +4,8 @@ using PX.Data;
 namespace Acuminator.Tests.Sources
 {
 	/// <exclude/>
-	[PXCacheName("DAC missing only CreatedByID")]
-	public class DacMissingCreatedByID : IBqlTable
+	[PXCacheName("DAC missing only CreatedByID field")]
+	public class DacMissingOnlyCreatedByID : IBqlTable
 	{
 		#region Tstamp
 		[PXDBTimestamp]
