@@ -105,10 +105,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 
 			var (semanticModel, root) = await document.GetSemanticModelAndRootAsync(cancellationToken).ConfigureAwait(false);
 
-			if (semanticModel == null || root == null)
+			if (semanticModel == null || root is not CompilationUnitSyntax compilationUnitNode)
 				return document;
 
-			SyntaxNode? nodeWithDiagnostic = root.FindNode(span);
+			SyntaxNode? nodeWithDiagnostic = compilationUnitNode.FindNode(span);
 			var dacNode = (nodeWithDiagnostic as ClassDeclarationSyntax) ??
 						   nodeWithDiagnostic?.Parent<ClassDeclarationSyntax>();
 
@@ -122,8 +122,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 				return document;
 
 			var newDacNode = InsertGeneratedFieldsIntoDac(dacNode, newDacFieldNodes);
-			var newRoot = root!.ReplaceNode(dacNode, newDacNode);
+			var newRoot = compilationUnitNode.ReplaceNode(dacNode, newDacNode);
 
+			newRoot = newRoot.AddMissingUsingDirectiveForNamespace(NamespaceNames.System)
+							 .AddMissingUsingDirectiveForNamespace(NamespaceNames.PXDataBql);
 			return document.WithSyntaxRoot(newRoot);
 		}
 

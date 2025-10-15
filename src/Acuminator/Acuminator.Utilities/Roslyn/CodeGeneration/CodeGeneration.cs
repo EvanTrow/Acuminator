@@ -32,7 +32,7 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 		/// The root node with added using directive.
 		/// </returns>
 		public static CompilationUnitSyntax AddMissingUsingDirectiveForNamespace(this CompilationUnitSyntax root, string namespaceName, 
-																				 bool insertSystemNamespaceFirst)
+																				 bool insertSystemNamespaceFirst = true)
 		{
 			root.ThrowOnNull();
 			namespaceName.ThrowOnNullOrWhiteSpace();
