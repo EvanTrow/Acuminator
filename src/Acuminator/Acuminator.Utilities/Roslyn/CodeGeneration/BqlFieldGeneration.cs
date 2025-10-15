@@ -20,11 +20,10 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 	/// </remarks>
 	public static class BqlFieldGeneration
 	{
-		public static ClassDeclarationSyntax? GenerateWeaklyTypedBqlField(string bqlFieldName, bool isFirstField, bool isRedeclaration,
-																		  MemberDeclarationSyntax? adjacentMemberToCopyRegions)
+		public static ClassDeclarationSyntax? GenerateWeaklyTypedBqlField(BqlFieldGenerationOptions generationOptions)
 		{
 			var iBqlFieldBaseTypeNode = IBqlFieldBaseTypeForBqlField();
-			var bqlField = GenerateBqlField(adjacentMemberToCopyRegions, iBqlFieldBaseTypeNode, bqlFieldName, isFirstField, isRedeclaration);
+			var bqlField = GenerateBqlField(generationOptions, iBqlFieldBaseTypeNode);
 
 			return bqlField;
 		}
@@ -41,23 +40,21 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			return iBqlFieldBaseType;
 		}
 
-		public static ClassDeclarationSyntax? GenerateTypedBqlField(DataTypeName dataTypeName, string bqlFieldName, bool isFirstField,
-																	bool isRedeclaration, MemberDeclarationSyntax? adjacentMemberToCopyRegions)
+		public static ClassDeclarationSyntax? GenerateTypedBqlField(DataTypeName dataTypeName, BqlFieldGenerationOptions generationOptions)
 		{
-			var bqlFieldBaseTypeNode = BaseTypeForBqlField(dataTypeName, bqlFieldName);
+			var bqlFieldBaseTypeNode = BaseTypeForBqlField(dataTypeName, generationOptions.BqlFieldName);
 
 			if (bqlFieldBaseTypeNode == null)
 				return null;
 
-			var bqlField = GenerateBqlField(adjacentMemberToCopyRegions, bqlFieldBaseTypeNode, bqlFieldName, isFirstField, isRedeclaration);
+			var bqlField = GenerateBqlField(generationOptions, bqlFieldBaseTypeNode);
 			return bqlField;
 		}
 
-		public static ClassDeclarationSyntax? GenerateTypedBqlField(BqlFieldTypeName bqlFieldTypeName, string bqlFieldName, bool isFirstField,
-																	bool isRedeclaration, MemberDeclarationSyntax? adjacentMemberToCopyRegions)
+		public static ClassDeclarationSyntax? GenerateTypedBqlField(BqlFieldTypeName bqlFieldTypeName, BqlFieldGenerationOptions generationOptions)
 		{
-			var bqlFieldBaseTypeNode = BaseTypeForBqlField(bqlFieldTypeName, bqlFieldName);
-			var bqlField = GenerateBqlField(adjacentMemberToCopyRegions, bqlFieldBaseTypeNode, bqlFieldName, isFirstField, isRedeclaration);
+			var bqlFieldBaseTypeNode = BaseTypeForBqlField(bqlFieldTypeName, generationOptions.BqlFieldName);
+			var bqlField = GenerateBqlField(generationOptions, bqlFieldBaseTypeNode);
 
 			return bqlField;
 		}
@@ -127,13 +124,12 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			return newBaseType;
 		}
 
-		private static ClassDeclarationSyntax GenerateBqlField(MemberDeclarationSyntax? adjacentMemberToCopyRegions, 
-																SimpleBaseTypeSyntax bqlFieldBaseType, string bqlFieldName, bool isFirstField, 
-																bool isRedeclaration)
+		private static ClassDeclarationSyntax GenerateBqlField(BqlFieldGenerationOptions generationOptions, 
+																SimpleBaseTypeSyntax bqlFieldBaseType)
 		{
 			var baseTypesListNode = BaseList(
 										SingletonSeparatedList<BaseTypeSyntax>(bqlFieldBaseType));
-			SyntaxTokenList modifiers = isRedeclaration
+			SyntaxTokenList modifiers = generationOptions.IsRedeclarationOfBaseField
 				? TokenList(
 					Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.NewKeyword), Token(SyntaxKind.AbstractKeyword))
 				: TokenList(
@@ -142,20 +138,20 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			var bqlFieldNode = ClassDeclaration(
 									attributeLists: default,
 									modifiers,
-									Identifier(bqlFieldName), typeParameterList: null, baseTypesListNode,
+									Identifier(generationOptions.BqlFieldName), typeParameterList: null, baseTypesListNode,
 									constraintClauses: default, members: default)
 								.WithOpenBraceToken(
 									Token(leading: TriviaList(), SyntaxKind.OpenBraceToken, TriviaList()));
 
-			var closeBracketToken = isFirstField
+			var closeBracketToken = generationOptions.IsFirstField
 				? Token(leading: TriviaList(Space), SyntaxKind.CloseBraceToken,
 						TriviaList(CarriageReturn, LineFeed, CarriageReturn, LineFeed))
 				: Token(leading: TriviaList(Space), SyntaxKind.CloseBraceToken, TriviaList(CarriageReturn, LineFeed));
 
 			bqlFieldNode = bqlFieldNode.WithCloseBraceToken(closeBracketToken);
 
-			if (adjacentMemberToCopyRegions != null)
-				bqlFieldNode = CopyRegionsFromMember(bqlFieldNode, adjacentMemberToCopyRegions);
+			if (generationOptions.AdjacentMemberToCopyRegions != null)
+				bqlFieldNode = CopyRegionsFromMember(bqlFieldNode, generationOptions.AdjacentMemberToCopyRegions);
 
 			return bqlFieldNode;
 		}
