@@ -76,7 +76,7 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			var newFirstModifier = 
 				firstBqlNodeModifier.WithLeadingTrivia(
 					TriviaList(
-							[LineFeed, CarriageReturn, regionStartTrivia, .. firstBqlNodeModifier.LeadingTrivia]
+							[regionStartTrivia, .. firstBqlNodeModifier.LeadingTrivia]
 						));
 
 			var newModifiers = bqlFieldNode.Modifiers.RemoveAt(0)
