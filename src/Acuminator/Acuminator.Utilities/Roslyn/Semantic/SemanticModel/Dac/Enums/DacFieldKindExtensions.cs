@@ -61,7 +61,7 @@ public static class DacFieldKindExtensions
 	/// True if the DAC field is an audit field, false if not.
 	/// </returns>
 	public static bool IsAuditField(this DacFieldKind kind) =>
-		kind >= DacFieldKind.CreatedByID && kind <= DacFieldKind.CreatedDateTime;
+		kind >= DacFieldKind.CreatedByID && kind <= DacFieldKind.LastModifiedDateTime;
 
 
 	/// <summary>
@@ -72,7 +72,7 @@ public static class DacFieldKindExtensions
 	/// True if the DAC field is Created audit field, false if not.
 	/// </returns>
 	public static bool IsCreatedAuditField(this DacFieldKind kind) =>
-		kind >= DacFieldKind.CreatedByID && kind <= DacFieldKind.LastModifiedDateTime;
+		kind >= DacFieldKind.CreatedByID && kind <= DacFieldKind.CreatedDateTime;
 
 	/// <summary>
 	/// Check if this is LastModified audit DAC field.
