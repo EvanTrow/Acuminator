@@ -89,8 +89,6 @@
 
     <None Include="ExternalRunner\**\*.*" />
     <None Include="ExternalDependency\**\*.*" />
-    <EmbeddedResource Remove="Tests\StaticAnalysis\MissingMandatoryDacFields\Sources\DacWithoutAnyMandatoryField_Expected.cs" />
-    <Compile Include="Tests\StaticAnalysis\MissingMandatoryDacFields\Sources\DacWithoutAnyMandatoryField_Expected.cs" />
     <None Include="FormatterTests.playlist" />
   </ItemGroup>
   <ItemGroup>
