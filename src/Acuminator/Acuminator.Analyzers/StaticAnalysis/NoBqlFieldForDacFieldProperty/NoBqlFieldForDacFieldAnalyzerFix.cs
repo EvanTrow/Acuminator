@@ -9,11 +9,13 @@ using System.Threading.Tasks;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.CodeGeneration;
+using Acuminator.Utilities.Roslyn.CSharpVersion;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
@@ -78,9 +80,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoBqlFieldForDacFieldProperty
 			if (dacNode == null)
 				return document;
 
+			var languageVersion = document.EffectiveCSharpVersion();
 			var dataTypeName = new DataTypeName(propertyType);
-			var newDacMembers = CreateMembersListWithBqlField(dacNode, propertyWithoutBqlFieldNode, bqlFieldName, dataTypeName);
-
+			var newDacMembers = CreateMembersListWithBqlField(dacNode, propertyWithoutBqlFieldNode, bqlFieldName, dataTypeName, 
+															  languageVersion);
 			if (newDacMembers == null)
 				return document;
 
@@ -92,14 +95,19 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoBqlFieldForDacFieldProperty
 
 		private SyntaxList<MemberDeclarationSyntax>? CreateMembersListWithBqlField(ClassDeclarationSyntax dacNode, 
 																				   PropertyDeclarationSyntax propertyWithoutBqlFieldNode,
-																				   string bqlFieldName, DataTypeName propertyDataType)
+																				   string bqlFieldName, DataTypeName propertyDataType,
+																				   LanguageVersion? languageVersion)
 		{
 			var members = dacNode.Members;
 
 			if (members.Count == 0)
 			{
-				var newSingleBqlFieldNode = BqlFieldGeneration.GenerateTypedBqlField(propertyDataType, bqlFieldName, isFirstField: true, 
-																					 isRedeclaration: false, propertyWithoutBqlFieldNode);
+				var generationOptionsForEmptyDac = new BqlFieldGenerationOptions(bqlFieldName, IsFirstField: true, 
+																				 IsRedeclarationOfBaseField: false,
+																				 AdjacentMemberToCopyRegions: propertyWithoutBqlFieldNode,
+																				 BqlFieldBaseTypeNamingStyle.FullNameWithNamespace,
+																				 languageVersion);
+				var newSingleBqlFieldNode = BqlFieldGeneration.GenerateTypedBqlField(propertyDataType, generationOptionsForEmptyDac);
 				return newSingleBqlFieldNode != null
 					? SingletonList<MemberDeclarationSyntax>(newSingleBqlFieldNode)
 					: null;
@@ -110,8 +118,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoBqlFieldForDacFieldProperty
 			if (propertyMemberIndex < 0)
 				propertyMemberIndex = 0;
 
-			var newBqlFieldNode = BqlFieldGeneration.GenerateTypedBqlField(propertyDataType, bqlFieldName, isFirstField: propertyMemberIndex == 0,
-																		   isRedeclaration: false, propertyWithoutBqlFieldNode);
+			var generationOptions = new BqlFieldGenerationOptions(bqlFieldName, IsFirstField: propertyMemberIndex == 0, 
+																  IsRedeclarationOfBaseField: false,
+																  AdjacentMemberToCopyRegions: propertyWithoutBqlFieldNode,
+																  BqlFieldBaseTypeNamingStyle.FullNameWithNamespace,
+																  languageVersion);
+			var newBqlFieldNode = BqlFieldGeneration.GenerateTypedBqlField(propertyDataType, generationOptions);
+
 			if (newBqlFieldNode == null)
 				return null;
 

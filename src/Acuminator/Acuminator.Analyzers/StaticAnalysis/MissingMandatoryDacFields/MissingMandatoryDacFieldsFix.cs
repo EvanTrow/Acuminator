@@ -335,7 +335,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 		{
 			var propertyType = new DataTypeName(propertyTypeName);
 			var fieldGenerationOptions = new DacFieldGenerationOptions(propertyType, isNullablePropertyType, isSealedDac,
-																		isFirstField, languageVersion);
+																		isFirstField, BqlFieldBaseTypeNamingStyle.OnlyTypeName,
+																		languageVersion);
 			AttributeListSyntax[] attributeLists =
 			[
 				AttributeList(

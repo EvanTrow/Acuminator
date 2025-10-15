@@ -8,7 +8,7 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 	/// <summary>
 	/// Styles of base types names for BQL fields.
 	/// </summary>
-	public enum BqlFieldsBaseTypesNamingStyles : byte
+	public enum BqlFieldBaseTypeNamingStyle : byte
 	{
 		FullNameWithNamespace,
 		OnlyTypeName
@@ -28,6 +28,6 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 	/// <param name="CSharpVersion">(Optional) Effective C# language version.</param>
 	public record BqlFieldGenerationOptions(string BqlFieldName, bool IsFirstField, bool IsRedeclarationOfBaseField, 
 											MemberDeclarationSyntax? AdjacentMemberToCopyRegions,
-											BqlFieldsBaseTypesNamingStyles BaseTypeNamingStyle, 
+											BqlFieldBaseTypeNamingStyle BaseTypeNamingStyle, 
 											LanguageVersion? CSharpVersion = null);
 }

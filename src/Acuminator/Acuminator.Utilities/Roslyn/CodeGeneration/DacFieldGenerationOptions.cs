@@ -11,7 +11,9 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 	/// <param name="IsNullablePropertyType">True if is nullable property type, false if not. Nullable here include nullable reference types</param>
 	/// <param name="IsSealedDac">True if containing DAC is sealed, false if not.</param>
 	/// <param name="IsFirstField">True if generated DAC field will be a first field in the DAC, false if not.</param>
+	/// <param name="BaseTypeNamingStyle">Style of base type name for the BQL field.</param>
 	/// <param name="CSharpVersion">(Optional) Effective C# language version.</param>
 	public record DacFieldGenerationOptions(DataTypeName NonNullablePropertyTypeName, bool IsNullablePropertyType, bool IsSealedDac,
-											bool IsFirstField, LanguageVersion? CSharpVersion = null);
+											bool IsFirstField, BqlFieldBaseTypeNamingStyle BaseTypeNamingStyle, 
+											LanguageVersion? CSharpVersion = null);
 }

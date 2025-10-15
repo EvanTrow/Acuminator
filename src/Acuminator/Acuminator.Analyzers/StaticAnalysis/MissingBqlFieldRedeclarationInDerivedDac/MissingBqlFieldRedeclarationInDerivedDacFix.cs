@@ -22,6 +22,8 @@ using PropertiesMap = System.Collections.Generic.Dictionary<string, (Microsoft.C
 using BqlFieldWithPropertyAndIndex = (Microsoft.CodeAnalysis.CSharp.Syntax.ClassDeclarationSyntax NewBqlNode, 
 									  Microsoft.CodeAnalysis.CSharp.Syntax.PropertyDeclarationSyntax? RelatedProperty, 
 									  int IndexToInsert);
+using Microsoft.CodeAnalysis.CSharp;
+using Acuminator.Utilities.Roslyn.CSharpVersion;
 
 namespace Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDerived
 {
@@ -146,18 +148,20 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDeri
 		}
 
 		private (SyntaxList<MemberDeclarationSyntax>, bool InsertedAtEnd)? GetDacMembersWithRedeclaredFields(
-																				Document document, ClassDeclarationSyntax dacNode,
-																				List<(string BqlFieldName, string? BqlFieldTypeName)> bqlFieldsToRedeclare,
-																				CancellationToken cancellationToken)
+																		Document document, ClassDeclarationSyntax dacNode,
+																		List<(string BqlFieldName, string? BqlFieldTypeName)> bqlFieldsToRedeclare,
+																		CancellationToken cancellationToken)
 		{
 			SyntaxList<MemberDeclarationSyntax> newDacMembersList;
 			bool insertedAtEnd;
+			var languageVersion = document.EffectiveCSharpVersion();
 
 			if (dacNode.Members.Count > 0)
 			{
 				var relatedPropertiesWithIndexByFieldName = GetPropertiesWithIndexByFieldNames(bqlFieldsToRedeclare, dacNode, cancellationToken);
 				var newDacMembersResult = 
-					CreateBqlFieldsForDacWithMembers(bqlFieldsToRedeclare, dacNode, relatedPropertiesWithIndexByFieldName, cancellationToken);
+					CreateBqlFieldsForDacWithMembers(bqlFieldsToRedeclare, dacNode, relatedPropertiesWithIndexByFieldName, languageVersion, 
+													cancellationToken);
 
 				if (newDacMembersResult == null)
 					return null;
@@ -166,7 +170,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDeri
 			}
 			else
 			{
-				var newDacMembers = CreateBqlFieldsForDacWithoutMembers(bqlFieldsToRedeclare, cancellationToken);
+				var newDacMembers = CreateBqlFieldsForDacWithoutMembers(bqlFieldsToRedeclare, languageVersion, cancellationToken);
 				newDacMembersList = List(newDacMembers);
 				insertedAtEnd	  = true;
 			}
@@ -178,7 +182,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDeri
 
 		private IEnumerable<MemberDeclarationSyntax> CreateBqlFieldsForDacWithoutMembers(
 																		List<(string BqlFieldName, string? BqlFieldTypeName)> bqlFieldsToRedeclare,
-																		CancellationToken cancellationToken)
+																		LanguageVersion? languageVersion, CancellationToken cancellationToken)
 		{
 			for (int i = 0; i < bqlFieldsToRedeclare.Count; i++)
 			{
@@ -187,20 +191,20 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDeri
 					? new BqlFieldTypeName(bqlFieldTypeName)
 					: null;
 
-				var newBqlFieldNode = CreateBqlFieldClassNode(adjacentMember: null, bqlFieldName, isFirstField: i == 0, strongBqlFieldTypeName);
-
+				var newBqlFieldNode = CreateBqlFieldClassNode(adjacentMember: null, bqlFieldName, isFirstField: i == 0, strongBqlFieldTypeName,
+															  languageVersion);
 				if (newBqlFieldNode != null)
 					yield return newBqlFieldNode;
 			}
 		}
 
 		private (SyntaxList<MemberDeclarationSyntax>, bool InsertedAtEnd)? CreateBqlFieldsForDacWithMembers(
-																				List<(string BqlFieldName, string? BqlFieldTypeName)> bqlFieldsToRedeclare,
-																				ClassDeclarationSyntax dacNode, PropertiesMap relatedPropertiesWithIndexByFieldName,
-																				CancellationToken cancellationToken)
+																List<(string BqlFieldName, string? BqlFieldTypeName)> bqlFieldsToRedeclare,
+																ClassDeclarationSyntax dacNode, PropertiesMap relatedPropertiesWithIndexByFieldName,
+																LanguageVersion? languageVersion, CancellationToken cancellationToken)
 		{
-			var newBqlFields = CreateBqlFieldNodesWithIndexes(bqlFieldsToRedeclare, dacNode, relatedPropertiesWithIndexByFieldName, cancellationToken);
-
+			var newBqlFields = CreateBqlFieldNodesWithIndexes(bqlFieldsToRedeclare, dacNode, relatedPropertiesWithIndexByFieldName, 
+															  languageVersion, cancellationToken);
 			if (newBqlFields.Count == 0)
 				return null;
 
@@ -248,7 +252,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDeri
 
 		private List<BqlFieldWithPropertyAndIndex> CreateBqlFieldNodesWithIndexes(List<(string BqlFieldName, string? BqlFieldTypeName)> bqlFieldsToRedeclare,
 																		ClassDeclarationSyntax dacNode, PropertiesMap relatedPropertiesWithIndexByFieldName,
-																		CancellationToken cancellationToken)
+																		LanguageVersion? languageVersion, CancellationToken cancellationToken)
 		{
 			var newBqlFields = new List<BqlFieldWithPropertyAndIndex>(capacity: bqlFieldsToRedeclare.Count);
 			var dacMembers   = dacNode.Members;
@@ -276,7 +280,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDeri
 				}
 
 				var newBqlFieldNode = CreateBqlFieldClassNode(relatedPropertyNode, bqlFieldName,
-															  isFirstField: indexToInsertBqlField == 0, strongBqlFieldTypeName);
+															  isFirstField: indexToInsertBqlField == 0, strongBqlFieldTypeName,
+															  languageVersion);
 				if (newBqlFieldNode != null)
 				{
 					newBqlFields.Add((newBqlFieldNode, relatedPropertyNode, indexToInsertBqlField));
@@ -287,18 +292,20 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDeri
 		}
 
 		private ClassDeclarationSyntax? CreateBqlFieldClassNode(MemberDeclarationSyntax? adjacentMember, string bqlFieldName,
-																bool isFirstField, BqlFieldTypeName? bqlFieldTypeName)
+																bool isFirstField, BqlFieldTypeName? bqlFieldTypeName,
+																LanguageVersion? languageVersion)
 		{
+			var generationOptions = new BqlFieldGenerationOptions(bqlFieldName, isFirstField, IsRedeclarationOfBaseField: true,
+																  adjacentMember, BqlFieldBaseTypeNamingStyle.FullNameWithNamespace,
+																  languageVersion);
 			if (bqlFieldTypeName.HasValue)
 			{
-				var stronglyTypedBqlFieldNode = BqlFieldGeneration.GenerateTypedBqlField(bqlFieldTypeName.Value, bqlFieldName, isFirstField,
-																						 isRedeclaration: true, adjacentMember);
+				var stronglyTypedBqlFieldNode = BqlFieldGeneration.GenerateTypedBqlField(bqlFieldTypeName.Value, generationOptions);
 				return stronglyTypedBqlFieldNode;
 			}
 			else
 			{
-				var weaklyTypedBqlFieldNode = BqlFieldGeneration.GenerateWeaklyTypedBqlField(bqlFieldName, isFirstField, isRedeclaration: true,
-																							 adjacentMember);
+				var weaklyTypedBqlFieldNode = BqlFieldGeneration.GenerateWeaklyTypedBqlField(generationOptions);
 				return weaklyTypedBqlFieldNode;
 			}
 		}

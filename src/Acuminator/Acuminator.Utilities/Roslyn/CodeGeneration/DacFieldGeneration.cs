@@ -32,9 +32,13 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 				return null;
 
 			string bqlFieldName = GetBqlFieldName(dacFieldName);
-			var bqlFieldNode = BqlFieldGeneration.GenerateTypedBqlField(fieldGenerationOptions.NonNullablePropertyTypeName, bqlFieldName, 
-																		fieldGenerationOptions.IsFirstField, isRedeclaration: false,
-																		adjacentMemberToCopyRegions: null);
+			var bqlFieldGenerationOptions = new BqlFieldGenerationOptions(bqlFieldName, fieldGenerationOptions.IsFirstField,
+																		  IsRedeclarationOfBaseField: false,
+																		  AdjacentMemberToCopyRegions: null,
+																		  fieldGenerationOptions.BaseTypeNamingStyle,
+																		  fieldGenerationOptions.CSharpVersion);
+			var bqlFieldNode = BqlFieldGeneration.GenerateTypedBqlField(fieldGenerationOptions.NonNullablePropertyTypeName, 
+																		bqlFieldGenerationOptions);
 			if (bqlFieldNode == null)
 				return null;
 
