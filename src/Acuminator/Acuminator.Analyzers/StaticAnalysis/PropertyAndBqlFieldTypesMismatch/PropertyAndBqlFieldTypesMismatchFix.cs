@@ -238,8 +238,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.PropertyAndBqlFieldTypesMismatch
 				return Task.FromResult(document);
 
 			var strongBqlFieldTypeName = new BqlFieldTypeName(newBqlFieldTypeName);
-			var newBqlFieldBaseType	   = BqlFieldGeneration.BaseTypeForBqlField(strongBqlFieldTypeName, bqlFieldName);
-
+			bool hasPxDataBqlNamespace = root is CompilationUnitSyntax compilationUnit &&
+										 compilationUnit.Usings.Any(u => u.Name?.ToString() == NamespaceNames.PXDataBql);
+			var baseTypeNamingStyle = hasPxDataBqlNamespace
+				? BqlFieldBaseTypeNamingStyle.OnlyTypeName
+				: BqlFieldBaseTypeNamingStyle.FullNameWithNamespace;
+			var newBqlFieldBaseType	   = BqlFieldGeneration.BaseTypeForBqlField(strongBqlFieldTypeName, bqlFieldName,
+																				baseTypeNamingStyle);
 			cancellation.ThrowIfCancellationRequested();
 
 			var newBqlFieldNode =
