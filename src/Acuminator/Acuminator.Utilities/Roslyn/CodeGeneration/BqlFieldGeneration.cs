@@ -2,7 +2,6 @@
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Constants;
-using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -42,8 +41,8 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 
 		public static ClassDeclarationSyntax? GenerateTypedBqlField(DataTypeName dataTypeName, BqlFieldGenerationOptions generationOptions)
 		{
-			var bqlFieldBaseTypeNode = BaseTypeForBqlField(dataTypeName, generationOptions.BqlFieldName);
-
+			var bqlFieldBaseTypeNode = BaseTypeForBqlField(dataTypeName, generationOptions.BqlFieldName,
+														   generationOptions.BaseTypeNamingStyle);
 			if (bqlFieldBaseTypeNode == null)
 				return null;
 
@@ -53,13 +52,15 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 
 		public static ClassDeclarationSyntax? GenerateTypedBqlField(BqlFieldTypeName bqlFieldTypeName, BqlFieldGenerationOptions generationOptions)
 		{
-			var bqlFieldBaseTypeNode = BaseTypeForBqlField(bqlFieldTypeName, generationOptions.BqlFieldName);
+			var bqlFieldBaseTypeNode = BaseTypeForBqlField(bqlFieldTypeName, generationOptions.BqlFieldName,
+														   generationOptions.BaseTypeNamingStyle);
 			var bqlField = GenerateBqlField(generationOptions, bqlFieldBaseTypeNode);
 
 			return bqlField;
 		}
 
-		public static SimpleBaseTypeSyntax? BaseTypeForBqlField(DataTypeName dataTypeName, string bqlFieldName)
+		public static SimpleBaseTypeSyntax? BaseTypeForBqlField(DataTypeName dataTypeName, string bqlFieldName,
+																BqlFieldBaseTypeNamingStyle baseTypeNamingStyle)
 		{
 			bqlFieldName.ThrowOnNullOrWhiteSpace();
 
@@ -68,19 +69,21 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			if (bqlFieldTypeName == null)
 				return null;
 
-			var bqlFieldType = BaseTypeForBqlFieldImpl(bqlFieldTypeName, bqlFieldName);
+			var bqlFieldType = BaseTypeForBqlFieldImpl(bqlFieldTypeName, bqlFieldName, baseTypeNamingStyle);
 			return bqlFieldType;
 		}
 
-		public static SimpleBaseTypeSyntax BaseTypeForBqlField(BqlFieldTypeName bqlFieldTypeName, string bqlFieldName)
+		public static SimpleBaseTypeSyntax BaseTypeForBqlField(BqlFieldTypeName bqlFieldTypeName, string bqlFieldName,
+																BqlFieldBaseTypeNamingStyle baseTypeNamingStyle)
 		{
 			bqlFieldName.ThrowOnNullOrWhiteSpace();
 
-			var bqlFieldType = BaseTypeForBqlFieldImpl(bqlFieldTypeName.Value, bqlFieldName);
+			var bqlFieldType = BaseTypeForBqlFieldImpl(bqlFieldTypeName.Value, bqlFieldName, baseTypeNamingStyle);
 			return bqlFieldType;
 		}
 
-		private static SimpleBaseTypeSyntax BaseTypeForBqlFieldImpl(string bqlFieldTypeName, string bqlFieldName)
+		private static SimpleBaseTypeSyntax BaseTypeForBqlFieldImpl(string bqlFieldTypeName, string bqlFieldName,
+																	BqlFieldBaseTypeNamingStyle baseTypeNamingStyle)
 		{
 			GenericNameSyntax fieldTypeNode =
 				GenericName(Identifier("Field"))
@@ -90,38 +93,61 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 						.WithGreaterThanToken(
 							Token(leading: TriviaList(), SyntaxKind.GreaterThanToken, TriviaList(Space))));
 
-			bool isAttributesBqlField = bqlFieldName.Equals(DacFieldNames.System.Attributes, StringComparison.OrdinalIgnoreCase) &&
-										bqlFieldTypeName.Equals(TypeNames.BqlField.BqlAttributes, StringComparison.OrdinalIgnoreCase); 
-			QualifiedNameSyntax bqlFieldNamespaceName;
+			var bqlFieldNamespaceName = GetBqlFieldNamespaceName(bqlFieldTypeName, bqlFieldName, baseTypeNamingStyle);
+			SimpleBaseTypeSyntax newBaseType;
 
-			if (isAttributesBqlField)
+			if (bqlFieldNamespaceName != null)
 			{
-				bqlFieldNamespaceName =
-					QualifiedName(
-						QualifiedName(
-							IdentifierName("PX"),
-							IdentifierName("Objects")),
-							IdentifierName("CR"));
-			}
-			else
-			{
-				bqlFieldNamespaceName =
-					QualifiedName(
-						QualifiedName(
-							IdentifierName("PX"),
-							IdentifierName("Data")),
-							IdentifierName("BQL"));
-			}
-
-			var newBaseType =
-				SimpleBaseType(
+				newBaseType =
+					SimpleBaseType(
 					QualifiedName(
 						QualifiedName(
 							bqlFieldNamespaceName,
 							IdentifierName(bqlFieldTypeName)),
 						fieldTypeNode));
+			}
+			else
+			{
+				newBaseType =
+					SimpleBaseType(
+						QualifiedName(
+							IdentifierName(bqlFieldTypeName),
+							fieldTypeNode));
+			}
 
 			return newBaseType;
+		}
+
+		private static QualifiedNameSyntax? GetBqlFieldNamespaceName(string bqlFieldTypeName, string bqlFieldName,
+																	BqlFieldBaseTypeNamingStyle baseTypeNamingStyle)
+		{
+			bool isAttributesBqlField = bqlFieldName.Equals(DacFieldNames.System.Attributes, StringComparison.OrdinalIgnoreCase) &&
+										bqlFieldTypeName.Equals(TypeNames.BqlField.BqlAttributes, StringComparison.OrdinalIgnoreCase);
+
+			if (isAttributesBqlField)
+			{
+				var bqlFieldNamespaceName =
+					QualifiedName(
+						QualifiedName(
+							IdentifierName("PX"),
+							IdentifierName("Objects")),
+							IdentifierName("CR"));
+
+				return bqlFieldNamespaceName;
+			}
+			else if (baseTypeNamingStyle == BqlFieldBaseTypeNamingStyle.FullNameWithNamespace)
+			{
+				var bqlFieldNamespaceName =
+					QualifiedName(
+						QualifiedName(
+							IdentifierName("PX"),
+							IdentifierName("Data")),
+							IdentifierName("BQL"));
+
+				return bqlFieldNamespaceName;
+			}
+			else
+				return null;
 		}
 
 		private static ClassDeclarationSyntax GenerateBqlField(BqlFieldGenerationOptions generationOptions, 
