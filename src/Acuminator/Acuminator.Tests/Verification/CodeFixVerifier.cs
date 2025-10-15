@@ -100,7 +100,7 @@ namespace Acuminator.Tests.Verification
 				var context = new CodeFixContext(document, analyzerDiagnostics[diagnosticToUseIndex], (a, d) => actions.Add(a), CancellationToken.None);
 				await codeFixProvider.RegisterCodeFixesAsync(context).ConfigureAwait(false);
 
-				if (!actions.Any())
+				if (actions.Count == 0)
 				{
 					diagnosticToUseIndex++;		// increase diagnostic counter to try next found diagnostic
 					continue;
@@ -138,7 +138,7 @@ namespace Acuminator.Tests.Verification
 				}
 
 				//check if there are analyzer diagnostics left after the code fix
-				if (!analyzerDiagnostics.Any())
+				if (analyzerDiagnostics.Length == 0)
 				{
 					break;
 				}
