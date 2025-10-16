@@ -82,34 +82,54 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			return list;
 		}
 
+		public static TNode CopyCompilerDirectivesFromTrivia<TNode>(TNode nodeToCopyTrivia, in SyntaxTriviaList triviaWithDirectives,
+																	bool copyBeforeNode, bool insertCopiedTriviaAfterNodeTrivia)
+		where TNode : SyntaxNode
+		{
+			return CopyDirectivesFromTrivia(nodeToCopyTrivia, triviaWithDirectives, copyBeforeNode, insertCopiedTriviaAfterNodeTrivia,
+											copyOnlyRegions: false);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static TNode CopyRegionsFromTrivia<TNode>(TNode nodeToCopyTrivia, in SyntaxTriviaList triviaWithRegions,
 														 bool copyBeforeNode, bool insertCopiedRegionsAfterNodeTrivia)
 		where TNode : SyntaxNode
 		{
+			return CopyDirectivesFromTrivia(nodeToCopyTrivia, triviaWithRegions, copyBeforeNode, insertCopiedRegionsAfterNodeTrivia,
+											copyOnlyRegions: true);
+		}
+
+		private static TNode CopyDirectivesFromTrivia<TNode>(TNode nodeToCopyTrivia, in SyntaxTriviaList triviaWithDirectives,
+														 bool copyBeforeNode, bool insertCopiedTriviaAfterNodeTrivia,
+														 bool copyOnlyRegions)
+		where TNode : SyntaxNode
+		{
 			nodeToCopyTrivia.ThrowOnNull();
 
-			var regionTrivias = triviaWithRegions.GetRegionDirectiveLines();
+			var directiveTrivias = copyOnlyRegions
+				? triviaWithDirectives.GetRegionDirectiveLines()
+				: triviaWithDirectives.GetCompilerDirectives();
 
-			if (regionTrivias.Count == 0)
+			if (directiveTrivias.Count == 0)
 				return nodeToCopyTrivia;
 
 			if (copyBeforeNode)
 			{
-				var bqlFieldNodeLeadingTrivia = nodeToCopyTrivia.GetLeadingTrivia();
-				var newBqlFieldNodeTrivia = insertCopiedRegionsAfterNodeTrivia
-					? bqlFieldNodeLeadingTrivia.AddRange(regionTrivias)
-					: bqlFieldNodeLeadingTrivia.InsertRange(0, regionTrivias);
+				var nodeLeadingTrivia = nodeToCopyTrivia.GetLeadingTrivia();
+				var newNodeLeadingTrivia = insertCopiedTriviaAfterNodeTrivia
+					? nodeLeadingTrivia.AddRange(directiveTrivias)
+					: nodeLeadingTrivia.InsertRange(0, directiveTrivias);
 
-				return nodeToCopyTrivia.WithLeadingTrivia(newBqlFieldNodeTrivia);
+				return nodeToCopyTrivia.WithLeadingTrivia(newNodeLeadingTrivia);
 			}
 			else
 			{
-				var bqlFieldNodeTrailingTrivia = nodeToCopyTrivia.GetTrailingTrivia();
-				var newBqlFieldNodeTrivia = insertCopiedRegionsAfterNodeTrivia
-					? bqlFieldNodeTrailingTrivia.AddRange(regionTrivias)
-					: bqlFieldNodeTrailingTrivia.InsertRange(0, regionTrivias);
+				var nodeTrailingTrivia = nodeToCopyTrivia.GetTrailingTrivia();
+				var newNodeTrailingTrivia = insertCopiedTriviaAfterNodeTrivia
+					? nodeTrailingTrivia.AddRange(directiveTrivias)
+					: nodeTrailingTrivia.InsertRange(0, directiveTrivias);
 
-				return nodeToCopyTrivia.WithTrailingTrivia(newBqlFieldNodeTrivia);
+				return nodeToCopyTrivia.WithTrailingTrivia(newNodeTrailingTrivia);
 			}
 		}
 
