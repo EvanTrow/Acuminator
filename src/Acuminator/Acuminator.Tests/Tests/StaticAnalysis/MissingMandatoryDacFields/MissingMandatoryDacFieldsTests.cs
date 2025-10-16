@@ -68,8 +68,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 			await VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData("DacMissingOnlyTimestampField_Expected.cs")]
-		public async Task DacMissingOnlyTimestampField_AfterCodeFix_NoDiagnostic(string source) =>
+		[EmbeddedFileData("DacAddMissingTimestampFieldToEnd_Expected.cs")]
+		public async Task Dac_MissingTimestampField_AfterCodeFix_NoDiagnostic(string source) =>
 			await VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
@@ -101,11 +101,11 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 									  ])));
 
 		[Theory]
-		[EmbeddedFileData("DacMissingOnlyTimestampField.cs")]
+		[EmbeddedFileData("DacAddMissingTimestampFieldToEnd.cs")]
 		public async Task Dac_MissingOnlyTimestampField_ShouldReport_OnlyMissingTimestamp(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1069_MissingSingleMandatoryDacField
-							.CreateFor(7, 15, "DacMissingOnlyTimestampField", "\"tstamp\""));
+							.CreateFor(8, 15, "DacAddMissingTimestampFieldToEnd", "\"tstamp\""));
 
 		[Theory]
 		[EmbeddedFileData("DacMissingMultipleAuditFields.cs")]
@@ -136,8 +136,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 			await VerifyCSharpFixAsync(source, expected);
 
 		[Theory]
-		[EmbeddedFileData("DacMissingOnlyTimestampField.cs", "DacMissingOnlyTimestampField_Expected.cs")]
-		public async Task DacMissingOnlyTimestampField_CodeFix_ShouldAdd_TimestampField(string source, string expected) =>
+		[EmbeddedFileData("DacAddMissingTimestampFieldToEnd.cs", "DacAddMissingTimestampFieldToEnd_Expected.cs")]
+		public async Task Dac_MissingTimestampField_CodeFix_ShouldAdd_TimestampField_ToEnd(string source, string expected) =>
 			await VerifyCSharpFixAsync(source, expected);
 
 		[Theory]
