@@ -177,17 +177,27 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 				: node;
 		}
 
-		public static IEnumerable<SyntaxTrivia>? RemoveRegionsFromTrivia(in SyntaxTriviaList trivia)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<SyntaxTrivia>? RemoveRegionsFromTrivia(in SyntaxTriviaList trivia) =>
+			RemoveDirectivesFromTrivia(trivia, removeOnlyRegions: true);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<SyntaxTrivia>? RemoveCompilerDirectivesFromTrivia(in SyntaxTriviaList trivia) =>
+			RemoveDirectivesFromTrivia(trivia, removeOnlyRegions: false);
+
+		private static IEnumerable<SyntaxTrivia>? RemoveDirectivesFromTrivia(in SyntaxTriviaList trivia, bool removeOnlyRegions)
 		{
 			if (trivia.Count == 0)
 				return null;
 
-			var regionTrivias = trivia.GetRegionDirectiveLines();
+			var directiveTrivias = removeOnlyRegions 
+				? trivia.GetRegionDirectiveLines()
+				: trivia.GetCompilerDirectives();
 
-			if (regionTrivias.Count == 0)
+			if (directiveTrivias.Count == 0)
 				return null;
 
-			var newTriviaWithoutRegions = trivia.Except(regionTrivias);
+			var newTriviaWithoutRegions = trivia.Except(directiveTrivias);
 			return newTriviaWithoutRegions;
 		}
 	}
