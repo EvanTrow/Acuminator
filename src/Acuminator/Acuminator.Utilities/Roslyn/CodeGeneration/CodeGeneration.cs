@@ -88,7 +88,7 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 		{
 			nodeToCopyTrivia.ThrowOnNull();
 
-			var regionTrivias = triviaWithRegions.GetRegionDirectiveLinesFromTrivia();
+			var regionTrivias = triviaWithRegions.GetRegionDirectiveLines();
 
 			if (regionTrivias.Count == 0)
 				return nodeToCopyTrivia;
@@ -160,7 +160,7 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			if (trivia.Count == 0)
 				return null;
 
-			var regionTrivias = trivia.GetRegionDirectiveLinesFromTrivia();
+			var regionTrivias = trivia.GetRegionDirectiveLines();
 
 			if (regionTrivias.Count == 0)
 				return null;

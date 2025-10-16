@@ -348,6 +348,7 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		}
 
 		public static List<SyntaxTrivia> GetRegionDirectiveLinesFromTrivia(this in SyntaxTriviaList trivias)
+		public static List<SyntaxTrivia> GetRegionDirectiveLines(this in SyntaxTriviaList trivias)
 		{
 			if (trivias.Count == 0)
 				return [];
