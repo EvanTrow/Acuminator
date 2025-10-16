@@ -114,45 +114,47 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 		}
 
 		/// <summary>
-		/// Removes the regions from the type member node leading trivia.
+		/// Removes the regions from the <paramref name="node"/>'s leading trivia.
 		/// </summary>
-		/// <param name="member">The type member node.</param>
+		/// <param name="node">The syntax node to act on.</param>
 		/// <returns>
-		/// Type member node with removed regions from leading trivia.
+		/// The node with removed regions from leading trivia.
 		/// </returns>
-		[return: NotNullIfNotNull(nameof(member))]
-		public static MemberDeclarationSyntax? RemoveRegionsFromLeadingTrivia(MemberDeclarationSyntax? member)
+		[return: NotNullIfNotNull(nameof(node))]
+		public static TNode? RemoveRegionsFromLeadingTrivia<TNode>(this TNode? node)
+		where TNode : SyntaxNode
 		{
-			if (member == null)
-				return member;
+			if (node == null)
+				return node;
 
-			var leadingTrivia	 = member.GetLeadingTrivia();
+			var leadingTrivia	 = node.GetLeadingTrivia();
 			var newLeadingTrivia = RemoveRegionsFromTrivia(leadingTrivia);
 
 			return newLeadingTrivia != null
-				? member.WithLeadingTrivia(newLeadingTrivia)
-				: member;
+				? node.WithLeadingTrivia(newLeadingTrivia)
+				: node;
 		}
 
 		/// <summary>
-		/// Removes the regions from the type member node trailing trivia.
+		/// Removes the regions from the <paramref name="node"/>'s trailing trivia.
 		/// </summary>
-		/// <param name="member">The type member node.</param>
+		/// <param name="node">The syntax node to act on.</param>
 		/// <returns>
-		/// Type member node with removed regions from trailing trivia.
+		/// The node with removed regions from trailing trivia.
 		/// </returns>
-		[return: NotNullIfNotNull(nameof(member))]
-		public static MemberDeclarationSyntax? RemoveRegionsFromTrailingTrivia(MemberDeclarationSyntax? member)
+		[return: NotNullIfNotNull(nameof(node))]
+		public static TNode? RemoveRegionsFromTrailingTrivia<TNode>(this TNode? node)
+		where TNode : SyntaxNode
 		{
-			if (member == null)
-				return member;
+			if (node == null)
+				return node;
 
-			var trailingTrivia	  = member.GetTrailingTrivia();
+			var trailingTrivia	  = node.GetTrailingTrivia();
 			var newTrailingTrivia = RemoveRegionsFromTrivia(trailingTrivia);
 
 			return newTrailingTrivia != null
-				? member.WithTrailingTrivia(newTrailingTrivia)
-				: member;
+				? node.WithTrailingTrivia(newTrailingTrivia)
+				: node;
 		}
 
 		public static IEnumerable<SyntaxTrivia>? RemoveRegionsFromTrivia(in SyntaxTriviaList trivia)

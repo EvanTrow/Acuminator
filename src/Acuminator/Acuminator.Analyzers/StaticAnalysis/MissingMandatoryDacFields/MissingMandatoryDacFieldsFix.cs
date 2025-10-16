@@ -441,7 +441,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 			{
 				bqlFieldNode = CodeGeneration.CopyRegionsFromTrivia(bqlFieldNode, prevMemberTrailingTrivia,
 																	copyBeforeNode: true, insertCopiedRegionsAfterNodeTrivia: false);
-				var lastMemberWithoutRegions = CodeGeneration.RemoveRegionsFromTrailingTrivia(prevMember);
+				var lastMemberWithoutRegions = prevMember.RemoveRegionsFromTrailingTrivia();
 				newDacMembers[indexToInsert - 1] = lastMemberWithoutRegions;
 			}
 

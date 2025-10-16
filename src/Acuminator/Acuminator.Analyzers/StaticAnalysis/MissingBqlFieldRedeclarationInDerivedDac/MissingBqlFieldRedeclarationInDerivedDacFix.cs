@@ -222,7 +222,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDeri
 
 				if (relatedProperty != null)
 				{
-					var relatedPropertyWithoutRegions = CodeGeneration.RemoveRegionsFromLeadingTrivia(relatedProperty);
+					var relatedPropertyWithoutRegions = relatedProperty.RemoveRegionsFromLeadingTrivia();
 
 					// Do this two step replacement of relatedProperty indtead of ReplaceNode because relatedProperty won't be found in the new syntax tree
 					newMembers = newMembers.RemoveAt(indexToInsert);

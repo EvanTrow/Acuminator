@@ -128,7 +128,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoBqlFieldForDacFieldProperty
 			if (newBqlFieldNode == null)
 				return null;
 
-			var propertyWithoutRegions = CodeGeneration.RemoveRegionsFromLeadingTrivia(propertyWithoutBqlFieldNode);
+			var propertyWithoutRegions = propertyWithoutBqlFieldNode.RemoveRegionsFromLeadingTrivia();
 			var newMembers = members.Replace(propertyWithoutBqlFieldNode, propertyWithoutRegions)
 									.Insert(propertyMemberIndex, newBqlFieldNode);
 			return newMembers;
