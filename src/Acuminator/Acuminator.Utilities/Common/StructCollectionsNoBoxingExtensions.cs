@@ -192,6 +192,28 @@ namespace Acuminator.Utilities.Common
 		}
 
 		/// <summary>
+		/// Any method for <see cref="SyntaxList{TNode}"/>. This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <typeparam name="TNode">Type of the syntax node.</typeparam>
+		/// <param name="source">The source to act on.</param>
+		/// <param name="predicate">The predicate.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		public static bool Any<TNode>(this SyntaxList<TNode> source, Func<TNode, bool> predicate)
+		where TNode : SyntaxNode
+		{
+			predicate.ThrowOnNull();
+
+			for (int i = 0; i < source.Count; i++)
+			{
+				if (predicate(source[i]))
+					return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Select method for <see cref="SyntaxTriviaList"/>. This is an optimization method which allows to avoid boxing.
 		/// </summary>
 		/// <typeparam name="TResult">Type of the result.</typeparam>
