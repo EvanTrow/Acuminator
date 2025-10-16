@@ -347,7 +347,32 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 			return false;
 		}
 
-		public static List<SyntaxTrivia> GetRegionDirectiveLinesFromTrivia(this in SyntaxTriviaList trivias)
+		public static List<SyntaxTrivia> GetCompilerDirectives(this in SyntaxTriviaList trivias)
+		{
+			if (trivias.Count == 0)
+				return [];
+
+			var compilerTrivias = new List<SyntaxTrivia>(2);
+			SyntaxTrivia? previousTrivia = null;
+
+			for (int i = 0; i < trivias.Count; i++)
+			{
+				var trivia = trivias[i];
+
+				if (trivia.IsDirective)
+				{
+					if (previousTrivia.HasValue && previousTrivia.Value.IsKind(SyntaxKind.WhitespaceTrivia))
+						compilerTrivias.Add(previousTrivia.Value);
+
+					compilerTrivias.Add(trivia);
+				}
+
+				previousTrivia = trivia;
+			}
+
+			return compilerTrivias;
+		}
+
 		public static List<SyntaxTrivia> GetRegionDirectiveLines(this in SyntaxTriviaList trivias)
 		{
 			if (trivias.Count == 0)
