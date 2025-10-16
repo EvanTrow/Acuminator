@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Constants;
@@ -37,23 +38,62 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			root.ThrowOnNull();
 			namespaceName.ThrowOnNullOrWhiteSpace();
 
-			bool alreadyHasUsing = root.Usings.Any(usingDirective => namespaceName == usingDirective.Name?.ToString());
+			var usings = root.Usings;
+			bool alreadyHasUsing = usings.Any(usingDirective => namespaceName == usingDirective.Name?.ToString());
 
 			if (alreadyHasUsing)
 				return root;
 
 			bool isSystemNamespace = namespaceName == NamespaceNames.System ||
 									 namespaceName.StartsWith($"{NamespaceNames.System}.", StringComparison.Ordinal);
-			var usingDirective = UsingDirective(
-									ParseName(namespaceName));
+			var newUsingDirective = UsingDirective(
+										ParseName(namespaceName));
 
 			if (isSystemNamespace && insertSystemNamespaceFirst)
 			{
-				var newUsings =	root.Usings.Insert(0, usingDirective);
+				(newUsingDirective, var newOldFirstUsingDirective) = MoveCompilerDirectivesFromPreviousFirstUsing(newUsingDirective);
+				SyntaxList<UsingDirectiveSyntax> newUsings;
+
+				if (newOldFirstUsingDirective != null)
+				{
+					newUsings = usings.RemoveAt(0)
+									  .InsertRange(0, [newUsingDirective, newOldFirstUsingDirective]);
+				}
+				else
+				{
+					// Old first using node was not modified - no compiler directives were moved from it
+					// So, no need to update its node
+					newUsings = usings.Insert(0, newUsingDirective);
+				}
+
 				return root.WithUsings(newUsings);
 			}
 			else
-				return root.AddUsings(usingDirective);
+				return root.AddUsings(newUsingDirective);
+
+			//-----------------------------------------------Local Function--------------------------------------------------
+			(UsingDirectiveSyntax NewFirstUsing, UsingDirectiveSyntax? NewOldFirstUsingDirective) MoveCompilerDirectivesFromPreviousFirstUsing(
+																									UsingDirectiveSyntax usingDirectiveToCopyTriviaTo)
+			{
+				if (usings.Count == 0)
+					return (usingDirectiveToCopyTriviaTo, NewOldFirstUsingDirective: null);
+
+				var previousFirstUsing = usings[0];
+				var previousFirstUsingLeadingTrivia = previousFirstUsing.GetLeadingTrivia();
+
+				if (previousFirstUsingLeadingTrivia.Count == 0 || !previousFirstUsingLeadingTrivia.Any(trivia => trivia.IsDirective))
+					return (usingDirectiveToCopyTriviaTo, NewOldFirstUsingDirective: null);
+
+				var usingDirectiveWithTrivia = CopyCompilerDirectivesFromTrivia(usingDirectiveToCopyTriviaTo, previousFirstUsingLeadingTrivia, 
+																				copyBeforeNode: true, insertCopiedTriviaAfterNodeTrivia: false);
+				var previousFirstUsingLeadingTriviaWithoutDirectives = RemoveCompilerDirectivesFromTrivia(previousFirstUsingLeadingTrivia);
+
+				var newPreviousFirstUsing = previousFirstUsingLeadingTriviaWithoutDirectives != null
+					? previousFirstUsing.WithLeadingTrivia(previousFirstUsingLeadingTriviaWithoutDirectives)
+					: previousFirstUsing;
+
+				return (usingDirectiveWithTrivia, newPreviousFirstUsing);
+			}
 		}
 
 		/// <summary>
@@ -177,10 +217,26 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 				: node;
 		}
 
+		/// <summary>
+		/// Removes the regions from the <paramref name="trivia"/> collection.
+		/// </summary>
+		/// <param name="trivia">The trivia.</param>
+		/// <returns>
+		/// If there was some trivia removed then returns new trivia collection without regions.<br/>
+		/// Otherwise, if there was no trivias to remove, returns <see langword="null"/>.
+		/// </returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<SyntaxTrivia>? RemoveRegionsFromTrivia(in SyntaxTriviaList trivia) =>
 			RemoveDirectivesFromTrivia(trivia, removeOnlyRegions: true);
 
+		/// <summary>
+		/// Removes the compiler directives from the <paramref name="trivia"/> collection.
+		/// </summary>
+		/// <param name="trivia">The trivia.</param>
+		/// <returns>
+		/// If there was some trivia removed then returns new trivia collection without regions.<br/>
+		/// Otherwise, if there was no trivias to remove, returns <see langword="null"/>.
+		/// </returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<SyntaxTrivia>? RemoveCompilerDirectivesFromTrivia(in SyntaxTriviaList trivia) =>
 			RemoveDirectivesFromTrivia(trivia, removeOnlyRegions: false);
