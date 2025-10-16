@@ -73,8 +73,13 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 			await VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData("DacMissingOnlyCreatedByID_Expected.cs")]
-		public async Task DacMissingOnlyCreatedByID_AfterCodeFix_NoDiagnostic(string source) =>
+		[EmbeddedFileData("DacAddMissingCreatedByIdBetweenDacFields_Expected.cs")]
+		public async Task Dac_MissingCreatedByIdField_AfterCodeFix_AddedToEnd_NoDiagnostic(string source) =>
+			await VerifyCSharpDiagnosticAsync(source);
+
+		[Theory]
+		[EmbeddedFileData("DacAddMissingCreatedByIdToBeginning_Expected.cs")]
+		public async Task Dac_MissingCreatedByIdField_AfterCodeFix_AddedToBeginning_NoDiagnostic(string source) =>
 			await VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
@@ -122,11 +127,18 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 									  ])));
 
 		[Theory]
-		[EmbeddedFileData("DacMissingOnlyCreatedByID.cs")]
-		public async Task DacMissingOnlyCreatedByID_ShouldReport_OnlyMissingCreatedByID(string source) =>
+		[EmbeddedFileData("DacAddMissingCreatedByIdBetweenDacFields.cs")]
+		public async Task Dac_MissingCreatedByIdField_ShouldReport_OnlyMissingCreatedByID(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1069_MissingSingleMandatoryDacField
-							.CreateFor(8, 15, "DacMissingOnlyCreatedByID", "\"CreatedByID\""));
+							.CreateFor(8, 15, "DacAddMissingCreatedByIdBetweenDacFields", "\"CreatedByID\""));
+
+		[Theory]
+		[EmbeddedFileData("DacAddMissingCreatedByIdToBeginning.cs")]
+		public async Task Dac_MissingCreatedByIdField_DifferentFieldOrder_ShouldReport_OnlyMissingCreatedByID(string source) =>
+			await VerifyCSharpDiagnosticAsync(source,
+				Descriptors.PX1069_MissingSingleMandatoryDacField
+							.CreateFor(10, 15, "DacAddMissingCreatedByIdToBeginning", "\"CreatedByID\""));
 
 		#region Code Fix Tests
 		[Theory]
@@ -137,12 +149,17 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 
 		[Theory]
 		[EmbeddedFileData("DacAddMissingTimestampFieldToEnd.cs", "DacAddMissingTimestampFieldToEnd_Expected.cs")]
-		public async Task Dac_MissingTimestampField_CodeFix_ShouldAdd_TimestampField_ToEnd(string source, string expected) =>
+		public async Task Dac_MissingTimestampField_CodeFix_ShouldAdd_Field_ToEnd(string source, string expected) =>
 			await VerifyCSharpFixAsync(source, expected);
 
 		[Theory]
-		[EmbeddedFileData("DacMissingOnlyCreatedByID.cs", "DacMissingOnlyCreatedByID_Expected.cs")]
-		public async Task DacMissingOnlyCreatedByID_CodeFix_ShouldAdd_CreatedByIDField(string source, string expected) =>
+		[EmbeddedFileData("DacAddMissingCreatedByIdBetweenDacFields.cs", "DacAddMissingCreatedByIdBetweenDacFields_Expected.cs")]
+		public async Task Dac_MissingCreatedByIdField_CodeFix_ShouldAdd_Field_BetweenDacFields(string source, string expected) =>
+			await VerifyCSharpFixAsync(source, expected);
+
+		[Theory]
+		[EmbeddedFileData("DacAddMissingCreatedByIdToBeginning.cs", "DacAddMissingCreatedByIdToBeginning_Expected.cs")]
+		public async Task Dac_MissingCreatedByIdField_CodeFix_ShouldAdd_Field_ToBeginning(string source, string expected) =>
 			await VerifyCSharpFixAsync(source, expected);
 
 		[Theory]

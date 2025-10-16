@@ -1,18 +1,14 @@
 #nullable enable
 using PX.Data;
 
+using System;
+
 namespace Acuminator.Tests.Sources
 {
 	/// <exclude/>
 	[PXCacheName("DAC missing only CreatedByID field")]
-	public class DacMissingOnlyCreatedByID : IBqlTable
+	public class DacAddMissingCreatedByIdToBeginning : IBqlTable
 	{
-		#region Tstamp
-		[PXDBTimestamp]
-		public virtual byte[]? tstamp { get; set; }
-		public abstract class Tstamp : PX.Data.BQL.BqlByteArray.Field<Tstamp> { }
-		#endregion
-
 		#region CreatedByScreenID
 		[PXDBCreatedByScreenID]
 		public virtual string? CreatedByScreenID { get; set; }
@@ -41,6 +37,12 @@ namespace Acuminator.Tests.Sources
 		[PXDBLastModifiedDateTime]
 		public virtual System.DateTime? LastModifiedDateTime { get; set; }
 		public abstract class lastModifiedDateTime : PX.Data.BQL.BqlDateTime.Field<lastModifiedDateTime> { }
+		#endregion
+
+		#region Tstamp
+		[PXDBTimestamp]
+		public virtual byte[]? tstamp { get; set; }
+		public abstract class Tstamp : PX.Data.BQL.BqlByteArray.Field<Tstamp> { }
 		#endregion
 
 		#region ID
