@@ -47,11 +47,7 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 			if (propertyNode == null)
 				return null;
 
-			string regionName = char.IsUpper(dacFieldName[0])
-				? dacFieldName
-				: bqlFieldName;
-			bqlFieldNode = AddRegionDirectiveToBqlNode(bqlFieldNode, regionName);
-
+			bqlFieldNode = AddRegionDirectiveToBqlNode(bqlFieldNode, regionName: dacFieldName);
 			return new GeneratedDacFieldNodeInfo(propertyNode, bqlFieldNode);
 		}
 
