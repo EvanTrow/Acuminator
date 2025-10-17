@@ -117,7 +117,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 		public async Task DacMissingMultipleAuditFields_ShouldReport_MultipleMissingFields(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1069_MissingMultipleMandatoryDacFields
-							.CreateFor(10, 15, "DacMissingMultipleAuditFields",
+							.CreateFor(9, 15, "DacMissingMultipleAuditFields",
 									  CreateMissingFieldsFormatArg(
 									  [
 											DacFieldKind.CreatedByScreenID,

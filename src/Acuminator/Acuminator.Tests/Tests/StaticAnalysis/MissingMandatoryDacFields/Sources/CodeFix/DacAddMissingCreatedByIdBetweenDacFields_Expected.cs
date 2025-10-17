@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-
 using PX.Data;
 using PX.Data.BQL;
 
@@ -21,7 +20,6 @@ namespace Acuminator.Tests.Sources
 		[PXDBCreatedByID]
 		public virtual Guid? CreatedByID { get; set; }
 		#endregion
-
 		#region CreatedByScreenID
 		[PXDBCreatedByScreenID]
 		public virtual string? CreatedByScreenID { get; set; }
