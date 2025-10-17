@@ -76,9 +76,10 @@ namespace Acuminator.Utilities.Roslyn.Syntax.Trivia
 			return compilerTrivias;
 		}
 
-		public static List<SyntaxTrivia> GetRegionDirectiveLines(this in SyntaxTriviaList trivias)
+		public static List<SyntaxTrivia> GetRegionDirectiveLines(this in SyntaxTriviaList trivias, 
+																 RegionDirectiveSearchMode regionDirectiveSearchMode)
 		{
-			if (trivias.Count == 0)
+			if (trivias.Count == 0 || regionDirectiveSearchMode == RegionDirectiveSearchMode.None)
 				return [];
 
 			var regionTrivias = new List<SyntaxTrivia>(2);
@@ -87,8 +88,16 @@ namespace Acuminator.Utilities.Roslyn.Syntax.Trivia
 			for (int i = 0; i < trivias.Count; i++)
 			{
 				var trivia = trivias[i];
+				bool includeTrivia = regionDirectiveSearchMode switch
+				{
+					RegionDirectiveSearchMode.StartRegion => trivia.IsKind(SyntaxKind.RegionDirectiveTrivia),
+					RegionDirectiveSearchMode.EndRegion   => trivia.IsKind(SyntaxKind.EndRegionDirectiveTrivia),
+					RegionDirectiveSearchMode.AllRegions  => trivia.Kind() is SyntaxKind.RegionDirectiveTrivia or 
+																			  SyntaxKind.EndRegionDirectiveTrivia,
+					_ 									  => false,
+				};
 
-				if (trivia.Kind() is SyntaxKind.RegionDirectiveTrivia or SyntaxKind.EndRegionDirectiveTrivia)
+				if (includeTrivia)
 				{
 					if (previousTrivia.HasValue && previousTrivia.Value.IsKind(SyntaxKind.WhitespaceTrivia))
 						regionTrivias.Add(previousTrivia.Value);
