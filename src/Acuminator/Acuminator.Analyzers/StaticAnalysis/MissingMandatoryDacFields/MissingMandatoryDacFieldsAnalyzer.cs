@@ -148,8 +148,8 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 			var (missingDacField, insertMode) = missingMandatoryDacFieldInfos[0];
 			var properties = new Dictionary<string, string?>
 			{
-				{ PX1069Properties.MissingMandatoryDacFieldsInfos, $"{missingDacField}{Constants.FieldKindAndInsertModeSeparator}{insertMode}" },
-				{ PX1069Properties.IsSealedDac,					   dac.Symbol.IsSealed.ToString() }
+				{ DiagnosticProperties.MissingMandatoryDacFieldsInfos, $"{missingDacField}{Constants.FieldKindAndInsertModeSeparator}{insertMode}" },
+				{ DiagnosticProperties.IsSealedDac,					   dac.Symbol.IsSealed.ToString() }
 			}
 			.ToImmutableDictionary();
 
@@ -163,8 +163,8 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 											 .ToList(missingMandatoryDacFieldInfos.Count);
 			var properties = new Dictionary<string, string?>
 			{
-				{ PX1069Properties.MissingMandatoryDacFieldsInfos, missingDacFieldsInfos.Join(Constants.FieldKindsSeparator) },
-				{ PX1069Properties.IsSealedDac,					   dac.Symbol.IsSealed.ToString() }
+				{ DiagnosticProperties.MissingMandatoryDacFieldsInfos, missingDacFieldsInfos.Join(Constants.FieldKindsSeparator) },
+				{ DiagnosticProperties.IsSealedDac,					   dac.Symbol.IsSealed.ToString() }
 			}
 			.ToImmutableDictionary();
 

@@ -49,7 +49,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 			if (missingDacFieldInfos?.Count is null or 0)
 				return Task.CompletedTask;
 
-			bool isSealedDac = diagnostic.IsFlagSet(PX1069Properties.IsSealedDac);
+			bool isSealedDac = diagnostic.IsFlagSet(DiagnosticProperties.IsSealedDac);
 			context.CancellationToken.ThrowIfCancellationRequested();
 
 			string codeActionName = nameof(Resources.PX1069Fix).GetLocalized().ToString();
@@ -63,7 +63,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 
 		private List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)>? GetMissingDacFieldInfos(Diagnostic diagnostic)
 		{
-			if (!diagnostic.TryGetPropertyValue(PX1069Properties.MissingMandatoryDacFieldsInfos, out string? missingDacFieldsInfos) ||
+			if (!diagnostic.TryGetPropertyValue(DiagnosticProperties.MissingMandatoryDacFieldsInfos, out string? missingDacFieldsInfos) ||
 				missingDacFieldsInfos.IsNullOrWhiteSpace())
 			{
 				return null;
