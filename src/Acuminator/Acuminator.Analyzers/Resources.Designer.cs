@@ -2250,6 +2250,33 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add missing NoteID field to the DAC.
+        /// </summary>
+        public static string PX1110Fix {
+            get {
+                return ResourceManager.GetString("PX1110Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The DAC has DAC field with the PXDBLocalizableString attribute. Therefore, this DAC must declare NoteID DAC field..
+        /// </summary>
+        public static string PX1110Title {
+            get {
+                return ResourceManager.GetString("PX1110Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC has DAC field with the PXDBLocalizableString attribute. Therefore, this DAC must declare NoteID DAC field..
+        /// </summary>
+        public static string PX1110TitleFormat {
+            get {
+                return ResourceManager.GetString("PX1110TitleFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Suppress the {0} diagnostic with Acuminator.
         /// </summary>
         public static string SuppressDiagnosticGroupCodeActionTitle {
