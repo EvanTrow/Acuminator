@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Constants;
-using Acuminator.Utilities.Roslyn.Syntax;
+using Acuminator.Utilities.Roslyn.Syntax.Trivia;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -127,27 +127,31 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 		where TNode : SyntaxNode
 		{
 			return CopyDirectivesFromTrivia(nodeToCopyTrivia, triviaWithDirectives, copyBeforeNode, insertCopiedTriviaAfterNodeTrivia,
-											copyOnlyRegions: false);
+											regionKindsToCopy: null);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static TNode CopyRegionsFromTrivia<TNode>(TNode nodeToCopyTrivia, in SyntaxTriviaList triviaWithRegions,
-														 bool copyBeforeNode, bool insertCopiedRegionsAfterNodeTrivia)
+														 bool copyBeforeNode, bool insertCopiedRegionsAfterNodeTrivia,
+														 RegionDirectiveSearchMode regionKindsToCopy)
 		where TNode : SyntaxNode
 		{
 			return CopyDirectivesFromTrivia(nodeToCopyTrivia, triviaWithRegions, copyBeforeNode, insertCopiedRegionsAfterNodeTrivia,
-											copyOnlyRegions: true);
+											regionKindsToCopy);
 		}
 
 		private static TNode CopyDirectivesFromTrivia<TNode>(TNode nodeToCopyTrivia, in SyntaxTriviaList triviaWithDirectives,
 														 bool copyBeforeNode, bool insertCopiedTriviaAfterNodeTrivia,
-														 bool copyOnlyRegions)
+														 RegionDirectiveSearchMode? regionKindsToCopy)
 		where TNode : SyntaxNode
 		{
 			nodeToCopyTrivia.ThrowOnNull();
 
-			var directiveTrivias = copyOnlyRegions
-				? triviaWithDirectives.GetRegionDirectiveLines()
+			if (regionKindsToCopy == RegionDirectiveSearchMode.None)
+				return nodeToCopyTrivia;
+
+			var directiveTrivias = regionKindsToCopy.HasValue
+				? triviaWithDirectives.GetRegionDirectiveLines(regionKindsToCopy.Value)
 				: triviaWithDirectives.GetCompilerDirectives();
 
 			if (directiveTrivias.Count == 0)
@@ -176,19 +180,21 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 		/// <summary>
 		/// Removes the regions from the <paramref name="node"/>'s leading trivia.
 		/// </summary>
+		/// <typeparam name="TNode">Type of the node.</typeparam>
 		/// <param name="node">The syntax node to act on.</param>
+		/// <param name="regionKindsToRemove">The region kinds to remove.</param>
 		/// <returns>
 		/// The node with removed regions from leading trivia.
 		/// </returns>
 		[return: NotNullIfNotNull(nameof(node))]
-		public static TNode? RemoveRegionsFromLeadingTrivia<TNode>(this TNode? node)
+		public static TNode? RemoveRegionsFromLeadingTrivia<TNode>(this TNode? node, RegionDirectiveSearchMode regionKindsToRemove)
 		where TNode : SyntaxNode
 		{
 			if (node == null)
 				return node;
 
 			var leadingTrivia	 = node.GetLeadingTrivia();
-			var newLeadingTrivia = RemoveRegionsFromTrivia(leadingTrivia);
+			var newLeadingTrivia = RemoveRegionsFromTrivia(leadingTrivia, regionKindsToRemove);
 
 			return newLeadingTrivia != null
 				? node.WithLeadingTrivia(newLeadingTrivia)
@@ -198,19 +204,21 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 		/// <summary>
 		/// Removes the regions from the <paramref name="node"/>'s trailing trivia.
 		/// </summary>
+		/// <typeparam name="TNode">Type of the node.</typeparam>
 		/// <param name="node">The syntax node to act on.</param>
+		/// <param name="regionKindsToRemove">The region kinds to remove.</param>
 		/// <returns>
 		/// The node with removed regions from trailing trivia.
 		/// </returns>
 		[return: NotNullIfNotNull(nameof(node))]
-		public static TNode? RemoveRegionsFromTrailingTrivia<TNode>(this TNode? node)
+		public static TNode? RemoveRegionsFromTrailingTrivia<TNode>(this TNode? node, RegionDirectiveSearchMode regionKindsToRemove)
 		where TNode : SyntaxNode
 		{
 			if (node == null)
 				return node;
 
 			var trailingTrivia	  = node.GetTrailingTrivia();
-			var newTrailingTrivia = RemoveRegionsFromTrivia(trailingTrivia);
+			var newTrailingTrivia = RemoveRegionsFromTrivia(trailingTrivia, regionKindsToRemove);
 
 			return newTrailingTrivia != null
 				? node.WithTrailingTrivia(newTrailingTrivia)
@@ -221,13 +229,15 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 		/// Removes the regions from the <paramref name="trivia"/> collection.
 		/// </summary>
 		/// <param name="trivia">The trivia.</param>
+		/// <param name="regionKindsToRemove">The region kinds to remove.</param>
 		/// <returns>
 		/// If there was some trivia removed then returns new trivia collection without regions.<br/>
 		/// Otherwise, if there was no trivias to remove, returns <see langword="null"/>.
 		/// </returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<SyntaxTrivia>? RemoveRegionsFromTrivia(in SyntaxTriviaList trivia) =>
-			RemoveDirectivesFromTrivia(trivia, removeOnlyRegions: true);
+		public static IEnumerable<SyntaxTrivia>? RemoveRegionsFromTrivia(in SyntaxTriviaList trivia, 
+																		 RegionDirectiveSearchMode regionKindsToRemove) =>
+			RemoveDirectivesFromTrivia(trivia, regionKindsToRemove);
 
 		/// <summary>
 		/// Removes the compiler directives from the <paramref name="trivia"/> collection.
@@ -239,15 +249,16 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 		/// </returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<SyntaxTrivia>? RemoveCompilerDirectivesFromTrivia(in SyntaxTriviaList trivia) =>
-			RemoveDirectivesFromTrivia(trivia, removeOnlyRegions: false);
+			RemoveDirectivesFromTrivia(trivia, regionKindsToRemove: null);
 
-		private static IEnumerable<SyntaxTrivia>? RemoveDirectivesFromTrivia(in SyntaxTriviaList trivia, bool removeOnlyRegions)
+		private static IEnumerable<SyntaxTrivia>? RemoveDirectivesFromTrivia(in SyntaxTriviaList trivia, 
+																			 RegionDirectiveSearchMode? regionKindsToRemove)
 		{
-			if (trivia.Count == 0)
+			if (trivia.Count == 0 || regionKindsToRemove == RegionDirectiveSearchMode.None)
 				return null;
 
-			var directiveTrivias = removeOnlyRegions 
-				? trivia.GetRegionDirectiveLines()
+			var directiveTrivias = regionKindsToRemove.HasValue
+				? trivia.GetRegionDirectiveLines(regionKindsToRemove.Value)
 				: trivia.GetCompilerDirectives();
 
 			if (directiveTrivias.Count == 0)

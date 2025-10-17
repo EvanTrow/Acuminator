@@ -14,6 +14,7 @@ using Acuminator.Utilities.Roslyn.CSharpVersion;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 using Acuminator.Utilities.Roslyn.Syntax;
+using Acuminator.Utilities.Roslyn.Syntax.Trivia;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
@@ -417,6 +418,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 
 			if (isInsertedAtEnd)
 			{
+				// For a first field inserted at the end of a DAC we need to copy regions from the DAC closing brace token
+				// Because those regions belong to the old last DAC field. 
+				// We need to insert them into the leading trivia of a new last DAC field.
 				if (isFirstFieldAddedToEnd)
 				{
 					bqlFieldNodeWithRegions = CopyRegionsFromDacCloseBraceToken(dacNode, newDacMembers, bqlFieldNodeWithRegions);
@@ -434,14 +438,19 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 		private static ClassDeclarationSyntax CopyRegionsFromPreviousMemberTrailingTrivia(List<MemberDeclarationSyntax> newDacMembers,
 																						  ClassDeclarationSyntax bqlFieldNode, int indexToInsert)
 		{
-			var prevMember = newDacMembers[indexToInsert - 1];
+			// If the new field is inserted at the end of the DAC, then the previous DAC member will be located at the end of the list.
+			// Otherwise, the previous DAC member will be the member at the index where we are going to insert the new field.
+			var prevMember = indexToInsert == newDacMembers.Count
+				? newDacMembers[^1]
+				: newDacMembers[indexToInsert];
 			var prevMemberTrailingTrivia = prevMember.GetTrailingTrivia();
 
 			if (prevMemberTrailingTrivia.Count > 0 && prevMemberTrailingTrivia.Any(trivia => trivia.IsDirective))
 			{
 				bqlFieldNode = CodeGeneration.CopyRegionsFromTrivia(bqlFieldNode, prevMemberTrailingTrivia,
-																	copyBeforeNode: true, insertCopiedRegionsAfterNodeTrivia: false);
-				var lastMemberWithoutRegions = prevMember.RemoveRegionsFromTrailingTrivia();
+																	copyBeforeNode: true, insertCopiedRegionsAfterNodeTrivia: false, 
+																	RegionDirectiveSearchMode.EndRegion);
+				var lastMemberWithoutRegions = prevMember.RemoveRegionsFromTrailingTrivia(RegionDirectiveSearchMode.EndRegion);
 				newDacMembers[indexToInsert - 1] = lastMemberWithoutRegions;
 			}
 
@@ -457,7 +466,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 			if (closeDacBraceLeadingTrivia.Count > 0 && closeDacBraceLeadingTrivia.Any(trivia => trivia.IsDirective))
 			{
 				bqlFieldNode = CodeGeneration.CopyRegionsFromTrivia(bqlFieldNode, closeDacBraceLeadingTrivia,
-																	copyBeforeNode: true, insertCopiedRegionsAfterNodeTrivia: false);
+																	copyBeforeNode: true, insertCopiedRegionsAfterNodeTrivia: false,
+																	RegionDirectiveSearchMode.AllRegions);
 			}
 
 			return bqlFieldNode;
@@ -470,7 +480,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 			if (closeDacBraceLeadingTrivia.Count == 0 || !closeDacBraceLeadingTrivia.Any(trivia => trivia.IsDirective))
 				return dacNode;
 
-			var closeDacBraceLeadingTriviaWithoutRegions = CodeGeneration.RemoveRegionsFromTrivia(closeDacBraceLeadingTrivia);
+			var closeDacBraceLeadingTriviaWithoutRegions = CodeGeneration.RemoveRegionsFromTrivia(closeDacBraceLeadingTrivia, 
+																								  RegionDirectiveSearchMode.AllRegions);
 			closeDacBraceLeadingTriviaWithoutRegions = closeDacBraceLeadingTriviaWithoutRegions?.AppendItem(ElasticCarriageReturnLineFeed) ??
 													   [ElasticCarriageReturnLineFeed];
 			var closeBraceTokenWithoutRegions = dacNode.CloseBraceToken.WithLeadingTrivia(closeDacBraceLeadingTriviaWithoutRegions);

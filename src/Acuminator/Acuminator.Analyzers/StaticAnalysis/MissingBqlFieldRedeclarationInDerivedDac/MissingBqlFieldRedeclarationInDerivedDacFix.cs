@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.CodeGeneration;
+using Acuminator.Utilities.Roslyn.Syntax.Trivia;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
@@ -222,7 +223,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDeri
 
 				if (relatedProperty != null)
 				{
-					var relatedPropertyWithoutRegions = relatedProperty.RemoveRegionsFromLeadingTrivia();
+					var relatedPropertyWithoutRegions = relatedProperty.RemoveRegionsFromLeadingTrivia(RegionDirectiveSearchMode.AllRegions);
 
 					// Do this two step replacement of relatedProperty indtead of ReplaceNode because relatedProperty won't be found in the new syntax tree
 					newMembers = newMembers.RemoveAt(indexToInsert);
@@ -231,7 +232,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDeri
 
 				var newBqlFieldNodeWithTrivia = ReferenceEquals(lastFieldInsertedAtTheEnd.NewBqlNode, newBqlFieldNode)
 					? CodeGeneration.CopyRegionsFromTrivia(newBqlFieldNode, dacNode.CloseBraceToken.LeadingTrivia, 
-														   copyBeforeNode: true, insertCopiedRegionsAfterNodeTrivia: true)
+														   copyBeforeNode: true, insertCopiedRegionsAfterNodeTrivia: true,
+														   RegionDirectiveSearchMode.AllRegions)
 					: newBqlFieldNode;
 
 				bool insertAtTheEnd = indexToInsert == dacMembersCount;
@@ -347,8 +349,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDeri
 
 			if (insertedAtEnd)
 			{
-				var newCloseBraketTrivia = CodeGeneration.RemoveRegionsFromTrivia(newDacNode.CloseBraceToken.LeadingTrivia);
-
+				var newCloseBraketTrivia = CodeGeneration.RemoveRegionsFromTrivia(newDacNode.CloseBraceToken.LeadingTrivia, 
+																				  RegionDirectiveSearchMode.AllRegions);
 				if (newCloseBraketTrivia == null)
 					return newDacNode;
 

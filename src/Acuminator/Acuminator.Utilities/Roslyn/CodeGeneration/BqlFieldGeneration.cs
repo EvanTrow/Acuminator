@@ -2,6 +2,7 @@
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Constants;
+using Acuminator.Utilities.Roslyn.Syntax.Trivia;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -191,7 +192,8 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 				return bqlFieldNode;
 
 			var bqlFieldNodeWithCopiedRegions = CodeGeneration.CopyRegionsFromTrivia(bqlFieldNode, leadingTrivia,
-													copyBeforeNode: true, insertCopiedRegionsAfterNodeTrivia: true);
+													copyBeforeNode: true, insertCopiedRegionsAfterNodeTrivia: true,
+													RegionDirectiveSearchMode.AllRegions);
 			return bqlFieldNodeWithCopiedRegions;
 		}
 	}

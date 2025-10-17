@@ -11,6 +11,7 @@ using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.CodeGeneration;
 using Acuminator.Utilities.Roslyn.CSharpVersion;
 using Acuminator.Utilities.Roslyn.Syntax;
+using Acuminator.Utilities.Roslyn.Syntax.Trivia;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
@@ -128,7 +129,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoBqlFieldForDacFieldProperty
 			if (newBqlFieldNode == null)
 				return null;
 
-			var propertyWithoutRegions = propertyWithoutBqlFieldNode.RemoveRegionsFromLeadingTrivia();
+			var propertyWithoutRegions = propertyWithoutBqlFieldNode.RemoveRegionsFromLeadingTrivia(RegionDirectiveSearchMode.AllRegions);
 			var newMembers = members.Replace(propertyWithoutBqlFieldNode, propertyWithoutRegions)
 									.Insert(propertyMemberIndex, newBqlFieldNode);
 			return newMembers;
