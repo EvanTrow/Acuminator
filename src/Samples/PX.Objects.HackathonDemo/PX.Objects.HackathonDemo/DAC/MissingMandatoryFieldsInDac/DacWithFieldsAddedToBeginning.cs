@@ -10,15 +10,35 @@ namespace Acuminator.Tests.Sources
 	[PXCacheName("DAC with fields added to beginning")]
 	public class DacWithFieldsAddedToBeginning : IBqlTable
 	{
+		#region CreatedByID
+		public abstract class createdByID : BqlGuid.Field<createdByID> { }
+
+		[PXDBCreatedByID]
+		public virtual Guid? CreatedByID { get; set; }
+		#endregion
 		#region CreatedDateTime
+		/// <inheritdoc cref="CreatedDateTime"/>
 		public abstract class createdDateTime : BqlDateTime.Field<createdDateTime> { }
 
+		/// <summary>
+		/// Created date time.
+		/// </summary>
 		[PXDBCreatedDateTime]
 		public virtual DateTime? CreatedDateTime { get; set; }
 		#endregion
+		#region CreatedByScreenID
+		public abstract class createdByScreenID : BqlString.Field<createdByScreenID> { }
+
+		[PXDBCreatedByScreenID]
+		public virtual string? CreatedByScreenID { get; set; }
+		#endregion
 		#region LastModifiedByID
+		/// <inheritdoc cref="LastModifiedByID"/>
 		public abstract class lastModifiedByID : BqlGuid.Field<lastModifiedByID> { }
 
+		/// <summary>
+		/// ID of the user who modified record last.
+		/// </summary>
 		[PXDBLastModifiedByID]
 		public virtual Guid? LastModifiedByID { get; set; }
 		#endregion
