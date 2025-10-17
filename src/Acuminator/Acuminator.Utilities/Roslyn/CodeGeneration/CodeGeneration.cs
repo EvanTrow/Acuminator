@@ -45,7 +45,7 @@ namespace Acuminator.Utilities.Roslyn.CodeGeneration
 				return root;
 
 			bool isSystemNamespace = namespaceName == NamespaceNames.System ||
-									 namespaceName.StartsWith($"{NamespaceNames.System}.", StringComparison.Ordinal);
+									 namespaceName.StartsWith(NamespaceNames.SystemWithDot, StringComparison.Ordinal);
 			var newUsingDirective = UsingDirective(
 										ParseName(namespaceName));
 
