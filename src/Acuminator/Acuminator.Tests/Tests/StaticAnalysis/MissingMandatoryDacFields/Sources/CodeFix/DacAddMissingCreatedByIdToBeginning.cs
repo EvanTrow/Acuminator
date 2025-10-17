@@ -39,7 +39,7 @@ namespace Acuminator.Tests.Sources
 		public abstract class lastModifiedDateTime : PX.Data.BQL.BqlDateTime.Field<lastModifiedDateTime> { }
 		#endregion
 
-		#region Tstamp
+		#region tstamp
 		[PXDBTimestamp]
 		public virtual byte[]? tstamp { get; set; }
 		public abstract class Tstamp : PX.Data.BQL.BqlByteArray.Field<Tstamp> { }

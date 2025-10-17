@@ -9,7 +9,7 @@ namespace Acuminator.Tests.Sources
 	[PXCacheName("DAC missing multiple audit fields")]
 	public class DacMissingMultipleAuditFields : IBqlTable
 	{
-		#region Tstamp
+		#region tstamp
 		[PXDBTimestamp]
 		public virtual byte[]? tstamp { get; set; }
 

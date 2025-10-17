@@ -20,7 +20,7 @@ namespace Acuminator.Tests.Sources
 		public abstract class description : PX.Data.BQL.BqlString.Field<description> { }
 		#endregion
 
-		#region Tstamp
+		#region tstamp
 		[PXDBTimestamp]
 		public virtual byte[]? tstamp { get; set; }
 

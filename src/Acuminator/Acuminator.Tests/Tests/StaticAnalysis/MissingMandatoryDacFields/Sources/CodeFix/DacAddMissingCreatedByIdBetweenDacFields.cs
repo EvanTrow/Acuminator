@@ -7,7 +7,7 @@ namespace Acuminator.Tests.Sources
 	[PXCacheName("DAC missing only CreatedByID field")]
 	public class DacAddMissingCreatedByIdBetweenDacFields : IBqlTable
 	{
-		#region Tstamp
+		#region tstamp
 		[PXDBTimestamp]
 		public virtual byte[]? tstamp { get; set; }
 		public abstract class Tstamp : PX.Data.BQL.BqlByteArray.Field<Tstamp> { }

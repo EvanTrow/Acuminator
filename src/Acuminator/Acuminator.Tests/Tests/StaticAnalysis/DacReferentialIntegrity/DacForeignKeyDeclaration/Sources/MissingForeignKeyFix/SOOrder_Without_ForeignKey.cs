@@ -100,7 +100,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.DacForei
 		public virtual DateTime? OrderDate { get; set; }
 		#endregion
 
-		#region Tstamp
+		#region tstamp
 		[PXDBTimestamp]
 		public virtual byte[] tstamp { get; set; }
 
