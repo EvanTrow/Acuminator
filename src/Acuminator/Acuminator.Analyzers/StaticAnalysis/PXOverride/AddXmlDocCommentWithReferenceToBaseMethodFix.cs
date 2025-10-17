@@ -8,14 +8,13 @@ using System.Threading.Tasks;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
-using Acuminator.Utilities.Roslyn.Syntax;
+using Acuminator.Utilities.Roslyn.Syntax.Trivia;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Simplification;
 using Microsoft.CodeAnalysis.Text;
 

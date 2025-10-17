@@ -14,7 +14,7 @@ using Acuminator.Utilities.Roslyn.PXFieldAttributes;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
-using Acuminator.Utilities.Roslyn.Syntax;
+using Acuminator.Utilities.Roslyn.Syntax.Trivia;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
