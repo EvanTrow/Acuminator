@@ -8,14 +8,24 @@ namespace Acuminator.Tests.Sources
 	public class DacAddMissingCreatedByIdBetweenDacFields : IBqlTable
 	{
 		#region tstamp
+		/// <summary>
+		/// The timestamp.
+		/// </summary>
 		[PXDBTimestamp]
 		public virtual byte[]? tstamp { get; set; }
+
+		/// <inheritdoc cref="tstamp"/>
 		public abstract class Tstamp : PX.Data.BQL.BqlByteArray.Field<Tstamp> { }
 		#endregion
 
 		#region CreatedByScreenID
+		/// <summary>
+		/// The screen ID from which the record was created.
+		/// </summary>
 		[PXDBCreatedByScreenID]
 		public virtual string? CreatedByScreenID { get; set; }
+
+		/// <inheritdoc cref="CreatedByScreenID"/>
 		public abstract class createdByScreenID : PX.Data.BQL.BqlString.Field<createdByScreenID> { }
 		#endregion
 
