@@ -2250,7 +2250,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add missing NoteID field to the DAC.
+        ///   Looks up a localized string similar to Add missing &quot;NoteID&quot; field to the DAC.
         /// </summary>
         public static string PX1110Fix {
             get {
