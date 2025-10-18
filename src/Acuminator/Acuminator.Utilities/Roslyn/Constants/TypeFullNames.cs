@@ -177,14 +177,15 @@
 
 		public const string PXStringListAttribute = "PX.Data.PXStringListAttribute";
 
-		public const string PXProtectedAccessAttribute = "PX.Data.PXProtectedAccessAttribute";
-		public const string PXProjectionAttribute = "PX.Data.PXProjectionAttribute";
-		public const string PXSelectorAttribute = "PX.Data.PXSelectorAttribute";
+		public const string PXProtectedAccessAttribute 	 = "PX.Data.PXProtectedAccessAttribute";
+		public const string PXProjectionAttribute 		 = "PX.Data.PXProjectionAttribute";
+		public const string PXSelectorAttribute 		 = "PX.Data.PXSelectorAttribute";
 		public const string PXDimensionSelectorAttribute = "PX.Data.PXDimensionSelectorAttribute";
-		public const string PXParentAttribute = "PX.Data.PXParentAttribute";
-		public const string PXForeignReferenceAttribute = "PX.Data.ReferentialIntegrity.Attributes.PXForeignReferenceAttribute";
-		public const string PXDBDefaultAttribute = "PX.Data.PXDBDefaultAttribute";
-		public const string PXAccumulatorAttribute = "PX.Data.PXAccumulatorAttribute";
+		public const string PXParentAttribute 			 = "PX.Data.PXParentAttribute";
+		public const string PXForeignReferenceAttribute  = "PX.Data.ReferentialIntegrity.Attributes.PXForeignReferenceAttribute";
+		public const string PXDBDefaultAttribute 		 = "PX.Data.PXDBDefaultAttribute";
+		public const string PXAccumulatorAttribute 		 = "PX.Data.PXAccumulatorAttribute";
+		public const string PXNoteAttribute 			 = "PX.Data.PXNoteAttribute";
 
 		public const string PXView = "PX.Data.PXView";
 
