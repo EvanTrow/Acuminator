@@ -8,6 +8,7 @@ using System.Threading;
 using Acuminator.Analyzers.StaticAnalysis.Dac;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression;
+using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 
@@ -32,24 +33,24 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 
 	public override void Analyze(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dac)
 	{
-		var missingMandatoryDacFieldKinds = GetMissingMandatoryDacFieldsInfos(dac, pxContext, symbolContext.CancellationToken);
+		var missingMandatoryDacFieldKinds = GetMissingMandatoryDacFieldsInfos(dac, symbolContext.CancellationToken);
 
-		if (missingMandatoryDacFieldKinds.MissingAuditAndTimestampInfos.Count > 0)
+		if (missingMandatoryDacFieldKinds.Count > 0)
 		{
-			ReportMissingMandatoryTimestampAndAuditDacFields(symbolContext, pxContext, dac, 
-															 missingMandatoryDacFieldKinds.MissingAuditAndTimestampInfos);
+			ReportMissingMandatoryTimestampAndAuditDacFields(symbolContext, pxContext, dac, missingMandatoryDacFieldKinds);
 		}
 
-		if (missingMandatoryDacFieldKinds.MissingNoteIdFieldInfo.HasValue)
+		var missingNoteIdFieldInfo = GetMissingNoteIdFieldInfo(dac, pxContext);
+
+		if (missingNoteIdFieldInfo.HasValue)
 		{
-			ReportMissingNoteIdDacField(symbolContext, pxContext, dac, missingMandatoryDacFieldKinds.MissingNoteIdFieldInfo.Value);
+			ReportMissingNoteIdDacField(symbolContext, pxContext, dac, missingNoteIdFieldInfo.Value);
 		}
 	}
 
-	private static MissingDacFieldsInfos GetMissingMandatoryDacFieldsInfos(DacSemanticModel dac, PXContext pxContext, CancellationToken cancellation)
+	private static List<MissingMandatoryDacFieldInfo> GetMissingMandatoryDacFieldsInfos(DacSemanticModel dac, CancellationToken cancellation)
 	{
 		var missingMandatoryDacFieldKinds = GetMandatoryDacFieldKinds();
-		bool hasNoteID = false;
 
 		// Check every DAC field in this DAC and its base DACs if there are any to see that if all mandatory DAC fields are present
 		foreach (var dacField in dac.DacFields)
@@ -58,26 +59,6 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 
 			if (dacField.FieldKind == DacFieldKind.tstamp || dacField.FieldKind.IsAuditField())
 				missingMandatoryDacFieldKinds.Remove(dacField.FieldKind);
-			else if (dacField.FieldKind == DacFieldKind.NoteID)
-				hasNoteID = true;
-		}
-
-		bool hasFieldWithLocalizableValues = false;
-		var pxDBLocalizableStringAttribute = pxContext.FieldAttributes.PXDBLocalizableStringAttribute;
-		MissingMandatoryDacFieldInfo? missingNoteIdFieldInfo = null;
-
-		if (!hasNoteID && pxDBLocalizableStringAttribute != null)
-		{
-			hasFieldWithLocalizableValues =
-				 dac.DacFieldPropertiesWithAcumaticaAttributes
-					.Where(p => p.PropertyTypeUnwrappedNullable.SpecialType == SpecialType.System_String)
-					.SelectMany(property => property.DeclaredDataTypeAttributes.AllDeclaredDatatypeAttributesOnDacProperty)
-					.Any(attributeInfo => attributeInfo.AggregatesAttribute(pxDBLocalizableStringAttribute));
-
-			if (hasFieldWithLocalizableValues)
-			{
-				missingNoteIdFieldInfo = new MissingMandatoryDacFieldInfo(DacFieldKind.NoteID, DacFieldInsertMode.AtTheEnd);
-			}
 		}
 
 		// cheap check for presence of declared DAC fields
@@ -86,7 +67,7 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 			var missingMandatoryFields = 
 				missingMandatoryDacFieldKinds.Select(fieldKind => new MissingMandatoryDacFieldInfo(fieldKind, DacFieldInsertMode.AtTheEnd))
 											 .ToList(missingMandatoryDacFieldKinds.Count);
-			return new MissingDacFieldsInfos(missingMandatoryFields, missingNoteIdFieldInfo);
+			return missingMandatoryFields;
 		}
 
 		var (hasCreatedAuditFields, hasLastModifiedAuditFields) = CheckForDeclaredAuditFields(dac);
@@ -102,7 +83,30 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 			}
 		}
 
-		return new MissingDacFieldsInfos(missingMandatoryDacFieldKindsWithIndexes, missingNoteIdFieldInfo);
+		return missingMandatoryDacFieldKindsWithIndexes;
+	}
+
+	private MissingMandatoryDacFieldInfo? GetMissingNoteIdFieldInfo(DacSemanticModel dac, PXContext pxContext)
+	{
+		bool hasNoteID = dac.PropertiesByNames.ContainsKey(DacFieldNames.System.NoteID);
+		var pxDBLocalizableStringAttribute = pxContext.FieldAttributes.PXDBLocalizableStringAttribute;
+		MissingMandatoryDacFieldInfo? missingNoteIdFieldInfo = null;
+
+		if (!hasNoteID && pxDBLocalizableStringAttribute != null)
+		{
+			bool hasFieldWithLocalizableValues =
+				 dac.DacFieldPropertiesWithAcumaticaAttributes
+					.Where(p => p.PropertyTypeUnwrappedNullable.SpecialType == SpecialType.System_String)
+					.SelectMany(property => property.DeclaredDataTypeAttributes.AllDeclaredDatatypeAttributesOnDacProperty)
+					.Any(attributeInfo => attributeInfo.AggregatesAttribute(pxDBLocalizableStringAttribute));
+
+			if (hasFieldWithLocalizableValues)
+			{
+				missingNoteIdFieldInfo = new MissingMandatoryDacFieldInfo(DacFieldKind.NoteID, DacFieldInsertMode.AtTheEnd);
+			}
+		}
+
+		return missingNoteIdFieldInfo;
 	}
 
 	private static List<DacFieldKind> GetMandatoryDacFieldKinds() =>
