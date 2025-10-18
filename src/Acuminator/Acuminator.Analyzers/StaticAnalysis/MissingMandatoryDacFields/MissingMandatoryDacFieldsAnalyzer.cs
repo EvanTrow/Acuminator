@@ -22,7 +22,8 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 		ImmutableArray.Create
 		(
 			Descriptors.PX1069_MissingSingleMandatoryDacField,
-			Descriptors.PX1069_MissingMultipleMandatoryDacFields
+			Descriptors.PX1069_MissingMultipleMandatoryDacFields,
+			Descriptors.PX1110_MissingNoteIdFieldInDacWithLocalizableFieldValues
 		);
 
 	public override bool ShouldAnalyze(PXContext pxContext, [NotNullWhen(true)] DacSemanticModel dac) => 
@@ -31,18 +32,24 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 
 	public override void Analyze(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dac)
 	{
-		var missingMandatoryDacFieldKinds = GetMissingMandatoryDacFieldsInfos(dac, symbolContext.CancellationToken);
+		var missingMandatoryDacFieldKinds = GetMissingMandatoryDacFieldsInfos(dac, pxContext, symbolContext.CancellationToken);
 
-		if (missingMandatoryDacFieldKinds.Count > 0)
+		if (missingMandatoryDacFieldKinds.MissingAuditAndTimestampInfos.Count > 0)
 		{
-			ReportMissingMandatoryDacFields(symbolContext, pxContext, dac, missingMandatoryDacFieldKinds);
+			ReportMissingMandatoryTimestampAndAuditDacFields(symbolContext, pxContext, dac, 
+															 missingMandatoryDacFieldKinds.MissingAuditAndTimestampInfos);
+		}
+
+		if (missingMandatoryDacFieldKinds.MissingNoteIdFieldInfo.HasValue)
+		{
+			ReportMissingNoteIdDacField(symbolContext, pxContext, dac, missingMandatoryDacFieldKinds.MissingNoteIdFieldInfo.Value);
 		}
 	}
 
-	private static List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)> GetMissingMandatoryDacFieldsInfos(DacSemanticModel dac, 
-																									  CancellationToken cancellation)
+	private static MissingDacFieldsInfos GetMissingMandatoryDacFieldsInfos(DacSemanticModel dac, PXContext pxContext, CancellationToken cancellation)
 	{
 		var missingMandatoryDacFieldKinds = GetMandatoryDacFieldKinds();
+		bool hasNoteID = false;
 
 		// Check every DAC field in this DAC and its base DACs if there are any to see that if all mandatory DAC fields are present
 		foreach (var dacField in dac.DacFields)
@@ -51,19 +58,39 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 
 			if (dacField.FieldKind == DacFieldKind.tstamp || dacField.FieldKind.IsAuditField())
 				missingMandatoryDacFieldKinds.Remove(dacField.FieldKind);
+			else if (dacField.FieldKind == DacFieldKind.NoteID)
+				hasNoteID = true;
+		}
+
+		bool hasFieldWithLocalizableValues = false;
+		var pxDBLocalizableStringAttribute = pxContext.FieldAttributes.PXDBLocalizableStringAttribute;
+		MissingMandatoryDacFieldInfo? missingNoteIdFieldInfo = null;
+
+		if (!hasNoteID && pxDBLocalizableStringAttribute != null)
+		{
+			hasFieldWithLocalizableValues =
+				 dac.DacFieldPropertiesWithAcumaticaAttributes
+					.Where(p => p.PropertyTypeUnwrappedNullable.SpecialType == SpecialType.System_String)
+					.SelectMany(property => property.DeclaredDataTypeAttributes.AllDeclaredDatatypeAttributesOnDacProperty)
+					.Any(attributeInfo => attributeInfo.AggregatesAttribute(pxDBLocalizableStringAttribute));
+
+			if (hasFieldWithLocalizableValues)
+			{
+				missingNoteIdFieldInfo = new MissingMandatoryDacFieldInfo(DacFieldKind.NoteID, DacFieldInsertMode.AtTheEnd);
+			}
 		}
 
 		// cheap check for presence of declared DAC fields
-		if (dac.Node == null || dac.Node.Members.Count == 0)
+		if (dac.Node?.Members.Count is null or 0)
 		{
-			return missingMandatoryDacFieldKinds.Select(fieldKind => (FieldKind: fieldKind, InsertMode: DacFieldInsertMode.AtTheEnd))
-												.ToList(missingMandatoryDacFieldKinds.Count);
+			var missingMandatoryFields = 
+				missingMandatoryDacFieldKinds.Select(fieldKind => new MissingMandatoryDacFieldInfo(fieldKind, DacFieldInsertMode.AtTheEnd))
+											 .ToList(missingMandatoryDacFieldKinds.Count);
+			return new MissingDacFieldsInfos(missingMandatoryFields, missingNoteIdFieldInfo);
 		}
 
 		var (hasCreatedAuditFields, hasLastModifiedAuditFields) = CheckForDeclaredAuditFields(dac);
-
-		var missingMandatoryDacFieldKindsWithIndexes = 
-			new List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)>(missingMandatoryDacFieldKinds.Count);
+		var missingMandatoryDacFieldKindsWithIndexes = new List<MissingMandatoryDacFieldInfo>(missingMandatoryDacFieldKinds.Count);
 
 		foreach (DacFieldKind missingFieldKind in missingMandatoryDacFieldKinds)
 		{
@@ -71,11 +98,11 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 
 			if (insertMode != null)
 			{
-				missingMandatoryDacFieldKindsWithIndexes.Add((FieldKind: missingFieldKind, InsertMode: insertMode.Value)); 
+				missingMandatoryDacFieldKindsWithIndexes.Add(new MissingMandatoryDacFieldInfo(missingFieldKind, insertMode.Value)); 
 			}
 		}
 
-		return missingMandatoryDacFieldKindsWithIndexes;
+		return new MissingDacFieldsInfos(missingMandatoryDacFieldKindsWithIndexes, missingNoteIdFieldInfo);
 	}
 
 	private static List<DacFieldKind> GetMandatoryDacFieldKinds() =>
@@ -134,8 +161,8 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 			_								  => null
 		};
 
-	private static void ReportMissingMandatoryDacFields(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dac,
-														List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)> missingMandatoryDacFieldInfos)
+	protected virtual void ReportMissingMandatoryTimestampAndAuditDacFields(SymbolAnalysisContext symbolContext, PXContext pxContext, 
+														DacSemanticModel dac, List<MissingMandatoryDacFieldInfo> missingMandatoryDacFieldInfos)
 	{
 		symbolContext.CancellationToken.ThrowIfCancellationRequested();
 
@@ -174,6 +201,26 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 			diagnostic = Diagnostic.Create(Descriptors.PX1069_MissingMultipleMandatoryDacFields, location, properties, messageArgs);
 		}
 
+		symbolContext.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
+	}
+
+	protected virtual void ReportMissingNoteIdDacField(SymbolAnalysisContext symbolContext, PXContext pxContext,
+													   DacSemanticModel dac, MissingMandatoryDacFieldInfo missingNoteIdFieldInfo)
+	{
+		symbolContext.CancellationToken.ThrowIfCancellationRequested();
+
+		var location = dac.Node!.Identifier.GetLocation().NullIfLocationKindIsNone() ??
+					   dac.Symbol.Locations.FirstOrDefault();
+
+		var (missingDacField, insertMode) = missingNoteIdFieldInfo;
+		var properties = new Dictionary<string, string?>
+			{
+				{ DiagnosticProperties.MissingMandatoryDacFieldsInfos, $"{missingDacField}{Constants.FieldKindAndInsertModeSeparator}{insertMode}" },
+				{ DiagnosticProperties.IsSealedDac,						dac.Symbol.IsSealed.ToString() }
+			}
+		.ToImmutableDictionary();
+
+		var diagnostic = Diagnostic.Create(Descriptors.PX1110_MissingNoteIdFieldInDacWithLocalizableFieldValues, location, properties, dac.Name);
 		symbolContext.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 	}
 }
