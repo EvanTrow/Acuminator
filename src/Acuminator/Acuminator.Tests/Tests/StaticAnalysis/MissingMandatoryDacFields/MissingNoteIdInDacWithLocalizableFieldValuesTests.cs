@@ -73,11 +73,24 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 		[EmbeddedFileData(@"PX1110\DacWithoutBothNoteIdAndLocalizableField.cs")]
 		public async Task Dac_WithoutBoth_NoteId_And_LocalizableField_NoDiagnostic(string source) =>
 			await VerifyCSharpDiagnosticAsync(source);
+
+		[Theory]
+		[EmbeddedFileData(@"PX1110\DacWithLocalizableFieldAndNoNoteID_Expected.cs")]
+		public async Task Dac_WithLocalizableField_And_WithoutNoteID_AfterCodeFix_NoDiagnostic(string source) =>
+			await VerifyCSharpDiagnosticAsync(source);
 		#endregion
 
-		#region Code Fix Tests
+		[Theory]
+		[EmbeddedFileData(@"PX1110\DacWithLocalizableFieldAndNoNoteID.cs")]
+		public async Task Dac_WithLocalizableField_And_WithoutNoteID(string source) =>
+			await VerifyCSharpDiagnosticAsync(source,
+				Descriptors.PX1110_MissingNoteIdFieldInDacWithLocalizableFieldValues
+						   .CreateFor(9, 15, "DacWithLocalizableFieldAndNoNoteID"));
 
-		#endregion
+		[Theory]
+		[EmbeddedFileData(@"PX1110\DacWithLocalizableFieldAndNoNoteID.cs", @"PX1110\DacWithLocalizableFieldAndNoNoteID_Expected.cs")]
+		public async Task Dac_WithLocalizableField_And_WithoutNoteID_CodeFix_ShouldAdd_NoteID_ToEnd(string source, string expected) =>
+			await VerifyCSharpFixAsync(source, expected);
 
 		private sealed class MissingNoteIdAnalyzerForPX1110Tests : MissingMandatoryDacFieldsAnalyzer
 		{
