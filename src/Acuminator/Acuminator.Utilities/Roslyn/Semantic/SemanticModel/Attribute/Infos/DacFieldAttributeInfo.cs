@@ -88,7 +88,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Attribute
 																										flattenedAttributeTypes, aggregatedMetadata);
 
 			return new DacFieldAttributeInfo(dbBoundnessCalculator.Context, attribute, flattenedAttributeApplications, flattenedAttributeTypes, 
-											 aggregatedMetadata, dbBoundness,declarationOrder);
+											 aggregatedMetadata, dbBoundness, declarationOrder);
 		}
 
 		private static bool IsDerivedFromIdentityTypes(ISet<ITypeSymbol> flattenedAttributes, PXContext pxContext) =>
