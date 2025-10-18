@@ -35,7 +35,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 			new[]
 			{
 				Descriptors.PX1069_MissingSingleMandatoryDacField.Id,
-				Descriptors.PX1069_MissingMultipleMandatoryDacFields.Id
+				Descriptors.PX1069_MissingMultipleMandatoryDacFields.Id,
+				Descriptors.PX1110_MissingNoteIdFieldInDacWithLocalizableFieldValues.Id
 			}
 			.Distinct()
 			.ToImmutableArray();
@@ -43,7 +44,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 		protected override Task RegisterCodeFixesForDiagnosticAsync(CodeFixContext context, Diagnostic diagnostic)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
-
 			var missingDacFieldInfos = GetMissingDacFieldInfos(diagnostic);
 
 			if (missingDacFieldInfos?.Count is null or 0)
@@ -52,12 +52,22 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 			bool isSealedDac = diagnostic.IsFlagSet(DiagnosticProperties.IsSealedDac);
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			string codeActionName = nameof(Resources.PX1069Fix).GetLocalized().ToString();
-			var codeAction = CodeAction.Create(codeActionName,
-											   cToken => AddMissingDacFieldsAsync(context.Document, context.Span, missingDacFieldInfos,
-																				  isSealedDac, cToken),
-											   equivalenceKey: codeActionName);
-			context.RegisterCodeFix(codeAction, diagnostic);
+			string? codeActionName = 
+				diagnostic.Id.Equals(Descriptors.PX1069_MissingSingleMandatoryDacField.Id, StringComparison.OrdinalIgnoreCase)
+					? nameof(Resources.PX1069Fix).GetLocalized().ToString()
+					: diagnostic.Id.Equals(Descriptors.PX1110_MissingNoteIdFieldInDacWithLocalizableFieldValues.Id, StringComparison.OrdinalIgnoreCase)
+						? nameof(Resources.PX1110Fix).GetLocalized().ToString()
+						: null;
+
+			if (codeActionName != null)
+			{
+				var codeAction = CodeAction.Create(codeActionName,
+												   cToken => AddMissingDacFieldsAsync(context.Document, context.Span, missingDacFieldInfos,
+																					  isSealedDac, cToken),
+												   equivalenceKey: codeActionName);
+				context.RegisterCodeFix(codeAction, diagnostic);
+			}
+
 			return Task.CompletedTask;
 		}
 
@@ -246,8 +256,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 					bool isNullablePropertyType = IsNullableRefTypeForDacProperty(semanticModel, insertMode, dacNode);
 					return GenerateLastModifiedByScreenIdField(isSealedDac, isFirstField, languageVersion, isNullablePropertyType);
 				}
-				case DacFieldKind.LastModifiedDateTime:  
+				case DacFieldKind.LastModifiedDateTime:
 					return GenerateLastModifiedDateTimeField(isSealedDac, isFirstField, languageVersion);
+				case DacFieldKind.NoteID:
+					return GenerateNoteIdField(isSealedDac, isFirstField, languageVersion);
 				default:
 					return null;
 			}
@@ -304,7 +316,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 																  bool isNullablePropertyType) =>
 			GenerateDacField(DacFieldNames.System.Timestamp, TypeNames.ByteArray, isNullablePropertyType,
 							 PXDBTimestamp, isSealedDac, isFirstField, languageVersion);
-		
+
+		private GeneratedDacFieldNodeInfo? GenerateNoteIdField(bool isSealedDac, bool isFirstField, LanguageVersion? languageVersion) =>
+			GenerateDacField(DacFieldNames.System.NoteID, nameof(Guid), isNullablePropertyType: true,
+							 PXNote, isSealedDac, isFirstField, languageVersion);
+
 		private GeneratedDacFieldNodeInfo? GenerateCreatedByIdField(bool isSealedDac, bool isFirstField, LanguageVersion? languageVersion) =>
 			GenerateDacField(DacFieldNames.System.CreatedByID, nameof(Guid), isNullablePropertyType: true,
 							 PXDBCreatedByID, isSealedDac, isFirstField, languageVersion);
