@@ -1,8 +1,8 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis;
 using Acuminator.Analyzers.StaticAnalysis.Dac;
@@ -11,8 +11,10 @@ using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -26,7 +28,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 			new DacAnalyzersAggregator(
 				CodeAnalysisSettings.Default.WithStaticAnalysisEnabled()
 											.WithSuppressionMechanismDisabled(),
-				new MissingMandatoryDacFieldsAnalyzer());
+				new MissingMandatoryDacFieldsAnalyzerForPX1069Tests());
 
 		protected override CodeFixProvider GetCSharpCodeFixProvider() => 
 			new MissingMandatoryDacFieldsFix();
@@ -175,5 +177,20 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 		private static string CreateMissingFieldsFormatArg(IEnumerable<DacFieldKind> dacFieldKinds) =>
 			dacFieldKinds.Select(fieldKind => $"\"{fieldKind.ToString()}\"")
 						 .Join(", ");
+
+
+		private sealed class MissingMandatoryDacFieldsAnalyzerForPX1069Tests : MissingMandatoryDacFieldsAnalyzer
+		{
+			public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+				ImmutableArray.Create
+				(
+					Descriptors.PX1069_MissingSingleMandatoryDacField,
+					Descriptors.PX1069_MissingMultipleMandatoryDacFields
+				);
+
+			protected override void ReportMissingNoteIdDacField(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dac,
+																MissingMandatoryDacFieldInfo missingNoteIdFieldInfo)
+			{ }
+		}
 	}
 }
