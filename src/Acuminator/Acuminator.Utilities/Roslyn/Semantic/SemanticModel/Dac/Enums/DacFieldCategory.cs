@@ -1,9 +1,9 @@
 ﻿namespace Acuminator.Utilities.Roslyn.Semantic.Dac;
 
 /// <summary>
-/// Values that represent DAC field kinds.
+/// Values that represent existing DAC field categories.
 /// </summary>
-public enum DacFieldKind : byte
+public enum DacFieldCategory : byte
 {
 	Regular,
 

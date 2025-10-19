@@ -50,15 +50,15 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 
 	private static List<MissingMandatoryDacFieldInfo> GetMissingMandatoryDacFieldsInfos(DacSemanticModel dac, CancellationToken cancellation)
 	{
-		var missingMandatoryDacFieldKinds = GetMandatoryDacFieldKinds();
+		var missingMandatoryDacFieldCategories = GetMandatoryDacFieldCategories();
 
 		// Check every DAC field in this DAC and its base DACs if there are any to see that if all mandatory DAC fields are present
 		foreach (var dacField in dac.DacFields)
 		{
 			cancellation.ThrowIfCancellationRequested();
 
-			if (dacField.FieldKind == DacFieldKind.tstamp || dacField.FieldKind.IsAuditField())
-				missingMandatoryDacFieldKinds.Remove(dacField.FieldKind);
+			if (dacField.FieldCategory == DacFieldCategory.tstamp || dacField.FieldCategory.IsAuditField())
+				missingMandatoryDacFieldCategories.Remove(dacField.FieldCategory);
 		}
 
 		// cheap check for presence of declared DAC fields
@@ -73,9 +73,9 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 		var (hasCreatedAuditFields, hasLastModifiedAuditFields) = CheckForDeclaredAuditFields(dac);
 		var missingMandatoryDacFieldKindsWithIndexes = new List<MissingMandatoryDacFieldInfo>(missingMandatoryDacFieldKinds.Count);
 
-		foreach (DacFieldKind missingFieldKind in missingMandatoryDacFieldKinds)
+		foreach (DacFieldCategory missingFieldCategory in missingMandatoryDacFieldCategories)
 		{
-			var insertMode = GetInsertModeForFieldKind(missingFieldKind, hasCreatedAuditFields, hasLastModifiedAuditFields);
+			var insertMode = GetInsertModeForFieldCategory(missingFieldCategory, hasCreatedAuditFields, hasLastModifiedAuditFields);
 
 			if (insertMode != null)
 			{
@@ -83,7 +83,7 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 			}
 		}
 
-		return missingMandatoryDacFieldKindsWithIndexes;
+		return missingMandatoryDacFieldInfos;
 	}
 
 	private MissingMandatoryDacFieldInfo? GetMissingNoteIdFieldInfo(DacSemanticModel dac, PXContext pxContext)
@@ -111,13 +111,13 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 
 	private static List<DacFieldKind> GetMandatoryDacFieldKinds() =>
 		[
-			DacFieldKind.tstamp,
-			DacFieldKind.CreatedByID,
-			DacFieldKind.CreatedByScreenID,
-			DacFieldKind.CreatedDateTime,
-			DacFieldKind.LastModifiedByID,
-			DacFieldKind.LastModifiedByScreenID,
-			DacFieldKind.LastModifiedDateTime
+			DacFieldCategory.tstamp,
+			DacFieldCategory.CreatedByID,
+			DacFieldCategory.CreatedByScreenID,
+			DacFieldCategory.CreatedDateTime,
+			DacFieldCategory.LastModifiedByID,
+			DacFieldCategory.LastModifiedByScreenID,
+			DacFieldCategory.LastModifiedDateTime
 		];
 
 	private static (bool HasCreatedAuditFields, bool HasLastModifiedAuditFields) CheckForDeclaredAuditFields(DacSemanticModel dac)
@@ -127,9 +127,9 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 
 		foreach (var dacField in dac.DeclaredDacFields)
 		{
-			if (dacField.FieldKind.IsCreatedAuditField())
+			if (dacField.FieldCategory.IsCreatedAuditField())
 				hasCreatedAuditFields = true;
-			else if (dacField.FieldKind.IsLastModifiedAuditField())
+			else if (dacField.FieldCategory.IsLastModifiedAuditField())
 				hasLastModifiedAuditFields = true;
 
 			if (hasCreatedAuditFields && hasLastModifiedAuditFields)
@@ -139,30 +139,30 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 		return (hasCreatedAuditFields, hasLastModifiedAuditFields);
 	}
 
-	private static DacFieldInsertMode? GetInsertModeForFieldKind(DacFieldKind missingFieldKind, bool hasCreatedAuditFields, 
-																bool hasLastModifiedAuditFields) =>
-		missingFieldKind switch
+	private static DacFieldInsertMode? GetInsertModeForFieldCategory(DacFieldCategory missingFieldCategory, bool hasCreatedAuditFields, 
+																	 bool hasLastModifiedAuditFields) =>
+		missingFieldCategory switch
 		{
-			DacFieldKind.CreatedByID or
-			DacFieldKind.CreatedByScreenID or
-			DacFieldKind.CreatedDateTime 	  => hasCreatedAuditFields
-													? (missingFieldKind == DacFieldKind.CreatedByID
-														? DacFieldInsertMode.BeforeFirstCreatedAuditField
-														: DacFieldInsertMode.AfterLastCreatedAuditField)
-													: (hasLastModifiedAuditFields
-														? DacFieldInsertMode.BeforeFirstLastModifiedAuditField
-														: DacFieldInsertMode.AtTheEnd),
-			DacFieldKind.LastModifiedByID or
-			DacFieldKind.LastModifiedByScreenID or
-			DacFieldKind.LastModifiedDateTime => hasLastModifiedAuditFields
-														? (missingFieldKind == DacFieldKind.LastModifiedByID
-															? DacFieldInsertMode.BeforeFirstLastModifiedAuditField
-															: DacFieldInsertMode.AfterLastLastModifiedAuditField)
-														: (hasCreatedAuditFields 
-															? DacFieldInsertMode.AfterLastCreatedAuditField
-															: DacFieldInsertMode.AtTheEnd),
-			DacFieldKind.tstamp 			  => DacFieldInsertMode.AtTheEnd,
-			_								  => null
+			DacFieldCategory.CreatedByID or
+			DacFieldCategory.CreatedByScreenID or
+			DacFieldCategory.CreatedDateTime 	  		=> hasCreatedAuditFields
+															? (missingFieldCategory == DacFieldCategory.CreatedByID
+																? DacFieldInsertMode.BeforeFirstCreatedAuditField
+																: DacFieldInsertMode.AfterLastCreatedAuditField)
+															: (hasLastModifiedAuditFields
+																? DacFieldInsertMode.BeforeFirstLastModifiedAuditField
+																: DacFieldInsertMode.AtTheEnd),
+			DacFieldCategory.LastModifiedByID or
+			DacFieldCategory.LastModifiedByScreenID or
+			DacFieldCategory.LastModifiedDateTime		=> hasLastModifiedAuditFields
+															? (missingFieldCategory == DacFieldCategory.LastModifiedByID
+																? DacFieldInsertMode.BeforeFirstLastModifiedAuditField
+																: DacFieldInsertMode.AfterLastLastModifiedAuditField)
+															: (hasCreatedAuditFields 
+																? DacFieldInsertMode.AfterLastCreatedAuditField
+																: DacFieldInsertMode.AtTheEnd),
+			DacFieldCategory.tstamp 			  		=> DacFieldInsertMode.AtTheEnd,
+			_									  		=> null
 		};
 
 	protected virtual void ReportMissingMandatoryTimestampAndAuditDacFields(SymbolAnalysisContext symbolContext, PXContext pxContext, 
@@ -190,7 +190,7 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 		else
 		{
 			var missingDacFieldsInfos = 
-				missingMandatoryDacFieldInfos.Select(info => $"{info.FieldKind}{Constants.FieldKindAndInsertModeSeparator}{info.InsertMode}")
+				missingMandatoryDacFieldInfos.Select(info => $"{info.FieldCategory}{Constants.FieldCategoryAndInsertModeSeparator}{info.InsertMode}")
 											 .ToList(missingMandatoryDacFieldInfos.Count);
 			var properties = new Dictionary<string, string?>
 			{
@@ -199,7 +199,7 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 			}
 			.ToImmutableDictionary();
 
-			var missingFieldsFormatArg = missingMandatoryDacFieldInfos.Select(info => $"\"{info.FieldKind}\"")
+			var missingFieldsFormatArg = missingMandatoryDacFieldInfos.Select(info => $"\"{info.FieldCategory}\"")
 																	  .Join(", ");
 			string[] messageArgs = [dac.Name, missingFieldsFormatArg];
 			diagnostic = Diagnostic.Create(Descriptors.PX1069_MissingMultipleMandatoryDacFields, location, properties, messageArgs);

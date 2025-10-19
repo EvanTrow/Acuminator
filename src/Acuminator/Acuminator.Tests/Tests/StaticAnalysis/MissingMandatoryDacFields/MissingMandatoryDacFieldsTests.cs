@@ -98,13 +98,13 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 							.CreateFor(8, 22, "SealedDacWithoutAnyMandatoryField",
 									  CreateMissingFieldsFormatArg(
 									  [
-											DacFieldKind.tstamp,
-											DacFieldKind.CreatedByID,
-											DacFieldKind.CreatedByScreenID,
-											DacFieldKind.CreatedDateTime,
-											DacFieldKind.LastModifiedByID,
-											DacFieldKind.LastModifiedByScreenID,
-											DacFieldKind.LastModifiedDateTime
+											DacFieldCategory.tstamp,
+											DacFieldCategory.CreatedByID,
+											DacFieldCategory.CreatedByScreenID,
+											DacFieldCategory.CreatedDateTime,
+											DacFieldCategory.LastModifiedByID,
+											DacFieldCategory.LastModifiedByScreenID,
+											DacFieldCategory.LastModifiedDateTime
 									  ])));
 
 		[Theory]
@@ -122,10 +122,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 							.CreateFor(9, 15, "DacMissingMultipleAuditFields",
 									  CreateMissingFieldsFormatArg(
 									  [
-											DacFieldKind.CreatedByScreenID,
-											DacFieldKind.CreatedDateTime,
-											DacFieldKind.LastModifiedByScreenID,
-											DacFieldKind.LastModifiedDateTime
+											DacFieldCategory.CreatedByScreenID,
+											DacFieldCategory.CreatedDateTime,
+											DacFieldCategory.LastModifiedByScreenID,
+											DacFieldCategory.LastModifiedDateTime
 									  ])));
 
 		[Theory]
@@ -174,10 +174,9 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 			await VerifyCSharpFixAsync(source, expected);
 		#endregion
 
-		private static string CreateMissingFieldsFormatArg(IEnumerable<DacFieldKind> dacFieldKinds) =>
-			dacFieldKinds.Select(fieldKind => $"\"{fieldKind.ToString()}\"")
-						 .Join(", ");
-
+		private static string CreateMissingFieldsFormatArg(IEnumerable<DacFieldCategory> dacFieldCategories) =>
+			dacFieldCategories.Select(fieldCategory => $"\"{fieldCategory.ToString()}\"")
+							  .Join(", ");
 
 		private sealed class MissingMandatoryDacFieldsAnalyzerForPX1069Tests : MissingMandatoryDacFieldsAnalyzer
 		{

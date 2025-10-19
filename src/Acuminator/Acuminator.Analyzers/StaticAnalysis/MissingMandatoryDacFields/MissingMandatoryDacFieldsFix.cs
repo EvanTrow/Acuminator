@@ -71,7 +71,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 			return Task.CompletedTask;
 		}
 
-		private List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)>? GetMissingDacFieldInfos(Diagnostic diagnostic)
+		private List<(DacFieldCategory FieldCategory, DacFieldInsertMode InsertMode)>? GetMissingDacFieldInfos(Diagnostic diagnostic)
 		{
 			if (!diagnostic.TryGetPropertyValue(DiagnosticProperties.MissingMandatoryDacFieldsInfos, out string? missingDacFieldsInfos) ||
 				missingDacFieldsInfos.IsNullOrWhiteSpace())
@@ -79,7 +79,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 				return null;
 			}
 
-			var dacFieldInfosStrings = missingDacFieldsInfos.Split(Constants.FieldKindsSeparatorArray, StringSplitOptions.RemoveEmptyEntries);
+			var dacFieldInfosStrings = missingDacFieldsInfos.Split(Constants.FieldCategoriesSeparatorArray, StringSplitOptions.RemoveEmptyEntries);
 			var dacFieldInfos = (from parsedInfo in dacFieldInfosStrings.Select(ParseDacFieldInfo)
 								 where parsedInfo != null
 								 select parsedInfo.Value
@@ -87,29 +87,29 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 			return dacFieldInfos;
 		}
 
-		private static (DacFieldKind FieldKind, DacFieldInsertMode InsertMode)? ParseDacFieldInfo(string dacFieldInfoString)
+		private static (DacFieldCategory FieldCategory, DacFieldInsertMode InsertMode)? ParseDacFieldInfo(string dacFieldInfoString)
 		{
 			if (dacFieldInfoString.IsNullOrWhiteSpace())
 				return null;
 
-			var parts = dacFieldInfoString.Split(Constants.FieldKindAndInsertModeSeparatorArray, StringSplitOptions.RemoveEmptyEntries);
+			var parts = dacFieldInfoString.Split(Constants.FieldCategoryAndInsertModeSeparatorArray, StringSplitOptions.RemoveEmptyEntries);
 
 			if (parts.Length != 2)
 				return null;
 
-			var (fieldKindStr, insertModeStr) = (parts[0].NullIfWhiteSpace()?.Trim(), parts[1].NullIfWhiteSpace()?.Trim());
+			var (fieldCategoryStr, insertModeStr) = (parts[0].NullIfWhiteSpace()?.Trim(), parts[1].NullIfWhiteSpace()?.Trim());
 
-			if (fieldKindStr == null || !Enum.TryParse(fieldKindStr, ignoreCase: true, out DacFieldKind fieldKind))
+			if (fieldCategoryStr == null || !Enum.TryParse(fieldCategoryStr, ignoreCase: true, out DacFieldCategory fieldCategory))
 				return null;
 
 			if (insertModeStr == null || !Enum.TryParse(insertModeStr, ignoreCase: true, out DacFieldInsertMode insertMode))
 				return null;
 
-			return (fieldKind, insertMode);
+			return (fieldCategory, insertMode);
 		}
 
 		private async Task<Document> AddMissingDacFieldsAsync(Document document, TextSpan span,
-													List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)> missingDacFieldInfos,
+													List<(DacFieldCategory FieldCategory, DacFieldInsertMode InsertMode)> missingDacFieldInfos,
 													bool isSealedDac, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
@@ -142,7 +142,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 
 		private List<(GeneratedDacFieldNodeInfo FieldNodesInfo, DacFieldInsertMode InsertMode)> GenerateMissingDacFieldNodes(
 																	ClassDeclarationSyntax dacNode, SemanticModel semanticModel,
-																	List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)> missingDacFieldInfos,
+																	List<(DacFieldCategory FieldCategory, DacFieldInsertMode InsertMode)> missingDacFieldInfos,
 																	bool isSealedDac, LanguageVersion? languageVersion, CancellationToken cancellation)
 		{
 			var dacMembers = dacNode.Members;
@@ -153,9 +153,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 			{
 				cancellation.ThrowIfCancellationRequested();
 
-				var (missingDacFieldKind, insertMode) = missingDacFieldInfos[i];
+				var (missingDacFieldCategory, insertMode) = missingDacFieldInfos[i];
 				bool isFirstField = isFirstInModifiedDac && i == indexInFieldInfos;
-				var generatedPropertyAndField = GenerateMissingDacField(missingDacFieldKind, insertMode, semanticModel, isSealedDac, 
+				var generatedPropertyAndField = GenerateMissingDacField(missingDacFieldCategory, insertMode, semanticModel, isSealedDac, 
 																		isFirstField, languageVersion, dacNode);
 				if (generatedPropertyAndField == null)
 					continue;
@@ -167,8 +167,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 		}
 
 		private static (bool IsFirstInModifiedDac, int IndexInFieldInfos) PredictInfoAboutFirstNewFieldInModifiedDac( 
-																		List<(DacFieldKind FieldKind, DacFieldInsertMode InsertMode)> missingDacFieldInfos,
-																		SyntaxList<MemberDeclarationSyntax> dacMembers)
+																	List<(DacFieldCategory FieldCategory, DacFieldInsertMode InsertMode)> missingDacFieldInfos,
+																	SyntaxList<MemberDeclarationSyntax> dacMembers)
 		{
 			// Try to predict which field will be first in the modified DAC and whether it will be a new DAC field
 			bool isEmptyDac = dacMembers.Count == 0;
@@ -208,14 +208,14 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 					// isFirstFieldInModifiedDac is already true thanks to the isEmptyDac assignment above
 					firstNewFieldIndexInModifiedDac = 0;
 
-					isFirstMemberCreatedAuditField = firstFieldInfo.FieldKind.IsCreatedAuditField();
-					isFirstMemberLastModifiedAuditField = !isFirstMemberCreatedAuditField && firstFieldInfo.FieldKind.IsLastModifiedAuditField();
+					isFirstMemberCreatedAuditField = firstFieldInfo.FieldCategory.IsCreatedAuditField();
+					isFirstMemberLastModifiedAuditField = !isFirstMemberCreatedAuditField && firstFieldInfo.FieldCategory.IsLastModifiedAuditField();
 				}
 			}
 
 			void InsertionOfNonFirstField(int index)
 			{
-				var (fieldKind, insertMode) = missingDacFieldInfos[index];
+				var (fieldCategory, insertMode) = missingDacFieldInfos[index];
 
 				if (insertMode == DacFieldInsertMode.AtTheBeginning ||
 					(isFirstMemberCreatedAuditField && insertMode == DacFieldInsertMode.BeforeFirstCreatedAuditField) ||
@@ -223,42 +223,42 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields
 				{
 					isFirstFieldInModifiedDac 			= true;
 					firstNewFieldIndexInModifiedDac 	= index;
-					isFirstMemberCreatedAuditField 		= fieldKind.IsCreatedAuditField();
-					isFirstMemberLastModifiedAuditField = !isFirstMemberCreatedAuditField && fieldKind.IsLastModifiedAuditField();
+					isFirstMemberCreatedAuditField 		= fieldCategory.IsCreatedAuditField();
+					isFirstMemberLastModifiedAuditField = !isFirstMemberCreatedAuditField && fieldCategory.IsLastModifiedAuditField();
 				}
 			}
 		}
 
-		private GeneratedDacFieldNodeInfo? GenerateMissingDacField(DacFieldKind missingDacFieldKind, DacFieldInsertMode insertMode,
+		private GeneratedDacFieldNodeInfo? GenerateMissingDacField(DacFieldCategory missingDacFieldCategory, DacFieldInsertMode insertMode,
 																   SemanticModel semanticModel, bool isSealedDac, bool isFirstField, 
 																   LanguageVersion? languageVersion, ClassDeclarationSyntax dacNode)
 		{
-			switch (missingDacFieldKind)
+			switch (missingDacFieldCategory)
 			{
-				case DacFieldKind.tstamp:
+				case DacFieldCategory.tstamp:
 				{
 					bool isNullablePropertyType = IsNullableRefTypeForDacProperty(semanticModel, insertMode, dacNode);
 					return GenerateTimestampField(isSealedDac, isFirstField, languageVersion, isNullablePropertyType);
 				}
-				case DacFieldKind.CreatedByID:
+				case DacFieldCategory.CreatedByID:
 					return GenerateCreatedByIdField(isSealedDac, isFirstField, languageVersion);
-				case DacFieldKind.CreatedByScreenID:
+				case DacFieldCategory.CreatedByScreenID:
 				{
 					bool isNullablePropertyType = IsNullableRefTypeForDacProperty(semanticModel, insertMode, dacNode);
 					return GenerateCreatedByScreenIdField(isSealedDac, isFirstField, languageVersion, isNullablePropertyType);
 				}
-				case DacFieldKind.CreatedDateTime:
+				case DacFieldCategory.CreatedDateTime:
 					return GenerateCreatedDateTimeField(isSealedDac, isFirstField, languageVersion);
-				case DacFieldKind.LastModifiedByID:
+				case DacFieldCategory.LastModifiedByID:
 					return GenerateLastModifiedByIdField(isSealedDac, isFirstField, languageVersion);
-				case DacFieldKind.LastModifiedByScreenID:
+				case DacFieldCategory.LastModifiedByScreenID:
 				{
 					bool isNullablePropertyType = IsNullableRefTypeForDacProperty(semanticModel, insertMode, dacNode);
 					return GenerateLastModifiedByScreenIdField(isSealedDac, isFirstField, languageVersion, isNullablePropertyType);
 				}
-				case DacFieldKind.LastModifiedDateTime:
+				case DacFieldCategory.LastModifiedDateTime:  
 					return GenerateLastModifiedDateTimeField(isSealedDac, isFirstField, languageVersion);
-				case DacFieldKind.NoteID:
+				case DacFieldCategory.NoteID:
 					return GenerateNoteIdField(isSealedDac, isFirstField, languageVersion);
 				default:
 					return null;

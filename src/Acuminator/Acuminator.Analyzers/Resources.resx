@@ -649,16 +649,16 @@ public virtual int? SomeDacField{ get; set; }</value>
     <value>The type of the DAC field property does not correspond to the type of the BQL field</value>
   </data>
   <data name="PX1069Fix" xml:space="preserve">
-    <value>Add missing mandatory DAC fields to the DAC</value>
+    <value>Add the missing mandatory DAC fields to the DAC</value>
   </data>
   <data name="PX1069Title" xml:space="preserve">
     <value>DAC must declare mandatory audit and timestamp DAC fields</value>
   </data>
   <data name="PX1069TitleFormat_MultipleFields" xml:space="preserve">
-    <value>The "{0}" DAC must declare mandatory {1} DAC fields</value>
+    <value>The "{0}" DAC must declare the mandatory {1} DAC fields</value>
   </data>
   <data name="PX1069TitleFormat_SingleField" xml:space="preserve">
-    <value>The "{0}" DAC must declare mandatory {1} DAC field</value>
+    <value>The "{0}" DAC must declare the mandatory {1} DAC field</value>
   </data>
   <data name="PX1070Title" xml:space="preserve">
     <value>The state of fields and actions can be configured only in the RowSelected event handler</value>

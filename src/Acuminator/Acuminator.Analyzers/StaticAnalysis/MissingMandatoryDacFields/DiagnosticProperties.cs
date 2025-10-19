@@ -7,9 +7,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields;
 internal static class DiagnosticProperties
 {
 	/// <summary>
-	/// Property stores infos about missing mandatory DAC fields separated by <see cref="Constants.FieldKindsSeparator"/>.<br/>
-	/// Each info consists of a pair of <see cref="DacFieldKind"/> and <see cref="DacFieldInsertMode"/> values separated by 
-	/// <see cref="Constants.FieldKindAndInsertModeSeparator"/>.
+	/// Property stores infos about missing mandatory DAC fields separated by <see cref="Constants.FieldCategoriesSeparator"/>.<br/>
+	/// Each info consists of a pair of <see cref="DacFieldCategory"/> and <see cref="DacFieldInsertMode"/> values separated by 
+	/// <see cref="Constants.FieldCategoryAndInsertModeSeparator"/>.
 	/// </summary>
 	public const string MissingMandatoryDacFieldsInfos = nameof(MissingMandatoryDacFieldsInfos);
 
