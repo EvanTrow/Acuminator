@@ -855,13 +855,13 @@ Reason: {2}</value>
     <value>The name of the additional delegate parameter for calling the base method of the PXOverride method breaks Acumatica naming conventions </value>
   </data>
   <data name="PX1110Fix" xml:space="preserve">
-    <value>Add missing "NoteID" field to the DAC</value>
+    <value>Add the missing "NoteID" field to the DAC</value>
   </data>
   <data name="PX1110Title" xml:space="preserve">
-    <value>The DAC has DAC field with the PXDBLocalizableString attribute. Therefore, this DAC must declare NoteID DAC field.</value>
+    <value>The DAC has a DAC field with the PXDBLocalizableString attribute. Therefore, this DAC must declare a NoteID DAC field.</value>
   </data>
   <data name="PX1110TitleFormat" xml:space="preserve">
-    <value>The "{0}" DAC has DAC field with the PXDBLocalizableString attribute. Therefore, this DAC must declare NoteID DAC field.</value>
+    <value>The "{0}" DAC has a DAC field with the PXDBLocalizableString attribute. Therefore, this DAC must declare a NoteID DAC field.</value>
   </data>
   <data name="SuppressDiagnosticGroupCodeActionTitle" xml:space="preserve">
     <value>Suppress the {0} diagnostic with Acuminator</value>
