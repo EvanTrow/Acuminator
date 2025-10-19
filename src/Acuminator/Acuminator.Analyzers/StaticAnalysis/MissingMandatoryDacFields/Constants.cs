@@ -2,9 +2,9 @@
 
 internal static class Constants
 {
-	public const string FieldKindsSeparator = ",";
-	public static readonly char[] FieldKindsSeparatorArray = FieldKindsSeparator.ToCharArray();
+	public const string FieldCategoriesSeparator = ",";
+	public static readonly char[] FieldCategoriesSeparatorArray = FieldCategoriesSeparator.ToCharArray();
 
-	public const string FieldKindAndInsertModeSeparator = "-";
-	public static readonly char[] FieldKindAndInsertModeSeparatorArray = FieldKindAndInsertModeSeparator.ToCharArray();
+	public const string FieldCategoryAndInsertModeSeparator = "-";
+	public static readonly char[] FieldCategoryAndInsertModeSeparatorArray = FieldCategoryAndInsertModeSeparator.ToCharArray();
 }
