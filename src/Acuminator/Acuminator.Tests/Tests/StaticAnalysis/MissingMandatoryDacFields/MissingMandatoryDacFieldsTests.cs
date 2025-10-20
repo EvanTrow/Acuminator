@@ -1,8 +1,8 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis;
 using Acuminator.Analyzers.StaticAnalysis.Dac;
@@ -11,8 +11,10 @@ using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -26,7 +28,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 			new DacAnalyzersAggregator(
 				CodeAnalysisSettings.Default.WithStaticAnalysisEnabled()
 											.WithSuppressionMechanismDisabled(),
-				new MissingMandatoryDacFieldsAnalyzer());
+				new MissingMandatoryDacFieldsAnalyzerForPX1069Tests());
 
 		protected override CodeFixProvider GetCSharpCodeFixProvider() => 
 			new MissingMandatoryDacFieldsFix();
@@ -63,33 +65,33 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 			await VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\SealedDacWithoutAnyMandatoryField_Expected.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\SealedDacWithoutAnyMandatoryField_Expected.cs")]
 		public async Task SealedDac_WithoutAnyMandatoryField_AfterCodeFix_NoDiagnostic(string source) =>
 			await VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\DacAddMissingTimestampFieldToEnd_Expected.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\DacAddMissingTimestampFieldToEnd_Expected.cs")]
 		public async Task Dac_MissingTimestampField_AfterCodeFix_NoDiagnostic(string source) =>
 			await VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\DacAddMissingCreatedByIdBetweenDacFields_Expected.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\DacAddMissingCreatedByIdBetweenDacFields_Expected.cs")]
 		public async Task Dac_MissingCreatedByIdField_AfterCodeFix_AddedToEnd_NoDiagnostic(string source) =>
 			await VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\DacAddMissingCreatedByIdToBeginning_Expected.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\DacAddMissingCreatedByIdToBeginning_Expected.cs")]
 		public async Task Dac_MissingCreatedByIdField_AfterCodeFix_AddedToBeginning_NoDiagnostic(string source) =>
 			await VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\DacMissingMultipleAuditFields_Expected.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\DacMissingMultipleAuditFields_Expected.cs")]
 		public async Task DacMissingMultipleAuditFields_AfterCodeFix_NoDiagnostic(string source) =>
 			await VerifyCSharpDiagnosticAsync(source);
 		#endregion
 
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\SealedDacWithoutAnyMandatoryField.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\SealedDacWithoutAnyMandatoryField.cs")]
 		public async Task SealedDac_WithoutAnyMandatoryField_ShouldReport_AllMissingFields(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1069_MissingMultipleMandatoryDacFields
@@ -106,14 +108,14 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 									  ])));
 
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\DacAddMissingTimestampFieldToEnd.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\DacAddMissingTimestampFieldToEnd.cs")]
 		public async Task Dac_MissingOnlyTimestampField_ShouldReport_OnlyMissingTimestamp(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1069_MissingSingleMandatoryDacField
 							.CreateFor(8, 15, "DacAddMissingTimestampFieldToEnd", "\"tstamp\""));
 
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\DacMissingMultipleAuditFields.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\DacMissingMultipleAuditFields.cs")]
 		public async Task DacMissingMultipleAuditFields_ShouldReport_MultipleMissingFields(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1069_MissingMultipleMandatoryDacFields
@@ -127,14 +129,14 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 									  ])));
 
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\DacAddMissingCreatedByIdBetweenDacFields.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\DacAddMissingCreatedByIdBetweenDacFields.cs")]
 		public async Task Dac_MissingCreatedByIdField_ShouldReport_OnlyMissingCreatedByID(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1069_MissingSingleMandatoryDacField
 							.CreateFor(8, 15, "DacAddMissingCreatedByIdBetweenDacFields", "\"CreatedByID\""));
 
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\DacAddMissingCreatedByIdToBeginning.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\DacAddMissingCreatedByIdToBeginning.cs")]
 		public async Task Dac_MissingCreatedByIdField_DifferentFieldOrder_ShouldReport_OnlyMissingCreatedByID(string source) =>
 			await VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1069_MissingSingleMandatoryDacField
@@ -142,28 +144,32 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 
 		#region Code Fix Tests
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\SealedDacWithoutAnyMandatoryField.cs", @"CodeFix\SealedDacWithoutAnyMandatoryField_Expected.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\SealedDacWithoutAnyMandatoryField.cs", 
+						  @"PX1069CodeFix\SealedDacWithoutAnyMandatoryField_Expected.cs")]
 		public async Task SealedDac_WithoutAnyMandatoryField_CodeFix_ShouldAdd_AllMandatoryFields_AsNonVirtual(
 																				string source, string expected) =>
 			await VerifyCSharpFixAsync(source, expected);
 
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\DacAddMissingTimestampFieldToEnd.cs", @"CodeFix\DacAddMissingTimestampFieldToEnd_Expected.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\DacAddMissingTimestampFieldToEnd.cs", @"PX1069CodeFix\DacAddMissingTimestampFieldToEnd_Expected.cs")]
 		public async Task Dac_MissingTimestampField_CodeFix_ShouldAdd_Field_ToEnd(string source, string expected) =>
 			await VerifyCSharpFixAsync(source, expected);
 
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\DacAddMissingCreatedByIdBetweenDacFields.cs", @"CodeFix\DacAddMissingCreatedByIdBetweenDacFields_Expected.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\DacAddMissingCreatedByIdBetweenDacFields.cs", 
+						  @"PX1069CodeFix\DacAddMissingCreatedByIdBetweenDacFields_Expected.cs")]
 		public async Task Dac_MissingCreatedByIdField_CodeFix_ShouldAdd_Field_BetweenDacFields(string source, string expected) =>
 			await VerifyCSharpFixAsync(source, expected);
 
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\DacAddMissingCreatedByIdToBeginning.cs", @"CodeFix\DacAddMissingCreatedByIdToBeginning_Expected.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\DacAddMissingCreatedByIdToBeginning.cs", 
+						  @"PX1069CodeFix\DacAddMissingCreatedByIdToBeginning_Expected.cs")]
 		public async Task Dac_MissingCreatedByIdField_CodeFix_ShouldAdd_Field_ToBeginning(string source, string expected) =>
 			await VerifyCSharpFixAsync(source, expected);
 
 		[Theory]
-		[EmbeddedFileData(@"CodeFix\DacMissingMultipleAuditFields.cs", @"CodeFix\DacMissingMultipleAuditFields_Expected.cs")]
+		[EmbeddedFileData(@"PX1069CodeFix\DacMissingMultipleAuditFields.cs", 
+						  @"PX1069CodeFix\DacMissingMultipleAuditFields_Expected.cs")]
 		public async Task DacMissingMultipleAuditFields_CodeFix_ShouldAdd_MissingFields(string source, string expected) =>
 			await VerifyCSharpFixAsync(source, expected);
 		#endregion
@@ -171,5 +177,19 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 		private static string CreateMissingFieldsFormatArg(IEnumerable<DacFieldCategory> dacFieldCategories) =>
 			dacFieldCategories.Select(fieldCategory => $"\"{fieldCategory.ToString()}\"")
 							  .Join(", ");
+
+		private sealed class MissingMandatoryDacFieldsAnalyzerForPX1069Tests : MissingMandatoryDacFieldsAnalyzer
+		{
+			public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+				ImmutableArray.Create
+				(
+					Descriptors.PX1069_MissingSingleMandatoryDacField,
+					Descriptors.PX1069_MissingMultipleMandatoryDacFields
+				);
+
+			protected override void ReportMissingNoteIdDacField(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dac,
+																MissingMandatoryDacFieldInfo missingNoteIdFieldInfo)
+			{ }
+		}
 	}
 }

@@ -651,14 +651,14 @@ public virtual int? SomeDacField{ get; set; }</value>
   <data name="PX1069Fix" xml:space="preserve">
     <value>Add the missing mandatory DAC fields to the DAC</value>
   </data>
+  <data name="PX1069Title" xml:space="preserve">
+    <value>DAC must declare mandatory audit and timestamp DAC fields</value>
+  </data>
   <data name="PX1069TitleFormat_MultipleFields" xml:space="preserve">
     <value>The "{0}" DAC must declare the mandatory {1} DAC fields</value>
   </data>
   <data name="PX1069TitleFormat_SingleField" xml:space="preserve">
     <value>The "{0}" DAC must declare the mandatory {1} DAC field</value>
-  </data>
-  <data name="PX1069Title" xml:space="preserve">
-    <value>The DAC must declare mandatory audit and timestamp DAC fields</value>
   </data>
   <data name="PX1070Title" xml:space="preserve">
     <value>The state of fields and actions can be configured only in the RowSelected event handler</value>
@@ -853,6 +853,15 @@ Reason: {2}</value>
   </data>
   <data name="PX1102Title" xml:space="preserve">
     <value>The name of the additional delegate parameter for calling the base method of the PXOverride method breaks Acumatica naming conventions </value>
+  </data>
+  <data name="PX1110Fix" xml:space="preserve">
+    <value>Add the missing "NoteID" field to the DAC</value>
+  </data>
+  <data name="PX1110Title" xml:space="preserve">
+    <value>The DAC has a DAC field with the PXDBLocalizableString attribute. Therefore, this DAC must declare a NoteID DAC field.</value>
+  </data>
+  <data name="PX1110TitleFormat" xml:space="preserve">
+    <value>The "{0}" DAC has a DAC field with the PXDBLocalizableString attribute. Therefore, this DAC must declare a NoteID DAC field.</value>
   </data>
   <data name="SuppressDiagnosticGroupCodeActionTitle" xml:space="preserve">
     <value>Suppress the {0} diagnostic with Acuminator</value>

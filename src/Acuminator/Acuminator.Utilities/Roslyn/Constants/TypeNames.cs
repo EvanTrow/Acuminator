@@ -109,7 +109,8 @@ namespace Acuminator.Utilities.Roslyn.Constants
 		{
 			public static class ShortNames
 			{
-				public const string PXDBTimestamp   	  = nameof(PXDBTimestamp);
+				public const string PXDBTimestamp = nameof(PXDBTimestamp);
+				public const string PXNote		  = nameof(PXNote);
 
 				public const string PXDBCreatedByID 	  = nameof(PXDBCreatedByID);
 				public const string PXDBCreatedByScreenID = nameof(PXDBCreatedByScreenID);

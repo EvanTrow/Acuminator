@@ -1636,7 +1636,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add missing mandatory DAC fields to the DAC.
+        ///   Looks up a localized string similar to Add the missing mandatory DAC fields to the DAC.
         /// </summary>
         public static string PX1069Fix {
             get {
@@ -1654,7 +1654,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC must declare mandatory {1} DAC fields.
+        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC must declare the mandatory {1} DAC fields.
         /// </summary>
         public static string PX1069TitleFormat_MultipleFields {
             get {
@@ -1663,7 +1663,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC must declare mandatory {1} DAC field.
+        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC must declare the mandatory {1} DAC field.
         /// </summary>
         public static string PX1069TitleFormat_SingleField {
             get {
@@ -2246,6 +2246,33 @@ namespace Acuminator.Analyzers {
         public static string PX1102Title {
             get {
                 return ResourceManager.GetString("PX1102Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add the missing &quot;NoteID&quot; field to the DAC.
+        /// </summary>
+        public static string PX1110Fix {
+            get {
+                return ResourceManager.GetString("PX1110Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The DAC has a DAC field with the PXDBLocalizableString attribute. Therefore, this DAC must declare a NoteID DAC field..
+        /// </summary>
+        public static string PX1110Title {
+            get {
+                return ResourceManager.GetString("PX1110Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC has a DAC field with the PXDBLocalizableString attribute. Therefore, this DAC must declare a NoteID DAC field..
+        /// </summary>
+        public static string PX1110TitleFormat {
+            get {
+                return ResourceManager.GetString("PX1110TitleFormat", resourceCulture);
             }
         }
         
