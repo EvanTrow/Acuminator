@@ -8,6 +8,7 @@ using System.Threading;
 using Acuminator.Analyzers.StaticAnalysis.Dac;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression;
+using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 
@@ -22,7 +23,8 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 		ImmutableArray.Create
 		(
 			Descriptors.PX1069_MissingSingleMandatoryDacField,
-			Descriptors.PX1069_MissingMultipleMandatoryDacFields
+			Descriptors.PX1069_MissingMultipleMandatoryDacFields,
+			Descriptors.PX1110_MissingNoteIdFieldInDacWithLocalizableFieldValues
 		);
 
 	public override bool ShouldAnalyze(PXContext pxContext, [NotNullWhen(true)] DacSemanticModel dac) => 
@@ -35,12 +37,18 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 
 		if (missingMandatoryDacFieldKinds.Count > 0)
 		{
-			ReportMissingMandatoryDacFields(symbolContext, pxContext, dac, missingMandatoryDacFieldKinds);
+			ReportMissingMandatoryTimestampAndAuditDacFields(symbolContext, pxContext, dac, missingMandatoryDacFieldKinds);
+		}
+
+		var missingNoteIdFieldInfo = GetMissingNoteIdFieldInfo(dac, pxContext);
+
+		if (missingNoteIdFieldInfo.HasValue)
+		{
+			ReportMissingNoteIdDacField(symbolContext, pxContext, dac, missingNoteIdFieldInfo.Value);
 		}
 	}
 
-	private static List<(DacFieldCategory FieldCategory, DacFieldInsertMode InsertMode)> GetMissingMandatoryDacFieldsInfos(DacSemanticModel dac, 
-																									  CancellationToken cancellation)
+	private static List<MissingMandatoryDacFieldInfo> GetMissingMandatoryDacFieldsInfos(DacSemanticModel dac, CancellationToken cancellation)
 	{
 		var missingMandatoryDacFieldCategories = GetMandatoryDacFieldCategories();
 
@@ -54,16 +62,16 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 		}
 
 		// cheap check for presence of declared DAC fields
-		if (dac.Node == null || dac.Node.Members.Count == 0)
+		if (dac.Node?.Members.Count is null or 0)
 		{
-			return missingMandatoryDacFieldCategories.Select(fieldCategory => (fieldCategory, DacFieldInsertMode.AtTheEnd))
-													 .ToList(missingMandatoryDacFieldCategories.Count);
+			var missingMandatoryFields =
+				missingMandatoryDacFieldCategories.Select(fieldCategory => new MissingMandatoryDacFieldInfo(fieldCategory, DacFieldInsertMode.AtTheEnd))
+												  .ToList(missingMandatoryDacFieldCategories.Count);
+			return missingMandatoryFields;
 		}
 
 		var (hasCreatedAuditFields, hasLastModifiedAuditFields) = CheckForDeclaredAuditFields(dac);
-
-		var missingMandatoryDacFieldInfos = 
-			new List<(DacFieldCategory FieldCategory, DacFieldInsertMode InsertMode)>(missingMandatoryDacFieldCategories.Count);
+		var missingMandatoryDacFieldInfos = new List<MissingMandatoryDacFieldInfo>(missingMandatoryDacFieldCategories.Count);
 
 		foreach (DacFieldCategory missingFieldCategory in missingMandatoryDacFieldCategories)
 		{
@@ -71,11 +79,34 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 
 			if (insertMode != null)
 			{
-				missingMandatoryDacFieldInfos.Add((FieldCategory: missingFieldCategory, InsertMode: insertMode.Value)); 
+				missingMandatoryDacFieldInfos.Add(new MissingMandatoryDacFieldInfo(missingFieldCategory, insertMode.Value)); 
 			}
 		}
 
 		return missingMandatoryDacFieldInfos;
+	}
+
+	private MissingMandatoryDacFieldInfo? GetMissingNoteIdFieldInfo(DacSemanticModel dac, PXContext pxContext)
+	{
+		bool hasNoteID = dac.PropertiesByNames.ContainsKey(DacFieldNames.System.NoteID);
+		var pxDBLocalizableStringAttribute = pxContext.FieldAttributes.PXDBLocalizableStringAttribute;
+		MissingMandatoryDacFieldInfo? missingNoteIdFieldInfo = null;
+
+		if (!hasNoteID && pxDBLocalizableStringAttribute != null)
+		{
+			bool hasFieldWithLocalizableValues =
+				 dac.DacFieldPropertiesWithAcumaticaAttributes
+					.Where(p => p.PropertyTypeUnwrappedNullable.SpecialType == SpecialType.System_String)
+					.SelectMany(property => property.DeclaredDataTypeAttributes.AllDeclaredDatatypeAttributesOnDacProperty)
+					.Any(attributeInfo => attributeInfo.AggregatesAttribute(pxDBLocalizableStringAttribute));
+
+			if (hasFieldWithLocalizableValues)
+			{
+				missingNoteIdFieldInfo = new MissingMandatoryDacFieldInfo(DacFieldCategory.NoteID, DacFieldInsertMode.AtTheEnd);
+			}
+		}
+
+		return missingNoteIdFieldInfo;
 	}
 
 	private static List<DacFieldCategory> GetMandatoryDacFieldCategories() =>
@@ -134,8 +165,8 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 			_									  		=> null
 		};
 
-	private static void ReportMissingMandatoryDacFields(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dac,
-														List<(DacFieldCategory FieldCategory, DacFieldInsertMode InsertMode)> missingMandatoryDacFieldInfos)
+	protected virtual void ReportMissingMandatoryTimestampAndAuditDacFields(SymbolAnalysisContext symbolContext, PXContext pxContext, 
+														DacSemanticModel dac, List<MissingMandatoryDacFieldInfo> missingMandatoryDacFieldInfos)
 	{
 		symbolContext.CancellationToken.ThrowIfCancellationRequested();
 
@@ -148,8 +179,8 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 			var (missingDacField, insertMode) = missingMandatoryDacFieldInfos[0];
 			var properties = new Dictionary<string, string?>
 			{
-				{ PX1069Properties.MissingMandatoryDacFieldsInfos, $"{missingDacField}{Constants.FieldCategoryAndInsertModeSeparator}{insertMode}" },
-				{ PX1069Properties.IsSealedDac,					   dac.Symbol.IsSealed.ToString() }
+				{ DiagnosticProperties.MissingMandatoryDacFieldsInfos, $"{missingDacField}{Constants.FieldCategoryAndInsertModeSeparator}{insertMode}" },
+				{ DiagnosticProperties.IsSealedDac,					   dac.Symbol.IsSealed.ToString() }
 			}
 			.ToImmutableDictionary();
 
@@ -163,8 +194,8 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 											 .ToList(missingMandatoryDacFieldInfos.Count);
 			var properties = new Dictionary<string, string?>
 			{
-				{ PX1069Properties.MissingMandatoryDacFieldsInfos, missingDacFieldsInfos.Join(Constants.FieldCategoriesSeparator) },
-				{ PX1069Properties.IsSealedDac,					   dac.Symbol.IsSealed.ToString() }
+				{ DiagnosticProperties.MissingMandatoryDacFieldsInfos, missingDacFieldsInfos.Join(Constants.FieldCategoriesSeparator) },
+				{ DiagnosticProperties.IsSealedDac,					   dac.Symbol.IsSealed.ToString() }
 			}
 			.ToImmutableDictionary();
 
@@ -174,6 +205,26 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 			diagnostic = Diagnostic.Create(Descriptors.PX1069_MissingMultipleMandatoryDacFields, location, properties, messageArgs);
 		}
 
+		symbolContext.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
+	}
+
+	protected virtual void ReportMissingNoteIdDacField(SymbolAnalysisContext symbolContext, PXContext pxContext,
+													   DacSemanticModel dac, MissingMandatoryDacFieldInfo missingNoteIdFieldInfo)
+	{
+		symbolContext.CancellationToken.ThrowIfCancellationRequested();
+
+		var location = dac.Node!.Identifier.GetLocation().NullIfLocationKindIsNone() ??
+					   dac.Symbol.Locations.FirstOrDefault();
+
+		var (missingDacField, insertMode) = missingNoteIdFieldInfo;
+		var properties = new Dictionary<string, string?>
+			{
+				{ DiagnosticProperties.MissingMandatoryDacFieldsInfos, $"{missingDacField}{Constants.FieldCategoryAndInsertModeSeparator}{insertMode}" },
+				{ DiagnosticProperties.IsSealedDac,						dac.Symbol.IsSealed.ToString() }
+			}
+		.ToImmutableDictionary();
+
+		var diagnostic = Diagnostic.Create(Descriptors.PX1110_MissingNoteIdFieldInDacWithLocalizableFieldValues, location, properties, dac.Name);
 		symbolContext.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 	}
 }

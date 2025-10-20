@@ -73,8 +73,8 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		public IReadOnlyCollection<DataTypeAttributeInfo> GetDacFieldTypeAttributeInfos(ITypeSymbol originalAttribute) =>
 			GetDacFieldTypeAttributeInfos(originalAttribute, preparedFlattenedAttributes: null);
 
-		internal IReadOnlyCollection<DataTypeAttributeInfo> GetDacFieldTypeAttributeInfos(ITypeSymbol? originalAttribute, 
-																						  ImmutableHashSet<ITypeSymbol>? preparedFlattenedAttributes)
+		internal IReadOnlyCollection<DataTypeAttributeInfo> GetDacFieldTypeAttributeInfos(ITypeSymbol? originalAttribute,
+																						  ISet<ITypeSymbol>? preparedFlattenedAttributes)
 		{
 			if (originalAttribute == null)
 				return [];
@@ -87,7 +87,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		}
 
 		internal IReadOnlyCollection<DataTypeAttributeInfo> GetDacFieldTypeAttributeInfos_NoWellKnownNonDataTypeAttributesCheck(ITypeSymbol originalAttribute,
-																										ImmutableHashSet<ITypeSymbol> flattenedAttributes)
+																										ISet<ITypeSymbol> flattenedAttributes)
 		{
 			if (flattenedAttributes.Count == 0)
 				return [];
@@ -139,8 +139,8 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		/// <returns>
 		/// The mixed database boundness attribute infos from the flattened set of attributes.
 		/// </returns>
-		private List<MixedDbBoundnessAttributeInfo>? GetMixedDbBoundnessAttributeInfosInFlattenedSet(ITypeSymbol originalAttribute, 
-																									 ImmutableHashSet<ITypeSymbol> flattenedAttributes)
+		private List<MixedDbBoundnessAttributeInfo>? GetMixedDbBoundnessAttributeInfosInFlattenedSet(ITypeSymbol originalAttribute,
+																									 ISet<ITypeSymbol> flattenedAttributes)
 		{
 			List<MixedDbBoundnessAttributeInfo>? mixedDbBoundnessAttributeInfos = null;
 			HashSet<ITypeSymbol>? checkedMixedAttributes = null;

@@ -16,6 +16,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Attribute
 	/// </summary>
 	public class DacFieldAttributeInfo : AttributeInfoBase
 	{
+		private readonly ISet<ITypeSymbol> _flattenedAttributeTypes;
+
 		public override AttributePlacement Placement => AttributePlacement.DacField;
 
 		/// <summary>
@@ -43,25 +45,27 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Attribute
 
 		public bool IsAcumaticaAttribute { get; }
 
-		protected DacFieldAttributeInfo(AttributeData attributeData, IEnumerable<AttributeWithApplication> flattenedAttributeApplications, 
-										IEnumerable<DataTypeAttributeInfo> attributeInfos, DbBoundnessType dbBoundness, int declarationOrder, 
-										bool isKey, bool isIdentity, bool isDefaultAttribute, bool isAutoNumberAttribute, 
-										bool isAcumaticaAttribute) :
+		protected DacFieldAttributeInfo(PXContext pxContext, AttributeData attributeData, IEnumerable<AttributeWithApplication> flattenedAttributeApplications,
+										ISet<ITypeSymbol> flattenedAttributeTypes, IEnumerable<DataTypeAttributeInfo> attributeInfos,
+										DbBoundnessType dbBoundness, int declarationOrder) :
 								   base(attributeData, declarationOrder)
 		{
-			FlattenedAcumaticaAttributes = (flattenedAttributeApplications as ImmutableHashSet<AttributeWithApplication>) ?? 
+			_flattenedAttributeTypes 	 = flattenedAttributeTypes.CheckIfNull();
+			FlattenedAcumaticaAttributes = (flattenedAttributeApplications as ImmutableHashSet<AttributeWithApplication>) ??
 											flattenedAttributeApplications.ToImmutableHashSet();
 			AggregatedAttributeMetadata  = attributeInfos.ToImmutableArray();
-			DbBoundness                  = dbBoundness;
-			IsKey                        = isKey;
-			IsIdentity                   = isIdentity;
-			IsDefaultAttribute           = isDefaultAttribute;
-			IsAutoNumberAttribute        = isAutoNumberAttribute;
-			IsAcumaticaAttribute         = isAcumaticaAttribute;
+			DbBoundness 				 = dbBoundness;
+
+			IsKey 				  = attributeData.NamedArguments.Any(arg => arg.Key.Contains(PropertyNames.Attributes.IsKey) &&
+																			arg.Value.Value is bool isKeyValue && isKeyValue);
+			IsIdentity 			  = IsDerivedFromIdentityTypes(_flattenedAttributeTypes, pxContext);
+			IsDefaultAttribute	  = IsPXDefaultAttribute(_flattenedAttributeTypes, pxContext);
+			IsAutoNumberAttribute = CheckForAutoNumberAttribute(_flattenedAttributeTypes, pxContext);
+			IsAcumaticaAttribute  = IsAcumaticaFrameworkAttribute(_flattenedAttributeTypes, attributeData.AttributeClass, pxContext);
 		}
 
 		public bool AggregatesAttribute(ITypeSymbol? attributeTypeToCheck) =>
-			FlattenedAcumaticaAttributes.Any(attr => attr.Type.Equals(attributeTypeToCheck, SymbolEqualityComparer.Default));
+			attributeTypeToCheck != null && _flattenedAttributeTypes.Contains(attributeTypeToCheck);
 
 		public bool AggregatesOneOfAttributes(IEnumerable<ITypeSymbol> attributeTypesToCheck) =>
 			attributeTypesToCheck.CheckIfNull().Any(AggregatesAttribute);
@@ -73,9 +77,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Attribute
 		{
 			var flattenedAttributeApplications = attribute.GetThisAndAllAggregatedAttributesWithApplications(
 																dbBoundnessCalculator.Context, includeBaseTypes: true);
-			var flattenedAttributeTypes = flattenedAttributeApplications.Count > 0
+			ISet<ITypeSymbol> flattenedAttributeTypes = flattenedAttributeApplications.Count > 0
 				? flattenedAttributeApplications.Select(attributeWithApplication => attributeWithApplication.Type)
-												.ToImmutableHashSet<ITypeSymbol>(SymbolEqualityComparer.Default)
+												.ToHashSet<ITypeSymbol>(SymbolEqualityComparer.Default)
 				: ImmutableHashSet<ITypeSymbol>.Empty;
 
 			var aggregatedMetadata = dbBoundnessCalculator.AttributesMetadataProvider
@@ -83,27 +87,19 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Attribute
 			DbBoundnessType dbBoundness = dbBoundnessCalculator.GetAttributeApplicationDbBoundnessType(attribute, flattenedAttributeApplications, 
 																										flattenedAttributeTypes, aggregatedMetadata);
 
-			bool isPXDefaultAttribute      = IsPXDefaultAttribute(flattenedAttributeTypes, dbBoundnessCalculator.Context);
-			bool isIdentityAttribute       = IsDerivedFromIdentityTypes(flattenedAttributeTypes, dbBoundnessCalculator.Context);
-			bool isAutoNumberAttribute     = CheckForAutoNumberAttribute(flattenedAttributeTypes, dbBoundnessCalculator.Context);
-			bool isAttributeWithPrimaryKey = attribute.NamedArguments.Any(arg => arg.Key.Contains(PropertyNames.Attributes.IsKey) &&
-																				 arg.Value.Value is bool isKeyValue && isKeyValue == true);
-			bool isAcumaticaAttribute	   = IsAcumaticaPlatformAttribute(flattenedAttributeTypes, attribute.AttributeClass, dbBoundnessCalculator.Context);
-
-			return new DacFieldAttributeInfo(attribute, flattenedAttributeApplications, aggregatedMetadata, dbBoundness, 
-											 declarationOrder, isAttributeWithPrimaryKey, isIdentityAttribute, isPXDefaultAttribute, isAutoNumberAttribute,
-											 isAcumaticaAttribute);
+			return new DacFieldAttributeInfo(dbBoundnessCalculator.Context, attribute, flattenedAttributeApplications, flattenedAttributeTypes, 
+											 aggregatedMetadata, dbBoundness, declarationOrder);
 		}
 
-		private static bool IsDerivedFromIdentityTypes(ImmutableHashSet<ITypeSymbol> flattenedAttributes, PXContext pxContext) =>
+		private static bool IsDerivedFromIdentityTypes(ISet<ITypeSymbol> flattenedAttributes, PXContext pxContext) =>
 			flattenedAttributes.Contains(pxContext.FieldAttributes.PXDBIdentityAttribute) ||
 			flattenedAttributes.Contains(pxContext.FieldAttributes.PXDBLongIdentityAttribute);
 
-		private static bool IsPXDefaultAttribute(ImmutableHashSet<ITypeSymbol> flattenedAttributes, PXContext pxContext) =>
+		private static bool IsPXDefaultAttribute(ISet<ITypeSymbol> flattenedAttributes, PXContext pxContext) =>
 			flattenedAttributes.Contains(pxContext.AttributeTypes.PXDefaultAttribute) && 
 			!flattenedAttributes.Contains(pxContext.AttributeTypes.PXUnboundDefaultAttribute);
 		
-		private static bool CheckForAutoNumberAttribute(ImmutableHashSet<ITypeSymbol> flattenedAttributes, PXContext pxContext)
+		private static bool CheckForAutoNumberAttribute(ISet<ITypeSymbol> flattenedAttributes, PXContext pxContext)
 		{
 			var autoNumberAttribute = pxContext.AttributeTypes.AutoNumberAttribute.Type;
 
@@ -113,8 +109,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Attribute
 			return flattenedAttributes.Contains(autoNumberAttribute);
 		}
 
-		private static bool IsAcumaticaPlatformAttribute(ImmutableHashSet<ITypeSymbol> flattenedAttributes, INamedTypeSymbol? attributeType, 
-														 PXContext pxContext) =>
+		private static bool IsAcumaticaFrameworkAttribute(ISet<ITypeSymbol> flattenedAttributes, INamedTypeSymbol? attributeType, PXContext pxContext) =>
 			flattenedAttributes.Count > 0 || pxContext.AttributeTypes.PXEventSubscriberAttribute.Equals(attributeType, SymbolEqualityComparer.Default);
 	}
 }

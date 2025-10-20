@@ -7,7 +7,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields;
 /// <summary>
 /// DAC field insert modes.
 /// </summary>
-internal enum DacFieldInsertMode : byte
+public enum DacFieldInsertMode : byte
 {
 	/// <summary>
 	/// Insert DAC field at the beginning of the DAC.

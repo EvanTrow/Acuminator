@@ -1078,6 +1078,15 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to MissingNoteIdFieldInDacWithLocalizableFieldValues.
+        /// </summary>
+        public static string PX1110 {
+            get {
+                return ResourceManager.GetString("PX1110", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MainDacOfProcessingViewMustContainNoteIdField.
         /// </summary>
         public static string PX1111 {

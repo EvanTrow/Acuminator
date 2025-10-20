@@ -65,7 +65,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		/// </returns>
 		internal DbBoundnessType GetAttributeApplicationDbBoundnessType(AttributeData attributeApplication, 
 																		ImmutableHashSet<AttributeWithApplication>? preparedFlattenedAttributesWithApplications,
-																		ImmutableHashSet<ITypeSymbol>? preparedFlattenedAttributesSet,
+																		ISet<ITypeSymbol>? preparedFlattenedAttributesSet,
 																		IReadOnlyCollection<DataTypeAttributeInfo>? preparedAttributesMetadata)
 		{
 			attributeApplication.ThrowOnNull();
@@ -86,7 +86,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			// Check combined information from attribute applications and metadata
 			var flattenedAttributesSet = preparedFlattenedAttributesSet ?? 
 										 flattenedAttributesWithApplications.Select(atrWithApp => atrWithApp.Type)
-																			.ToImmutableHashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
+																			.ToHashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
 			var attributesMetadata = 
 				preparedAttributesMetadata ?? 
 				AttributesMetadataProvider.GetDacFieldTypeAttributeInfos_NoWellKnownNonDataTypeAttributesCheck(attributeApplication.AttributeClass,
@@ -279,7 +279,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		/// <returns>
 		/// DBBoundness deduced by the duck typing.
 		/// </returns>
-		private DbBoundnessType DuckTypingCheckIfAttributeHasMixedDbBoundness(IReadOnlyCollection<ITypeSymbol> flattenedAttributesSet)
+		private DbBoundnessType DuckTypingCheckIfAttributeHasMixedDbBoundness(IEnumerable<ITypeSymbol> flattenedAttributesSet)
 		{
 			//only IsDBField properties are considered in analysis for attributes that can be applied to both bound and unbound fields
 			foreach (var attributeType in flattenedAttributesSet)

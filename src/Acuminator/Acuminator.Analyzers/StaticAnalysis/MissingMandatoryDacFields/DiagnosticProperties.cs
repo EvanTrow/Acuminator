@@ -4,7 +4,7 @@ using Acuminator.Utilities.Roslyn.Semantic.Dac;
 
 namespace Acuminator.Analyzers.StaticAnalysis.MissingMandatoryDacFields;
 
-internal static class PX1069Properties
+internal static class DiagnosticProperties
 {
 	/// <summary>
 	/// Property stores infos about missing mandatory DAC fields separated by <see cref="Constants.FieldCategoriesSeparator"/>.<br/>
