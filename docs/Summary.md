@@ -111,3 +111,4 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1101](diagnostics/PX1101.md) | The additional delegate parameter of the method with the `PXOverride` attribute must have the same signature as the base method. | Error | Available |
 | [PX1102](diagnostics/PX1102.md) | The additional delegate parameter of the method with the `PXOverride` attribute must have a name conforming Acumatica naming conventions. | Warning | Available |
 | [PX1110](diagnostics/PX1110.md) | The DAC has a DAC field with the `PXDBLocalizableString` attribute. Therefore, this DAC must declare a `NoteID` DAC field. | Error | Available |
+| [PX1111](diagnostics/PX1111.md) | The main DAC of the processing view must contain `NoteID` field. | Error | Unavailable |
