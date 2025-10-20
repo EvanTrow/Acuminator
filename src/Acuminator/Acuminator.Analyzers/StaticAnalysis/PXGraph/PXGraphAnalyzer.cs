@@ -14,6 +14,7 @@ using Acuminator.Analyzers.StaticAnalysis.DatabaseQueries;
 using Acuminator.Analyzers.StaticAnalysis.ForbidPrivateEventHandlers;
 using Acuminator.Analyzers.StaticAnalysis.InvalidPXActionSignature;
 using Acuminator.Analyzers.StaticAnalysis.LongOperationStart;
+using Acuminator.Analyzers.StaticAnalysis.MainDacOfProcessingViewMustContainNoteIdField;
 using Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGraphExtensions;
 using Acuminator.Analyzers.StaticAnalysis.NoIsActiveMethodForExtension;
 using Acuminator.Analyzers.StaticAnalysis.NonPublicGraphsDacsAndExtensions;
@@ -69,6 +70,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 			new StaticFieldOrPropertyInGraphAnalyzer(),
 			new TypoInViewAndActionHandlerNameAnalyzer(),
 			new PXOverrideAnalyzer(),
+			new MainDacOfProcessingViewMustContainNoteIdFieldAnalyzer(),
 			new ObsoleteElementsUsageAnalyzer(),
 			new ForbidPrivateEventHandlersAnalyzer())
 		{

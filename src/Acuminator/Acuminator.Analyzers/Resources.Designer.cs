@@ -2277,6 +2277,24 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The main DAC of the processing view must contain &quot;NoteID&quot; field.
+        /// </summary>
+        public static string PX1111Title {
+            get {
+                return ResourceManager.GetString("PX1111Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The main DAC &quot;{0}&quot; of the processing view &quot;{1}&quot; must contain &quot;NoteID&quot; field.
+        /// </summary>
+        public static string PX1111TitleFormat {
+            get {
+                return ResourceManager.GetString("PX1111TitleFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Suppress the {0} diagnostic with Acuminator.
         /// </summary>
         public static string SuppressDiagnosticGroupCodeActionTitle {

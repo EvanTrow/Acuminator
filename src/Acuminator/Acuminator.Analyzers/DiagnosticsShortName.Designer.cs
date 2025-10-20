@@ -1085,5 +1085,14 @@ namespace Acuminator.Analyzers {
                 return ResourceManager.GetString("PX1110", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MainDacOfProcessingViewMustContainNoteIdField.
+        /// </summary>
+        public static string PX1111 {
+            get {
+                return ResourceManager.GetString("PX1111", resourceCulture);
+            }
+        }
     }
 }

@@ -214,6 +214,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 		protected void InitProcessingDelegatesInfo()
 		{
+			if (ViewsByNames.Count == 0)
+			{
+				IsProcessing = false;
+				return;
+			}
+
 			if (!ModelCreationOptions.HasFlag(GraphSemanticModelCreationOptions.CollectProcessingDelegates))
 			{
 				IsProcessing = Views.Any(v => v.IsProcessing);
@@ -222,13 +228,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 			var processingViewSymbols = Views.Where(v => v.IsProcessing)
 											 .Select(v => v.Symbol)
-											 .ToImmutableHashSet(SymbolEqualityComparer.Default);
+											 .ToHashSet(SymbolEqualityComparer.Default);
 			IsProcessing = processingViewSymbols.Count > 0;
 
 			if (!IsProcessing)
-			{
 				return;
-			}
 
 			_cancellation.ThrowIfCancellationRequested();
 			var declaringNodes = Symbol.DeclaringSyntaxReferences

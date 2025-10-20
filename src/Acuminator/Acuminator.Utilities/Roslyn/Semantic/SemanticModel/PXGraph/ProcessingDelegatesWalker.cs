@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -19,17 +17,17 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	internal class ProcessingDelegatesWalker : DelegatesWalkerBase
 	{
 		private int _currentDeclarationOrder;
-		private readonly ImmutableHashSet<ISymbol> _processingViewSymbols;
+		private readonly HashSet<ISymbol> _processingViewSymbols;
 
-		public Dictionary<string, List<ProcessingDelegateInfo>> ParametersDelegateListByView { get; } =
-			new Dictionary<string, List<ProcessingDelegateInfo>>();
-		public Dictionary<string, List<ProcessingDelegateInfo>> ProcessDelegateListByView { get; } =
-			new Dictionary<string, List<ProcessingDelegateInfo>>();
-		public Dictionary<string, List<ProcessingDelegateInfo>> FinallyProcessDelegateListByView { get; } =
-			new Dictionary<string, List<ProcessingDelegateInfo>>();
+		public Dictionary<string, List<ProcessingDelegateInfo>> ParametersDelegateListByView { get; } = new();
 
-		public ProcessingDelegatesWalker(PXContext pxContext, ImmutableHashSet<ISymbol> processingViewSymbols, CancellationToken cancellation)
-			: base(pxContext, cancellation)
+		public Dictionary<string, List<ProcessingDelegateInfo>> ProcessDelegateListByView { get; } = new();
+		
+		public Dictionary<string, List<ProcessingDelegateInfo>> FinallyProcessDelegateListByView { get; } = new();
+
+		public ProcessingDelegatesWalker(PXContext pxContext, HashSet<ISymbol> processingViewSymbols, 
+										 CancellationToken cancellation) : 
+									base(pxContext, cancellation)
 		{
 			_processingViewSymbols = processingViewSymbols.CheckIfNull();
 		}

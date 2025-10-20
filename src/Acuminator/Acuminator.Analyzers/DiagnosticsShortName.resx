@@ -459,4 +459,7 @@
   <data name="PX1110" xml:space="preserve">
     <value>MissingNoteIdFieldInDacWithLocalizableFieldValues</value>
   </data>
+  <data name="PX1111" xml:space="preserve">
+    <value>MainDacOfProcessingViewMustContainNoteIdField</value>
+  </data>
 </root>
