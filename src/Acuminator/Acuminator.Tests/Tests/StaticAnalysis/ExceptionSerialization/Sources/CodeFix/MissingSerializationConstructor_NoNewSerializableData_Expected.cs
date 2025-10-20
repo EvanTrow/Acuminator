@@ -1,10 +1,10 @@
-﻿using System;
+﻿using System.Runtime.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 using PX.Data;
-using System.Runtime.Serialization;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.ExceptionSerialization.Sources
 {

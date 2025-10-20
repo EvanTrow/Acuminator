@@ -192,6 +192,28 @@ namespace Acuminator.Utilities.Common
 		}
 
 		/// <summary>
+		/// Any method for <see cref="SyntaxList{TNode}"/>. This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <typeparam name="TNode">Type of the syntax node.</typeparam>
+		/// <param name="source">The source to act on.</param>
+		/// <param name="predicate">The predicate.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		public static bool Any<TNode>(this SyntaxList<TNode> source, Func<TNode, bool> predicate)
+		where TNode : SyntaxNode
+		{
+			predicate.ThrowOnNull();
+
+			for (int i = 0; i < source.Count; i++)
+			{
+				if (predicate(source[i]))
+					return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Select method for <see cref="SyntaxTriviaList"/>. This is an optimization method which allows to avoid boxing.
 		/// </summary>
 		/// <typeparam name="TResult">Type of the result.</typeparam>
@@ -360,6 +382,7 @@ namespace Acuminator.Utilities.Common
 		/// <param name="source">The source collection to act on.</param>
 		/// <param name="triviasToAdd">The <see cref="SyntaxTriviaList"/> trivias to add.</param>
 		/// <returns/>
+		[DebuggerStepThrough]
 		public static IEnumerable<SyntaxTrivia> Concat(this IEnumerable<SyntaxTrivia>? source, in SyntaxTriviaList triviasToAdd)
 		{
 			if (source == null)
@@ -387,6 +410,7 @@ namespace Acuminator.Utilities.Common
 		/// <param name="triviaList">The trivia list to act on.</param>
 		/// <param name="triviasToAdd">The collection of trivias to add.</param>
 		/// <returns/>
+		[DebuggerStepThrough]
 		public static IEnumerable<SyntaxTrivia> Concat(this in SyntaxTriviaList triviaList, IEnumerable<SyntaxTrivia>? triviasToAdd)
 		{
 			if (triviaList.Count == 0)
@@ -414,6 +438,7 @@ namespace Acuminator.Utilities.Common
 		/// <param name="triviaList">The trivia list to act on.</param>
 		/// <param name="triviasToAdd">The <see cref="SyntaxTriviaList"/> trivias to add.</param>
 		/// <returns/>
+		[DebuggerStepThrough]
 		public static SyntaxTriviaList Concat(this in SyntaxTriviaList triviaList, in SyntaxTriviaList triviasToAdd)
 		{
 			if (triviaList.Count == 0)
@@ -430,6 +455,27 @@ namespace Acuminator.Utilities.Common
 				unitedTrivia[triviaList.Count + i] = triviasToAdd[i];
 
 			return new SyntaxTriviaList(unitedTrivia);
+		}
+
+		/// <summary>
+		/// Any method for <see cref="SyntaxTriviaList"/> collection without boxing.<br/>
+		/// This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="triviaList">The trivia list to act on.</param>
+		/// <param name="predicate">The predicate.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		public static bool Any(this in SyntaxTriviaList triviaList, Func<SyntaxTrivia, bool> predicate)
+		{
+			predicate.ThrowOnNull();
+
+			for (int i = 0; i < triviaList.Count; i++)
+			{
+				if (predicate(triviaList[i]))
+					return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>

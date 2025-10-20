@@ -77,6 +77,7 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1066](diagnostics/PX1066.md) | The name of the BQL field may contain a mistake. | Warning (ISV Level 3: Informational) | Available |
 | [PX1067](diagnostics/PX1067.md) | The DAC does not contain a redeclaration of a BQL field declared in the base DAC. | Warning (ISV Level 3: Informational) | Available |
 | [PX1068](diagnostics/PX1068.md) | The type of the DAC field property does not correspond to the type of the BQL field. | Error | Available |
+| [PX1069](diagnostics/PX1069.md) | The DAC must declare mandatory timestamp and audit DAC fields. | Error | Available |
 | [PX1070](diagnostics/PX1070.md) | The state of fields and actions can be configured only in `RowSelected` event handlers. | Error | Unavailable |
 | [PX1071](diagnostics/PX1071.md) | Actions cannot be executed within event handlers. | Error | Unavailable |
 | [PX1072](diagnostics/PX1072.md) | BQL queries must be executed within the context of an existing `PXGraph` instance. | Warning (ISV Level 1: Significant) | Available |

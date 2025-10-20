@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Acuminator.Utilities.Roslyn.Semantic
 {
-	public static class SematicModelUtils
+	public static class SemanticModelUtils
 	{
 		/// <summary>
 		/// Safely analyse data flow for a <paramref name="node"/> and return <see cref="DataFlowAnalysis"/> if analysis succeeded.

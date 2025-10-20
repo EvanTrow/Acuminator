@@ -1,10 +1,9 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Syntax;
+using Acuminator.Utilities.Roslyn.Syntax.Trivia;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;

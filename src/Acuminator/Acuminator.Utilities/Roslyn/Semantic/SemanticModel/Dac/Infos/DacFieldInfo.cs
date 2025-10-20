@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -121,6 +119,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// </remarks>
 		public bool IsNonBqlProperty => HasFieldPropertyDeclared && !HasBqlFieldEffective && !HasAcumaticaAttributes;
 
+		/// <summary>
+		/// The DAC field category.
+		/// </summary>
+		public DacFieldCategory FieldCategory { get; }
+
 		public DacFieldInfo(DacPropertyInfo? dacPropertyInfo, DacBqlFieldInfo? dacBqlFieldInfo, DacFieldInfo baseInfo) :
 					   this(dacPropertyInfo, dacBqlFieldInfo)
 		{
@@ -133,10 +136,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			if (dacPropertyInfo == null && dacBqlFieldInfo == null)
 				throw new ArgumentNullException($"Both {nameof(dacPropertyInfo)} and {nameof(dacBqlFieldInfo)} parameters cannot be null.");
 
-			PropertyInfo = dacPropertyInfo;
-			BqlFieldInfo = dacBqlFieldInfo;
-			Name 		 = PropertyInfo?.Name ?? BqlFieldInfo!.Name.ToPascalCase();
-			DacType 	 = PropertyInfo?.Symbol.ContainingType ?? BqlFieldInfo!.Symbol.ContainingType;
+			PropertyInfo  = dacPropertyInfo;
+			BqlFieldInfo  = dacBqlFieldInfo;
+			Name 		  = PropertyInfo?.Name ?? BqlFieldInfo!.Name.ToPascalCase();
+			DacType 	  = PropertyInfo?.Symbol.ContainingType ?? BqlFieldInfo!.Symbol.ContainingType;
+			FieldCategory = DacFieldCategoryExtensions.GetDacFieldCategory(Name);
 
 			if (dacBqlFieldInfo != null)
 			{

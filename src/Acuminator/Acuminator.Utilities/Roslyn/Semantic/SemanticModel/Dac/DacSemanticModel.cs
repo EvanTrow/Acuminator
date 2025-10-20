@@ -103,6 +103,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// </summary>
 		public ImmutableArray<DacAttributeInfo> Attributes { get; }
 
+		/// <summary>
+		/// The PXAccumulator-derived attribute if there is any declared on a DAC.
+		/// </summary>
+		public DacAttributeInfo? AccumulatorAttribute { get; }
+
+		[MemberNotNullWhen(returnValue: true, nameof(AccumulatorAttribute))]
+		public bool HasAccumulatorAttribute => AccumulatorAttribute != null;
+
 		protected DacSemanticModel(PXContext pxContext, DacType dacType, INamedTypeSymbol symbol, ClassDeclarationSyntax? node,
 									int declarationOrder, CancellationToken cancellation)
 		{
@@ -134,6 +142,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 			IsFullyUnbound  = DacFieldPropertiesWithAcumaticaAttributes.All(p => p.EffectiveDbBoundness is DbBoundnessType.Unbound or DbBoundnessType.NotDefined);
 			IsProjectionDac = CheckIfDacIsProjection();
+			AccumulatorAttribute = GetPXAccumulatorAttribute();
 		}
 
 		/// <summary>
@@ -233,6 +242,16 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 				return false;
 
 			return Attributes.Any(attrInfo => attrInfo.IsPXProjection);
+		}
+
+		protected DacAttributeInfo? GetPXAccumulatorAttribute()
+		{
+			if (DacType != DacType.Dac || Attributes.IsDefaultOrEmpty)
+				return null;
+
+			var accumulatorAttribute = PXContext.AttributeTypes.PXAccumulatorAttribute;
+			return Attributes.FirstOrDefault(attr => attr.AttributeType != null && 
+													 attr.AttributeType.InheritsFromOrEquals(accumulatorAttribute));
 		}
 	}
 }

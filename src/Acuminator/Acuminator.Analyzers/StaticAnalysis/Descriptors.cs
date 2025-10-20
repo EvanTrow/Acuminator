@@ -387,6 +387,14 @@ namespace Acuminator.Analyzers.StaticAnalysis
 		public static DiagnosticDescriptor PX1068_PropertyAndBqlFieldTypesMismatch { get; } =
 			Rule("PX1068", nameof(Resources.PX1068Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1068);
 
+		public static DiagnosticDescriptor PX1069_MissingSingleMandatoryDacField { get; } =
+			Rule("PX1069", nameof(Resources.PX1069Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1069,
+				 messageFormat: nameof(Resources.PX1069TitleFormat_SingleField).GetLocalized());
+
+		public static DiagnosticDescriptor PX1069_MissingMultipleMandatoryDacFields { get; } =
+			Rule("PX1069", nameof(Resources.PX1069Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1069,
+				 messageFormat: nameof(Resources.PX1069TitleFormat_MultipleFields).GetLocalized());
+
 		public static DiagnosticDescriptor PX1070_UiPresentationLogicInEventHandlers { get; } =
 			Rule("PX1070", nameof(Resources.PX1070Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1070);
 

@@ -1636,6 +1636,42 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add missing mandatory DAC fields to the DAC.
+        /// </summary>
+        public static string PX1069Fix {
+            get {
+                return ResourceManager.GetString("PX1069Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DAC must declare mandatory audit and timestamp DAC fields.
+        /// </summary>
+        public static string PX1069Title {
+            get {
+                return ResourceManager.GetString("PX1069Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC must declare mandatory {1} DAC fields.
+        /// </summary>
+        public static string PX1069TitleFormat_MultipleFields {
+            get {
+                return ResourceManager.GetString("PX1069TitleFormat_MultipleFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC must declare mandatory {1} DAC field.
+        /// </summary>
+        public static string PX1069TitleFormat_SingleField {
+            get {
+                return ResourceManager.GetString("PX1069TitleFormat_SingleField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The state of fields and actions can be configured only in the RowSelected event handler.
         /// </summary>
         public static string PX1070Title {
@@ -2075,12 +2111,12 @@ namespace Acuminator.Analyzers {
                 return ResourceManager.GetString("PX1098Fix", resourceCulture);
             }
         }
-
-		/// <summary>
-		///   Looks up a localized string similar to A method with the PXOverride attribute must declare an XML documentation comment with a reference to the base method. The format of the comment is:<br/>
-		/// &#47;&#47;&#47; Overrides &lt;seealso cref=&quot;{Base method}&quot;/&gt;.
-		/// </summary>
-		public static string PX1098Title {
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A method with the PXOverride attribute must declare an XML documentation comment with a reference to the base method. The format of the comment:
+        ////// Overrides &lt;seealso cref=&quot;{Base method}&quot;/&gt;.
+        /// </summary>
+        public static string PX1098Title {
             get {
                 return ResourceManager.GetString("PX1098Title", resourceCulture);
             }
