@@ -62,40 +62,96 @@ namespace Acuminator.Analyzers.StaticAnalysis.MainDacOfProcessingViewMustContain
 		private static Location? GetLocation(DataViewInfo processingView, CancellationToken cancellation)
 		{
 			if (!processingView.Symbol.IsInSourceCode() ||
-				!processingView.Type.IsGenericType || processingView.Type.TypeArguments.IsDefaultOrEmpty)
+				processingView.Symbol.GetSyntax(cancellation) is not SyntaxNode viewNode)
 			{
 				return processingView.Symbol.Locations.FirstOrDefault();
 			}
 
-			return processingView.DAC?.Locations.FirstOrDefault() ??
+			if (GetTypeNodeFromViewNode(viewNode) is not TypeSyntax viewTypeNode)
+				return processingView.Symbol.Locations.FirstOrDefault();
+
+			if (!processingView.Type.IsGenericType || processingView.Type.TypeArguments.IsDefaultOrEmpty)
+			{
+				return viewTypeNode.GetLocation().NullIfLocationKindIsNone() ??
+					   processingView.Symbol.Locations.FirstOrDefault();
+			}
+
+			return GetLocationFromViewTypeNode(viewTypeNode, processingView);
+		}
+
+		private static Location? GetLocationFromViewTypeNode(TypeSyntax viewTypeNode, DataViewInfo processingView)
+		{
+			int mainDacIndex = processingView.Type.TypeArguments.IndexOf(processingView.DAC!, SymbolEqualityComparer.Default);
+
+			if (mainDacIndex < 0 || mainDacIndex >= processingView.Type.TypeArguments.Length)
+			{
+				return viewTypeNode.GetLocation().NullIfLocationKindIsNone() ??
+					   processingView.Symbol.Locations.FirstOrDefault();
+			}
+
+			var genericTypeName = GetGenericNameFromTypeName(viewTypeNode);
+
+			if (genericTypeName?.TypeArgumentList == null)
+			{
+				return viewTypeNode.GetLocation().NullIfLocationKindIsNone() ??
+					   processingView.Symbol.Locations.FirstOrDefault();
+			}
+
+			var typeArgumentsNodes = genericTypeName.TypeArgumentList.Arguments;
+			string dacName = processingView.DAC!.Name;
+			string dacNameSuffix = $".{processingView.DAC!.Name}";
+
+			if (mainDacIndex < typeArgumentsNodes.Count)
+			{
+				var mainDacTypeArgNode = typeArgumentsNodes[mainDacIndex];
+				string mainDacTypeArgName = mainDacTypeArgNode.ToString();
+
+				if (mainDacTypeArgName == dacName || mainDacTypeArgName.EndsWith(dacNameSuffix, StringComparison.Ordinal))
+				{
+					return mainDacTypeArgNode.GetLocation().NullIfLocationKindIsNone() ??
+						   viewTypeNode.GetLocation().NullIfLocationKindIsNone() ??
+						   processingView.Symbol.Locations.FirstOrDefault();
+				}
+			}
+
+			var mainDacTypeArgFoundByDacName = GetMainDacTypeArgNode(typeArgumentsNodes, dacName, dacNameSuffix);
+			return mainDacTypeArgFoundByDacName?.GetLocation().NullIfLocationKindIsNone() ??
+				   viewTypeNode.GetLocation().NullIfLocationKindIsNone() ??
 				   processingView.Symbol.Locations.FirstOrDefault();
-
-			//if ()
-			//	return processingView.Symbol.Locations.FirstOrDefault();
-
-			//var location = processingView.Type.IsGenericType && !
-			//	? processingView.Symbol.Locations.FirstOrDefault()
-			//	: GetTypeNodeFromViewNode(viewNode)?.GetLocation().NullIfLocationKindIsNone()
-			//	  ?? processingView.Symbol.Locations.FirstOrDefault();
-
-			//var viewTypeNode = GetTypeNodeFromViewNode(viewNode);
-
-			//if (viewTypeNode == null)
-			//	return processingView.Symbol.Locations.FirstOrDefault();
-			//else if (!processingView.Type.IsGenericType || processingView.Type.TypeArguments.IsDefaultOrEmpty)
-			//{
-			//	return viewTypeNode.GetLocation().NullIfLocationKindIsNone() ??
-			//			processingView.Symbol.Locations.FirstOrDefault();
-			//}
 		}
 
 		private static TypeSyntax? GetTypeNodeFromViewNode(SyntaxNode viewNode) => viewNode switch
 		{
+			VariableDeclaratorSyntax viewVariableDeclarator   => viewVariableDeclarator.Parent<VariableDeclarationSyntax>()?.Type,
 			PropertyDeclarationSyntax viewPropertyNode 		  => viewPropertyNode.Type,
 			FieldDeclarationSyntax viewFieldNode 			  => viewFieldNode.Declaration?.Type,
 			VariableDeclarationSyntax viewVariableDeclaration => viewVariableDeclaration.Type,
-			VariableDeclaratorSyntax viewVariableDeclarator   => viewVariableDeclarator.Parent<VariableDeclarationSyntax>()?.Type,
 			_ 												  => null
 		};
+
+		private static GenericNameSyntax? GetGenericNameFromTypeName(TypeSyntax typeNode) =>
+			typeNode switch
+			{
+				GenericNameSyntax genericTypeNameNode 	  => genericTypeNameNode,
+				QualifiedNameSyntax qualifiedTypeNameNode => qualifiedTypeNameNode.Right as GenericNameSyntax,
+				_ 										  => null
+			};
+
+		private static TypeSyntax? GetMainDacTypeArgNode(in SeparatedSyntaxList<TypeSyntax> typeArguments, string dacName,
+														 string dacNameSuffix)
+		{
+			for (int i = 0; i < typeArguments.Count; i++)
+			{
+				var typeArg = typeArguments[i];
+				string typeArgName = typeArg.ToString();
+
+				if (typeArgName == dacName || typeArgName.EndsWith(dacNameSuffix, StringComparison.Ordinal))
+				{
+					return typeArg;
+				}
+			}
+
+			return null;
+		}
 	}
 }
