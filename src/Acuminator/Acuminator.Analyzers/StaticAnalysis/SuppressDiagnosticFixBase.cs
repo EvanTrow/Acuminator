@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -63,7 +64,7 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			{
 				RegisterCodeActionForDiagnostic(diagnostic, context);
 			}
-				
+
 			return Task.CompletedTask;
 		}
 
@@ -75,7 +76,7 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			if (groupCodeAction != null)
 			{
 				context.RegisterCodeFix(groupCodeAction, diagnostic);
-			}	
+			}
 		}
 
 		protected virtual CodeAction? GetCodeActionToRegister(Diagnostic diagnostic, CodeFixContext context)
@@ -104,7 +105,7 @@ namespace Acuminator.Analyzers.StaticAnalysis
 
 			// Use reflection based factory to create group code action with nested actions and custom priority.
 			// Setting code action priority is impossible via Roslyn public API.
-			var groupCodeAction = 
+			var groupCodeAction =
 				CodeActionWithNestedActionsFabric.CreateCodeActionWithNestedActions(groupCodeActionName, suppressionCodeActions.ToImmutable()) ??
 				CodeAction.Create(groupCodeActionName, suppressionCodeActions.ToImmutable(), isInlinable: false);
 
@@ -134,10 +135,10 @@ namespace Acuminator.Analyzers.StaticAnalysis
 		{
 			string suppressionFileCodeActionName = nameof(Resources.SuppressDiagnosticInSuppressionFileCodeActionTitle).GetLocalized().ToString();
 			return new SuppressWithSuppressionFileCodeAction(context, diagnostic, suppressionFileCodeActionName,
-															 equivalenceKey: suppressionFileCodeActionName + diagnostic.Id); 
+															 equivalenceKey: suppressionFileCodeActionName + diagnostic.Id);
 		}
 
-		protected virtual async Task<Document> AddSuppressionCommentAsync(CodeFixContext context, Diagnostic diagnostic, 
+		protected virtual async Task<Document> AddSuppressionCommentAsync(CodeFixContext context, Diagnostic diagnostic,
 																		  CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
@@ -149,6 +150,11 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			if (diagnostic == null || reportedNode == null)
 				return document;
 
+			SyntaxNode? nodeToPlaceComment = GetNodeToPlaceComment(reportedNode);
+
+			if (nodeToPlaceComment == null)
+				return document;
+
 			cancellationToken.ThrowIfCancellationRequested();
 
 			var (diagnosticShortName, diagnosticJustification) = GetDiagnosticShortNameAndJustification(diagnostic);
@@ -157,36 +163,67 @@ namespace Acuminator.Analyzers.StaticAnalysis
 				return document;
 
 			string suppressionComment = string.Format(SuppressionCommentFormat, diagnostic.Id, diagnosticShortName, diagnosticJustification);
+			bool isInsideList = nodeToPlaceComment.Parent is BaseArgumentListSyntax or TypeArgumentListSyntax;
+
+			var modifiedRoot = isInsideList
+				? GetNewRootWithSuppressionCommentForArgumentNodeInList(root!, nodeToPlaceComment, suppressionComment)
+				: GetNewRootWithSuppressionCommentForNonListNode(root!, nodeToPlaceComment, suppressionComment);
+
+			return document.WithSyntaxRoot(modifiedRoot);
+		}
+
+		protected virtual SyntaxNode GetNewRootWithSuppressionCommentForArgumentNodeInList(SyntaxNode root, SyntaxNode nodeToPlaceComment,
+																							string suppressionComment)
+		{
+			var suppressionCommentTrivias = new SyntaxTriviaList
+			(
+				SyntaxFactory.SyntaxTrivia(SyntaxKind.SingleLineCommentTrivia, suppressionComment),
+				SyntaxFactory.CarriageReturnLineFeed
+			);
+
+			SyntaxTriviaList oldLeadingTrivia = nodeToPlaceComment.GetLeadingTrivia();
+			SyntaxTriviaList newLeadingTrivia;
+
+			if (oldLeadingTrivia.Count > 0)
+			{
+				var whiteSpaceIndentationTrivia = oldLeadingTrivia.TakeWhile((in SyntaxTrivia t) => !t.IsKind(SyntaxKind.EndOfLineTrivia))
+																  .Where(t => !t.IsDirective && t.IsKind(SyntaxKind.WhitespaceTrivia));
+				var mutableTriviaList = whiteSpaceIndentationTrivia.ToList(capacity: oldLeadingTrivia.Count);
+				mutableTriviaList.AddRange(suppressionCommentTrivias);
+				mutableTriviaList.AddRange(oldLeadingTrivia);
+
+				newLeadingTrivia = new SyntaxTriviaList(mutableTriviaList);
+			}
+			else
+				newLeadingTrivia = suppressionCommentTrivias;
+
+			var nodeWithSuppressionComment = nodeToPlaceComment.WithLeadingTrivia(newLeadingTrivia);
+			var modifiedRoot = root.ReplaceNode(nodeToPlaceComment, nodeWithSuppressionComment);
+
+			return modifiedRoot;
+		}
+
+		protected virtual SyntaxNode GetNewRootWithSuppressionCommentForNonListNode(SyntaxNode root, SyntaxNode nodeToPlaceComment,
+																					string suppressionComment)
+		{
 			var suppressionCommentTrivias = new SyntaxTrivia[]
 			{
 				SyntaxFactory.SyntaxTrivia(SyntaxKind.SingleLineCommentTrivia, suppressionComment),
-				SyntaxFactory.ElasticEndOfLine("")
+				SyntaxFactory.ElasticEndOfLine(string.Empty)
 			};
-
-			SyntaxNode? nodeToPlaceComment = reportedNode;
-
-			while (nodeToPlaceComment is not (StatementSyntax or MemberDeclarationSyntax or UsingDirectiveSyntax or null))
-			{
-				nodeToPlaceComment = nodeToPlaceComment.Parent;
-			}
-
-			if (nodeToPlaceComment == null)
-				return document;
 
 			SyntaxTriviaList leadingTrivia = nodeToPlaceComment.GetLeadingTrivia();
 			SyntaxNode? modifiedRoot;
 
 			if (leadingTrivia.Count > 0)
-				modifiedRoot = root!.InsertTriviaAfter(leadingTrivia.Last(), suppressionCommentTrivias);
+				modifiedRoot = root.InsertTriviaAfter(leadingTrivia.Last(), suppressionCommentTrivias);
 			else
 			{
 				var nodeWithSuppressionComment = nodeToPlaceComment.WithLeadingTrivia(suppressionCommentTrivias);
-				modifiedRoot = root!.ReplaceNode(nodeToPlaceComment, nodeWithSuppressionComment);
+				modifiedRoot = root.ReplaceNode(nodeToPlaceComment, nodeWithSuppressionComment);
 			}
 
-			return modifiedRoot != null
-				? document.WithSyntaxRoot(modifiedRoot)
-				: document;
+			return modifiedRoot;
 		}
 
 		protected (string? DiagnosticShortName, string? DiagnosticJustification) GetDiagnosticShortNameAndJustification(Diagnostic diagnostic)
@@ -203,5 +240,20 @@ namespace Acuminator.Analyzers.StaticAnalysis
 
 			return (diagnosticShortName, diagnosticJustification);
 		}
+
+		protected SyntaxNode? GetNodeToPlaceComment(SyntaxNode reportedNode)
+		{
+			SyntaxNode? nodeToPlaceComment = reportedNode;
+			while (nodeToPlaceComment != null && !CanPlaceCommentAboveNode(nodeToPlaceComment))
+			{
+				nodeToPlaceComment = nodeToPlaceComment.Parent;
+			}
+
+			return nodeToPlaceComment;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		protected bool CanPlaceCommentAboveNode(SyntaxNode node) =>
+			node is StatementSyntax or ArgumentSyntax or MemberDeclarationSyntax or UsingDirectiveSyntax;
 	}
 }
