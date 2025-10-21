@@ -244,16 +244,12 @@ namespace Acuminator.Analyzers.StaticAnalysis
 		protected SyntaxNode? GetNodeToPlaceComment(SyntaxNode reportedNode)
 		{
 			SyntaxNode? nodeToPlaceComment = reportedNode;
-			while (nodeToPlaceComment != null && !CanPlaceCommentAboveNode(nodeToPlaceComment))
+			while (nodeToPlaceComment != null && !SuppressionExtensions.CanNodeContainSuppressionComment(nodeToPlaceComment))
 			{
 				nodeToPlaceComment = nodeToPlaceComment.Parent;
 			}
 
 			return nodeToPlaceComment;
 		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		protected bool CanPlaceCommentAboveNode(SyntaxNode node) =>
-			node is StatementSyntax or ArgumentSyntax or MemberDeclarationSyntax or UsingDirectiveSyntax;
 	}
 }
