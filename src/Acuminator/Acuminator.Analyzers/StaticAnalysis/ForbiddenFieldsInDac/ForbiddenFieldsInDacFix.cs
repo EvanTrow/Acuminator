@@ -7,6 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.Dac;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -47,10 +49,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.ForbiddenFieldsInDac
 
 		private async Task<Document> DeleteForbiddenFieldsAsync(Document document, TextSpan span, CancellationToken cancellationToken)
 		{
-			SyntaxNode? root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+			cancellationToken.ThrowIfCancellationRequested();
+
+			var (semanticModel, root) = await document.GetSemanticModelAndRootAsync(cancellationToken).ConfigureAwait(false);
 			SyntaxNode? diagnosticNode = root?.FindNode(span);
 
-			if (diagnosticNode == null || cancellationToken.IsCancellationRequested)
+			if (semanticModel == null || diagnosticNode == null)
 				return document;
 
 			ClassDeclarationSyntax? dacDeclaration = diagnosticNode.Parent<ClassDeclarationSyntax>();
@@ -64,32 +68,36 @@ namespace Acuminator.Analyzers.StaticAnalysis.ForbiddenFieldsInDac
 			var regionsVisitor = new RegionsVisitor(identifierToRemove, cancellationToken);
 			regionsVisitor.Visit(dacDeclaration);
 
-			if (cancellationToken.IsCancellationRequested)
-				return document;
+			cancellationToken.ThrowIfCancellationRequested();
+
+			// Store names of BQL fields to remove before the modification of AST 
+			var bqlFieldNamesToRemove = (from bqlField in dacDeclaration.Members.OfType<ClassDeclarationSyntax>()
+										 where identifierToRemove.Equals(bqlField.Identifier.Text, StringComparison.OrdinalIgnoreCase) &&
+											  semanticModel.GetDeclaredSymbol(bqlField, cancellationToken) is INamedTypeSymbol bqlFieldSymbol &&
+											  bqlFieldSymbol.IsDacBqlField()
+										 select bqlField.Identifier.Text
+										)
+										.ToList(capacity: 4);
 
 			ClassDeclarationSyntax modifiedDac = RemoveRegions(dacDeclaration, regionsVisitor.RegionNodesToRemove);
 			var propertiesToRemove = modifiedDac.Members.OfType<PropertyDeclarationSyntax>() //-V3080
 														.Where(p => identifierToRemove.Equals(p.Identifier.Text, 
 																							  StringComparison.OrdinalIgnoreCase));
 			modifiedDac = modifiedDac.RemoveNodes(propertiesToRemove, SyntaxRemoveOptions.KeepExteriorTrivia)!;
-
-			var dacFieldsToRemove = modifiedDac.Members.OfType<ClassDeclarationSyntax>()
-													   .Where(dacField => identifierToRemove.Equals(dacField.Identifier.Text, 
-																									StringComparison.OrdinalIgnoreCase));
-			modifiedDac = modifiedDac.RemoveNodes(dacFieldsToRemove, SyntaxRemoveOptions.KeepExteriorTrivia)!;
+			
+			var bqlFieldsToRemove = modifiedDac.Members.OfType<ClassDeclarationSyntax>()
+													   .Where(bqlField => bqlFieldNamesToRemove.Contains(bqlField.Identifier.Text));
+			modifiedDac = modifiedDac.RemoveNodes(bqlFieldsToRemove, SyntaxRemoveOptions.KeepExteriorTrivia)!;
 			var modifiedRoot = root!.ReplaceNode(dacDeclaration, modifiedDac);
 
-			if (cancellationToken.IsCancellationRequested)
-				return document;
+			cancellationToken.ThrowIfCancellationRequested();
 
 			//Format tabulations
 			Workspace workspace = document.Project.Solution.Workspace;
 			OptionSet formatOptions = GetFormattingOptions(workspace);
 			modifiedRoot = Formatter.Format(modifiedRoot, workspace, formatOptions, cancellationToken);
 
-			if (cancellationToken.IsCancellationRequested)
-				return document;
-
+			cancellationToken.ThrowIfCancellationRequested();
 			return document.WithSyntaxRoot(modifiedRoot);
 		}
 
