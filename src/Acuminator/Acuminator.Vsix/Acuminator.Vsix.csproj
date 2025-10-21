@@ -536,6 +536,7 @@
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacCategories\NonBqlDacPropertiesCategoryNodeViewModel.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\Base\DacFieldNodeViewModelBase.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\DacBqlFieldNodeViewModel.cs" />
+    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\DacFields\AuditDacFieldNodeViewModel.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\NonBqlDacPropertyNodeViewModel.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\DacFieldPropertyNodeViewModel.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\InitializationAndActivation\IsActiveDacMethodNodeViewModel.cs" />

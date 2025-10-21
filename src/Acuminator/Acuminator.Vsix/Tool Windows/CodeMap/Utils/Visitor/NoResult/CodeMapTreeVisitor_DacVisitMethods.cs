@@ -19,6 +19,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual void VisitNode(KeyDacFieldsCategoryNodeViewModel dacKeyFieldsCategory) => DefaultVisit(dacKeyFieldsCategory);
 
+		public virtual void VisitNode(AuditDacFieldsCategoryNodeViewModel auditDacFieldsCategory) => DefaultVisit(auditDacFieldsCategory);
+
 		public virtual void VisitNode(DacInitializationAndActivationCategoryNodeViewModel dacInitializationAndActivationCategory) =>
 			DefaultVisit(dacInitializationAndActivationCategory);
 
@@ -32,6 +34,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public virtual void VisitNode(RegularDacFieldNodeViewModel dacField) => DefaultVisit(dacField);
 
 		public virtual void VisitNode(KeyDacFieldNodeViewModel dacField) => DefaultVisit(dacField);
+
+		public virtual void VisitNode(AuditDacFieldNodeViewModel auditDacField) => DefaultVisit(auditDacField);
 
 		public virtual void VisitNode(IsActiveDacMethodNodeViewModel isActiveDacMethodNode) =>
 		DefaultVisit(isActiveDacMethodNode);
