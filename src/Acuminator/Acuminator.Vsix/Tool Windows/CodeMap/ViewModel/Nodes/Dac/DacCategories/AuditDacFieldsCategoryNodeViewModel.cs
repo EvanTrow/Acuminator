@@ -11,13 +11,13 @@ using Acuminator.Vsix.ToolWindows.CodeMap.Dac;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap;
 
-public class DacAuditFieldsCategoryNodeViewModel : DacFieldCategoryNodeViewModel
+public class AuditDacFieldsCategoryNodeViewModel : DacFieldCategoryNodeViewModel
 {
 	protected override bool AllowNavigation => true;
 
 	public override Icon NodeIcon => Icon.DacAuditFieldsCategory;
 
-	public DacAuditFieldsCategoryNodeViewModel(DacNodeViewModel dacViewModel, TreeNodeViewModel parent, bool isExpanded) : 
+	public AuditDacFieldsCategoryNodeViewModel(DacNodeViewModel dacViewModel, TreeNodeViewModel parent, bool isExpanded) : 
 										  base(dacViewModel, parent, DacMemberCategory.AuditDacFields, isExpanded)
 	{
 	}
