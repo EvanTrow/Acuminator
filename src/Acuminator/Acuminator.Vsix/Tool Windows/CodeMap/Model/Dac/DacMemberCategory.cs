@@ -11,6 +11,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap.Dac
 		BaseTypes,
 		Keys,
 		AllDacFields,
+		AuditDacFields,
 		NonBqlProperties,
 		InitializationAndActivation,
 	}
@@ -22,6 +23,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap.Dac
 			{ DacMemberCategory.BaseTypes, "Base Types" },
 			{ DacMemberCategory.Keys, "Keys" },
 			{ DacMemberCategory.AllDacFields, "DAC Fields" },
+			{ DacMemberCategory.AuditDacFields, "Audit Fields" },
 			{ DacMemberCategory.NonBqlProperties, "Non-BQL Properties" },
 			{ DacMemberCategory.InitializationAndActivation, "Initialization & Activation" }
 		};
