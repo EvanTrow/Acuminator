@@ -340,6 +340,24 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Is audit field.
+        /// </summary>
+        public static string CodeMap_ExtraInfo_DacAuditFieldIconTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_ExtraInfo_DacAuditFieldIconTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Audit fields.
+        /// </summary>
+        public static string CodeMap_ExtraInfo_DacAuditFieldsCategoryIconTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_ExtraInfo_DacAuditFieldsCategoryIconTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Is part of a primary key.
         /// </summary>
         public static string CodeMap_ExtraInfo_DacKeyIconTooltip {
@@ -809,7 +827,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enables Acuminator diagnostics suppression with suppression comments and Acuminator suppression files. If this setting is set to false, Acuminator will ignore suppression comments in the source code and Acuminator suppression files and display all found diagnostics..
+        ///   Looks up a localized string similar to Enables Acuminator diagnostic suppression by using suppression comments and Acuminator suppression files. If this setting is set to false, Acuminator will ignore suppression comments in the source code and Acuminator suppression files and display detected errors and warnings for all diagnostics..
         /// </summary>
         public static string Setting_CodeAnalysis_SuppressionMechanismEnabled_Description {
             get {
@@ -818,7 +836,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable Acuminator diagnostics suppression.
+        ///   Looks up a localized string similar to Enable Acuminator diagnostic suppression.
         /// </summary>
         public static string Setting_CodeAnalysis_SuppressionMechanismEnabled_Title {
             get {
