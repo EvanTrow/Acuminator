@@ -539,6 +539,7 @@
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\NonBqlDacPropertyNodeViewModel.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\DacFieldPropertyNodeViewModel.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\InitializationAndActivation\IsActiveDacMethodNodeViewModel.cs" />
+    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\DacFields\KeyDacFieldNodeViewModel.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\Dac\BaseDacPlaceholderNodeViewModel.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\Dac\Base\DacNodeViewModelBase.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphEventsGrouping\Dac\Base\DacGroupingNodeForFieldEventHandlerBaseViewModel.cs" />
@@ -611,7 +612,7 @@
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacCategories\DacKeysCategoryNodeViewModel.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacCategories\AllDacFieldsDacCategoryNodeViewModel.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacCategories\Base\DacMemberCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\RegularDacFieldNodeViewModel.cs" />
+    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\DacFields\RegularDacFieldNodeViewModel.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\Base\DacMemberNodeViewModel.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\Dac\DacNodeViewModel.cs" />
     <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphEventsGrouping\DacField\DacFieldGroupingNodeForFieldEventHandlerViewModel.cs" />

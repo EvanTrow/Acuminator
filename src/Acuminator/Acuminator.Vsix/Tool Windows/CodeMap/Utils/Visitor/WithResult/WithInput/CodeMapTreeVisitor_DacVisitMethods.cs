@@ -37,6 +37,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public virtual TResult VisitNode(RegularDacFieldNodeViewModel dacField, TInput input) => 
 			DefaultVisit(dacField, input);
 
+		public virtual TResult VisitNode(KeyDacFieldNodeViewModel dacField, TInput input) => 
+			DefaultVisit(dacField, input);
+
 		public virtual TResult VisitNode(IsActiveDacMethodNodeViewModel isActiveDacMethodNode, TInput input) =>
 			DefaultVisit(isActiveDacMethodNode, input);
 

@@ -11,9 +11,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 											  DacFieldInfo fieldInfo, bool isExpanded) : 
 					DacFieldNodeViewModelBase(dacMemberCategoryVM, parent, fieldInfo, isExpanded)
 	{
-		public override Icon NodeIcon => IsKey
-				? Icon.DacKeyField
-				: Icon.DacField;
+		public override Icon NodeIcon => Icon.DacField;
 
 		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => 
 			treeVisitor.VisitNode(this, input);
