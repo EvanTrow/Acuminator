@@ -3,14 +3,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 using Acuminator.Vsix.ToolWindows.CodeMap.Dac;
-
-using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
@@ -48,6 +45,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			yield return DacMemberCategory.InitializationAndActivation;
 			yield return DacMemberCategory.Keys;
 			yield return DacMemberCategory.AllDacFields;
+			yield return DacMemberCategory.AuditDacFields;
 			yield return DacMemberCategory.NonBqlProperties;
 		}
 
@@ -57,6 +55,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				DacMemberCategory.BaseTypes					  => new DacBaseTypesCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
 				DacMemberCategory.InitializationAndActivation => new DacInitializationAndActivationCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
 				DacMemberCategory.Keys 						  => new KeyDacFieldsCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
+				DacMemberCategory.AuditDacFields 			  => new AuditDacFieldsCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
 				DacMemberCategory.AllDacFields 				  => new AllDacFieldsDacCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
 				DacMemberCategory.NonBqlProperties			  => new NonBqlDacPropertiesCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
 				_ 											  => null,
@@ -83,7 +82,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			}
 		}
 
-		public override IEnumerable<TreeNodeViewModel>? VisitNode(DacInitializationAndActivationCategoryNodeViewModel dacInitializationAndActivationCategory)
+		public override IEnumerable<TreeNodeViewModel> VisitNode(DacInitializationAndActivationCategoryNodeViewModel dacInitializationAndActivationCategory)
 		{
 			Cancellation.ThrowIfCancellationRequested();
 
@@ -98,15 +97,20 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				return [];
 		}
 
-		public override IEnumerable<TreeNodeViewModel>? VisitNode(KeyDacFieldsCategoryNodeViewModel dacKeyFieldsCategory) =>
+		public override IEnumerable<TreeNodeViewModel> VisitNode(KeyDacFieldsCategoryNodeViewModel dacKeyFieldsCategory) =>
 			CreateDacFieldsCategoryChildren(dacKeyFieldsCategory, 
 					fieldVmConstructor: fieldInfo => new KeyDacFieldNodeViewModel(dacKeyFieldsCategory, parent: dacKeyFieldsCategory,
 																				  fieldInfo, ExpandCreatedNodes));
 
-		public override IEnumerable<TreeNodeViewModel>? VisitNode(AllDacFieldsDacCategoryNodeViewModel allDacFieldsCategory) =>
+		public override IEnumerable<TreeNodeViewModel> VisitNode(AllDacFieldsDacCategoryNodeViewModel allDacFieldsCategory) =>
 			CreateDacFieldsCategoryChildren(allDacFieldsCategory,
 					fieldVmConstructor: fieldInfo => new RegularDacFieldNodeViewModel(allDacFieldsCategory, parent: allDacFieldsCategory,
 																					  fieldInfo, ExpandCreatedNodes));
+
+		public override IEnumerable<TreeNodeViewModel> VisitNode(AuditDacFieldsCategoryNodeViewModel auditDacFieldsCategory) =>
+			CreateDacFieldsCategoryChildren(auditDacFieldsCategory,
+					fieldVmConstructor: fieldInfo => new AuditDacFieldNodeViewModel(auditDacFieldsCategory, parent: auditDacFieldsCategory,
+																					fieldInfo, ExpandCreatedNodes));
 
 		protected virtual IEnumerable<TreeNodeViewModel> CreateDacFieldsCategoryChildren(DacFieldCategoryNodeViewModel dacFieldCategory,
 																Func<DacFieldInfo, DacFieldNodeViewModelBase?> fieldVmConstructor)
@@ -153,6 +157,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(KeyDacFieldNodeViewModel dacField) => 
 			CreateDacFieldPropertyAndBqlField(dacField);
+
+		public override IEnumerable<TreeNodeViewModel> VisitNode(AuditDacFieldNodeViewModel auditDacField) =>
+			CreateDacFieldPropertyAndBqlField(auditDacField);
 
 		protected virtual IEnumerable<TreeNodeViewModel> CreateDacFieldPropertyAndBqlField(DacFieldNodeViewModelBase dacFieldVmBase)
 		{
