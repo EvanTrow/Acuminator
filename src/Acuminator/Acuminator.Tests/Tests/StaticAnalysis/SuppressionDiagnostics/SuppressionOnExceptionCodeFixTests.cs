@@ -26,12 +26,22 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.SuppressionDiagnostics
 
 		[Theory]
 		[EmbeddedFileData(@"Exceptions\PXCustomException_Expected.cs")]
-		public virtual Task CustomException_Alert_ChainedConstructorCall_Suppressed(string source) =>
+		public virtual Task CustomException_Alert_InChainedConstructorCall_Suppressed(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
+
+		[Theory]
+		[EmbeddedFileData(@"Exceptions\PXCustomExceptionDifferentFormat_Expected.cs")]
+		public virtual Task CustomException_DifferentFormat_Alert_InChainedConstructorCall_Suppressed(string source) =>
 			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"Exceptions\PXCustomException.cs", @"Exceptions\PXCustomException_Expected.cs")]
-		public virtual Task CustomException_Alert_ChainedConstructorCall_SuppressComment_CodeFix(string actual, string expected) =>
+		public virtual Task CustomException_Alert_InChainedConstructorCall_SuppressComment_CodeFix(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected);
+
+		[Theory]
+		[EmbeddedFileData(@"Exceptions\PXCustomExceptionDifferentFormat.cs", @"Exceptions\PXCustomExceptionDifferentFormat_Expected.cs")]
+		public virtual Task CustomException_DifferentFormat_Alert_InChainedConstructorCall_SuppressComment_CodeFix(string actual, string expected) =>
 			VerifyCSharpFixAsync(actual, expected);
 	}
 }
