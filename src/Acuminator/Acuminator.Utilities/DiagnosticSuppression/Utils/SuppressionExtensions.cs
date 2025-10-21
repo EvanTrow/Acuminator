@@ -20,7 +20,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			node is StatementSyntax or MemberDeclarationSyntax or UsingDirectiveSyntax or ArgumentSyntax or ParameterSyntax;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static bool ShouldStopSearchForSuppressionComment(SyntaxNode node) =>
+		public static bool ShouldStopSearchForSuppressionComment(SyntaxNode node) =>
 			node is StatementSyntax or MemberDeclarationSyntax or UsingDirectiveSyntax;
 
 		public static void ReportDiagnosticWithSuppressionCheck(this SymbolAnalysisContext context, Diagnostic diagnostic,

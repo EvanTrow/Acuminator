@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,6 +11,7 @@ using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.DiagnosticSuppression.CodeActions;
 using Acuminator.Utilities.Roslyn.CodeActions;
+using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
@@ -163,7 +163,7 @@ namespace Acuminator.Analyzers.StaticAnalysis
 				return document;
 
 			string suppressionComment = string.Format(SuppressionCommentFormat, diagnostic.Id, diagnosticShortName, diagnosticJustification);
-			bool isInsideList = nodeToPlaceComment.Parent is BaseArgumentListSyntax or TypeArgumentListSyntax;
+			bool isInsideList = nodeToPlaceComment.Parent is BaseArgumentListSyntax or TypeArgumentListSyntax or BaseParameterListSyntax;
 
 			var modifiedRoot = isInsideList
 				? GetNewRootWithSuppressionCommentForArgumentNodeInList(root!, nodeToPlaceComment, suppressionComment)
@@ -172,39 +172,8 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			return document.WithSyntaxRoot(modifiedRoot);
 		}
 
-		protected virtual SyntaxNode GetNewRootWithSuppressionCommentForArgumentNodeInList(SyntaxNode root, SyntaxNode nodeToPlaceComment,
-																							string suppressionComment)
-		{
-			var suppressionCommentTrivias = new SyntaxTriviaList
-			(
-				SyntaxFactory.SyntaxTrivia(SyntaxKind.SingleLineCommentTrivia, suppressionComment),
-				SyntaxFactory.CarriageReturnLineFeed
-			);
-
-			SyntaxTriviaList oldLeadingTrivia = nodeToPlaceComment.GetLeadingTrivia();
-			SyntaxTriviaList newLeadingTrivia;
-
-			if (oldLeadingTrivia.Count > 0)
-			{
-				var whiteSpaceIndentationTrivia = oldLeadingTrivia.TakeWhile((in SyntaxTrivia t) => !t.IsKind(SyntaxKind.EndOfLineTrivia))
-																  .Where(t => !t.IsDirective && t.IsKind(SyntaxKind.WhitespaceTrivia));
-				var mutableTriviaList = whiteSpaceIndentationTrivia.ToList(capacity: oldLeadingTrivia.Count);
-				mutableTriviaList.AddRange(suppressionCommentTrivias);
-				mutableTriviaList.AddRange(oldLeadingTrivia);
-
-				newLeadingTrivia = new SyntaxTriviaList(mutableTriviaList);
-			}
-			else
-				newLeadingTrivia = suppressionCommentTrivias;
-
-			var nodeWithSuppressionComment = nodeToPlaceComment.WithLeadingTrivia(newLeadingTrivia);
-			var modifiedRoot = root.ReplaceNode(nodeToPlaceComment, nodeWithSuppressionComment);
-
-			return modifiedRoot;
-		}
-
-		protected virtual SyntaxNode GetNewRootWithSuppressionCommentForNonListNode(SyntaxNode root, SyntaxNode nodeToPlaceComment,
-																					string suppressionComment)
+		protected SyntaxNode GetNewRootWithSuppressionCommentForNonListNode(SyntaxNode root, SyntaxNode nodeToPlaceComment,
+																			string suppressionComment)
 		{
 			var suppressionCommentTrivias = new SyntaxTrivia[]
 			{
@@ -224,6 +193,91 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			}
 
 			return modifiedRoot;
+		}
+
+		protected SyntaxNode GetNewRootWithSuppressionCommentForArgumentNodeInList(SyntaxNode root, SyntaxNode nodeToPlaceComment,
+																					string suppressionComment)
+		{
+			bool shouldAddNewLineBeforeComment = ShouldAddNewLineBeforeComment(nodeToPlaceComment);
+
+			SyntaxTriviaList oldLeadingTrivia  = nodeToPlaceComment.GetLeadingTrivia();
+			var whiteSpaceIndentationTrivia	   = GetWhiteSpaceTrivia(oldLeadingTrivia);
+
+			var parentLeadingTrivia 				  = GetParentTrivia(nodeToPlaceComment);
+			var whiteSpaceIndentationParentTrivia = GetWhiteSpaceTrivia(parentLeadingTrivia);
+
+			bool oldTriviaStartsWithNewLine = 
+				!shouldAddNewLineBeforeComment && oldLeadingTrivia.Count > 0 && oldLeadingTrivia[0].IsKind(SyntaxKind.EndOfLineTrivia);
+			var suppressionCommentTriviasMutableList = new List<SyntaxTrivia>(capacity: 16);
+
+			if (shouldAddNewLineBeforeComment || oldTriviaStartsWithNewLine)
+			{
+				suppressionCommentTriviasMutableList.Add(SyntaxFactory.CarriageReturnLineFeed);
+
+				if (shouldAddNewLineBeforeComment)
+				{
+					suppressionCommentTriviasMutableList.AddRange(whiteSpaceIndentationParentTrivia);
+					suppressionCommentTriviasMutableList.Add(SyntaxFactory.Tab);
+					suppressionCommentTriviasMutableList.Add(SyntaxFactory.Tab);
+				}
+			}
+
+			suppressionCommentTriviasMutableList.AddRange(whiteSpaceIndentationTrivia);
+			suppressionCommentTriviasMutableList.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.SingleLineCommentTrivia, suppressionComment));
+
+			if (!oldTriviaStartsWithNewLine)
+			{
+				suppressionCommentTriviasMutableList.Add(SyntaxFactory.CarriageReturnLineFeed);
+
+				if (shouldAddNewLineBeforeComment)
+				{
+					suppressionCommentTriviasMutableList.AddRange(whiteSpaceIndentationParentTrivia);
+					suppressionCommentTriviasMutableList.Add(SyntaxFactory.Tab);
+					suppressionCommentTriviasMutableList.Add(SyntaxFactory.Tab);
+				}
+			}
+
+			suppressionCommentTriviasMutableList.AddRange(oldLeadingTrivia);
+
+			var newLeadingTrivia = new SyntaxTriviaList(suppressionCommentTriviasMutableList);
+			var nodeWithSuppressionComment = nodeToPlaceComment.WithLeadingTrivia(newLeadingTrivia);
+			var modifiedRoot = root.ReplaceNode(nodeToPlaceComment, nodeWithSuppressionComment);
+
+			return modifiedRoot;
+		}
+
+		private bool ShouldAddNewLineBeforeComment(SyntaxNode nodeToPlaceComment)
+		{
+			if (nodeToPlaceComment.Parent == null)  // in all uncertain cases add new line for safety
+				return true;
+
+			var nodeLocation  = nodeToPlaceComment.GetLocation();
+			var nodeLineSpan  = nodeLocation.GetLineSpan();
+
+			var parentLocation = nodeToPlaceComment.Parent.GetLocation();
+			var parentLineSpan = parentLocation.GetLineSpan();
+
+			// Node with a comment is on the same line as the parent list => need to add new line
+			if (parentLineSpan.StartLinePosition.Line == nodeLineSpan.StartLinePosition.Line)
+				return true;
+
+			var arguments = GetArguments(nodeToPlaceComment.Parent);
+
+			if (arguments?.Count is null or 0)
+				return true;
+
+			int nodeToPlaceCommentIndex = arguments.FindIndex(argNode => argNode.Equals(nodeToPlaceComment));
+
+			// Node with a comment is first in the list and on a different line than the parent => no need to add new line
+			if (nodeToPlaceCommentIndex <= 0)	
+				return false;
+
+			var previousArgument = arguments[nodeToPlaceCommentIndex - 1];
+			var previousArgumentLocation = previousArgument.GetLocation();
+			var previousArgumentLineSpan = previousArgumentLocation.GetLineSpan();
+
+			// Node with a comment is on the same line as the previous argument => need to add new line
+			return previousArgumentLineSpan.EndLinePosition.Line == nodeLineSpan.StartLinePosition.Line;
 		}
 
 		protected (string? DiagnosticShortName, string? DiagnosticJustification) GetDiagnosticShortNameAndJustification(Diagnostic diagnostic)
@@ -250,6 +304,39 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			}
 
 			return nodeToPlaceComment;
+		}
+
+		private static IReadOnlyList<SyntaxNode>? GetArguments(SyntaxNode listNode) =>
+			listNode switch
+			{
+				BaseArgumentListSyntax baseArgList		  => baseArgList.Arguments,
+				BaseParameterListSyntax baseParameterList => baseParameterList.Parameters,
+				TypeArgumentListSyntax typeArgumentList	  => typeArgumentList.Arguments,
+				_ 										  => null
+			};
+
+		private static SyntaxTriviaList? GetParentTrivia(SyntaxNode nodeToPlaceComment)
+		{
+			SyntaxNode? nodeToGetTrivia = nodeToPlaceComment;
+
+			while (nodeToGetTrivia != null && !SuppressionExtensions.ShouldStopSearchForSuppressionComment(nodeToGetTrivia))
+			{
+				nodeToGetTrivia = nodeToGetTrivia.Parent;
+			}
+
+			return nodeToGetTrivia?.GetLeadingTrivia();
+		}
+
+		private static List<SyntaxTrivia> GetWhiteSpaceTrivia(in SyntaxTriviaList? trivia)
+		{
+			if (trivia?.Count is null or 0)
+				return [];
+
+			return trivia.Value.Reverse()
+							   .TakeWhile((in SyntaxTrivia t) => !t.IsKind(SyntaxKind.EndOfLineTrivia))
+							   .Where(t => !t.IsDirective && t.IsKind(SyntaxKind.WhitespaceTrivia))
+							   .Reverse()
+							   .ToList(trivia.Value.Count);
 		}
 	}
 }
