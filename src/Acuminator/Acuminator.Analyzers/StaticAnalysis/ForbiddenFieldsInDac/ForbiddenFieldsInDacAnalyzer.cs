@@ -22,8 +22,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.ForbiddenFieldsInDac
 	/// </summary>
 	public class ForbiddenFieldsInDacAnalyzer : DacAggregatedAnalyzerBase
 	{
-		private const string CompanyPrefix = "Company";
-
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create
 			(
@@ -101,7 +99,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.ForbiddenFieldsInDac
 		{
 			var propertiesWithInvalidPrefix = 
 				dacOrDacExtension.DeclaredDacFieldPropertiesWithBqlFields
-								 .Where(property => property.Name.StartsWith(CompanyPrefix, StringComparison.OrdinalIgnoreCase) &&
+								 .Where(property => property.Name.StartsWith(DacFieldNames.Restricted.Prefixes.CompanyPrefix, 
+																			 StringComparison.OrdinalIgnoreCase) &&
 													forbiddenNames.All(field => !field.Equals(property.Name, StringComparison.OrdinalIgnoreCase)));
 
 			foreach (DacPropertyInfo property in propertiesWithInvalidPrefix)
@@ -118,7 +117,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.ForbiddenFieldsInDac
 													   ImmutableArray<string> forbiddenNames, SymbolAnalysisContext context)
 		{
 			var fieldsWithInvalidPrefix = 
-				allNestedTypes.Where(groupedByName => groupedByName.Key.StartsWith(CompanyPrefix, StringComparison.OrdinalIgnoreCase) &&
+				allNestedTypes.Where(groupedByName => groupedByName.Key.StartsWith(DacFieldNames.Restricted.Prefixes.CompanyPrefix, 
+																				   StringComparison.OrdinalIgnoreCase) &&
 													  forbiddenNames.All(field => !field.Equals(groupedByName.Key, StringComparison.OrdinalIgnoreCase)))
 							  .SelectMany(groupedByName => groupedByName);
 
