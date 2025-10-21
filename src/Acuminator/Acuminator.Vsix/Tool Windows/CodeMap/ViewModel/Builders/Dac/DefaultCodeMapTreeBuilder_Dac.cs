@@ -113,7 +113,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			{
 				Cancellation.ThrowIfCancellationRequested();
 				
-				var dacFieldNode = new DacFieldNodeViewModel(dacFieldCategory!, parent: dacFieldCategory!, fieldInfo, ExpandCreatedNodes);
+				var dacFieldNode = new RegularDacFieldNodeViewModel(dacFieldCategory!, parent: dacFieldCategory!, fieldInfo, ExpandCreatedNodes);
 				yield return dacFieldNode;
 			}
 		}
@@ -138,7 +138,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			}
 		}
 
-		public override IEnumerable<TreeNodeViewModel>? VisitNode(DacFieldNodeViewModel dacField)
+		public override IEnumerable<TreeNodeViewModel>? VisitNode(RegularDacFieldNodeViewModel dacField)
 		{
 			if (dacField.FieldInfo.PropertyInfo != null)
 			{

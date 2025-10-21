@@ -17,18 +17,14 @@ using Acuminator.Vsix.Utilities;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class DacFieldNodeViewModel : TreeNodeViewModel, 
-										 IElementWithTooltip, IGroupNodeWithCyclingNavigation, INodeWithDeclarationOrder
+	public abstract class DacFieldNodeViewModelBase : TreeNodeViewModel, 
+													  IElementWithTooltip, IGroupNodeWithCyclingNavigation, INodeWithDeclarationOrder
 	{
 		public override TreeNodeFilterBehavior FilterBehavior => TreeNodeFilterBehavior.DisplayedIfNodeOrChildrenMeetFilter;
 
 		public DacMemberCategoryNodeViewModel MemberCategory { get; }
 
 		public DacMemberCategory MemberType => MemberCategory.CategoryType;
-
-		public override Icon NodeIcon => IsKey
-				? Icon.DacKeyField
-				: Icon.DacField;
 
 		public override ExtendedObservableCollection<ExtraInfoViewModel>? ExtraInfos { get; }
 
@@ -37,6 +33,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public bool IsKey => FieldInfo.IsKey;
 
 		public bool IsIdentity => FieldInfo.IsIdentity;
+
+		public DacFieldCategory FieldCategory => FieldInfo.FieldCategory;
 
 		public DbBoundnessType EffectiveDbBoundness => FieldInfo.EffectiveDbBoundness;
 
@@ -54,9 +52,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		IList<TreeNodeViewModel> IGroupNodeWithCyclingNavigation.DisplayedChildren => DisplayedChildren;
 
-		public DacFieldNodeViewModel(DacMemberCategoryNodeViewModel dacMemberCategoryVM, TreeNodeViewModel parent, DacFieldInfo fieldInfo, 
-									 bool isExpanded) :
-								base(dacMemberCategoryVM?.Tree!, parent, isExpanded)
+		protected DacFieldNodeViewModelBase(DacMemberCategoryNodeViewModel dacMemberCategoryVM, TreeNodeViewModel parent,
+											DacFieldInfo fieldInfo, bool isExpanded) :
+										base(dacMemberCategoryVM?.Tree!, parent, isExpanded)
 		{
 			MemberCategory = dacMemberCategoryVM!;
 			FieldInfo = fieldInfo.CheckIfNull();
@@ -112,13 +110,6 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			DbBoundnessType.Error 	   => VSIXResource.CodeMap_DbBoundnessIndicator_Inconsistent,
 			_ 						   => null
 		};
-
-		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => 
-			treeVisitor.VisitNode(this, input);
-
-		public override TResult AcceptVisitor<TResult>(CodeMapTreeVisitor<TResult> treeVisitor) => treeVisitor.VisitNode(this);
-
-		public override void AcceptVisitor(CodeMapTreeVisitor treeVisitor) => treeVisitor.VisitNode(this);
 
 		TooltipInfo? IElementWithTooltip.CalculateTooltip()
 		{
