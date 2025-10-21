@@ -38,10 +38,16 @@ public static class DacFieldCategoryExtensions
 	/// <returns>
 	/// The DAC field category.
 	/// </returns>
-	public static DacFieldCategory GetDacFieldCategory(string dacFieldName) =>
-		_systemDacFieldNamesToCategories.TryGetValue(dacFieldName.CheckIfNullOrWhiteSpace(), out DacFieldCategory category) 
-			? category
-			: DacFieldCategory.Regular;
+	public static DacFieldCategory GetDacFieldCategory(string dacFieldName)
+	{
+		if (_systemDacFieldNamesToCategories.TryGetValue(dacFieldName.CheckIfNullOrWhiteSpace(), out DacFieldCategory category))
+			return category;
+
+		if (dacFieldName.StartsWith(DacFieldNames.Restricted.Prefixes.CompanyPrefix, StringComparison.OrdinalIgnoreCase))
+			return DacFieldCategory.CompanyPrefix;
+
+		return DacFieldCategory.Regular;
+	}
 
 	/// <summary>
 	/// Check if this is a system DAC field.
