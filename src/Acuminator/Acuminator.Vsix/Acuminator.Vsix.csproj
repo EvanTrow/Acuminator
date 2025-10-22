@@ -186,264 +186,43 @@
     <None Include="Help Examples\ExampleOfSubMenuDefinition.vsct" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AcuminatorVSPackage.cs" />
-    <Compile Include="BannedApi\BannedApiDeployer.cs" />
-    <Compile Include="BannedApi\ApiFileSettingWatcher.cs" />
-    <Compile Include="Code Snippets\CodeSnippetsDeployer.cs" />
-    <Compile Include="Coloriser\AsyncTagging\Interfaces\ITagsCache.cs" />
-    <Compile Include="Coloriser\Constants\ColoringConstants.cs" />
-    <Compile Include="Coloriser\Constants\VSColors.cs" />
-    <Compile Include="Coloriser\Formats\BracesFormats.cs" />
-    <Compile Include="Coloriser\Formats\Theme\AcuminatorThemeChangedEventArgs.cs" />
-    <Compile Include="Coloriser\Formats\Theme\ThemeUpdater.cs" />
-    <Compile Include="Coloriser\Formats\EditorFormatBase.cs" />
-    <Compile Include="Coloriser\Formats\EditorFormats.cs" />
-    <Compile Include="Coloriser\PXColorizerTaggerBase.cs" />
-    <Compile Include="Coloriser\AsyncTagging\BackgroundTagging.cs" />
-    <Compile Include="Coloriser\AsyncTagging\TagsCacheSync.cs" />
-    <Compile Include="Coloriser\Base\PXTaggerBase.cs" />
-    <Compile Include="Coloriser\Constants\OutliningConstants.cs" />
-    <Compile Include="Coloriser\Outlining\PXOutliningTagger.cs" />
-    <Compile Include="Coloriser\Outlining\PXOutliningTaggerProvider.cs" />
-    <Compile Include="Coloriser\Base\PXTaggerProviderBase.cs" />
-    <Compile Include="Coloriser\Roslyn\Utils\RoslynVSEditorExtensions.cs" />
-    <Compile Include="Commands\BQL Fixer\AngleBracesBqlRewriter.cs" />
-    <Compile Include="Commands\BQL Fixer\FixBqlCommand.cs" />
-    <Compile Include="Commands\DiagnosticSuppression\BuildAction\VsixBuildActionSetterVS2022.cs" />
-    <Compile Include="Commands\DiagnosticSuppression\Diagnostic Service\DiagnosticDataLocation.cs" />
-    <Compile Include="Commands\DiagnosticSuppression\Diagnostic Service\DiagnosticData.cs" />
-    <Compile Include="Commands\DiagnosticSuppression\Base\SuppressDiagnosticCommandBase.cs" />
-    <Compile Include="Commands\DiagnosticSuppression\Diagnostic Service\RoslynDTOWrapperBase.cs" />
-    <Compile Include="Commands\DiagnosticSuppression\BuildAction\VsixBuildActionSetterVS2019.cs" />
-    <Compile Include="Commands\DiagnosticSuppression\VsixIOErrorProcessor.cs" />
-    <Compile Include="Commands\DiagnosticSuppression\Suppression File\SuppressDiagnosticInSuppressionFileCommand.cs" />
-    <Compile Include="Commands\DiagnosticSuppression\Diagnostic Service\RoslynDiagnosticService.cs" />
-    <Compile Include="Commands\GoToDeclarationOrHandler\GoToDeclarationOrHandlerCommand.cs" />
-    <Compile Include="Commands\VSCommandBase.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+     <!--Use MSBuild glob pattern to include all .cs code files for compilation -->
+    <Compile Include="**\*.cs"/>
+
+     <!--Use MSBuild glob pattern to exclude .cs files from obj and bin folder-->
+    <Compile Remove="obj\**\*.cs"/>
+    <Compile Remove="bin\**\*.cs"/>
+
+    <!-- Exclude some special C# files like code-behind for XAML to correctly re-include them with proper details-->
+    <Compile Remove="**\*.xaml.cs"/> 
     <Compile Include="Resources\Themes\Styles.xaml.cs">
       <DependentUpon>Styles.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Resources\VSIXResource.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>VSIXResource.resx</DependentUpon>
-    </Compile>
-    <Compile Include="BannedApi\BannedApiSettingsObserver.cs" />
-    <Compile Include="Settings\BannedApiSettingsFromOptionsPage.cs" />
-    <Compile Include="Settings\CodeAnalysisSettingsFromOptionsPage.cs" />
-    <Compile Include="Settings\OutOfProcess\OutOfProcessSettingValueProvider.cs" />
-    <Compile Include="Settings\OutOfProcess\OutOfProcessSettingsUpdater.cs" />
-    <Compile Include="Settings\ISettingsEvents.cs" />
-    <Compile Include="Tool Windows\CodeMap\Icons\Icon.cs" />
-    <Compile Include="Tool Windows\CodeMap\Icons\TreeNodeToImageSourceConverter.cs" />
-    <Compile Include="Tool Windows\CodeMap\Model\Dac\DacSemanticModelForCodeMap.cs" />
-    <Compile Include="Tool Windows\CodeMap\Model\Graph\Infos\BaseMemberOverrideInfo.cs" />
-    <Compile Include="Tool Windows\CodeMap\Model\Graph\Infos\InstanceConstructorInfo.cs" />
-    <Compile Include="Tool Windows\CodeMap\Tooltips\TreeIconTooltipConverter.cs" />
     <Compile Include="Tool Windows\CodeMap\UI\CodeMapSearchBox.xaml.cs">
       <DependentUpon>CodeMapSearchBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tool Windows\CodeMap\UI\CodeMapTreeControl.xaml.cs">
       <DependentUpon>CodeMapTreeControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tool Windows\CodeMap\Utils\PlaceholderNodeUtils.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Base\IPlaceholderNode.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Base\TreeNodeViewModel.FilterHelper.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Filter\FilterOptions.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Filter\TreeNodeFilterBehavior.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Filter\FilterEventArgs.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Attributes\Groups\Base\AttributesGroupNodeViewModelGeneric.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Attributes\Groups\Graph\GraphAttributesGroupNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Attributes\LeafNodes\Base\AttributeNodeViewModelGeneric.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Attributes\Groups\Base\AttributesGroupNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Attributes\Groups\Dac\DacAttributesGroupNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Attributes\LeafNodes\Dac\DacAttributeNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Attributes\LeafNodes\Dac\DacFieldAttributeNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Attributes\LeafNodes\Graph\GraphAttributeNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Attributes\LeafNodes\Graph\CacheAttachedAttributeNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacCategories\Base\DacFieldCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacCategories\DacInitializationAndActivationCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacCategories\DacBaseTypesCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacCategories\AuditDacFieldsCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacCategories\NonBqlDacPropertiesCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\Base\DacFieldNodeViewModelBase.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\DacBqlFieldNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\DacFields\AuditDacFieldNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\NonBqlDacPropertyNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\DacFieldPropertyNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\InitializationAndActivation\IsActiveDacMethodNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\DacFields\KeyDacFieldNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\Dac\BaseDacPlaceholderNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\Dac\Base\DacNodeViewModelBase.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphEventsGrouping\Dac\Base\DacGroupingNodeForFieldEventHandlerBaseViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembersCategories\GraphBaseMemberOverridesCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembersCategories\GraphBaseTypesCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\InitializationAndActivation\GraphInitializeMethodNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\InitializationAndActivation\GraphConfigureMethodNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\InitializationAndActivation\GraphStaticConstructorNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\InitializationAndActivation\GraphInstanceConstructorNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\GraphBaseMembeOverrideNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\InitializationAndActivation\IsActive\IsActiveForGraphMethodNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\InitializationAndActivation\IsActive\IsActiveGraphMethodNodeViewModelBase.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Filter\FilterViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\Graph\BaseGraphPlaceholderNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\Graph\Base\GraphNodeViewModelBase.cs" />
-    <Compile Include="Tool Windows\Common\TooltipInfo.cs" />
-    <Compile Include="Tool Windows\Converters\MultipleBoolsToSingleBoolConverter.cs" />
-    <Compile Include="Tool Windows\Converters\CollectionIsNonEmptyToBoolConverter.cs" />
-    <Compile Include="Tool Windows\Converters\StringIsNonEmptyToBoolConverter.cs" />
-    <Compile Include="Utils\Polyfills\NotNullIfNotNullAttribute.cs" />
-    <Compile Include="Utils\Polyfills\MemberNotNullWhenAttribute.cs" />
-    <Compile Include="Utils\Polyfills\MemberNotNullAttribute.cs" />
-    <Compile Include="Utils\Storage\AcuminatorMyDocumentsStorage.cs" />
-    <Compile Include="Utils\Storage\StorageUtils.cs" />
-    <Compile Include="Utils\Storage\VersionFile.cs" />
-    <Compile Include="Utils\Text\StringUtils.cs" />
-    <Compile Include="Tool Windows\CodeMap\Utils\Visitor\NoResult\CodeMapTreeWalker.cs" />
-    <Compile Include="Tool Windows\CodeMap\Utils\Visitor\StackGuard.cs" />
-    <Compile Include="Tool Windows\CodeMap\Utils\Visitor\NoResult\CodeMapTreeVisitor.cs" />
-    <Compile Include="Tool Windows\CodeMap\Utils\Visitor\NoResult\CodeMapTreeVisitor_DacVisitMethods.cs" />
-    <Compile Include="Tool Windows\CodeMap\Utils\Visitor\NoResult\CodeMapTreeVisitor_GraphVisitMethods.cs" />
-    <Compile Include="Tool Windows\CodeMap\Utils\Visitor\WithResult\CodeMapTreeVisitor.cs" />
-    <Compile Include="Tool Windows\CodeMap\Utils\Visitor\WithResult\CodeMapTreeVisitor_DacVisitMethods.cs" />
-    <Compile Include="Tool Windows\CodeMap\Utils\Visitor\WithResult\CodeMapTreeVisitor_GraphVisitMethods.cs" />
-    <Compile Include="Tool Windows\CodeMap\Utils\Visitor\WithResult\WithInput\CodeMapTreeVisitor.cs" />
-    <Compile Include="Tool Windows\CodeMap\Utils\Visitor\WithResult\WithInput\CodeMapTreeVisitor_DacVisitMethods.cs" />
-    <Compile Include="Tool Windows\CodeMap\Utils\Visitor\WithResult\WithInput\CodeMapTreeVisitor_GraphVisitMethods.cs" />
-    <Compile Include="Tool Windows\Common\IElementWithTooltip.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Base\INodeWithDeclarationOrder.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembersCategories\GraphInitializationAndActivationCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\InitializationAndActivation\IsActive\IsActiveGraphMethodNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\VSEventsAdapter\VS2022\EventsMappingInfoVS2022.cs" />
-    <Compile Include="Tool Windows\CodeMap\VSEventsAdapter\VSEventsAdapter.cs" />
-    <Compile Include="Tool Windows\CodeMap\VSEventsAdapter\VS2022\VSEventsAdapterVS2022.cs" />
-    <Compile Include="Tool Windows\CodeMap\VSEventsAdapter\VS2019 and older\VSEventsAdapterVS2019.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\CodeMapWindowViewModel.CodeMapDteEventsObserver.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Sorting\NodeDeclarationOrderComparer.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Sorting\Sorters\NodesSorter.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Sorting\Visitors\CodeMapSubtreeSorter.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Sorting\CodeMapSortContext.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Sorting\Visitors\CodeMapTreeInitialSorter.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Sorting\SortType.cs" />
-    <Compile Include="Tool Windows\CodeMap\Tooltips\ElementWithTooltipToTooltipConverter.cs" />
-    <Compile Include="Tool Windows\CodeMap\Model\Dac\DacMemberCategory.cs" />
-    <Compile Include="Tool Windows\CodeMap\Model\Graph\GraphSemanticModelForCodeMap.cs" />
-    <Compile Include="Tool Windows\CodeMap\Model\Graph\GraphMemberInfoType.cs" />
-    <Compile Include="Tool Windows\CodeMap\Model\Graph\GraphMemberCategory.cs" />
-    <Compile Include="Tool Windows\CodeMap\Model\SemanticModelCreation\Base\IRootCandidateSymbolsRetriever.cs" />
-    <Compile Include="Tool Windows\CodeMap\Model\SemanticModelCreation\Base\ISemanticModelFactory.cs" />
-    <Compile Include="Tool Windows\CodeMap\Model\SemanticModelCreation\RootCandidateSymbolsRetrieverDefault.cs" />
-    <Compile Include="Tool Windows\CodeMap\Model\SemanticModelCreation\SemanticModelFactoryDefault.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Base\IGroupNodeWithCyclingNavigation.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\ExtraInfo\Base\ExtraInfoViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\ExtraInfo\TextViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\ExtraInfo\IconViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Builders\Base\TreeBuilderBase.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Builders\Dac\DefaultCodeMapTreeBuilder_Dac.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Builders\DefaultCodeMapTreeBuilder.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Builders\Graph\DefaultCodeMapTreeBuilder_Graph.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacCategories\DacKeysCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacCategories\AllDacFieldsDacCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacCategories\Base\DacMemberCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\DacFields\RegularDacFieldNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\DacMembers\Base\DacMemberNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Dac\Dac\DacNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphEventsGrouping\DacField\DacFieldGroupingNodeForFieldEventHandlerViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphEventsGrouping\Dac\Base\DacGroupingNodeBaseViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphEventsGrouping\Dac\DacGroupingNodeForFieldEventHandlerViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphEventsGrouping\Dac\DacGroupingNodeForCacheAttachedEventHandlerViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphEventsGrouping\Dac\DacGroupingNodeForRowEventHandlerViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphEventsGrouping\DacField\DacFieldGroupingNodeBaseViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembersCategories\PXOverridesCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\PXOverrideNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembersCategories\Base\GraphEventHandlerCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\CodeMapWindowViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\CodeMapWindow.cs" />
     <Compile Include="Tool Windows\CodeMap\UI\CodeMapWindowControl.xaml.cs">
       <DependentUpon>CodeMapWindowControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tool Windows\CodeMap\OpenCodeMapWindowCommand.cs" />
-    <Compile Include="Tool Windows\CodeMap\Model\DocumentModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembersCategories\Base\GraphMemberCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Attributes\LeafNodes\Base\AttributeNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembersCategories\FieldEventHandlerCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembersCategories\ActionCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembersCategories\CacheAttachedCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembersCategories\RowEventHandlerCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembersCategories\ViewCategoryNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMemberInfos\GraphMemberInfoNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\FieldEventHandlerNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\ActionNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\ViewNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\RowEventHandlerNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\CacheAttachedNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\Graph\GraphNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Nodes\Graph\GraphMembers\Base\GraphMemberNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\TreeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\ViewModel\Base\TreeNodeViewModel.cs" />
-    <Compile Include="Tool Windows\CodeMap\Utils\CodeMapRefreshMode.cs" />
-    <Compile Include="Utils\Text\IndentUtils.cs" />
-    <Compile Include="Tool Windows\CodeMap\Utils\CodeMapDocChangesClassifier.cs" />
-    <Compile Include="Tool Windows\CodeMap\UI\Converters\TreeViewLineConverter .cs" />
-    <Compile Include="Tool Windows\Converters\ColorToBrushConverter.cs" />
-    <Compile Include="Utils\ChangesClassification\ChangeInfluenceScope.cs" />
-    <Compile Include="Tool Windows\CodeMap\Utils\CyclingNavigationUtils.cs" />
-    <Compile Include="Tool Windows\Converters\BoolInversionConverter.cs" />
-    <Compile Include="Tool Windows\Converters\ObjectToItsTypeConverter.cs" />
-    <Compile Include="Tool Windows\Converters\IsBackgroundDarkConverter.cs" />
-    <Compile Include="Tool Windows\Converters\VisibilityInverter.cs" />
-    <Compile Include="Tool Windows\Converters\BoolToVisibilityConverter.cs" />
-    <Compile Include="Tool Windows\OpenToolWindowCommandBase.cs" />
-    <Compile Include="Tool Windows\ViewModel\Command.cs" />
-    <Compile Include="Tool Windows\ViewModel\ToolWindowViewModelBase.cs" />
-    <Compile Include="Tool Windows\ViewModel\ViewModelBase.cs" />
-    <Compile Include="Utils\Constants\Constants.cs" />
-    <Compile Include="Utils\Logger\LogMode.cs" />
-    <Compile Include="Utils\Logger\AcuminatorLogger.cs" />
-    <Compile Include="Utils\ChangesClassification\DocumentChangesClassifier.cs" />
-    <Compile Include="Utils\EditorExtensions.cs" />
-    <Compile Include="Coloriser\AsyncTagging\TagsCacheAsync.cs" />
-    <Compile Include="Coloriser\Formats\ClassificationTypeDefinitions.cs" />
-    <Compile Include="Coloriser\MainTagger\PXColorizerMainTagger.cs" />
-    <Compile Include="Coloriser\Regex\PXRegexColorizerTagger.cs" />
-    <Compile Include="Coloriser\PXColorizerTaggerProvider.cs" />
-    <Compile Include="Commands\Formatter\BqlAggregateRewriter.cs" />
-    <Compile Include="Commands\Formatter\BqlConditionRewriter.cs" />
-    <Compile Include="Commands\Formatter\BqlContext.cs" />
-    <Compile Include="Commands\Formatter\BqlFirstTableRewriter.cs" />
-    <Compile Include="Commands\Formatter\BqlFormatter.cs" />
-    <Compile Include="Commands\Formatter\BqlJoinRewriter.cs" />
-    <Compile Include="Commands\Formatter\BqlRewriter.cs" />
-    <Compile Include="Commands\Formatter\BqlRewriterBase.cs" />
-    <Compile Include="Commands\Formatter\BqlStatementRewriter.cs" />
-    <Compile Include="Commands\Formatter\BqlViewDeclarationRewriter.cs" />
-    <Compile Include="Commands\Formatter\FormatBqlCommand.cs" />
-    <Compile Include="Commands\Formatter\SpanWalker.cs" />
-    <Compile Include="Commands\Formatter\SyntaxTriviaListExtensions.cs" />
-    <Compile Include="Settings\SettingChangedEventArgs.cs" />
+
+    <Compile Remove="Resources\VSIXResource.Designer.cs"/>
+    <Compile Include="Resources\VSIXResource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VSIXResource.resx</DependentUpon>
+    </Compile>
+
+    <Compile Remove="Settings\UI\GeneralOptionsPage.cs"/>
     <Compile Include="Settings\UI\GeneralOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Utils\Version\VSVersionProvider.cs" />
-    <Compile Include="Utils\WPF\Collection\ExtendedObservableCollection.cs" />
-    <Compile Include="Utils\Navigation\VSDocumentNavigation.cs" />
-    <Compile Include="Utils\VSServicesExtensions.cs" />
-    <Compile Include="Utils\ResourceManagerExtensions.cs" />
-    <Compile Include="Utils\UIAttributes\CategoryFromResourcesAttribute.cs" />
-    <Compile Include="Utils\UIAttributes\DescriptionFromResourcesAttribute.cs" />
-    <Compile Include="Utils\UIAttributes\DisplayNameFromResourcesAttribute.cs" />
-    <Compile Include="Utils\WPF\VisualTreeUtils.cs" />
-    <Compile Include="Utils\WPF\ResourceDictionaryExtensions.cs" />
-    <EmbeddedResource Include="Coloriser\Regex\Test\ARDocumentRelease.cs" />
-    <EmbeddedResource Include="Coloriser\Regex\Test\PMAllocationProcess.cs" />
-    <EmbeddedResource Include="Coloriser\Regex\Test\APInvoice.cs" />
-    <EmbeddedResource Include="Coloriser\Regex\Test\APRegister.cs" />
-    <Compile Include="Coloriser\Roslyn\ParsedSymbolsCache.cs" />
-    <Compile Include="Coloriser\Roslyn\ParsedDocument.cs" />
-    <Compile Include="Coloriser\Roslyn\PXColoriserSyntaxWalker.cs" />
-    <Compile Include="Coloriser\Roslyn\PXRoslynColorizerTagger.cs" />
-    <Compile Include="Coloriser\Regex\Utils\RegExpressions.cs" />
+
+    <Compile Remove="Coloriser\Regex\Test\*.cs" />
+    <EmbeddedResource Include="Coloriser\Regex\Test\*.cs" />
+   
     <EmbeddedResource Include="Resources\VSIXResource.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>VSIXResource.Designer.cs</LastGenOutput>
