@@ -71,153 +71,6 @@
     <StartArguments>/rootsuffix Roslyn</StartArguments>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Field Events\FieldDefaultingNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Field Events\CacheAttachedNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Unspecified Event\FieldEventNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Unspecified Event\RowEventNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Row Events\RowInsertedNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Row Events\RowInsertingNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Row Events\RowSelectedNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Row Events\RowUpdatedNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Row Events\RowUpdatingNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica DAC Snippets\DAC Field\DacField.snippet">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica DAC Snippets\DAC Field\DacStringField.snippet">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica DAC Snippets\DAC Field\DacBoolField.snippet">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica DAC Snippets\DAC Field\DacDecimalField.snippet">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica DAC Snippets\DAC Field\DacIntField.snippet">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Field Events\FieldSelectingNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Field Events\FieldUpdatedNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Field Events\FieldUpdatingNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Field Events\FieldVerifyingNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Row Events\RowDeletedNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Row Events\RowDeletingNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Row Events\RowPersistedNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Row Events\RowPersistingNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Row Events\RowDeletedGeneric.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Row Events\RowDeletingGeneric.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Row Events\RowInsertedGeneric.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Row Events\RowInsertingGeneric.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Row Events\RowPersistedGeneric.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Row Events\RowPersistingGeneric.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Row Events\RowSelectedGeneric.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Row Events\RowUpdatedGeneric.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Row Events\RowUpdatingGeneric.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Full Signature\Unspecified Event\FieldEventGenericFull.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Row Events\Unspecified Event\RowEventGeneric.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Full Signature\FieldDefaultingGenericFull.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Full Signature\FieldSelectingGenericFull.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Full Signature\FieldUpdatedGenericFull.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Full Signature\FieldUpdatingGenericFull.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Full Signature\FieldVerifyingGenericFull.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Short Signature\Unspecified Event\FieldEventGenericShort.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Short Signature\CacheAttachedGenericShort.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Short Signature\FieldDefaultingGenericShort.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Short Signature\FieldSelectingGenericShort.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Short Signature\FieldUpdatedGenericShort.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Short Signature\FieldUpdatingGenericShort.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Short Signature\FieldVerifyingGenericShort.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica DAC Snippets\DAC.snippet">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Name Convention Events\Field Events\ExceptionHandlingNameConvention.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Full Signature\ExceptionHandlingGenericFull.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Code Snippets\Acumatica Generic Events\Field Events Short Signature\ExceptionHandlingGenericFull.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -257,6 +110,10 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <!--Use MSBuild glob pattern to include all code snippets as embedded resources -->
+    <EmbeddedResource Include="Code Snippets\**\*.snippet">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <Content Include="Code Snippets\Snippets.pkgdef">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
