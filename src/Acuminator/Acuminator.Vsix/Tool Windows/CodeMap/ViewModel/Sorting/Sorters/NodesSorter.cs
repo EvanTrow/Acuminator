@@ -121,9 +121,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			{
 				(SortType.Declaration, SortDirection.Ascending)  => nodesToSort.OrderBy(NodeDeclarationOrderComparer.Instance),
 				(SortType.Declaration, SortDirection.Descending) => nodesToSort.OrderByDescending(NodeDeclarationOrderComparer.Instance),
-				(SortType.Alphabet, SortDirection.Ascending)     => nodesToSort.OrderBy(node => node.Name),
-				(SortType.Alphabet, SortDirection.Descending)    => nodesToSort.OrderByDescending(node => node.Name),
-				_ => nodesToSort
+				(SortType.Alphabet, SortDirection.Ascending)	 => nodesToSort.OrderBy(node => node.Name),
+				(SortType.Alphabet, SortDirection.Descending)	 => nodesToSort.OrderByDescending(node => node.Name),
+				_												 => nodesToSort
 			};
 	}
 }

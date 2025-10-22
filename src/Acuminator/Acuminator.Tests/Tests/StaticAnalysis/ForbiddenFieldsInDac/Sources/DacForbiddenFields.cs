@@ -24,7 +24,7 @@ namespace PX.Objects.HackathonDemo
 		public int? OrderNbr { get; set; }
 		#endregion
 		#region  DeletedDatabaseRecord
-		public abstract class deletedDatabaseRecord { }
+		public abstract class deletedDatabaseRecord { }		// Not a BQL field => shouldn't report
 		[PXDefault]
 		[PXUIField(DisplayName = "Deleted Flag")]
 		public string DeletedDatabaseRecord { get; set; }

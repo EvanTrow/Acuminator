@@ -26,7 +26,6 @@ namespace PX.Objects.HackathonDemo
 		public int? OrderNbr { get; set; }
 		#endregion
 		#region  DeletedDatabaseRecord
-		// Acuminator disable once PX1027 ForbiddenFieldsInDacDeclaration [Justification]
 		public abstract class deletedDatabaseRecord { }
 		// Acuminator disable once PX1027 ForbiddenFieldsInDacDeclaration [Justification]
 		[PXDefault]

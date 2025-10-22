@@ -229,7 +229,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			GraphMemberInfoNodeViewModel 	  => true,
 			DacGroupingNodeBaseViewModel 	  => false,
 			DacFieldGroupingNodeBaseViewModel => false,
-			DacFieldNodeViewModel 			  => false,
+			DacFieldNodeViewModelBase 		  => false,
 			GraphNodeViewModel 				  => true,
 			DacNodeViewModel 				  => true,
 			BaseDacPlaceholderNodeViewModel	  => true,

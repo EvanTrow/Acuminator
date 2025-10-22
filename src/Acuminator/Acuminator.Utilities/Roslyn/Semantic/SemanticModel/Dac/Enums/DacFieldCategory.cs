@@ -24,6 +24,7 @@ public enum DacFieldCategory : byte
 	DatabaseRecordStatus,
 	CompanyID,
 	CompanyMask,
+	CompanyPrefix,
 	Notes,
 	Files
 }

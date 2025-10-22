@@ -48,6 +48,14 @@ namespace Acuminator.Utilities.Roslyn.Constants
 		/// </summary>
 		public static class Restricted
 		{
+			/// <summary>
+			/// Names of restricted system DAC fields prefixes.
+			/// </summary>
+			public static class Prefixes
+			{
+				public const string CompanyPrefix = "Company";
+			}
+
 			public const string DeletedDatabaseRecord = "DeletedDatabaseRecord";
 			public const string DatabaseRecordStatus  = "DatabaseRecordStatus";
 			public const string CompanyID 			  = "CompanyID";
