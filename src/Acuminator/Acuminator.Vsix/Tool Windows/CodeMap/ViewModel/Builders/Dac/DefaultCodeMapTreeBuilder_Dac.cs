@@ -98,22 +98,15 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		}
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(KeyDacFieldsCategoryNodeViewModel dacKeyFieldsCategory) =>
-			CreateDacFieldsCategoryChildren(dacKeyFieldsCategory, 
-					fieldVmConstructor: fieldInfo => new KeyDacFieldNodeViewModel(dacKeyFieldsCategory, parent: dacKeyFieldsCategory,
-																				  fieldInfo, ExpandCreatedNodes));
+			CreateDacFieldsCategoryChildren(dacKeyFieldsCategory);
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(AllDacFieldsDacCategoryNodeViewModel allDacFieldsCategory) =>
-			CreateDacFieldsCategoryChildren(allDacFieldsCategory,
-					fieldVmConstructor: fieldInfo => new RegularDacFieldNodeViewModel(allDacFieldsCategory, parent: allDacFieldsCategory,
-																					  fieldInfo, ExpandCreatedNodes));
+			CreateDacFieldsCategoryChildren(allDacFieldsCategory);
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(AuditDacFieldsCategoryNodeViewModel auditDacFieldsCategory) =>
-			CreateDacFieldsCategoryChildren(auditDacFieldsCategory,
-					fieldVmConstructor: fieldInfo => new AuditDacFieldNodeViewModel(auditDacFieldsCategory, parent: auditDacFieldsCategory,
-																					fieldInfo, ExpandCreatedNodes));
+			CreateDacFieldsCategoryChildren(auditDacFieldsCategory);
 
-		protected virtual IEnumerable<TreeNodeViewModel> CreateDacFieldsCategoryChildren(DacFieldCategoryNodeViewModel dacFieldCategory,
-																Func<DacFieldInfo, DacFieldNodeViewModelBase?> fieldVmConstructor)
+		protected virtual IEnumerable<TreeNodeViewModel> CreateDacFieldsCategoryChildren(DacFieldCategoryNodeViewModel dacFieldCategory)
 		{
 			var dacFields = dacFieldCategory?.GetCategoryDacFields();
 
@@ -123,12 +116,13 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			foreach (DacFieldInfo fieldInfo in dacFields)
 			{
 				Cancellation.ThrowIfCancellationRequested();
-				DacFieldNodeViewModelBase? dacFieldNode = fieldVmConstructor(fieldInfo);
-
-				if (dacFieldNode != null)
-				{
-					yield return dacFieldNode;
-				}
+				DacFieldNodeViewModelBase dacFieldNode = fieldInfo.IsKey
+					? new KeyDacFieldNodeViewModel(dacFieldCategory!, parent: dacFieldCategory!, fieldInfo, ExpandCreatedNodes)
+					: fieldInfo.FieldCategory.IsAuditField()
+						? new AuditDacFieldNodeViewModel(dacFieldCategory!, parent: dacFieldCategory!, fieldInfo, ExpandCreatedNodes)
+						: new RegularDacFieldNodeViewModel(dacFieldCategory!, parent: dacFieldCategory!, fieldInfo, ExpandCreatedNodes);
+	
+				yield return dacFieldNode;	
 			}
 		}
 
