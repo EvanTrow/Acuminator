@@ -427,7 +427,7 @@
     <Resource Include="Resources\CodeMap\DacAuditFieldsCategory.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\CodeMap\DacAuditProperty.png">
+    <Resource Include="Resources\CodeMap\DacAuditField.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Content Include="Resources\DacExplorer.ico">

@@ -104,8 +104,8 @@
 	<BitmapImage x:Key="DacNonBqlProperty" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacNonBqlProperty.png"/>
 
-	<BitmapImage x:Key="DacAuditProperty" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
-			 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacAuditProperty.png"/>
+	<BitmapImage x:Key="DacAuditField" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+			 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacAuditField.png"/>
 
 	<BitmapImage x:Key="DacKeysCategory" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacKeysCategory.ico"/>
