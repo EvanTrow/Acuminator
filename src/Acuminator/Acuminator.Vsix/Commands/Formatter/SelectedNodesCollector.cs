@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -18,7 +20,7 @@ namespace PX.Analyzers.Vsix.Formatter
 			_selectedSpan = selectedSpan;
 		}
 
-		public override void Visit(SyntaxNode node)
+		public override void Visit(SyntaxNode? node)
 		{
 			if (node != null && node.SpanStart >= _selectedSpan.Start && node.Span.End <= _selectedSpan.End)
 			{

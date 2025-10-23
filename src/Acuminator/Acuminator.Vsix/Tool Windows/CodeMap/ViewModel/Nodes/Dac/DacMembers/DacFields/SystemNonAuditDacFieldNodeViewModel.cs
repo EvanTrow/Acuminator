@@ -7,11 +7,11 @@ using Acuminator.Utilities.Roslyn.Semantic.Dac;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class AuditDacFieldNodeViewModel(DacMemberCategoryNodeViewModel dacMemberCategoryVM, TreeNodeViewModel parent, 
-											DacFieldInfo fieldInfo, bool isExpanded) : 
-						DacFieldNodeViewModelBase(dacMemberCategoryVM, parent, fieldInfo, isExpanded)
+	public class SystemNonAuditDacFieldNodeViewModel(DacMemberCategoryNodeViewModel dacMemberCategoryVM, TreeNodeViewModel parent, 
+													 DacFieldInfo fieldInfo, bool isExpanded) : 
+							DacFieldNodeViewModelBase(dacMemberCategoryVM, parent, fieldInfo, isExpanded)
 	{
-		public override Icon NodeIcon => Icon.DacAuditField;
+		public override Icon NodeIcon => Icon.DacSystemNonAuditField;
 
 		public override bool IconDependsOnCurrentTheme => true;
 

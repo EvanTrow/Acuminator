@@ -17,7 +17,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool CanNodeContainSuppressionComment(SyntaxNode node) =>
-			node is StatementSyntax or MemberDeclarationSyntax or UsingDirectiveSyntax or ArgumentSyntax or ParameterSyntax;
+			node is StatementSyntax or MemberDeclarationSyntax or UsingDirectiveSyntax or ArgumentSyntax or ParameterSyntax or AttributeListSyntax;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool ShouldStopSearchForSuppressionComment(SyntaxNode node) =>
