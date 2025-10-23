@@ -65,6 +65,11 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingMandatoryDacFields
 			await VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
+		[EmbeddedFileData("ProjectionDac.cs", "ProjectionDac.BaseDac.cs")]
+		public async Task ProjectionDac_NoDiagnostic(string source, string baseDacSource) =>
+			await VerifyCSharpDiagnosticAsync(source, baseDacSource);
+
+		[Theory]
 		[EmbeddedFileData(@"PX1069CodeFix\SealedDacWithoutAnyMandatoryField_Expected.cs")]
 		public async Task SealedDac_WithoutAnyMandatoryField_AfterCodeFix_NoDiagnostic(string source) =>
 			await VerifyCSharpDiagnosticAsync(source);
