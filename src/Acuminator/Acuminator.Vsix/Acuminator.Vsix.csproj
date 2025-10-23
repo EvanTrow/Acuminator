@@ -193,7 +193,10 @@
     <Resource Include="Resources\CodeMap\Constructor.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\CodeMap\DacAuditField.png">
+    <Resource Include="Resources\CodeMap\DacAuditFieldDark.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\DacAuditFieldLight.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\CodeMap\DacAuditFieldsCategory.png">
@@ -205,16 +208,22 @@
     <Resource Include="Resources\CodeMap\DacExtension.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\CodeMap\DacFieldProperty.png">
+    <Resource Include="Resources\CodeMap\DacFieldPropertyDark.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\CodeMap\DacNonBqlProperty.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>	
-	<Resource Include="Resources\CodeMap\DacSystemNonAuditDark.png">
+    <Resource Include="Resources\CodeMap\DacFieldPropertyLight.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-	<Resource Include="Resources\CodeMap\DacSystemNonAuditLight.png">
+    <Resource Include="Resources\CodeMap\DacNonBqlPropertyDark.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\DacNonBqlPropertyLight.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\DacSystemNonAuditDark.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\DacSystemNonAuditLight.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\CodeMap\DacSystemNonAuditFieldsCategory.png">
