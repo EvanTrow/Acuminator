@@ -66,12 +66,18 @@
 	<BitmapImage x:Key="StaticGraphConstructor" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/Constructor.png"/>
 
-	<BitmapImage x:Key="PropertyOverrideGraph" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
-				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/Overrides/PropertyOverride.png"/>
+	<BitmapImage x:Key="PropertyOverrideGraphDark" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/Overrides/PropertyOverrideDark.png"/>
 
-	<BitmapImage x:Key="EventOverrideGraph" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
-				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/Overrides/EventOverride.png"/>
+	<BitmapImage x:Key="PropertyOverrideGraphLight" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/Overrides/PropertyOverrideLight.png"/>
 
+	<BitmapImage x:Key="EventOverrideGraphDark" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/Overrides/EventOverrideDark.png"/>
+
+	<BitmapImage x:Key="EventOverrideGraphLight" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+			 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/Overrides/EventOverrideLight.png"/>
+	
 	<BitmapImage x:Key="MethodOverrideGraph" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/Overrides/MethodOverride.png"/>
 
@@ -98,14 +104,29 @@
 	<BitmapImage x:Key="DacBqlField" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacBqlField.png"/>
 
-	<BitmapImage x:Key="DacFieldProperty" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
-				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacFieldProperty.png"/>
+	<BitmapImage x:Key="DacFieldPropertyDark" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacFieldPropertyDark.png"/>
 
-	<BitmapImage x:Key="DacNonBqlProperty" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
-				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacNonBqlProperty.png"/>
+	<BitmapImage x:Key="DacFieldPropertyLight" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+			 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacFieldPropertyLight.png"/>
 
-	<BitmapImage x:Key="DacAuditProperty" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
-			 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacAuditProperty.png"/>
+	<BitmapImage x:Key="DacNonBqlPropertyDark" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacNonBqlPropertyDark.png"/>
+
+	<BitmapImage x:Key="DacNonBqlPropertyLight" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+			 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacNonBqlPropertyLight.png"/>
+	
+	<BitmapImage x:Key="DacAuditFieldDark" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+			 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacAuditFieldDark.png"/>
+
+	<BitmapImage x:Key="DacAuditFieldLight" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+		 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacAuditFieldLight.png"/>
+
+	<BitmapImage x:Key="DacSystemNonAuditFieldDark" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+			 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacSystemNonAuditDark.png"/>
+
+	<BitmapImage x:Key="DacSystemNonAuditFieldLight" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+			 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacSystemNonAuditLight.png"/>
 
 	<BitmapImage x:Key="DacKeysCategory" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacKeysCategory.ico"/>
@@ -118,7 +139,10 @@
 
 	<BitmapImage x:Key="DacAuditFieldsCategory" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacAuditFieldsCategory.png"/>
-	
+
+	<BitmapImage x:Key="DacSystemNonAuditFieldsCategory" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+			 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacSystemNonAuditFieldsCategory.png"/>
+
 	<BitmapImage x:Key="DacNonBqlPropertiesCategory" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacNonBqlPropertiesCategory.ico"/>
 
