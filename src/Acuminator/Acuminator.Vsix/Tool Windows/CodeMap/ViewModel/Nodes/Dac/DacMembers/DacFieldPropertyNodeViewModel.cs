@@ -14,6 +14,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	{
 		public override Icon NodeIcon => Icon.DacFieldProperty;
 
+		public override bool IconDependsOnCurrentTheme => true;
+
 		public DacPropertyInfo PropertyInfo => (MemberInfo as DacPropertyInfo)!;
 
 		public DacFieldPropertyNodeViewModel(DacMemberCategoryNodeViewModel dacMemberCategoryVM, TreeNodeViewModel parent, 
