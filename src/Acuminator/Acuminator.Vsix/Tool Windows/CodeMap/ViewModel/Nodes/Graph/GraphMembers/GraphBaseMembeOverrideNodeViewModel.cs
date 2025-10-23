@@ -20,6 +20,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override Icon NodeIcon { get; }
 
+		public override bool IconDependsOnCurrentTheme => 
+			OverrideKind is MemberOverrideKind.NormalPropertyOverride or MemberOverrideKind.NormalEventOverride;
+
 		public BaseMemberOverrideInfo BaseMemberOverrideInfo => (BaseMemberOverrideInfo)MemberInfo;
 
 		public override string Name

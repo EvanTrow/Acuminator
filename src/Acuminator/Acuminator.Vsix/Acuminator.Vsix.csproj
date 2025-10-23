@@ -244,7 +244,10 @@
     <Resource Include="Resources\CodeMap\Overrides\BaseMemberOverrideCategory.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\CodeMap\Overrides\EventOverride.png">
+    <Resource Include="Resources\CodeMap\Overrides\EventOverrideDark.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\Overrides\EventOverrideLight.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\CodeMap\Overrides\MethodOverride.png">
@@ -253,7 +256,10 @@
     <Resource Include="Resources\CodeMap\Overrides\PersistMethodOverride.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\CodeMap\Overrides\PropertyOverride.png">
+    <Resource Include="Resources\CodeMap\Overrides\PropertyOverrideDark.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+     <Resource Include="Resources\CodeMap\Overrides\PropertyOverrideLight.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
