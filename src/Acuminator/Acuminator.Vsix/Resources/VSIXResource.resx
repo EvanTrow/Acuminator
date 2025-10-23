@@ -210,14 +210,20 @@
   <data name="CodeMap_ExtraInfo_CustomViewTooltip" xml:space="preserve">
     <value>The view is a custom class derived from standard PXSelect-like classes</value>
   </data>
-  <data name="CodeMap_ExtraInfo_DacAuditFieldsCategoryIconTooltip" xml:space="preserve">
-    <value>Audit fields</value>
-  </data>
   <data name="CodeMap_ExtraInfo_DacAuditFieldIconTooltip" xml:space="preserve">
-    <value>Is audit field</value>
+    <value>This is an audit DAC field</value>
+  </data>
+  <data name="CodeMap_ExtraInfo_DacAuditFieldsCategoryIconTooltip" xml:space="preserve">
+    <value>Audit DAC fields</value>
   </data>
   <data name="CodeMap_ExtraInfo_DacKeyIconTooltip" xml:space="preserve">
     <value>Is part of a primary key</value>
+  </data>
+  <data name="CodeMap_ExtraInfo_DacSystemNonAuditFieldIconTooltip" xml:space="preserve">
+    <value>This is a system non-audit DAC field</value>
+  </data>
+  <data name="CodeMap_ExtraInfo_DacSystemNonAuditFieldsCategoryIconTooltip" xml:space="preserve">
+    <value>System non-audit DAC fields</value>
   </data>
   <data name="CodeMap_ExtraInfo_HasPXDBIdentityAttributeTooltip" xml:space="preserve">
     <value>The PXDBIdentity attribute is specified for this field.</value>

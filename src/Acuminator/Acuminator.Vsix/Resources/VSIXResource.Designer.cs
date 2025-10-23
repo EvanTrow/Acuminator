@@ -340,7 +340,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Is audit field.
+        ///   Looks up a localized string similar to This is an audit DAC field.
         /// </summary>
         public static string CodeMap_ExtraInfo_DacAuditFieldIconTooltip {
             get {
@@ -349,7 +349,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Audit fields.
+        ///   Looks up a localized string similar to Audit DAC fields.
         /// </summary>
         public static string CodeMap_ExtraInfo_DacAuditFieldsCategoryIconTooltip {
             get {
@@ -363,6 +363,24 @@ namespace Acuminator.Vsix {
         public static string CodeMap_ExtraInfo_DacKeyIconTooltip {
             get {
                 return ResourceManager.GetString("CodeMap_ExtraInfo_DacKeyIconTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is a system non-audit DAC field.
+        /// </summary>
+        public static string CodeMap_ExtraInfo_DacSystemNonAuditFieldIconTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_ExtraInfo_DacSystemNonAuditFieldIconTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to System non-audit DAC fields.
+        /// </summary>
+        public static string CodeMap_ExtraInfo_DacSystemNonAuditFieldsCategoryIconTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_ExtraInfo_DacSystemNonAuditFieldsCategoryIconTooltip", resourceCulture);
             }
         }
         
