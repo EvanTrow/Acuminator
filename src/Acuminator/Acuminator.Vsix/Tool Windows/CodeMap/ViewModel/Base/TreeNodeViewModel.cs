@@ -33,7 +33,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		/// <summary>
 		/// The icon depends on the current IDE theme.
 		/// </summary>
-		public virtual bool IconDependsOnCurrentTheme { get; }
+		public virtual bool IconDependsOnCurrentTheme => false;
 
 		public virtual ExtendedObservableCollection<ExtraInfoViewModel>? ExtraInfos => null;
 
