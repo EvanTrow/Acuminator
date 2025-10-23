@@ -121,7 +121,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-
+  </ItemGroup>
+  <!-- Resources included in VSIX -->
+  <ItemGroup>
     <Content Include="manifestIcon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -150,7 +152,13 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-
+    <VSCTCompile Include="AcuminatorVSPackage.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <None Include="Help Examples\ExampleOfSubMenuDefinition.vsct" />
+  </ItemGroup>
+  <!-- .ico and .png resources in Resource folder -->
+  <ItemGroup>
     <Resource Include="Resources\Refresh.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -169,32 +177,85 @@
     <Resource Include="Resources\ExpandAll.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-
-     <!--Use MSBuild glob pattern to include all Code Map icons as resources -->
-     <Resource Include="Resources\CodeMap\**\*.ico">
+  </ItemGroup>
+  <!-- Code Map icons -->
+  <ItemGroup>
+    <!--Use MSBuild glob pattern to include all Code Map icons as resources -->
+    <Resource Include="Resources\CodeMap\**\*.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-     </Resource>
-
-     <!--Use MSBuild glob pattern to include all Code Map .png images as resources -->
-     <Resource Include="Resources\CodeMap\**\*.png">
+    </Resource>
+    <Resource Include="Resources\CodeMap\BaseTypesCategoryDark.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-     </Resource>
-
-    <VSCTCompile Include="AcuminatorVSPackage.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
-    <None Include="Help Examples\ExampleOfSubMenuDefinition.vsct" />
+    </Resource>
+    <Resource Include="Resources\CodeMap\BaseTypesCategoryLight.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\Constructor.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\DacAuditField.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\DacAuditFieldsCategory.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\DacBqlField.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\DacExtension.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\DacFieldProperty.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\DacNonBqlProperty.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>	
+	<Resource Include="Resources\CodeMap\DacSystemNonAuditDark.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+	<Resource Include="Resources\CodeMap\DacSystemNonAuditLight.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\DacSystemNonAuditFieldsCategory.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\Filter.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\GraphExtension.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\InitializationAndActivationCategory.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\IsActiveMethod.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\Overrides\BaseMemberOverrideCategory.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\Overrides\EventOverride.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\Overrides\MethodOverride.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\Overrides\PersistMethodOverride.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\CodeMap\Overrides\PropertyOverride.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-     <!--Use MSBuild glob pattern to include all .cs code files for compilation -->
-    <Compile Include="**\*.cs"/>
-
-     <!--Use MSBuild glob pattern to exclude .cs files from obj and bin folder-->
-    <Compile Remove="obj\**\*.cs"/>
-    <Compile Remove="bin\**\*.cs"/>
-
+    <!--Use MSBuild glob pattern to include all .cs code files for compilation -->
+    <Compile Include="**\*.cs" />
+    <!--Use MSBuild glob pattern to exclude .cs files from obj and bin folder-->
+    <Compile Remove="obj\**\*.cs" />
+    <Compile Remove="bin\**\*.cs" />
     <!-- Exclude some special C# files like code-behind for XAML to correctly re-include them with proper details-->
-    <Compile Remove="**\*.xaml.cs"/> 
+    <Compile Remove="**\*.xaml.cs" />
     <Compile Include="Resources\Themes\Styles.xaml.cs">
       <DependentUpon>Styles.xaml</DependentUpon>
     </Compile>
@@ -207,22 +268,18 @@
     <Compile Include="Tool Windows\CodeMap\UI\CodeMapWindowControl.xaml.cs">
       <DependentUpon>CodeMapWindowControl.xaml</DependentUpon>
     </Compile>
-
-    <Compile Remove="Resources\VSIXResource.Designer.cs"/>
+    <Compile Remove="Resources\VSIXResource.Designer.cs" />
     <Compile Include="Resources\VSIXResource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>VSIXResource.resx</DependentUpon>
     </Compile>
-
-    <Compile Remove="Settings\UI\GeneralOptionsPage.cs"/>
+    <Compile Remove="Settings\UI\GeneralOptionsPage.cs" />
     <Compile Include="Settings\UI\GeneralOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
-
     <Compile Remove="Coloriser\Regex\Test\*.cs" />
     <EmbeddedResource Include="Coloriser\Regex\Test\*.cs" />
-   
     <EmbeddedResource Include="Resources\VSIXResource.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>VSIXResource.Designer.cs</LastGenOutput>

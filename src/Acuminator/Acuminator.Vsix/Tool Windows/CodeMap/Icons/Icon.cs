@@ -20,13 +20,13 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		DacBqlField,
 		DacNonBqlProperty,
 		DacAuditField,
-		DacSystemField,
+		DacSystemNonAuditField,
 
 		AllDacFieldsCategory,
 		DacKeysCategory,
 		DacNonBqlPropertiesCategory,
 		DacAuditFieldsCategory,
-		DacSystemFieldsCategory,
+		DacSystemNonAuditFieldsCategory,
 
 		Category,
 		BaseTypesCategory,
