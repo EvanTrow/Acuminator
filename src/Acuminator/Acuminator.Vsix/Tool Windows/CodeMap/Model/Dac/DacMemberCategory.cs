@@ -21,13 +21,13 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap.Dac
 	{
 		private static readonly Dictionary<DacMemberCategory, string> _descriptions = new()
 		{
-			{ DacMemberCategory.BaseTypes, "Base Types" },
-			{ DacMemberCategory.Keys, "Keys" },
-			{ DacMemberCategory.AllDacFields, "All Fields" },
-			{ DacMemberCategory.AuditDacFields, "Audit Fields" },
-			{ DacMemberCategory.SystemNonAuditDacFields, "System Non-Audit Fields" },
-			{ DacMemberCategory.NonBqlProperties, "Non-BQL Properties" },
-			{ DacMemberCategory.InitializationAndActivation, "Initialization & Activation" }
+			{ DacMemberCategory.BaseTypes, 					 VSIXResource.CodeMap_DAC_MemberCategories_BaseTypes },
+			{ DacMemberCategory.Keys, 						 VSIXResource.CodeMap_DAC_MemberCategories_Keys },
+			{ DacMemberCategory.AllDacFields, 				 VSIXResource.CodeMap_DAC_MemberCategories_AllFields },
+			{ DacMemberCategory.AuditDacFields, 			 VSIXResource.CodeMap_DAC_MemberCategories_AuditFields },
+			{ DacMemberCategory.SystemNonAuditDacFields, 	 VSIXResource.CodeMap_DAC_MemberCategories_SystemNonAuditFields },
+			{ DacMemberCategory.NonBqlProperties, 			 VSIXResource.CodeMap_DAC_MemberCategories_NonBQLProperties },
+			{ DacMemberCategory.InitializationAndActivation, VSIXResource.CodeMap_DAC_MemberCategories_InitializationAndActivation }
 		};
 
 		public static string Description(this DacMemberCategory dacMemberCategory) =>

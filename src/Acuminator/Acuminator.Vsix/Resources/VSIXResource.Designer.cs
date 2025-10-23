@@ -268,6 +268,69 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All Fields.
+        /// </summary>
+        public static string CodeMap_DAC_MemberCategories_AllFields {
+            get {
+                return ResourceManager.GetString("CodeMap_DAC_MemberCategories_AllFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Audit Fields.
+        /// </summary>
+        public static string CodeMap_DAC_MemberCategories_AuditFields {
+            get {
+                return ResourceManager.GetString("CodeMap_DAC_MemberCategories_AuditFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Base Types.
+        /// </summary>
+        public static string CodeMap_DAC_MemberCategories_BaseTypes {
+            get {
+                return ResourceManager.GetString("CodeMap_DAC_MemberCategories_BaseTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Initialization &amp; Activation.
+        /// </summary>
+        public static string CodeMap_DAC_MemberCategories_InitializationAndActivation {
+            get {
+                return ResourceManager.GetString("CodeMap_DAC_MemberCategories_InitializationAndActivation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keys.
+        /// </summary>
+        public static string CodeMap_DAC_MemberCategories_Keys {
+            get {
+                return ResourceManager.GetString("CodeMap_DAC_MemberCategories_Keys", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Non-BQL Properties.
+        /// </summary>
+        public static string CodeMap_DAC_MemberCategories_NonBQLProperties {
+            get {
+                return ResourceManager.GetString("CodeMap_DAC_MemberCategories_NonBQLProperties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to System Non-Audit Fields.
+        /// </summary>
+        public static string CodeMap_DAC_MemberCategories_SystemNonAuditFields {
+            get {
+                return ResourceManager.GetString("CodeMap_DAC_MemberCategories_SystemNonAuditFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bound.
         /// </summary>
         public static string CodeMap_DbBoundnessIndicator_Bound {

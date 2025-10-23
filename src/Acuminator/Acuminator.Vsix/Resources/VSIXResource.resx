@@ -186,6 +186,27 @@
   <data name="CodeMap_ConstructorNodeName" xml:space="preserve">
     <value>Constructor</value>
   </data>
+  <data name="CodeMap_DAC_MemberCategories_AllFields" xml:space="preserve">
+    <value>All Fields</value>
+  </data>
+  <data name="CodeMap_DAC_MemberCategories_AuditFields" xml:space="preserve">
+    <value>Audit Fields</value>
+  </data>
+  <data name="CodeMap_DAC_MemberCategories_BaseTypes" xml:space="preserve">
+    <value>Base Types</value>
+  </data>
+  <data name="CodeMap_DAC_MemberCategories_InitializationAndActivation" xml:space="preserve">
+    <value>Initialization &amp; Activation</value>
+  </data>
+  <data name="CodeMap_DAC_MemberCategories_Keys" xml:space="preserve">
+    <value>Keys</value>
+  </data>
+  <data name="CodeMap_DAC_MemberCategories_NonBQLProperties" xml:space="preserve">
+    <value>Non-BQL Properties</value>
+  </data>
+  <data name="CodeMap_DAC_MemberCategories_SystemNonAuditFields" xml:space="preserve">
+    <value>System Non-Audit Fields</value>
+  </data>
   <data name="CodeMap_DbBoundnessIndicator_Bound" xml:space="preserve">
     <value>Bound</value>
   </data>
