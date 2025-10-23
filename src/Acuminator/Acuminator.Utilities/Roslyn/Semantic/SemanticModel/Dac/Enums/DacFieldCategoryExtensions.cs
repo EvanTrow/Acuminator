@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Constants;
@@ -56,6 +57,7 @@ public static class DacFieldCategoryExtensions
 	/// <returns>
 	/// True if the DAC field is a system field, false if not.
 	/// </returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsSystemField(this DacFieldCategory category) => 
 		category != DacFieldCategory.Regular;
 
@@ -66,6 +68,7 @@ public static class DacFieldCategoryExtensions
 	/// <returns>
 	/// True if the DAC field is an audit field, false if not.
 	/// </returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsAuditField(this DacFieldCategory category) =>
 		category >= DacFieldCategory.CreatedByID && category <= DacFieldCategory.LastModifiedDateTime;
 
@@ -77,6 +80,7 @@ public static class DacFieldCategoryExtensions
 	/// <returns>
 	/// True if the DAC field is Created audit field, false if not.
 	/// </returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsCreatedAuditField(this DacFieldCategory category) =>
 		category >= DacFieldCategory.CreatedByID && category <= DacFieldCategory.CreatedDateTime;
 
@@ -87,6 +91,7 @@ public static class DacFieldCategoryExtensions
 	/// <returns>
 	/// True if the DAC field is LastModified audit field, false if not.
 	/// </returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsLastModifiedAuditField(this DacFieldCategory category) =>
 		category >= DacFieldCategory.LastModifiedByID && category <= DacFieldCategory.LastModifiedDateTime;
 
@@ -97,6 +102,7 @@ public static class DacFieldCategoryExtensions
 	/// <returns>
 	/// True if the DAC field is reserved by runtime, false if not.
 	/// </returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsReservedByRuntime(this DacFieldCategory category) =>
 		category >= DacFieldCategory.DeletedDatabaseRecord && category <= DacFieldCategory.Files;
 }
