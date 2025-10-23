@@ -13,6 +13,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	{
 		public override Icon NodeIcon => Icon.DacSystemNonAuditField;
 
+		public override bool IconDependsOnCurrentTheme => true;
+
 		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => 
 			treeVisitor.VisitNode(this, input);
 
