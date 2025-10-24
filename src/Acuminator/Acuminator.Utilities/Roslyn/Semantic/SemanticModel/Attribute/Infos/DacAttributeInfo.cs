@@ -73,10 +73,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Attribute
 				if (baseType.SpecialType == SpecialType.System_Object)
 					break;
 
-				isPXProjection 	= isPXProjection  || attributeType.Equals(projectionAttribute, SymbolEqualityComparer.Default);
-				isPXCacheName  	= isPXCacheName   || attributeType.Equals(pxCacheNameAttribute, SymbolEqualityComparer.Default);
-				isPXHidden	   	= isPXHidden 	  || attributeType.Equals(pxHiddenAttribute, SymbolEqualityComparer.Default);
-				isPXAccumulator = isPXAccumulator || attributeType.Equals(pxAccumulatorAttribute, SymbolEqualityComparer.Default);
+				isPXProjection 	= isPXProjection  || baseType.Equals(projectionAttribute, SymbolEqualityComparer.Default);
+				isPXCacheName  	= isPXCacheName   || baseType.Equals(pxCacheNameAttribute, SymbolEqualityComparer.Default);
+				isPXHidden	   	= isPXHidden 	  || baseType.Equals(pxHiddenAttribute, SymbolEqualityComparer.Default);
+				isPXAccumulator = isPXAccumulator || baseType.Equals(pxAccumulatorAttribute, SymbolEqualityComparer.Default);
 
 				if (isPXProjection || isPXCacheName || isPXHidden || isPXAccumulator)
 					return (isPXProjection, isPXCacheName, isPXHidden, isPXAccumulator);
