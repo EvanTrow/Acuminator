@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.VisualStudio.Shell;
 
 using Acuminator.Vsix.Utilities;
 
@@ -20,6 +22,18 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public CodeMapWindowControl()
 		{
 			this.InitializeComponent();
-		}	
+		}
+
+		private void CodeMapImage_Initialized(object sender, EventArgs e) =>
+			DpiUtils.SetReverseDpiTransformationForImage(sender as Image);
+
+		private void CodeMapImage_DpiChanged(object sender, DpiChangedEventArgs e)
+		{
+			if (sender is Image image &&
+				(e.OldDpi.DpiScaleX != e.NewDpi.DpiScaleX || e.OldDpi.DpiScaleY != e.NewDpi.DpiScaleY))
+			{
+				DpiUtils.SetReverseDpiTransformationForImage(image);
+			}
+		}
 	}
 }

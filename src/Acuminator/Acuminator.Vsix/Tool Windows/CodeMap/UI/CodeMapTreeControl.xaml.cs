@@ -6,8 +6,11 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 using Microsoft.VisualStudio.Shell;
+
+using Acuminator.Vsix.Utilities;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
@@ -143,5 +146,17 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				return;
 			}
 		}
+
+		private void CodeMapIcon_DpiChanged(object sender, DpiChangedEventArgs e)
+		{
+			if (sender is Image iconImage &&
+				(e.OldDpi.DpiScaleX != e.NewDpi.DpiScaleX || e.OldDpi.DpiScaleY != e.NewDpi.DpiScaleY))
+			{
+				DpiUtils.SetReverseDpiTransformationForImage(iconImage);
+			}
+		}
+
+		private void CodeMapIcon_Initialized(object sender, EventArgs e) =>
+			DpiUtils.SetReverseDpiTransformationForImage(sender as Image);
 	}
 }
