@@ -35,6 +35,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 																	: VSIXResource.CodeMap_ExtraInfo_ProcessingGraphExtensionIconTooltip,
 				Icon.ProjectionDac 								=> VSIXResource.CodeMap_ExtraInfo_ProjectionDacIndicatorTooltip,
 				Icon.ProjectionAttribute 						=> VSIXResource.CodeMap_Icon_ProjectionAttributeTooltip,
+				Icon.PXAccumulatorDac 							=> VSIXResource.CodeMap_ExtraInfo_PXAccumulatorDacIndicatorTooltip,
+				Icon.PXAccumulatorAttribute 					=> VSIXResource.CodeMap_Icon_PXAccumulatorAttributeTooltip,
 				_ 												=> null
 			};
 		}

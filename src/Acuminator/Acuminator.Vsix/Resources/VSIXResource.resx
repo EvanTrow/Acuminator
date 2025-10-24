@@ -261,6 +261,9 @@
   <data name="CodeMap_ExtraInfo_IsGraphExtension" xml:space="preserve">
     <value>Graph Extension</value>
   </data>
+  <data name="CodeMap_ExtraInfo_PXAccumulatorDacIndicatorTooltip" xml:space="preserve">
+    <value>This DAC has PXAccumulator attribute or attribute derived from it</value>
+  </data>
   <data name="CodeMap_ExtraInfo_PXFilterViewIconTooltip" xml:space="preserve">
     <value>This view is PXFilter or it is derived from it</value>
   </data>
@@ -293,6 +296,9 @@
   </data>
   <data name="CodeMap_FailedToUnsubscribeFromVsEvents_ErrorMessage" xml:space="preserve">
     <value>Code Map failed to unsubscribe from Visual Studio events</value>
+  </data>
+  <data name="CodeMap_Icon_PXAccumulatorAttributeTooltip" xml:space="preserve">
+    <value>This is a PXAccumulator attribute</value>
   </data>
   <data name="CodeMap_Icon_ProjectionAttributeTooltip" xml:space="preserve">
     <value>This is a projection attribute</value>

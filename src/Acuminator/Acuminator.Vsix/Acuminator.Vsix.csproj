@@ -241,6 +241,9 @@
     <Resource Include="Resources\CodeMap\IsActiveMethod.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+     <Resource Include="Resources\CodeMap\PXAccumulator.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\CodeMap\Overrides\BaseMemberOverrideCategory.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>

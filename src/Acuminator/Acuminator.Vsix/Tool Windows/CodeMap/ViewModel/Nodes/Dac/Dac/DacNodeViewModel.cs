@@ -38,6 +38,11 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				yield return new IconViewModel(this, Icon.ProjectionDac);
 			}
 
+			if (DacModel.HasAccumulatorAttribute)
+			{
+				yield return new IconViewModel(this, Icon.PXAccumulatorDac);
+			}
+
 			yield return CreateDacTypeInfo();
 
 			var pxCacheNameAttributeInfo = DacModelForCodeMap.Attributes.FirstOrDefault(attrInfo => attrInfo.IsPXCacheName);
