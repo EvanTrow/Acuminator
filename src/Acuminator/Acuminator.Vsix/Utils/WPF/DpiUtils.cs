@@ -54,7 +54,7 @@ internal static class DpiUtils
 			RenderOptions.SetBitmapScalingMode(scaleTransform, scalingMode);
 
 			image.RenderTransform = scaleTransform;
-			image.RenderTransformOrigin = new Point(0.5, 0.5);
+			image.RenderTransformOrigin = new Point(0.5, 0.5); // The (0.5, 0.5) parameters center the transformation origin.
 		}
 
 		RenderOptions.SetBitmapScalingMode(image, scalingMode);
