@@ -33,11 +33,14 @@ public class MissingMandatoryDacFieldsAnalyzer : DacAggregatedAnalyzerBase
 
 	public override void Analyze(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dac)
 	{
-		var missingMandatoryDacFieldKinds = GetMissingMandatoryDacFieldsInfos(dac, symbolContext.CancellationToken);
-
-		if (missingMandatoryDacFieldKinds.Count > 0)
+		if (!dac.IsProjectionDac)
 		{
-			ReportMissingMandatoryTimestampAndAuditDacFields(symbolContext, pxContext, dac, missingMandatoryDacFieldKinds);
+			var missingMandatoryDacFieldKinds = GetMissingMandatoryDacFieldsInfos(dac, symbolContext.CancellationToken);
+
+			if (missingMandatoryDacFieldKinds.Count > 0)
+			{
+				ReportMissingMandatoryTimestampAndAuditDacFields(symbolContext, pxContext, dac, missingMandatoryDacFieldKinds);
+			}
 		}
 
 		var missingNoteIdFieldInfo = GetMissingNoteIdFieldInfo(dac, pxContext);
