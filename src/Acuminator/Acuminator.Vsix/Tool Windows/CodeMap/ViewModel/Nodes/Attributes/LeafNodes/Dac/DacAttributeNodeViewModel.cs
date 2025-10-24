@@ -18,7 +18,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				? Icon.PXAccumulatorAttribute
 				: Icon.Attribute;
 
-		public override bool IconDependsOnCurrentTheme => !AttributeInfo.IsPXProjection;
+		public override bool IconDependsOnCurrentTheme => !AttributeInfo.IsPXProjection && !AttributeInfo.IsPXAccumulatorAttribute;
 
 		public override ExtendedObservableCollection<ExtraInfoViewModel>? ExtraInfos { get; }
 
