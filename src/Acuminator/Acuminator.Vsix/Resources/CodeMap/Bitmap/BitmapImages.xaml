@@ -192,8 +192,12 @@
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/DacNonBqlPropertiesCategory.ico"
 				 RenderOptions.BitmapScalingMode="HighQuality"/>
 
-	<BitmapImage x:Key="ProjectionDacSmall" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+	<BitmapImage x:Key="ProjectionDacSmall" DecodePixelHeight="14" DecodePixelWidth="14" CacheOption="OnLoad"
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/Projection.ico"
+				 RenderOptions.BitmapScalingMode="HighQuality"/>
+
+	<BitmapImage x:Key="PXAccumulatorDacSmall" DecodePixelHeight="14" DecodePixelWidth="14" CacheOption="OnLoad"
+				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/PXAccumulator.png"
 				 RenderOptions.BitmapScalingMode="HighQuality"/>
 	<!--#endregion-->
 
@@ -243,6 +247,10 @@
 	<BitmapImage x:Key="ProjectionAttribute" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
 				 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/Projection.ico"
 				 RenderOptions.BitmapScalingMode="HighQuality"/>
+
+	<BitmapImage x:Key="PXAccumulatorAttribute" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
+			 UriSource="pack://application:,,,/Acuminator;component/Resources/CodeMap/PXAccumulator.png"
+			 RenderOptions.BitmapScalingMode="HighQuality"/>
 	<!--#endregion-->
 
 	<BitmapImage x:Key="BaseTypesCategoryDark" DecodePixelHeight="16" DecodePixelWidth="16" CacheOption="OnLoad"
