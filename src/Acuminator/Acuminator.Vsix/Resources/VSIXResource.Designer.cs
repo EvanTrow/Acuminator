@@ -538,6 +538,15 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This DAC has PXAccumulator attribute or attribute derived from it.
+        /// </summary>
+        public static string CodeMap_ExtraInfo_PXAccumulatorDacIndicatorTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_ExtraInfo_PXAccumulatorDacIndicatorTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This view is PXFilter or it is derived from it.
         /// </summary>
         public static string CodeMap_ExtraInfo_PXFilterViewIconTooltip {
@@ -597,6 +606,15 @@ namespace Acuminator.Vsix {
         public static string CodeMap_Icon_ProjectionAttributeTooltip {
             get {
                 return ResourceManager.GetString("CodeMap_Icon_ProjectionAttributeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is a PXAccumulator attribute.
+        /// </summary>
+        public static string CodeMap_Icon_PXAccumulatorAttributeTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_Icon_PXAccumulatorAttributeTooltip", resourceCulture);
             }
         }
         
