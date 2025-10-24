@@ -23,10 +23,15 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public DacAttributeNodeViewModel(TreeNodeViewModel parent, DacAttributeInfo attributeInfo, bool isExpanded = false) :
 									base(parent, attributeInfo, isExpanded)
 		{
-			ExtraInfos = new ExtendedObservableCollection<ExtraInfoViewModel>(GetDacExtraInfos());
+			var dacFriendlyNameInfo = GetDacFriendlyNameForPXCacheNameAttribute();
+
+			if (dacFriendlyNameInfo != null)
+			{
+				ExtraInfos = new ExtendedObservableCollection<ExtraInfoViewModel>(dacFriendlyNameInfo);
+			}
 		}
 
-		private IEnumerable<ExtraInfoViewModel> GetDacExtraInfos()
+		private ExtraInfoViewModel? GetDacFriendlyNameForPXCacheNameAttribute()
 		{
 			if (AttributeInfo.IsPXCacheName)
 			{
@@ -36,9 +41,11 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				{
 					dacFriendlyName = $"\"{dacFriendlyName}\"";
 					Color color = Color.FromRgb(38, 155, 199);
-					yield return new TextViewModel(this, dacFriendlyName, darkThemeForeground: color, lightThemeForeground: color);
+					return new TextViewModel(this, dacFriendlyName, darkThemeForeground: color, lightThemeForeground: color);
 				}
 			}
+
+			return null;
 		}
 
 		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => 
