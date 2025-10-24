@@ -14,7 +14,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	{
 		public override Icon NodeIcon => AttributeInfo.IsPXProjection
 			? Icon.ProjectionAttribute
-			: Icon.Attribute;
+			: AttributeInfo.IsPXAccumulatorAttribute
+				? Icon.PXAccumulatorAttribute
+				: Icon.Attribute;
 
 		public override bool IconDependsOnCurrentTheme => !AttributeInfo.IsPXProjection;
 
