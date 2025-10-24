@@ -130,8 +130,8 @@
 						MaxHeight="20" MinHeight="20" MaxWidth="20" MinWidth="20" Style="{StaticResource RefreshButtonStyle}">
 					
 					<Image Source="{StaticResource RefreshImage}" Style="{StaticResource vsImageStyle}"
-						   Initialized="CodeMapImage_Initialized" DpiChanged="CodeMapImage_DpiChanged" 
-						   RenderOptions.BitmapScalingMode="HighQuality" UseLayoutRounding="False"/>
+						   Initialized="CodeMapImage_Initialized" DpiChanged="CodeMapImage_DpiChanged"
+						   RenderOptions.BitmapScalingMode="HighQuality" UseLayoutRounding="True"/>
 					<Button.IsEnabled>
 						<MultiBinding Mode="OneWay" Converter="{StaticResource multipleBoolsToSingleBoolConverter}" 
 									  ConverterParameter="{x:Static converters:MultipleBoolsAggregationMode.AllFalse}">
