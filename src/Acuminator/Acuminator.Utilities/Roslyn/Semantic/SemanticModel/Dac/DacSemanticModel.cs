@@ -249,9 +249,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			if (DacType != DacType.Dac || Attributes.IsDefaultOrEmpty)
 				return null;
 
-			var accumulatorAttribute = PXContext.AttributeTypes.PXAccumulatorAttribute;
-			return Attributes.FirstOrDefault(attr => attr.AttributeType != null && 
-													 attr.AttributeType.InheritsFromOrEquals(accumulatorAttribute));
+			return Attributes.FirstOrDefault(attr => attr.IsPXAccumulatorAttribute);
 		}
 	}
 }
