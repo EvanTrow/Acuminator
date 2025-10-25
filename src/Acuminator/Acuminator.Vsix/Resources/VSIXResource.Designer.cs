@@ -403,7 +403,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is an audit DAC field.
+        ///   Looks up a localized string similar to An audit DAC field.
         /// </summary>
         public static string CodeMap_ExtraInfo_DacAuditFieldIconTooltip {
             get {
@@ -412,7 +412,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Audit DAC fields.
+        ///   Looks up a localized string similar to A list of audit fields.
         /// </summary>
         public static string CodeMap_ExtraInfo_DacAuditFieldsCategoryIconTooltip {
             get {
@@ -430,7 +430,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is a system non-audit DAC field.
+        ///   Looks up a localized string similar to A system non-audit DAC field.
         /// </summary>
         public static string CodeMap_ExtraInfo_DacSystemNonAuditFieldIconTooltip {
             get {
@@ -439,7 +439,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to System non-audit DAC fields.
+        ///   Looks up a localized string similar to A list of system non-audit DAC fields.
         /// </summary>
         public static string CodeMap_ExtraInfo_DacSystemNonAuditFieldsCategoryIconTooltip {
             get {
@@ -538,7 +538,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This DAC has PXAccumulator attribute or attribute derived from it.
+        ///   Looks up a localized string similar to This DAC has a PXAccumulator attribute or an attribute derived from the PXAccumulator attribute.
         /// </summary>
         public static string CodeMap_ExtraInfo_PXAccumulatorDacIndicatorTooltip {
             get {
@@ -601,7 +601,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is a projection attribute.
+        ///   Looks up a localized string similar to This is the projection attribute.
         /// </summary>
         public static string CodeMap_Icon_ProjectionAttributeTooltip {
             get {
@@ -610,7 +610,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is a PXAccumulator attribute.
+        ///   Looks up a localized string similar to This is the PXAccumulator attribute.
         /// </summary>
         public static string CodeMap_Icon_PXAccumulatorAttributeTooltip {
             get {
