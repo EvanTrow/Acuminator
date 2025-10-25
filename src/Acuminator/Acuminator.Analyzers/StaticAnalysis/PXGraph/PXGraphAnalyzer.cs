@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,6 +10,7 @@ using Acuminator.Analyzers.StaticAnalysis.CallingBaseDataViewDelegate;
 using Acuminator.Analyzers.StaticAnalysis.ChangesInPXCache;
 using Acuminator.Analyzers.StaticAnalysis.ConstructorInGraphExtension;
 using Acuminator.Analyzers.StaticAnalysis.DatabaseQueries;
+using Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac;
 using Acuminator.Analyzers.StaticAnalysis.ForbidPrivateEventHandlers;
 using Acuminator.Analyzers.StaticAnalysis.InvalidPXActionSignature;
 using Acuminator.Analyzers.StaticAnalysis.LongOperationStart;
@@ -45,6 +45,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 		protected override SymbolKind SymbolKind => SymbolKind.NamedType;
 
 		public PXGraphAnalyzer() : this(null,
+			new GraphAndGraphExtensionDeclarationAnalyzer(),
 			new PXGraphCreationInGraphInWrongPlacesGraphAnalyzer(),
 			new ConstructorInGraphExtensionAnalyzer(),
 			new SavingChangesInGraphSemanticModelAnalyzer(),
