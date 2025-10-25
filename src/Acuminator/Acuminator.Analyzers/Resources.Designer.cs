@@ -2295,6 +2295,15 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Make the type abstract.
+        /// </summary>
+        public static string PX1112Fix {
+            get {
+                return ResourceManager.GetString("PX1112Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Graphs and graph extensions with generic type parameters must be abstract.
         /// </summary>
         public static string PX1112Title {
