@@ -2277,7 +2277,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The main DAC of the processing view must contain &quot;NoteID&quot; field.
+        ///   Looks up a localized string similar to The primary DAC of a processing view must contain the &quot;NoteID&quot; field.
         /// </summary>
         public static string PX1111Title {
             get {
@@ -2286,11 +2286,20 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The main DAC &quot;{0}&quot; of the processing view &quot;{1}&quot; must contain &quot;NoteID&quot; field.
+        ///   Looks up a localized string similar to The primary DAC &quot;{0}&quot; of the processing view &quot;{1}&quot; must contain the &quot;NoteID&quot; field.
         /// </summary>
         public static string PX1111TitleFormat {
             get {
                 return ResourceManager.GetString("PX1111TitleFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Graphs and graph extensions with generic type parameters must be abstract.
+        /// </summary>
+        public static string PX1112Title {
+            get {
+                return ResourceManager.GetString("PX1112Title", resourceCulture);
             }
         }
         

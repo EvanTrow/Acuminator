@@ -538,5 +538,8 @@ namespace Acuminator.Analyzers.StaticAnalysis
 		public static DiagnosticDescriptor PX1111_MainDacOfProcessingViewMustContainNoteIdField { get; } =
 			Rule("PX1111", nameof(Resources.PX1111Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1111, 
 				messageFormat: nameof(Resources.PX1111TitleFormat).GetLocalized());
+
+		public static DiagnosticDescriptor PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract { get; } =
+			Rule("PX1112", nameof(Resources.PX1112Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1112);
 	}
 }
