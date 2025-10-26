@@ -2322,7 +2322,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Graphs and graph extensions cannot be sealed types.
+        ///   Looks up a localized string similar to Graphs and graph extensions should not be sealed types.
         /// </summary>
         public static string PX1113Title {
             get {

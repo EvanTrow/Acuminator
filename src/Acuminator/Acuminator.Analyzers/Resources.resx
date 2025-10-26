@@ -879,7 +879,7 @@ Reason: {2}</value>
     <value>Remove "sealed" modifier from the type</value>
   </data>
   <data name="PX1113Title" xml:space="preserve">
-    <value>Graphs and graph extensions cannot be sealed types</value>
+    <value>Graphs and graph extensions should not be sealed types</value>
   </data>
   <data name="SuppressDiagnosticGroupCodeActionTitle" xml:space="preserve">
     <value>Suppress the {0} diagnostic with Acuminator</value>
