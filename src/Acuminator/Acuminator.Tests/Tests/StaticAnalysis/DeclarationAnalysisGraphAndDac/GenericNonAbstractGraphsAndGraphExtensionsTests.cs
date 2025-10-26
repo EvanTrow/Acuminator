@@ -97,6 +97,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraphAndDac
 			protected override void CheckIfGraphOrGraphExtensionIsSealed(SymbolAnalysisContext context, PXContext pxContext, 
 																		 PXGraphEventSemanticModel graphOrGraphExt)
 			{ }
+
+			protected override void CheckIfGraphExtensionInheritsFromNonAbstractGraphExtension(SymbolAnalysisContext context, PXContext pxContext, 
+																								PXGraphEventSemanticModel graphExtension)
+			{ }
 		}
 	}
 }

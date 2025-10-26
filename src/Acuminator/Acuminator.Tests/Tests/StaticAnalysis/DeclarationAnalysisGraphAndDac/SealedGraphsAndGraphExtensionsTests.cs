@@ -88,6 +88,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraphAndDac
 																					 PXGraphEventSemanticModel graphOrGraphExt)
 			{
 			}
+
+			protected override void CheckIfGraphExtensionInheritsFromNonAbstractGraphExtension(SymbolAnalysisContext context, PXContext pxContext, 
+																								PXGraphEventSemanticModel graphExtension)
+			{ }
 		}
 	}
 }
