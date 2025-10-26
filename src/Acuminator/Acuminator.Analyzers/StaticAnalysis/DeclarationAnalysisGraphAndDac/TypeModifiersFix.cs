@@ -38,9 +38,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 
 			if (diagnostic.Id == Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract.Id)
 			{
-				addAbstractModifier = true;
-				removeSealedModifier = false;
-				codeActionName = nameof(Resources.PX1112Fix).GetLocalized().ToString();
+				addAbstractModifier  = true;
+				removeSealedModifier = true;
+				codeActionName 		 = nameof(Resources.PX1112Fix).GetLocalized().ToString();
 			}
 			else
 			{
