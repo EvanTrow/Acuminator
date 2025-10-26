@@ -46,8 +46,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 			
 			var location = graphOrGraphExt.Node!.Identifier.GetLocation().NullIfLocationKindIsNone() ??
 						   graphOrGraphExt.Node.GetLocation();
-			var diagnostic = Diagnostic.Create(Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract, location,
-												graphOrGraphExt.Symbol.Name);
+			var diagnostic = Diagnostic.Create(
+											Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract, location);
 
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
@@ -65,7 +65,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 
 			location ??= graphOrGraphExt.Node.Identifier.GetLocation().NullIfLocationKindIsNone() ??
 						 graphOrGraphExt.Node.GetLocation();
-			var diagnostic = Diagnostic.Create(Descriptors.PX1113_SealedGraphsAndGraphExtensions, location, graphOrGraphExt.Symbol.Name);
+			var diagnostic = Diagnostic.Create(
+											Descriptors.PX1113_SealedGraphsAndGraphExtensions, location);
 
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
