@@ -541,5 +541,8 @@ namespace Acuminator.Analyzers.StaticAnalysis
 
 		public static DiagnosticDescriptor PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract { get; } =
 			Rule("PX1112", nameof(Resources.PX1112Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1112);
+
+		public static DiagnosticDescriptor PX1113_SealedGraphsAndGraphExtensions { get; } =
+			Rule("PX1113", nameof(Resources.PX1113Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1113);
 	}
 }

@@ -875,6 +875,12 @@ Reason: {2}</value>
   <data name="PX1112Title" xml:space="preserve">
     <value>Graphs and graph extensions with generic type parameters must be abstract</value>
   </data>
+  <data name="PX1113Fix" xml:space="preserve">
+    <value>Remove "sealed" modifier from the type</value>
+  </data>
+  <data name="PX1113Title" xml:space="preserve">
+    <value>Graphs and graph extensions cannot be sealed types</value>
+  </data>
   <data name="SuppressDiagnosticGroupCodeActionTitle" xml:space="preserve">
     <value>Suppress the {0} diagnostic with Acuminator</value>
   </data>
