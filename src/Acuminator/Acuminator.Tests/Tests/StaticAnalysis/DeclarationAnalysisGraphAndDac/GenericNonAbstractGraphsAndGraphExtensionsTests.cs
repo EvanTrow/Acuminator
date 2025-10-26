@@ -15,6 +15,8 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 using Xunit;
+using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraphAndDac
 {
@@ -91,6 +93,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraphAndDac
 				(
 					Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract
 				);
+
+			protected override void CheckIfGraphOrGraphExtensionIsSealed(SymbolAnalysisContext context, PXContext pxContext, 
+																		 PXGraphEventSemanticModel graphOrGraphExt)
+			{ }
 		}
 	}
 }
