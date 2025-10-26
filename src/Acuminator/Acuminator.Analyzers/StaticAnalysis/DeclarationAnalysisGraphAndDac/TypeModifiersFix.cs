@@ -28,36 +28,38 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 			new HashSet<string>
 			{
 				Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract.Id,
+				Descriptors.PX1113_SealedGraphsAndGraphExtensions.Id
 			}
 			.ToImmutableArray();
 
 		protected override Task RegisterCodeFixesForDiagnosticAsync(CodeFixContext context, Diagnostic diagnostic)
 		{
-			bool removeSealedModifier, addAbstractModifier;
+			bool addAbstractModifier;
 			string codeActionName;
 
 			if (diagnostic.Id == Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract.Id)
 			{
-				addAbstractModifier  = true;
-				removeSealedModifier = true;
-				codeActionName 		 = nameof(Resources.PX1112Fix).GetLocalized().ToString();
+				addAbstractModifier = true;
+				codeActionName 		= nameof(Resources.PX1112Fix).GetLocalized().ToString();
+			}
+			else if (diagnostic.Id == Descriptors.PX1113_SealedGraphsAndGraphExtensions.Id)
+			{
+				addAbstractModifier = false;
+				codeActionName 		= nameof(Resources.PX1113Fix).GetLocalized().ToString();
 			}
 			else
-			{
 				return Task.CompletedTask;
-			}
 
 			context.CancellationToken.ThrowIfCancellationRequested();
 
 			var codeAction = CodeAction.Create(codeActionName,
-											   cToken => UpdateTypeModifiers(context.Document, context.Span, removeSealedModifier, 
-																			 addAbstractModifier, cToken),
+											   cToken => UpdateTypeModifiers(context.Document, context.Span, addAbstractModifier, cToken),
 											   equivalenceKey: codeActionName);
 			context.RegisterCodeFix(codeAction, diagnostic);
 			return Task.CompletedTask;
 		}
 
-		private async Task<Solution> UpdateTypeModifiers(Document document, TextSpan span, bool removeSealedModifier, bool addAbstractModifier,
+		private async Task<Solution> UpdateTypeModifiers(Document document, TextSpan span, bool addAbstractModifier,
 														 CancellationToken cancellationToken)
 		{
 			Solution originalSolution = document.Project.Solution;
@@ -84,22 +86,22 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 			if (typeDeclarations.Length <= 1)
 			{
 				var changedSolutionForNonPartialType = UpdateTypeNodeModifiersForNonPartialType(document, root, graphOrDacOrExtensionToMakePublicNode,
-																								removeSealedModifier, addAbstractModifier);
+																								addAbstractModifier);
 				return changedSolutionForNonPartialType;
 			}
 			else
 			{
 				var changedSolutionForPartialType = await UpdateTypeNodeModifiersForPartialType(document.Project.Solution, typeDeclarations,
-																						removeSealedModifier, addAbstractModifier, cancellationToken)
+																								addAbstractModifier, cancellationToken)
 														.ConfigureAwait(false);
 				return changedSolutionForPartialType;
 			}	
 		}
 
 		private Solution UpdateTypeNodeModifiersForNonPartialType(Document document, SyntaxNode root, ClassDeclarationSyntax graphOrGraphExtTypeNode, 
-																  bool removeSealedModifier, bool addAbstractModifier)
+																  bool addAbstractModifier)
 		{
-			var modifiedGraphOrGraphExtTypeNode = UpdateTypeNodeModifiers(graphOrGraphExtTypeNode, removeSealedModifier, addAbstractModifier);
+			var modifiedGraphOrGraphExtTypeNode = UpdateTypeNodeModifiers(graphOrGraphExtTypeNode, addAbstractModifier);
 
 			if (ReferenceEquals(modifiedGraphOrGraphExtTypeNode, graphOrGraphExtTypeNode))
 				return document.Project.Solution;
@@ -111,8 +113,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 		}
 
 		private async Task<Solution> UpdateTypeNodeModifiersForPartialType(Solution originalSolution, ImmutableArray<SyntaxReference> graphOrGraphExtDeclarations,
-																		   bool removeSealedModifier, bool addAbstractModifier, 
-																		   CancellationToken cancellation)
+																		   bool addAbstractModifier, CancellationToken cancellation)
 		{
 			var solutionEditor = new SolutionEditor(originalSolution);
 			var documentEditors = await GetAllDocumentEditorsAsync(solutionEditor, graphOrGraphExtDeclarations, cancellation).ConfigureAwait(false);
@@ -129,7 +130,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 
 				foreach (var graphOrGraphExtTypeNode in graphOrGraphExtTypeNodesInDocument)
 				{
-					var modifiedGraphOrGraphExtTypeNode = UpdateTypeNodeModifiers(graphOrGraphExtTypeNode, removeSealedModifier, addAbstractModifier);
+					var modifiedGraphOrGraphExtTypeNode = UpdateTypeNodeModifiers(graphOrGraphExtTypeNode, addAbstractModifier);
 
 					if (ReferenceEquals(modifiedGraphOrGraphExtTypeNode, graphOrGraphExtTypeNode))
 						continue;
@@ -178,14 +179,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 				   .OfType<ClassDeclarationSyntax>();
 		}
 
-		private ClassDeclarationSyntax UpdateTypeNodeModifiers(ClassDeclarationSyntax graphOrGraphExtensionNode,
-																bool removeSealedModifier, bool addAbstractModifier)
+		private ClassDeclarationSyntax UpdateTypeNodeModifiers(ClassDeclarationSyntax graphOrGraphExtensionNode, bool addAbstractModifier)
 		{
 			var oldModifiers = graphOrGraphExtensionNode.Modifiers;
 			SyntaxTokenList newModifiers = oldModifiers;
 			bool modifiedAny = false;
 
-			if (removeSealedModifier && oldModifiers.Count > 0)
+			if (oldModifiers.Count > 0)
 			{
 				int sealedIndex = newModifiers.IndexOf(SyntaxKind.SealedKeyword);
 				if (sealedIndex >= 0 && sealedIndex < newModifiers.Count)
