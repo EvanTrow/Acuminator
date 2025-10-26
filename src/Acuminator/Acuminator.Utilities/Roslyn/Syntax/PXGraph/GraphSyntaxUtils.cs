@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -102,6 +104,38 @@ namespace Acuminator.Utilities.Roslyn.Syntax.PXGraph
 			}
 
 			return typeSymbol;
+		}
+
+		public static (INamedTypeSymbol TypeSymbol, TypeSyntax TypeNode)? GetBaseGraphTypeInfo(SemanticModel semanticModel, PXContext pxContext,
+																								ClassDeclarationSyntax? graphNode,
+																								CancellationToken cancellation)
+		{
+			semanticModel.ThrowOnNull();
+			pxContext.ThrowOnNull();
+
+			if (graphNode?.BaseList == null)
+				return null;
+
+			var baseTypes = graphNode.BaseList.Types;
+
+			if (baseTypes.Count == 0)
+				return null;
+
+			foreach (var typeSyntax in baseTypes)
+			{
+				cancellation.ThrowIfCancellationRequested();
+
+				if (typeSyntax?.Type == null ||
+					semanticModel.GetTypeInfo(typeSyntax.Type).Type is not INamedTypeSymbol baseTypeSymbol)
+				{
+					continue;
+				}
+
+				if (baseTypeSymbol.IsPXGraph(pxContext))
+					return (baseTypeSymbol, typeSyntax.Type);
+			}
+
+			return null;
 		}
 	}
 }
