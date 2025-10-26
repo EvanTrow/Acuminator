@@ -17,9 +17,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 {
-	/// <summary>
-	/// An analyzer that checks that DACs, graphs, DAC and graph extensions are public.
-	/// </summary>
 	public class GraphAndGraphExtensionDeclarationAnalyzer : PXGraphAggregatedAnalyzerBase
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
