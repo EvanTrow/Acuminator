@@ -26,6 +26,7 @@ Generate comprehensive unit tests for the `{DIAGNOSTIC_ID}` diagnostic (e.g., PX
 ## NAMING CONVENTIONS FOR TESTS SOURCES
 - Place test source files in the `Sources` subfolder and its subfolders
 - Name test source files descriptively based on the scenario being tested
+- For the test sources use the subnamespace `Source` of the test class namespace
 - Examples:
   - `SealedGraphExtension.cs`
   - `NonSealedGraph.cs`
