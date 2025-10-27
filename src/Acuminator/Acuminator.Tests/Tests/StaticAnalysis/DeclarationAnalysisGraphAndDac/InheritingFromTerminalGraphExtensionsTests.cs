@@ -10,7 +10,6 @@ using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 using Xunit;
@@ -32,7 +31,34 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraphAndDac
 		public async Task InheritFrom_Abstract_Or_Generic_GraphExtension_NoDiagnostic(string source) =>
 			await VerifyCSharpDiagnosticAsync(source);
 
-		
+		[Theory]
+		[EmbeddedFileData(@"InheritingFromTerminalGraphExtensions\RegularGraphInheritance.cs")]
+		public async Task RegularGraph_InheritanceScenarios_NoDiagnostic(string source) =>
+			await VerifyCSharpDiagnosticAsync(source);
+
+		[Theory]
+		[EmbeddedFileData(@"InheritingFromTerminalGraphExtensions\FirstLevelGraphExtension.cs")]
+		public async Task FirstLevel_GraphExtension_NoDiagnostic(string source) =>
+			await VerifyCSharpDiagnosticAsync(source);
+
+		[Theory]
+		[EmbeddedFileData(@"InheritingFromTerminalGraphExtensions\InheritFromNonAbstractExtension.cs")]
+		public async Task InheritFrom_NonAbstract_GraphExtension(string source) =>
+			await VerifyCSharpDiagnosticAsync(source,
+				Descriptors.PX1114_GraphExtensionInheritFromNonAbstractGraphExtension.CreateFor(19, 39));
+
+		[Theory]
+		[EmbeddedFileData(@"InheritingFromTerminalGraphExtensions\InheritFromNonAbstractExtensionIndirectly.cs",
+						  @"InheritingFromTerminalGraphExtensions\InheritFromNonAbstractExtensionIndirectly.BaseTypes.cs")]
+		public async Task InheritFrom_NonAbstract_GraphExtension_Indirectly(string source, string baseSource) =>
+			await VerifyCSharpDiagnosticAsync(source, baseSource,
+				Descriptors.PX1114_GraphExtensionInheritFromNonAbstractGraphExtension.CreateFor(6, 43));
+
+		[Theory]
+		[EmbeddedFileData(@"InheritingFromTerminalGraphExtensions\InheritFromPXProtectedAccessExtension.cs")]
+		public async Task GraphExtension_InheritingFromPXProtectedAccessExtension(string source) =>
+			await VerifyCSharpDiagnosticAsync(source,
+				Descriptors.PX1114_GraphExtensionInheritFromNonAbstractGraphExtension.CreateFor(19, 47));
 
 		private sealed class GraphAndGraphExtensionDeclarationAnalyzerForPX1114Tests : GraphAndGraphExtensionDeclarationAnalyzer
 		{
