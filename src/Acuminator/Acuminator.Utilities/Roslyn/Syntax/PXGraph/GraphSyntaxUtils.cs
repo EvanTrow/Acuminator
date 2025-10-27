@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 
@@ -106,9 +107,21 @@ namespace Acuminator.Utilities.Roslyn.Syntax.PXGraph
 			return typeSymbol;
 		}
 
-		public static (INamedTypeSymbol TypeSymbol, TypeSyntax TypeNode)? GetBaseGraphTypeInfo(SemanticModel semanticModel, PXContext pxContext,
-																								ClassDeclarationSyntax? graphNode,
-																								CancellationToken cancellation)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static (INamedTypeSymbol TypeSymbol, TypeSyntax TypeNode)? GetBaseGraphTypeInfo(SemanticModel semanticModel, 
+																								PXContext pxContext, ClassDeclarationSyntax? graphNode,
+																								CancellationToken cancellation) =>
+			GetBaseGraphOrExtensionTypeInfo(semanticModel, pxContext, graphNode, lookForGraphExtension: false, cancellation);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static (INamedTypeSymbol TypeSymbol, TypeSyntax TypeNode)? GetBaseGraphExtensionTypeInfo(SemanticModel semanticModel,
+																										PXContext pxContext, ClassDeclarationSyntax? graphNode,
+																										CancellationToken cancellation) =>
+			GetBaseGraphOrExtensionTypeInfo(semanticModel, pxContext, graphNode, lookForGraphExtension: true, cancellation);
+
+		private static (INamedTypeSymbol TypeSymbol, TypeSyntax TypeNode)? GetBaseGraphOrExtensionTypeInfo(SemanticModel semanticModel,
+																						PXContext pxContext, ClassDeclarationSyntax? graphNode,
+																						bool lookForGraphExtension,  CancellationToken cancellation)
 		{
 			semanticModel.ThrowOnNull();
 			pxContext.ThrowOnNull();
@@ -131,7 +144,12 @@ namespace Acuminator.Utilities.Roslyn.Syntax.PXGraph
 					continue;
 				}
 
-				if (baseTypeSymbol.IsPXGraph(pxContext))
+				if (lookForGraphExtension)
+				{
+					if (baseTypeSymbol.IsPXGraphExtension(pxContext))
+						return (baseTypeSymbol, typeSyntax.Type);
+				}
+				else if (baseTypeSymbol.IsPXGraph(pxContext))
 					return (baseTypeSymbol, typeSyntax.Type);
 			}
 

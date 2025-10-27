@@ -13,7 +13,6 @@ using Acuminator.Utilities.Roslyn.Syntax.PXGraph;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
@@ -107,9 +106,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 						   graphExtension.Node.GetLocation();
 				}
 
-				var baseGraphInfo = GraphSyntaxUtils.GetBaseGraphTypeInfo(semanticModel, pxContext, graphExtension.Node,
-																		  context.CancellationToken);
-				var location = baseGraphInfo?.TypeNode.GetLocation().NullIfLocationKindIsNone();
+				var baseGraphExtensionInfo = GraphSyntaxUtils.GetBaseGraphExtensionTypeInfo(semanticModel, pxContext, graphExtension.Node,
+																							context.CancellationToken);
+				var location = baseGraphExtensionInfo?.TypeNode.GetLocation().NullIfLocationKindIsNone();
 				location ??= graphExtension.Node.Identifier.GetLocation().NullIfLocationKindIsNone() ??
 							 graphExtension.Node.GetLocation();
 				return location;
