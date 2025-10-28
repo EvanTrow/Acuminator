@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
 using Acuminator.Utilities.Common;
@@ -13,6 +13,7 @@ using Acuminator.Utilities.Roslyn.Syntax.PXGraph;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
@@ -22,6 +23,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
 			ImmutableArray.Create
 			(
+				Descriptors.PX1093_GraphDeclarationViolation,
 				Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract,
 				Descriptors.PX1113_SealedGraphsAndGraphExtensions,
 				Descriptors.PX1114_GraphExtensionInheritFromNonAbstractGraphExtension
@@ -35,10 +37,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 			context.CancellationToken.ThrowIfCancellationRequested();
 			CheckIfGraphOrGraphExtensionIsSealed(context, pxContext, graphOrGraphExt);
 
-			if (graphOrGraphExt.GraphType == GraphType.PXGraphExtension)
+			context.CancellationToken.ThrowIfCancellationRequested();
+			var semanticModel = context.Compilation.GetSemanticModel(graphOrGraphExt.Node!.SyntaxTree);
+
+			if (graphOrGraphExt.GraphType == GraphType.PXGraph)
 			{
-				context.CancellationToken.ThrowIfCancellationRequested();
-				CheckIfGraphExtensionInheritsFromNonAbstractGraphExtension(context, pxContext, graphOrGraphExt);
+				CheckIfBaseGraphTypeSpecifyCorrectGraphAsTypeArgument(context, pxContext, semanticModel, graphOrGraphExt);
+			}
+			else
+			{
+				CheckIfGraphExtensionInheritsFromNonAbstractGraphExtension(context, pxContext, semanticModel, graphOrGraphExt);
 			}
 		}
 
@@ -78,8 +86,60 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 
+		protected virtual void CheckIfBaseGraphTypeSpecifyCorrectGraphAsTypeArgument(SymbolAnalysisContext context, PXContext pxContext,
+																					 SemanticModel? semanticModel, PXGraphEventSemanticModel graph)
+		{
+			var graphArgumentNode = GetGraphTypeArgumentNodeFromBaseGraphType(semanticModel, pxContext, graph.Node!, context.CancellationToken);
+
+			if (graphArgumentNode == null)
+				return;
+
+			// Get last identifier to handle cases like SO.SOSetupMaint
+			var graphArgumentIdentifier = graphArgumentNode.DescendantNodesAndSelf()
+														   .OfType<IdentifierNameSyntax>()
+														   .LastOrDefault();
+			if (graphArgumentIdentifier == null)
+				return;
+
+			var graphTypeArgumentTypeInfo = semanticModel.GetTypeInfo(graphArgumentIdentifier);	
+			var graphTypeArgumentType = graphTypeArgumentTypeInfo.Type;
+
+			if (graphTypeArgumentType?.TypeKind != TypeKind.Class || graph.Symbol.Equals(graphTypeArgumentType, SymbolEqualityComparer.Default))
+			{
+				return;
+			}
+
+			context.ReportDiagnosticWithSuppressionCheck(
+				Diagnostic.Create(Descriptors.PX1093_GraphDeclarationViolation, graphArgumentIdentifier.GetLocation()),
+				pxContext.CodeAnalysisSettings);
+		}
+
+		private TypeSyntax? GetGraphTypeArgumentNodeFromBaseGraphType(SemanticModel? semanticModel, PXContext pxContext,
+																	  ClassDeclarationSyntax graphNode, CancellationToken cancellation)
+		{
+			var baseGraphTypeInfo = semanticModel != null
+				? GraphSyntaxUtils.GetBaseGraphTypeInfo(semanticModel, pxContext, graphNode, cancellation)
+				: null;
+
+			if (baseGraphTypeInfo == null)
+				return null;
+
+			var (baseTypeSymbol, baseTypeNode) = baseGraphTypeInfo.Value;
+			var isGraphBaseType = baseTypeSymbol.ConstructedFrom.Equals(pxContext.PXGraph.GenericTypeGraph, SymbolEqualityComparer.Default) ||
+								  baseTypeSymbol.ConstructedFrom.Equals(pxContext.PXGraph.GenericTypeGraphDac, SymbolEqualityComparer.Default) ||
+								  baseTypeSymbol.ConstructedFrom.Equals(pxContext.PXGraph.GenericTypeGraphDacField, SymbolEqualityComparer.Default);
+			if (!isGraphBaseType)
+				return null;
+
+			var typeArgumentsListNode = baseTypeNode.DescendantNodes()
+													.OfType<TypeArgumentListSyntax>()
+													.FirstOrDefault();
+
+			return typeArgumentsListNode?.Arguments.FirstOrDefault();
+		}
+
 		protected virtual void CheckIfGraphExtensionInheritsFromNonAbstractGraphExtension(SymbolAnalysisContext context, PXContext pxContext,
-																						  PXGraphEventSemanticModel graphExtension)
+																			SemanticModel? semanticModel, PXGraphEventSemanticModel graphExtension)
 		{
 			var pxProtectedAccessAttribute = pxContext.AttributeTypes.PXProtectedAccessAttribute;
 			bool isDerivedFromTerminalGraphExtension = 
@@ -98,18 +158,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 			//-----------------------------------------------Local Function------------------------------------------------
 			Location? GetDiagnosticLocation()
 			{
-				var semanticModel = context.Compilation.GetSemanticModel(graphExtension.Node!.SyntaxTree);
-
 				if (semanticModel == null)
 				{
-					return graphExtension.Node.Identifier.GetLocation().NullIfLocationKindIsNone() ??
+					return graphExtension.Node!.Identifier.GetLocation().NullIfLocationKindIsNone() ??
 						   graphExtension.Node.GetLocation();
 				}
 
 				var baseGraphExtensionInfo = GraphSyntaxUtils.GetBaseGraphExtensionTypeInfo(semanticModel, pxContext, graphExtension.Node,
 																							context.CancellationToken);
 				var location = baseGraphExtensionInfo?.TypeNode.GetLocation().NullIfLocationKindIsNone();
-				location ??= graphExtension.Node.Identifier.GetLocation().NullIfLocationKindIsNone() ??
+				location ??= graphExtension.Node!.Identifier.GetLocation().NullIfLocationKindIsNone() ??
 							 graphExtension.Node.GetLocation();
 				return location;
 			}

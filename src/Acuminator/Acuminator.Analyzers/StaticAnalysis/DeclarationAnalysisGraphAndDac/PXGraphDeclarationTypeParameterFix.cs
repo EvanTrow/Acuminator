@@ -10,9 +10,10 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Acuminator.Analyzers.StaticAnalysis.PXGraphDeclarationTypeParameter
+namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 {
-	[ExportCodeFixProvider(LanguageNames.CSharp), Shared]
+	[Shared]
+	[ExportCodeFixProvider(LanguageNames.CSharp)]
 	public class PXGraphDeclarationTypeParameterFix : PXCodeFixProvider
 	{
 		public override ImmutableArray<string> FixableDiagnosticIds { get; } =
@@ -36,11 +37,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphDeclarationTypeParameter
 		{
 			cancellation.ThrowIfCancellationRequested();
 
-			var root = await document
-				.GetSyntaxRootAsync(cancellation)
-				.ConfigureAwait(false);
+			var root = await document.GetSyntaxRootAsync(cancellation).ConfigureAwait(false);
 
-			if (!(root?.FindNode(span) is IdentifierNameSyntax invalidParameterTypeIdentifier))
+			if (root?.FindNode(span) is not IdentifierNameSyntax invalidParameterTypeIdentifier)
 			{
 				return document;
 			}
