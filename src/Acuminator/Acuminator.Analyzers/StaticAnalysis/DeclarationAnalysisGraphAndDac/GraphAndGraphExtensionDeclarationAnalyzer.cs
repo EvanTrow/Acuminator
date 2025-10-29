@@ -102,7 +102,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 			if (graphArgumentIdentifier == null)
 				return;
 
-			var graphTypeArgumentTypeInfo = semanticModel.GetTypeInfo(graphArgumentIdentifier);	
+			var graphTypeArgumentTypeInfo = semanticModel.GetTypeInfo(graphArgumentIdentifier, context.CancellationToken);
 			var graphTypeArgumentType = graphTypeArgumentTypeInfo.Type;
 
 			if (graphTypeArgumentType?.TypeKind != TypeKind.Class || graph.Symbol.Equals(graphTypeArgumentType, SymbolEqualityComparer.Default))
