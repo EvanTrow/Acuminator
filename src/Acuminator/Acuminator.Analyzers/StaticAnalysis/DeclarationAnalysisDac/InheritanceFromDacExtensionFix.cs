@@ -16,7 +16,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
-namespace Acuminator.Analyzers.StaticAnalysis.InheritanceFromPXCacheExtension
+namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 {
 	[ExportCodeFixProvider(LanguageNames.CSharp), Shared]
 	public class InheritanceFromDacExtensionFix : PXCodeFixProvider

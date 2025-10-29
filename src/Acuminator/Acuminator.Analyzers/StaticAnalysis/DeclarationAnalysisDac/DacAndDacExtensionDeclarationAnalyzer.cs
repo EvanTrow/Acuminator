@@ -11,7 +11,7 @@ using Acuminator.Utilities.Roslyn.Semantic.Dac;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Acuminator.Analyzers.StaticAnalysis.InheritanceFromPXCacheExtension
+namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 {
     public class DacAndDacExtensionDeclarationAnalyzer : DacAggregatedAnalyzerBase
 	{

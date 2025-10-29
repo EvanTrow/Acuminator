@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Acuminator.Analyzers.StaticAnalysis.InheritanceFromPXCacheExtension
+namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 {
 	[ExportCodeFixProvider(LanguageNames.CSharp), Shared]
 	public class InheritanceFromDacExtensionMakeSealedFix : PXCodeFixProvider
