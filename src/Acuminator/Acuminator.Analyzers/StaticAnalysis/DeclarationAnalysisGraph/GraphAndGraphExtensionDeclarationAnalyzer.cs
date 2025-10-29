@@ -9,7 +9,7 @@ using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
-using Acuminator.Utilities.Roslyn.Syntax.PXGraph;
+using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -122,7 +122,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraph
 																	  ClassDeclarationSyntax graphNode, CancellationToken cancellation)
 		{
 			var baseGraphTypeInfo = semanticModel != null
-				? GraphSyntaxUtils.GetBaseGraphTypeInfo(semanticModel, pxContext, graphNode, cancellation)
+				? BaseTypeSyntaxUtils.GetBaseGraphTypeInfo(semanticModel, pxContext, graphNode, cancellation)
 				: null;
 
 			if (baseGraphTypeInfo == null)
@@ -130,8 +130,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraph
 
 			var (baseTypeSymbol, baseTypeNode) = baseGraphTypeInfo.Value;
 
-			if (!baseTypeSymbol.IsGraphBaseType() || baseTypeSymbol.TypeArguments.IsDefaultOrEmpty)
+			if (!baseTypeSymbol.IsGraphBaseType() || baseTypeSymbol is not INamedTypeSymbol concreteBaseType || 
+				concreteBaseType.TypeArguments.IsDefaultOrEmpty)
+			{ 
 				return null;
+			}
 
 			var typeArgumentsListNode = baseTypeNode.DescendantNodes()
 													.OfType<TypeArgumentListSyntax>()
@@ -165,8 +168,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraph
 						   graphExtension.Node.GetLocation();
 				}
 
-				var baseGraphExtensionInfo = GraphSyntaxUtils.GetBaseGraphExtensionTypeInfo(semanticModel, pxContext, graphExtension.Node,
-																							context.CancellationToken);
+				var baseGraphExtensionInfo = BaseTypeSyntaxUtils.GetBaseGraphExtensionTypeInfo(semanticModel, pxContext, graphExtension.Node,
+																								context.CancellationToken);
 				var location = baseGraphExtensionInfo?.TypeNode.GetLocation().NullIfLocationKindIsNone();
 				location ??= graphExtension.Node!.Identifier.GetLocation().NullIfLocationKindIsNone() ??
 							 graphExtension.Node.GetLocation();
@@ -178,7 +181,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraph
 																		SemanticModel? semanticModel, PXGraphEventSemanticModel graphExtension)
 		{
 			var baseGraphExtensionInfo = semanticModel != null
-				? GraphSyntaxUtils.GetBaseGraphTypeInfo(semanticModel, pxContext, graphExtension.Node, context.CancellationToken)
+				? BaseTypeSyntaxUtils.GetBaseGraphTypeInfo(semanticModel, pxContext, graphExtension.Node, context.CancellationToken)
 				: null;
 
 			if (baseGraphExtensionInfo == null)
@@ -186,8 +189,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraph
 
 			var (baseExtensionTypeSymbol, baseExtensionTypeNode) = baseGraphExtensionInfo.Value;
 
-			if (!baseExtensionTypeSymbol.IsGraphExtensionBaseType() || baseExtensionTypeSymbol.TypeArguments.IsDefaultOrEmpty)
+			if (!baseExtensionTypeSymbol.IsGraphExtensionBaseType() || baseExtensionTypeSymbol is not INamedTypeSymbol concreteBaseType ||
+				concreteBaseType.TypeArguments.IsDefaultOrEmpty)
+			{ 
 				return;
+			}
 
 			var typeArgumentsListNode = baseExtensionTypeNode.DescendantNodes()
 															 .OfType<TypeArgumentListSyntax>()

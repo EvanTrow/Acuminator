@@ -106,54 +106,5 @@ namespace Acuminator.Utilities.Roslyn.Syntax.PXGraph
 
 			return typeSymbol;
 		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static (INamedTypeSymbol TypeSymbol, TypeSyntax TypeNode)? GetBaseGraphTypeInfo(SemanticModel semanticModel, 
-																								PXContext pxContext, ClassDeclarationSyntax? graphNode,
-																								CancellationToken cancellation) =>
-			GetBaseGraphOrExtensionTypeInfo(semanticModel, pxContext, graphNode, lookForGraphExtension: false, cancellation);
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static (INamedTypeSymbol TypeSymbol, TypeSyntax TypeNode)? GetBaseGraphExtensionTypeInfo(SemanticModel semanticModel,
-																										PXContext pxContext, ClassDeclarationSyntax? graphNode,
-																										CancellationToken cancellation) =>
-			GetBaseGraphOrExtensionTypeInfo(semanticModel, pxContext, graphNode, lookForGraphExtension: true, cancellation);
-
-		private static (INamedTypeSymbol TypeSymbol, TypeSyntax TypeNode)? GetBaseGraphOrExtensionTypeInfo(SemanticModel semanticModel,
-																						PXContext pxContext, ClassDeclarationSyntax? graphNode,
-																						bool lookForGraphExtension,  CancellationToken cancellation)
-		{
-			semanticModel.ThrowOnNull();
-			pxContext.ThrowOnNull();
-
-			if (graphNode?.BaseList == null)
-				return null;
-
-			var baseTypes = graphNode.BaseList.Types;
-
-			if (baseTypes.Count == 0)
-				return null;
-
-			foreach (var typeSyntax in baseTypes)
-			{
-				cancellation.ThrowIfCancellationRequested();
-
-				if (typeSyntax?.Type == null ||
-					semanticModel.GetTypeInfo(typeSyntax.Type).Type is not INamedTypeSymbol baseTypeSymbol)
-				{
-					continue;
-				}
-
-				if (lookForGraphExtension)
-				{
-					if (baseTypeSymbol.IsPXGraphExtension(pxContext))
-						return (baseTypeSymbol, typeSyntax.Type);
-				}
-				else if (baseTypeSymbol.IsPXGraph(pxContext))
-					return (baseTypeSymbol, typeSyntax.Type);
-			}
-
-			return null;
-		}
 	}
 }
