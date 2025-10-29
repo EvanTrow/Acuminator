@@ -142,5 +142,40 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 															 method.Parameters.Length == 1 && pxScreenConfiguration.Equals(method.Parameters[0].Type,
 																														   SymbolEqualityComparer.Default));
 		}
+
+		/// <summary>
+		/// Check whether <paramref name="graphExtension"/> is a terminal graph extension.
+		/// </summary>
+		/// <remarks>
+		/// A <b>terminal graph extension</b> is a graph extension that will be instantiated by Acumatica Framework at runtime during the initialization of the corresponding graph.<br/>
+		///<br/>
+		/// Currently, there are two types of terminal extensions:
+		/// <list type="number">
+		/// <item>
+		/// <b>Non-abstract and non-generic graph extension</b>: A concrete graph extension without generic type parameters.
+		/// </item>
+		/// <item>
+		/// <b>Abstract graph extension with <c>PXProtectedAccessAttribute</c></b>: An abstract graph extension decorated with the <c>PXProtectedAccessAttribute</c> attribute.
+		/// </item>
+		/// </list>
+		/// </remarks>
+		/// <param name="graphExtension">The graph extension to act on.</param>
+		/// <param name="pxContext">Context.</param>
+		/// <returns>
+		/// True if terminal graph extension, false if not.
+		/// </returns>
+		public static bool IsTerminalGraphExtension(this INamedTypeSymbol graphExtension, PXContext pxContext)
+		{
+			pxContext.ThrowOnNull();
+
+			if (!graphExtension.CheckIfNull().TypeParameters.IsDefaultOrEmpty)
+				return false;
+			else if (!graphExtension.IsAbstract)
+				return true;
+
+			var pxProtectedAccessAttribute = pxContext.AttributeTypes.PXProtectedAccessAttribute;
+			return pxProtectedAccessAttribute != null &&
+				   graphExtension.HasAttribute(pxProtectedAccessAttribute, checkOverrides: false);
+		}
 	}
 }

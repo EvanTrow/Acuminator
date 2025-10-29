@@ -26,7 +26,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 				Descriptors.PX1093_GraphDeclarationViolation,
 				Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract,
 				Descriptors.PX1113_SealedGraphsAndGraphExtensions,
-				Descriptors.PX1114_GraphExtensionInheritFromNonAbstractGraphExtension
+				Descriptors.PX1114_GraphExtensionInheritFromNonAbstractGraphExtension,
+				Descriptors.PX1115_NonTerminalBaseGraphExtension
 			);
 
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel graphOrGraphExt)
@@ -141,11 +142,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 		protected virtual void CheckIfGraphExtensionInheritsFromNonAbstractGraphExtension(SymbolAnalysisContext context, PXContext pxContext,
 																			SemanticModel? semanticModel, PXGraphEventSemanticModel graphExtension)
 		{
-			var pxProtectedAccessAttribute = pxContext.AttributeTypes.PXProtectedAccessAttribute;
 			bool isDerivedFromTerminalGraphExtension = 
 				graphExtension.Symbol.GetGraphExtensionBaseTypes()
 									 .OfType<INamedTypeSymbol>()
-									 .Any(baseExtension => IsTerminalGraphExtension(baseExtension, pxProtectedAccessAttribute));
+									 .Any(baseExtension => baseExtension.IsTerminalGraphExtension(pxContext));
 
 			if (!isDerivedFromTerminalGraphExtension)
 				return;
@@ -171,18 +171,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 							 graphExtension.Node.GetLocation();
 				return location;
 			}
-		}
-
-		private static bool IsTerminalGraphExtension(INamedTypeSymbol graphExtension, INamedTypeSymbol? pxProtectedAccessAttribute)
-		{
-			if (!graphExtension.TypeParameters.IsDefaultOrEmpty)
-				return false;
-			else if (!graphExtension.IsAbstract)
-				return true;
-
-			return pxProtectedAccessAttribute != null 
-				? graphExtension.HasAttribute(pxProtectedAccessAttribute, checkOverrides: false)
-				: false;
 		}
 	}
 }
