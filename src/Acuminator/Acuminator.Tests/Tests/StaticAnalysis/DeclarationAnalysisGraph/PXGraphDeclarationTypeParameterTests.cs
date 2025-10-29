@@ -66,6 +66,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph
 			protected override void CheckIfGraphExtensionInheritsFromTerminalGraphExtension(SymbolAnalysisContext context, PXContext pxContext, 
 																				SemanticModel? semanticModel, PXGraphEventSemanticModel graphExtension)
 			{ }
+
+			protected override void CheckIfGraphExtensionHasNonTerminalBaseExtensions(SymbolAnalysisContext context, PXContext pxContext, 
+																				SemanticModel? semanticModel, PXGraphEventSemanticModel graphExtension)
+			{ }
 		}
 	}
 }

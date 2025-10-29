@@ -105,6 +105,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph
 			protected override void CheckIfBaseGraphTypeSpecifyCorrectGraphAsTypeArgument(SymbolAnalysisContext context, PXContext pxContext,
 																			SemanticModel? semanticModel, PXGraphEventSemanticModel graph)
 			{ }
+
+			protected override void CheckIfGraphExtensionHasNonTerminalBaseExtensions(SymbolAnalysisContext context, PXContext pxContext,
+																				SemanticModel? semanticModel, PXGraphEventSemanticModel graphExtension)
+			{ }
 		}
 	}
 }
