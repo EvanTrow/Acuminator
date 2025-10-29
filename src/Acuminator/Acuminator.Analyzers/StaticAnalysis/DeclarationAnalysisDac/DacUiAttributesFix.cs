@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Composition;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,12 +13,13 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Acuminator.Analyzers.StaticAnalysis.DacUiAttributes
+namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 {
-	[ExportCodeFixProvider(LanguageNames.CSharp), Shared]
+	[Shared]
+	[ExportCodeFixProvider(LanguageNames.CSharp)]
 	public class DacUiAttributesFix : PXCodeFixProvider
 	{
-		private enum FixOption
+		private enum FixOption : byte
 		{
 			AddPXCacheNameAttribute,
 			AddPXHiddenAttribute

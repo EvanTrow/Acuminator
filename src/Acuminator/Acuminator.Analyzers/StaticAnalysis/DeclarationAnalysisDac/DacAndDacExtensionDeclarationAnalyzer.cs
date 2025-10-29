@@ -22,6 +22,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 				Descriptors.PX1009_InheritanceFromDacExtension,
 				Descriptors.PX1011_NotSealedDacExtension,
 				Descriptors.PX1028_ConstructorInDacDeclaration,
+				Descriptors.PX1094_DacShouldHaveUiAttribute,
 				Descriptors.PX1115_NonTerminalBaseDacExtension
 			);
 
@@ -32,7 +33,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			if (dacOrDacExtension.DacType == DacType.DacExtension)
+			if (dacOrDacExtension.DacType == DacType.Dac)
+			{
+				CheckAttributesDeclaredOnDac(context, pxContext, dacOrDacExtension);
+			}
+			else
 			{
 				CheckIfDacExtensionForInheritanceIssues(context, pxContext, dacOrDacExtension);
 
@@ -55,6 +60,40 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 					Diagnostic.Create(Descriptors.PX1028_ConstructorInDacDeclaration, location),
 					pxContext.CodeAnalysisSettings);
 			}
+		}
+
+		protected virtual void CheckAttributesDeclaredOnDac(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dac)
+		{
+			if (dac.IsMappedCacheExtension)
+				return;
+
+			bool hasPXCacheNameAttribute = false;
+			bool hasPXHiddenAttribute = false;
+			var dacAttributes = dac.Attributes;
+
+			if (!dacAttributes.IsDefaultOrEmpty)
+			{
+				foreach (var attributeInfo in dac.Attributes)
+				{
+					context.CancellationToken.ThrowIfCancellationRequested();
+
+					if (attributeInfo.AttributeType == null)
+						continue;
+
+					hasPXCacheNameAttribute = hasPXCacheNameAttribute || attributeInfo.IsPXCacheName;
+					hasPXHiddenAttribute	= hasPXHiddenAttribute || attributeInfo.IsPXHidden;
+
+					if (hasPXCacheNameAttribute || hasPXHiddenAttribute)
+						return;
+				}
+			}
+
+			var location = dac.Node!.Identifier.GetLocation().NullIfLocationKindIsNone() ??
+						   dac.Node.GetLocation();
+			var diagnostic = Diagnostic.Create(
+											Descriptors.PX1094_DacShouldHaveUiAttribute, location);
+
+			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 
 		private void CheckIfDacExtensionForInheritanceIssues(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacExtension)
