@@ -47,7 +47,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraph
 			}
 			else
 			{
-				CheckIfGraphExtensionInheritsFromNonAbstractGraphExtension(context, pxContext, semanticModel, graphOrGraphExt);
+				CheckIfGraphExtensionInheritsFromTerminalGraphExtension(context, pxContext, semanticModel, graphOrGraphExt);
 
 				context.CancellationToken.ThrowIfCancellationRequested();
 				CheckIfGraphExtensionHasNonTerminalBaseExtensions(context, pxContext, semanticModel, graphOrGraphExt);
@@ -140,7 +140,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraph
 			return typeArgumentsListNode?.Arguments.FirstOrDefault();
 		}
 
-		protected virtual void CheckIfGraphExtensionInheritsFromNonAbstractGraphExtension(SymbolAnalysisContext context, PXContext pxContext,
+		protected virtual void CheckIfGraphExtensionInheritsFromTerminalGraphExtension(SymbolAnalysisContext context, PXContext pxContext,
 																			SemanticModel? semanticModel, PXGraphEventSemanticModel graphExtension)
 		{
 			bool isDerivedFromTerminalGraphExtension = 
