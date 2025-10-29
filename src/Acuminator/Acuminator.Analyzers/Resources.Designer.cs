@@ -2340,6 +2340,24 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Only non-abstract DAC extensions can be used as base DAC extensions.
+        /// </summary>
+        public static string PX1115TitleDacExtension {
+            get {
+                return ResourceManager.GetString("PX1115TitleDacExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only terminal graph extensions can be used as base graph extensions.
+        /// </summary>
+        public static string PX1115TitleGraphExtension {
+            get {
+                return ResourceManager.GetString("PX1115TitleGraphExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Suppress the {0} diagnostic with Acuminator.
         /// </summary>
         public static string SuppressDiagnosticGroupCodeActionTitle {

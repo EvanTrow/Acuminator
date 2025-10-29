@@ -547,5 +547,13 @@ namespace Acuminator.Analyzers.StaticAnalysis
 
 		public static DiagnosticDescriptor PX1114_GraphExtensionInheritFromNonAbstractGraphExtension { get; } =
 			Rule("PX1114", nameof(Resources.PX1114Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1114);
+
+		public static DiagnosticDescriptor PX1115_NonTerminalBaseGraphExtension { get; } =
+			Rule("PX1115", nameof(Resources.PX1115TitleGraphExtension).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error,
+				 DiagnosticsShortName.PX1115GraphExtension);
+
+		public static DiagnosticDescriptor PX1115_NonTerminalBaseDacExtension { get; } =
+			Rule("PX1115", nameof(Resources.PX1115TitleDacExtension).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, 
+				DiagnosticsShortName.PX1115DacExtension);
 	}
 }
