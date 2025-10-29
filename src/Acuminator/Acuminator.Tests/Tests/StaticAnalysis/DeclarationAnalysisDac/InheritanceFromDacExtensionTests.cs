@@ -1,6 +1,6 @@
 ﻿using Acuminator.Analyzers.StaticAnalysis;
 using Acuminator.Analyzers.StaticAnalysis.Dac;
-using Acuminator.Analyzers.StaticAnalysis.InheritanceFromPXCacheExtension;
+using Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
@@ -51,22 +51,4 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.InheritanceFromPXCacheExtension
 		    VerifyCSharpFix(actual, expected);
 	    }
     }
-
-	public class InheritanceFromPXCacheExtensionMakeSealedTests : CodeFixVerifier
-	{
-		protected override CodeFixProvider GetCSharpCodeFixProvider() => new InheritanceFromDacExtensionMakeSealedFix();
-
-		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
-			new DacAnalyzersAggregator(
-				CodeAnalysisSettings.Default.WithStaticAnalysisEnabled()
-											.WithSuppressionMechanismDisabled(),
-				new DacAndDacExtensionDeclarationAnalyzer());
-
-		[Theory]
-		[EmbeddedFileData("InheritanceFromPXCacheExtensionMakeSealed_Bad.cs", "InheritanceFromPXCacheExtensionMakeSealed_Bad_Expected.cs")]
-		public void TestCodeFix(string actual, string expected)
-		{
-			VerifyCSharpFix(actual, expected);
-		}
-	}
 }
