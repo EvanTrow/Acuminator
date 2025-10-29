@@ -2331,7 +2331,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Graph extension should not inherit from non-abstract graph extensions.
+        ///   Looks up a localized string similar to Graph extension should not inherit from non-terminal graph extensions.
         /// </summary>
         public static string PX1114Title {
             get {

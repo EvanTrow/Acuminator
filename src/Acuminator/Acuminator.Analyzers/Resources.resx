@@ -882,7 +882,7 @@ Reason: {2}</value>
     <value>Graphs and graph extensions should not be sealed types</value>
   </data>
   <data name="PX1114Title" xml:space="preserve">
-    <value>Graph extension should not inherit from non-abstract graph extensions</value>
+    <value>Graph extension should not inherit from non-terminal graph extensions</value>
   </data>
   <data name="SuppressDiagnosticGroupCodeActionTitle" xml:space="preserve">
     <value>Suppress the {0} diagnostic with Acuminator</value>
