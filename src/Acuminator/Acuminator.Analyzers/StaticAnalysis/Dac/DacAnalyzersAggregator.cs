@@ -50,7 +50,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 			new NonPublicGraphAndDacAndExtensionsAnalyzer(),
 			new ForbiddenFieldsInDacAnalyzer(),
 			new DacUiAttributesAnalyzer(),
-			new InheritanceFromPXCacheExtensionAnalyzer(),
+			new DacAndDacExtensionDeclarationAnalyzer(),
 			new NoBqlFieldForDacFieldPropertyAnalyzer(),
 			new MissingBqlFieldRedeclarationInDerivedDacAnalyzer(),
 			new MissingMandatoryDacFieldsAnalyzer(),

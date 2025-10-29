@@ -13,7 +13,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.InheritanceFromPXCacheExtension
 {
-    public class InheritanceFromPXCacheExtensionAnalyzer : DacAggregatedAnalyzerBase
+    public class DacAndDacExtensionDeclarationAnalyzer : DacAggregatedAnalyzerBase
 	{
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => 
 			ImmutableArray.Create

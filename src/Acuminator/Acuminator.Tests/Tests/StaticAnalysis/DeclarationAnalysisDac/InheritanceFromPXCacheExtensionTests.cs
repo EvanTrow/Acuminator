@@ -18,7 +18,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.InheritanceFromPXCacheExtension
 			new DacAnalyzersAggregator(
 				CodeAnalysisSettings.Default.WithStaticAnalysisEnabled()
 											.WithSuppressionMechanismDisabled(),
-				new InheritanceFromPXCacheExtensionAnalyzer());
+				new DacAndDacExtensionDeclarationAnalyzer());
 
 		[Theory]
         [EmbeddedFileData("InheritanceFromPXCacheExtension_Good.cs")]
@@ -60,7 +60,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.InheritanceFromPXCacheExtension
 			new DacAnalyzersAggregator(
 				CodeAnalysisSettings.Default.WithStaticAnalysisEnabled()
 											.WithSuppressionMechanismDisabled(),
-				new InheritanceFromPXCacheExtensionAnalyzer());
+				new DacAndDacExtensionDeclarationAnalyzer());
 
 		[Theory]
 		[EmbeddedFileData("InheritanceFromPXCacheExtensionMakeSealed_Bad.cs", "InheritanceFromPXCacheExtensionMakeSealed_Bad_Expected.cs")]
