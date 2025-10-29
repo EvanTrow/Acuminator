@@ -22,28 +22,50 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 				Descriptors.PX1011_NotSealedDacExtension
 			);
 
-		public override bool ShouldAnalyze(PXContext pxContext, DacSemanticModel dac) =>
-			base.ShouldAnalyze(pxContext, dac) &&
-			dac.DacType == DacType.DacExtension && 
-			dac.Name != TypeNames.PXCacheExtension && !dac.IsMappedCacheExtension;
-
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dac)
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacOrDacExtension)
 		{
-			if (dac.Symbol.BaseType?.Name == TypeNames.PXCacheExtension)
+			context.CancellationToken.ThrowIfCancellationRequested();
+
+			if (dacOrDacExtension.DacType == DacType.DacExtension)
 			{
-				if (!dac.Symbol.IsSealed)
-				{
-					context.ReportDiagnosticWithSuppressionCheck(
-						Diagnostic.Create(Descriptors.PX1011_NotSealedDacExtension, dac.Symbol.Locations.First()),
-						pxContext.CodeAnalysisSettings);
-				}
+				CheckIfDacExtensionForInheritanceIssues(context, pxContext, dacOrDacExtension);
+			}
+		}
+
+		private void CheckIfDacExtensionForInheritanceIssues(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacExtension)
+		{
+			if (dacExtension.Name == TypeNames.PXCacheExtension || dacExtension.IsMappedCacheExtension)
+				return;
+
+			var baseType = dacExtension.Symbol.BaseType;
+
+			if (baseType != null && baseType.IsDacExtensionBaseType())
+			{
+				CheckIfDacExtensionIsSealed(context, pxContext, dacExtension);
 			}
 			else
 			{
+				ReportDacExtensionInheritance(context, pxContext, dacExtension);
+			}
+		}
+
+		protected virtual void CheckIfDacExtensionIsSealed(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacExtension)
+		{
+			if (!dacExtension.Symbol.IsSealed)
+			{
+				var location = dacExtension.Symbol.Locations.FirstOrDefault();
 				context.ReportDiagnosticWithSuppressionCheck(
-					Diagnostic.Create(Descriptors.PX1009_InheritanceFromDacExtension, dac.Symbol.Locations.First()),
+					Diagnostic.Create(Descriptors.PX1011_NotSealedDacExtension, location),
 					pxContext.CodeAnalysisSettings);
 			}
 		}
-    }
+
+		protected virtual void ReportDacExtensionInheritance(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacExtension)
+		{
+			var location = dacExtension.Symbol.Locations.FirstOrDefault();
+			context.ReportDiagnosticWithSuppressionCheck(
+					Diagnostic.Create(Descriptors.PX1009_InheritanceFromDacExtension, location),
+					pxContext.CodeAnalysisSettings);
+		}
+	}
 }
