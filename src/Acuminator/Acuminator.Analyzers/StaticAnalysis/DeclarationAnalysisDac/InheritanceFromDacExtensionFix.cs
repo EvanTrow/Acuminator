@@ -22,7 +22,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 	public class InheritanceFromDacExtensionFix : PXCodeFixProvider
 	{
 		public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-			ImmutableArray.Create(Descriptors.PX1009_InheritanceFromPXCacheExtension.Id);
+			ImmutableArray.Create(Descriptors.PX1009_InheritanceFromDacExtension.Id);
 
 		protected override async Task RegisterCodeFixesForDiagnosticAsync(CodeFixContext context, Diagnostic diagnostic)
 		{

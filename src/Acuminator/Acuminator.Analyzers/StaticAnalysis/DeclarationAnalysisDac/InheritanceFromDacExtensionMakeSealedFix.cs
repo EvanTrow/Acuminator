@@ -15,7 +15,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 	public class InheritanceFromDacExtensionMakeSealedFix : PXCodeFixProvider
 	{
 		public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-			ImmutableArray.Create(Descriptors.PX1011_InheritanceFromPXCacheExtension.Id);
+			ImmutableArray.Create(Descriptors.PX1011_NotSealedDacExtension.Id);
 
 		protected override async Task RegisterCodeFixesForDiagnosticAsync(CodeFixContext context, Diagnostic diagnostic)
 		{

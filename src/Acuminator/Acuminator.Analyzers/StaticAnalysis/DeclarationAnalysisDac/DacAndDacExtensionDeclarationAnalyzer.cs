@@ -18,8 +18,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => 
 			ImmutableArray.Create
 			(
-				Descriptors.PX1009_InheritanceFromPXCacheExtension,
-				Descriptors.PX1011_InheritanceFromPXCacheExtension
+				Descriptors.PX1009_InheritanceFromDacExtension,
+				Descriptors.PX1011_NotSealedDacExtension
 			);
 
 		public override bool ShouldAnalyze(PXContext pxContext, DacSemanticModel dac) =>
@@ -34,14 +34,14 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 				if (!dac.Symbol.IsSealed)
 				{
 					context.ReportDiagnosticWithSuppressionCheck(
-						Diagnostic.Create(Descriptors.PX1011_InheritanceFromPXCacheExtension, dac.Symbol.Locations.First()),
+						Diagnostic.Create(Descriptors.PX1011_NotSealedDacExtension, dac.Symbol.Locations.First()),
 						pxContext.CodeAnalysisSettings);
 				}
 			}
 			else
 			{
 				context.ReportDiagnosticWithSuppressionCheck(
-					Diagnostic.Create(Descriptors.PX1009_InheritanceFromPXCacheExtension, dac.Symbol.Locations.First()),
+					Diagnostic.Create(Descriptors.PX1009_InheritanceFromDacExtension, dac.Symbol.Locations.First()),
 					pxContext.CodeAnalysisSettings);
 			}
 		}

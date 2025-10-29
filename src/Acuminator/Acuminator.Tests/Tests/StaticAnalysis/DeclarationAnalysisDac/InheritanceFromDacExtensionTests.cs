@@ -32,9 +32,9 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.InheritanceFromPXCacheExtension
 		public void TestDiagnostic(string actual)
         {
             VerifyCSharpDiagnostic(actual,
-	            Descriptors.PX1009_InheritanceFromPXCacheExtension.CreateFor(10, 15),
-	            Descriptors.PX1011_InheritanceFromPXCacheExtension.CreateFor(12, 15),
-	            Descriptors.PX1011_InheritanceFromPXCacheExtension.CreateFor(13, 15));
+	            Descriptors.PX1009_InheritanceFromDacExtension.CreateFor(10, 15),
+	            Descriptors.PX1011_NotSealedDacExtension.CreateFor(12, 15),
+	            Descriptors.PX1011_NotSealedDacExtension.CreateFor(13, 15));
         }
 
 	    [Theory]
