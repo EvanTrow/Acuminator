@@ -17,7 +17,7 @@ using Xunit;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraphAndDac
+namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph
 {
 	public class SealedGraphsAndGraphExtensionsTests : CodeFixVerifier
 	{

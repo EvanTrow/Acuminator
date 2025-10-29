@@ -16,7 +16,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 using Xunit;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraphAndDac
+namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph
 {
 	public class PXGraphDeclarationTypeParameterTests : CodeFixVerifier
 	{
