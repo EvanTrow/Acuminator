@@ -1,7 +1,7 @@
 using PX.Data;
 using PX.Data.DependencyInjection;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraphAndDac.Sources
+namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph.Sources
 {
 	public class SomeGraph : PXGraph<SomeGraph>
 	{

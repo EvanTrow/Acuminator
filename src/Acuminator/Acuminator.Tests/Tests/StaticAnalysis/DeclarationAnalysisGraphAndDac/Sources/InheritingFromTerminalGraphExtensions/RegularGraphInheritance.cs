@@ -1,6 +1,6 @@
 using PX.Data;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraphAndDac.Sources
+namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph.Sources
 {
 	// Graph inheriting from another non-abstract graph - should NOT report diagnostic
 	public class DerivedGraph : RegularGraph

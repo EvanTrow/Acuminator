@@ -1,6 +1,6 @@
 using PX.Data;
 
-namespace PX.Objects
+namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph.Sources
 {
 	public class GenericGraphExtension<TGraph> : PXGraphExtension<TGraph>
 	where TGraph : PXGraph

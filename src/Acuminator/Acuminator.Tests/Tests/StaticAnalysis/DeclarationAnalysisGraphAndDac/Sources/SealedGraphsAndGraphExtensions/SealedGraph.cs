@@ -1,6 +1,6 @@
 using PX.Data;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraphAndDac.Sources
+namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph.Sources
 {
 	public sealed class SealedGraph<TDac> : PXGraph<SealedGraph<TDac>>
 	{
