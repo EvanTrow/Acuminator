@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Xunit;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.InheritanceFromPXCacheExtension
+namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisDac
 {
     public class InheritanceFromDacExtensionTests : CodeFixVerifier
     {

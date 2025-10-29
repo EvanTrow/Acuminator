@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 {
 	[ExportCodeFixProvider(LanguageNames.CSharp), Shared]
-	public class InheritanceFromDacExtensionMakeSealedFix : PXCodeFixProvider
+	public class MakeSealedDacExtensionFix : PXCodeFixProvider
 	{
 		public override ImmutableArray<string> FixableDiagnosticIds { get; } =
 			ImmutableArray.Create(Descriptors.PX1011_NotSealedDacExtension.Id);

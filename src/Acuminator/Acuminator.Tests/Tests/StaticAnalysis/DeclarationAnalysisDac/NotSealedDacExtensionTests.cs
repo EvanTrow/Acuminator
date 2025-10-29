@@ -9,11 +9,11 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 using Xunit;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.InheritanceFromPXCacheExtension
+namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisDac
 {
 	public class NotSealedDacExtensionTests : CodeFixVerifier
 	{
-		protected override CodeFixProvider GetCSharpCodeFixProvider() => new InheritanceFromDacExtensionMakeSealedFix();
+		protected override CodeFixProvider GetCSharpCodeFixProvider() => new MakeSealedDacExtensionFix();
 
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
 			new DacAnalyzersAggregator(
