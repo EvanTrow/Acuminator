@@ -19,7 +19,7 @@ using Microsoft.CodeAnalysis.Editing;
 namespace Acuminator.Analyzers.StaticAnalysis.InheritanceFromPXCacheExtension
 {
 	[ExportCodeFixProvider(LanguageNames.CSharp), Shared]
-	public class InheritanceFromPXCacheExtensionFix : PXCodeFixProvider
+	public class InheritanceFromDacExtensionFix : PXCodeFixProvider
 	{
 		public override ImmutableArray<string> FixableDiagnosticIds { get; } =
 			ImmutableArray.Create(Descriptors.PX1009_InheritanceFromPXCacheExtension.Id);

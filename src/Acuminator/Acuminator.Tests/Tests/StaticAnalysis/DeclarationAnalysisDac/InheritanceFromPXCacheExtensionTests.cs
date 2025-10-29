@@ -10,9 +10,9 @@ using Xunit;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.InheritanceFromPXCacheExtension
 {
-    public class InheritanceFromPXCacheExtensionTests : CodeFixVerifier
+    public class InheritanceFromDacExtensionTests : CodeFixVerifier
     {
-	    protected override CodeFixProvider GetCSharpCodeFixProvider() => new InheritanceFromPXCacheExtensionFix();
+	    protected override CodeFixProvider GetCSharpCodeFixProvider() => new InheritanceFromDacExtensionFix();
 	    
 	    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
 			new DacAnalyzersAggregator(
@@ -54,7 +54,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.InheritanceFromPXCacheExtension
 
 	public class InheritanceFromPXCacheExtensionMakeSealedTests : CodeFixVerifier
 	{
-		protected override CodeFixProvider GetCSharpCodeFixProvider() => new InheritanceFromPXCacheExtensionMakeSealedFix();
+		protected override CodeFixProvider GetCSharpCodeFixProvider() => new InheritanceFromDacExtensionMakeSealedFix();
 
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
 			new DacAnalyzersAggregator(
