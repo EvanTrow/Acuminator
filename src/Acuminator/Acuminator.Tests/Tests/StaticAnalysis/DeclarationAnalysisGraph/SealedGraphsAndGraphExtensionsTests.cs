@@ -32,8 +32,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph
 
 		[Theory]
 		[EmbeddedFileData(@"SealedGraphsAndGraphExtensions\SealedGraph.cs")]
-		public async Task SealedGraph(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task SealedGraph(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1113_SealedGraphsAndGraphExtensions.CreateFor(5, 9),
 				Descriptors.PX1113_SealedGraphsAndGraphExtensions.CreateFor(9, 9),
 				Descriptors.PX1113_SealedGraphsAndGraphExtensions.CreateFor(15, 9),
@@ -42,38 +42,38 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph
 
 		[Theory]
 		[EmbeddedFileData(@"SealedGraphsAndGraphExtensions\SealedGraphExtension.cs")]
-		public async Task SealedGraphExtension(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task SealedGraphExtension(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1113_SealedGraphsAndGraphExtensions.CreateFor(6, 9),
 				Descriptors.PX1113_SealedGraphsAndGraphExtensions.CreateFor(11, 9));
 
 		[Theory]
 		[EmbeddedFileData(@"SealedGraphsAndGraphExtensions\RegularGraphAndGraphExtension.cs")]
-		public async Task Regular_GraphsAndGraphExtensions_NoDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task Regular_GraphsAndGraphExtensions_NoDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"SealedGraphsAndGraphExtensions\SealedGraph_Expected.cs")]
-		public async Task SealedGraph_AfterCodeFix_NoDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task SealedGraph_AfterCodeFix_NoDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"SealedGraphsAndGraphExtensions\SealedGraphExtension_Expected.cs")]
-		public async Task SealedGraphExtension_AfterCodeFix_NoDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task SealedGraphExtension_AfterCodeFix_NoDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		#region Code Fix Tests
 		[Theory]
 		[EmbeddedFileData(@"SealedGraphsAndGraphExtensions\SealedGraph.cs", 
 						  @"SealedGraphsAndGraphExtensions\SealedGraph_Expected.cs")]
-		public async Task Sealed_Graph_CodeFix_RemoveSealed(string source, string expected) =>
-			await VerifyCSharpFixAsync(source, expected);
+		public Task Sealed_Graph_CodeFix_RemoveSealed(string source, string expected) =>
+			VerifyCSharpFixAsync(source, expected);
 
 		[Theory]
 		[EmbeddedFileData(@"SealedGraphsAndGraphExtensions\SealedGraphExtension.cs", 
 						  @"SealedGraphsAndGraphExtensions\SealedGraphExtension_Expected.cs")]
-		public async Task Sealed_GraphExtension_CodeFix_RemoveSealed(string source, string expected) =>
-			await VerifyCSharpFixAsync(source, expected);
+		public Task Sealed_GraphExtension_CodeFix_RemoveSealed(string source, string expected) =>
+			VerifyCSharpFixAsync(source, expected);
 		#endregion
 
 		private sealed class GraphAndGraphExtensionDeclarationAnalyzerForPX1113Tests : GraphAndGraphExtensionDeclarationAnalyzer

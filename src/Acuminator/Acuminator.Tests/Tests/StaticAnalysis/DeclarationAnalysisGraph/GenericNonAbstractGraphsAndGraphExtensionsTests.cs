@@ -33,8 +33,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph
 
 		[Theory]
 		[EmbeddedFileData(@"GenericNonAbstractGraphsAndGraphExtensions\GenericGraph.cs")]
-		public async Task GenericGraph_NonAbstract(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GenericGraph_NonAbstract(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract.CreateFor(5, 15),
 				Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract.CreateFor(9, 15),
 				Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract.CreateFor(15, 22),
@@ -42,48 +42,48 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph
 
 		[Theory]
 		[EmbeddedFileData(@"GenericNonAbstractGraphsAndGraphExtensions\GenericGraphExtension.cs")]
-		public async Task GenericGraphExtension_NonAbstract(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GenericGraphExtension_NonAbstract(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract.CreateFor(5, 15),
 				Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract.CreateFor(10, 15));
 
 		[Theory]
 		[EmbeddedFileData(@"GenericNonAbstractGraphsAndGraphExtensions\GenericPartialGraphAndGraphExtension.cs")]
-		public async Task GenericPartial_GraphAndGraphExtensions_NonAbstract(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GenericPartial_GraphAndGraphExtensions_NonAbstract(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract.CreateFor(5, 23),
 				Descriptors.PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract.CreateFor(15, 23));
 
 		#region No Diagnostic Scenarios
 		[Theory]
 		[EmbeddedFileData(@"GenericNonAbstractGraphsAndGraphExtensions\AbstractGenericGraphAndGraphExtension.cs")]
-		public async Task AbstractGenericGraph_NoDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task AbstractGenericGraph_NoDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"GenericNonAbstractGraphsAndGraphExtensions\NonGenericGraphAndGraphExtension.cs")]
-		public async Task NonGenericGraph_NoDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task NonGenericGraph_NoDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 		#endregion
 
 		#region Code Fix Tests
 		[Theory]
 		[EmbeddedFileData(@"GenericNonAbstractGraphsAndGraphExtensions\GenericGraph.cs", 
 						  @"GenericNonAbstractGraphsAndGraphExtensions\GenericGraph_Expected.cs")]
-		public async Task Generic_Graph_CodeFix_AddAbstract(string source, string expected) =>
-			await VerifyCSharpFixAsync(source, expected);
+		public Task Generic_Graph_CodeFix_AddAbstract(string source, string expected) =>
+			VerifyCSharpFixAsync(source, expected);
 
 		[Theory]
 		[EmbeddedFileData(@"GenericNonAbstractGraphsAndGraphExtensions\GenericGraphExtension.cs", 
 						  @"GenericNonAbstractGraphsAndGraphExtensions\GenericGraphExtension_Expected.cs")]
-		public async Task Generic_GraphExtension_CodeFix_AddAbstract(string source, string expected) =>
-			await VerifyCSharpFixAsync(source, expected);
+		public Task Generic_GraphExtension_CodeFix_AddAbstract(string source, string expected) =>
+			VerifyCSharpFixAsync(source, expected);
 
 		[Theory]
 		[EmbeddedFileData(@"GenericNonAbstractGraphsAndGraphExtensions\GenericPartialGraphAndGraphExtension.cs",
 						  @"GenericNonAbstractGraphsAndGraphExtensions\GenericPartialGraphAndGraphExtension_Expected.cs")]
-		public async Task GenericPartial_GraphAndGraphExtensions_CodeFix_AddAbstract(string source, string expected) =>
-			await VerifyCSharpFixAsync(source, expected);
+		public Task GenericPartial_GraphAndGraphExtensions_CodeFix_AddAbstract(string source, string expected) =>
+			VerifyCSharpFixAsync(source, expected);
 		#endregion
 
 		private sealed class GraphAndGraphExtensionDeclarationAnalyzerForPX1112Tests : GraphAndGraphExtensionDeclarationAnalyzer

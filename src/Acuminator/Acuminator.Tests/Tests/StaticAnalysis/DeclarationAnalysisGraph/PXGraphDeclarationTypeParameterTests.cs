@@ -31,21 +31,21 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph
 
 		[Theory]
 		[EmbeddedFileData(@"GraphDeclarationTypeParameter\Graph_Bad.cs")]
-		public async Task Graph_ReportsDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task Graph_ReportsDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1093_GraphDeclarationViolation.CreateFor(11, 35),
 				Descriptors.PX1093_GraphDeclarationViolation.CreateFor(15, 39),
 				Descriptors.PX1093_GraphDeclarationViolation.CreateFor(19, 33));
 
 		[Theory]
 		[EmbeddedFileData(@"GraphDeclarationTypeParameter\Graph_Good.cs")]
-		public async Task Graph_AfterCodeFix_NoDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task Graph_AfterCodeFix_NoDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"GraphDeclarationTypeParameter\Graph_Bad.cs", @"GraphDeclarationTypeParameter\Graph_Good.cs")]
-		public async Task Graph_IncorrectTypeArgument_In_BaseType_CodeFix(string actual, string expected) =>
-			await VerifyCSharpFixAsync(actual, expected);
+		public Task Graph_IncorrectTypeArgument_In_BaseType_CodeFix(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected);
 
 		private sealed class GraphAndGraphExtensionDeclarationAnalyzerForPX1093Tests : GraphAndGraphExtensionDeclarationAnalyzer
 		{

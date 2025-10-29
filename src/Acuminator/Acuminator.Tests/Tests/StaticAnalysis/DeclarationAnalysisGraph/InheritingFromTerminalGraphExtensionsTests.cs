@@ -28,36 +28,36 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph
 
 		[Theory]
 		[EmbeddedFileData(@"InheritingFromTerminalGraphExtensions\InheritFromAbstractOrGenericGraphExtension.cs")]
-		public async Task InheritFrom_Abstract_Or_Generic_GraphExtension_NoDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task InheritFrom_Abstract_Or_Generic_GraphExtension_NoDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"InheritingFromTerminalGraphExtensions\RegularGraphInheritance.cs")]
-		public async Task RegularGraph_InheritanceScenarios_NoDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task RegularGraph_InheritanceScenarios_NoDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"InheritingFromTerminalGraphExtensions\FirstLevelGraphExtension.cs")]
-		public async Task FirstLevel_GraphExtension_NoDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task FirstLevel_GraphExtension_NoDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"InheritingFromTerminalGraphExtensions\InheritFromNonAbstractExtension.cs")]
-		public async Task InheritFrom_NonAbstract_GraphExtension(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task InheritFrom_NonAbstract_GraphExtension(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1114_GraphExtensionInheritFromNonAbstractGraphExtension.CreateFor(19, 39));
 
 		[Theory]
 		[EmbeddedFileData(@"InheritingFromTerminalGraphExtensions\InheritFromNonAbstractExtensionIndirectly.cs",
 						  @"InheritingFromTerminalGraphExtensions\InheritFromNonAbstractExtensionIndirectly.BaseTypes.cs")]
-		public async Task InheritFrom_NonAbstract_GraphExtension_Indirectly(string source, string baseSource) =>
-			await VerifyCSharpDiagnosticAsync(source, baseSource,
+		public Task InheritFrom_NonAbstract_GraphExtension_Indirectly(string source, string baseSource) =>
+			VerifyCSharpDiagnosticAsync(source, baseSource,
 				Descriptors.PX1114_GraphExtensionInheritFromNonAbstractGraphExtension.CreateFor(6, 43));
 
 		[Theory]
 		[EmbeddedFileData(@"InheritingFromTerminalGraphExtensions\InheritFromPXProtectedAccessExtension.cs")]
-		public async Task GraphExtension_InheritingFromPXProtectedAccessExtension(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task GraphExtension_InheritingFromPXProtectedAccessExtension(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1114_GraphExtensionInheritFromNonAbstractGraphExtension.CreateFor(19, 47));
 
 		private sealed class GraphAndGraphExtensionDeclarationAnalyzerForPX1114Tests : GraphAndGraphExtensionDeclarationAnalyzer
