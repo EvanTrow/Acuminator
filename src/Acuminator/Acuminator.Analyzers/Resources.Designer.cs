@@ -732,7 +732,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Constructors in DACs are prohibited.
+        ///   Looks up a localized string similar to Constructors in DACs and DAC extensions are prohibited.
         /// </summary>
         public static string PX1028Title {
             get {
