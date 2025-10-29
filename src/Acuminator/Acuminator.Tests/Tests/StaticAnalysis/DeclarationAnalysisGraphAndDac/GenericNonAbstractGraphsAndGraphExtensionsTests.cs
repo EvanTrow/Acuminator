@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis;
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
-using Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac;
+using Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraph;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;

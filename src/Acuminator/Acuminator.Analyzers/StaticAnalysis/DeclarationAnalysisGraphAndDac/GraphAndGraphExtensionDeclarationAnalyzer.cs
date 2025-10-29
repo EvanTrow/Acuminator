@@ -16,7 +16,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
+namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraph
 {
 	public class GraphAndGraphExtensionDeclarationAnalyzer : PXGraphAggregatedAnalyzerBase
 	{

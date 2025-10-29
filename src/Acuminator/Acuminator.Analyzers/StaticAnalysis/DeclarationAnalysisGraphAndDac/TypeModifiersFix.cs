@@ -18,7 +18,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
+namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraph
 {
 	[Shared]
 	[ExportCodeFixProvider(LanguageNames.CSharp)]

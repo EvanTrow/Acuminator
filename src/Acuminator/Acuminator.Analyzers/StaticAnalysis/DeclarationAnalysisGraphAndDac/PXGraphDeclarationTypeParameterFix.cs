@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
+namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraph
 {
 	[Shared]
 	[ExportCodeFixProvider(LanguageNames.CSharp)]
