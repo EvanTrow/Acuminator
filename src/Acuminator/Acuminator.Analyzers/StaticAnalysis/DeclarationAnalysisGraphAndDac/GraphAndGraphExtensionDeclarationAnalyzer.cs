@@ -126,10 +126,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 				return null;
 
 			var (baseTypeSymbol, baseTypeNode) = baseGraphTypeInfo.Value;
-			var isGraphBaseType = baseTypeSymbol.ConstructedFrom.Equals(pxContext.PXGraph.GenericTypeGraph, SymbolEqualityComparer.Default) ||
-								  baseTypeSymbol.ConstructedFrom.Equals(pxContext.PXGraph.GenericTypeGraphDac, SymbolEqualityComparer.Default) ||
-								  baseTypeSymbol.ConstructedFrom.Equals(pxContext.PXGraph.GenericTypeGraphDacField, SymbolEqualityComparer.Default);
-			if (!isGraphBaseType)
+
+			if (!baseTypeSymbol.IsGraphBaseType() || baseTypeSymbol.TypeArguments.IsDefaultOrEmpty)
 				return null;
 
 			var typeArgumentsListNode = baseTypeNode.DescendantNodes()
