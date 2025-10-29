@@ -3,7 +3,6 @@ using System.Linq;
 
 using Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator;
 using Acuminator.Analyzers.StaticAnalysis.AutoNumberAttribute;
-using Acuminator.Analyzers.StaticAnalysis.ConstructorInDac;
 using Acuminator.Analyzers.StaticAnalysis.DacExtensionDefaultAttribute;
 using Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch;
 using Acuminator.Analyzers.StaticAnalysis.DacKeyFieldDeclaration;
@@ -45,7 +44,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 			new DacPropertyAttributesAnalyzer(),
 			new DacAutoNumberAttributeAnalyzer(),
 			new DacNonAbstractFieldTypeAnalyzer(),
-			new ConstructorInDacAnalyzer(),
 			new UnderscoresInDacAnalyzer(),
 			new NonPublicGraphAndDacAndExtensionsAnalyzer(),
 			new ForbiddenFieldsInDacAnalyzer(),

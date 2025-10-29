@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Acuminator.Analyzers.StaticAnalysis.ConstructorInDac
+namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 {
 	[Shared]
 	[ExportCodeFixProvider(LanguageNames.CSharp)]
@@ -33,12 +33,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.ConstructorInDac
 
 		private async Task<Document> DeleteConstructorsAsync(Document document, TextSpan span, CancellationToken cancellationToken)
 		{
+			cancellationToken.ThrowIfCancellationRequested();
+
 			SyntaxNode? root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 			SyntaxNode? diagnosticNode = root?.FindNode(span);
 
-			if (diagnosticNode == null || cancellationToken.IsCancellationRequested)
+			if (diagnosticNode == null)
 				return document;
 
+			cancellationToken.ThrowIfCancellationRequested();
 			var modifiedRoot = root!.RemoveNode(diagnosticNode, SyntaxRemoveOptions.KeepTrailingTrivia | SyntaxRemoveOptions.KeepLeadingTrivia);
 
 			return document.WithSyntaxRoot(modifiedRoot!);
