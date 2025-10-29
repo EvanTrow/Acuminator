@@ -48,6 +48,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 			else
 			{
 				CheckIfGraphExtensionInheritsFromNonAbstractGraphExtension(context, pxContext, semanticModel, graphOrGraphExt);
+
+				context.CancellationToken.ThrowIfCancellationRequested();
+				CheckIfGraphExtensionHasNonTerminalBaseExtensions(context, pxContext, semanticModel, graphOrGraphExt);
 			}
 		}
 
@@ -168,6 +171,52 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraphAndDac
 				location ??= graphExtension.Node!.Identifier.GetLocation().NullIfLocationKindIsNone() ??
 							 graphExtension.Node.GetLocation();
 				return location;
+			}
+		}
+
+		protected virtual void CheckIfGraphExtensionHasNonTerminalBaseExtensions(SymbolAnalysisContext context, PXContext pxContext,
+																		SemanticModel? semanticModel, PXGraphEventSemanticModel graphExtension)
+		{
+			var baseGraphExtensionInfo = semanticModel != null
+				? GraphSyntaxUtils.GetBaseGraphTypeInfo(semanticModel, pxContext, graphExtension.Node, context.CancellationToken)
+				: null;
+
+			if (baseGraphExtensionInfo == null)
+				return;
+
+			var (baseExtensionTypeSymbol, baseExtensionTypeNode) = baseGraphExtensionInfo.Value;
+
+			if (!baseExtensionTypeSymbol.IsGraphExtensionBaseType() || baseExtensionTypeSymbol.TypeArguments.IsDefaultOrEmpty)
+				return;
+
+			var typeArgumentsListNode = baseExtensionTypeNode.DescendantNodes()
+															 .OfType<TypeArgumentListSyntax>()
+															 .FirstOrDefault();
+			var typeArgumentsNodes = typeArgumentsListNode?.Arguments;
+
+			if (typeArgumentsNodes?.Count is null or 0)
+				return;
+
+			foreach (TypeSyntax typeArgNode in typeArgumentsNodes)
+			{
+				CheckIfTypeArgIsNonTerminalExtension(context, pxContext, semanticModel!, typeArgNode);
+			}
+		}
+
+		private static void CheckIfTypeArgIsNonTerminalExtension(SymbolAnalysisContext context, PXContext pxContext, SemanticModel semanticModel,
+																 TypeSyntax typeArgNode)
+		{
+			var graphExtTypeArgumentTypeInfo = semanticModel.GetTypeInfo(typeArgNode, context.CancellationToken);
+			var graphExtTypeArgumentType = graphExtTypeArgumentTypeInfo.Type as INamedTypeSymbol;
+
+			if (graphExtTypeArgumentType?.TypeKind != TypeKind.Class || !graphExtTypeArgumentType.IsPXGraphExtension(pxContext))
+				return;
+
+			if (!graphExtTypeArgumentType.IsTerminalGraphExtension(pxContext))
+			{
+				var diagnostic = Diagnostic.Create(
+											Descriptors.PX1115_NonTerminalBaseGraphExtension, typeArgNode.GetLocation());
+				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 			}
 		}
 	}
