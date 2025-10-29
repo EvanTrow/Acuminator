@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis;
@@ -7,7 +8,10 @@ using Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
+using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.Dac;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -17,14 +21,14 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisDac
 {
 	public class InheritanceFromDacExtensionTests : CodeFixVerifier
 	{
-		protected override CodeFixProvider GetCSharpCodeFixProvider() => new InheritanceFromDacExtensionFix();
-		
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
 			new DacAnalyzersAggregator(
 				CodeAnalysisSettings.Default.WithStaticAnalysisEnabled()
 											.WithSuppressionMechanismDisabled(),
-				new DacAndDacExtensionDeclarationAnalyzer());
+				new DacAndDacExtensionDeclarationAnalyzerForInheritanceTests());
 
+		protected override CodeFixProvider GetCSharpCodeFixProvider() => new InheritanceFromDacExtensionFix();
+		
 		[Theory]
 		[EmbeddedFileData(@"InheritanceFromDacExtension\InheritanceFromDacExtension_Good.cs")]
 		public Task Sealed_DacExtension_WithCorrectBaseType_NoDiagnostic(string source) =>
@@ -48,5 +52,19 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisDac
 						  @"InheritanceFromDacExtension\InheritanceFromDacExtension_Expected.cs")]
 		public Task DacExtension_DerivedFromAnotherDacExtension_CodeFix_ChangeBaseType(string source, string expected) =>
 			VerifyCSharpFixAsync(source, expected);
+
+
+		private sealed class DacAndDacExtensionDeclarationAnalyzerForInheritanceTests : DacAndDacExtensionDeclarationAnalyzer
+		{
+			public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+				ImmutableArray.Create
+				(
+					Descriptors.PX1009_InheritanceFromDacExtension,
+					Descriptors.PX1011_NotSealedDacExtension
+				);
+
+			protected override void CheckForConstructors(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacOrDacExtension)
+			{ }
+		}
 	}
 }
