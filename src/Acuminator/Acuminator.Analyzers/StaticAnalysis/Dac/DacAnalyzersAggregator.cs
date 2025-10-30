@@ -9,7 +9,6 @@ using Acuminator.Analyzers.StaticAnalysis.DacKeyFieldDeclaration;
 using Acuminator.Analyzers.StaticAnalysis.DacNonAbstractFieldType;
 using Acuminator.Analyzers.StaticAnalysis.DacPropertyAttributes;
 using Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity;
-using Acuminator.Analyzers.StaticAnalysis.DacUiAttributes;
 using Acuminator.Analyzers.StaticAnalysis.ForbiddenFieldsInDac;
 using Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac;
 using Acuminator.Analyzers.StaticAnalysis.LegacyBqlField;
@@ -41,14 +40,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
         protected override SymbolKind SymbolKind => SymbolKind.NamedType;
 
         public DacAnalyzersAggregator() : this(null,
+			new DacAndDacExtensionDeclarationAnalyzer(),
 			new DacPropertyAttributesAnalyzer(),
 			new DacAutoNumberAttributeAnalyzer(),
 			new DacNonAbstractFieldTypeAnalyzer(),
 			new UnderscoresInDacAnalyzer(),
 			new NonPublicGraphAndDacAndExtensionsAnalyzer(),
 			new ForbiddenFieldsInDacAnalyzer(),
-			new DacUiAttributesAnalyzer(),
-			new DacAndDacExtensionDeclarationAnalyzer(),
 			new NoBqlFieldForDacFieldPropertyAnalyzer(),
 			new MissingBqlFieldRedeclarationInDerivedDacAnalyzer(),
 			new MissingMandatoryDacFieldsAnalyzer(),
