@@ -41,9 +41,9 @@ Each test should:
 - Use `[Theory]` and `[EmbeddedFileData(@"FolderName\FileName.cs")]` attributes. The path to the test source file specified in the `EmbeddedFileData` attribute should be relative to the `Sources` folder.
 - The path to the test source file specified in the `EmbeddedFileData` attribute should use Windows path separators (`\`).
 - The C# string with to the test source file specified in the `EmbeddedFileData` attribute should be C# verbatim string literal (use `@` before the opening quote) if the file is located in a subfolder of the `Sources` folder.
-- Be `async Task` methods
-- Call `await VerifyCSharpDiagnosticAsync(source)` for no-diagnostic cases
-- Call `await VerifyCSharpDiagnosticAsync(source, Descriptors.{DIAGNOSTIC_ID}.CreateFor(line, column))` for positive cases
+- Be `Task` returning methods without `async` keyword in the method signature
+- Call `VerifyCSharpDiagnosticAsync(source)` for no-diagnostic cases
+- Call `VerifyCSharpDiagnosticAsync(source, Descriptors.{DIAGNOSTIC_ID}.CreateFor(line, column))` for positive cases
 - Use correct line and column numbers for diagnostic expectations. The correct line and columns are the starting position of the location of the reported diagnostic. 
 
 ## TEST CATEGORIES TO INCLUDE
