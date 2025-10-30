@@ -29,37 +29,35 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacUiAttributes
 		protected override CodeFixProvider GetCSharpCodeFixProvider() => new DacUiAttributesFix();
 
 		[Theory]
-		[EmbeddedFileData("Dac_Bad.cs")]
-		public Task Dac_ReportsDiagnostic(string source) =>
+		[EmbeddedFileData(@"DacUiAttributes\DacWithoutAttributes.cs")]
+		public Task Dac_WithoutAttributes_ReportsDiagnostic(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1094_DacShouldHaveUiAttribute.CreateFor(6, 15));
 
 		[Theory]
-		[EmbeddedFileData("Dac_Good_Hidden.cs")]
+		[EmbeddedFileData(@"DacUiAttributes\DacWithPXHiddenAttribute.cs")]
 		public Task Dac_WithPXHiddenAttribute_DoesntReportDiagnostic(string source) =>
 			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData("Dac_Good_CacheName.cs")]
+		[EmbeddedFileData(@"DacUiAttributes\DacWithCacheNameAttribute.cs")]
 		public Task Dac_WithPXCacheNameAttribute_DoesntReportDiagnostic(string source) =>
 			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData("PXMappedCacheExtension.cs")]
+		[EmbeddedFileData(@"DacUiAttributes\PXMappedDacExtension.cs")]
 		public Task PXMappedCacheExtension_DoesntReportDiagnostic(string source) =>
 			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
-		[EmbeddedFileData(
-			"Dac_Bad.cs",
-			"Dac_Good_Hidden.cs")]
+		[EmbeddedFileData(@"DacUiAttributes\DacWithoutAttributes.cs",
+						  @"DacUiAttributes\DacWithPXHiddenAttribute.cs")]
 		public Task AddPXHiddenAttribute_VerifyCodeFix(string actual, string expected) =>
 			VerifyCSharpFixAsync(actual, expected, 0);
 
 		[Theory]
-		[EmbeddedFileData(
-			"Dac_Bad.cs",
-			"Dac_Good_CacheName.cs")]
+		[EmbeddedFileData(@"DacUiAttributes\DacWithoutAttributes.cs",
+						  @"DacUiAttributes\DacWithCacheNameAttribute.cs")]
 		public Task AddPXCacheNameAttribute_VerifyCodeFix(string actual, string expected) =>
 			VerifyCSharpFixAsync(actual, expected, 1);
 

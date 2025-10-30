@@ -2,7 +2,7 @@
 
 using PX.Data;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.DacUiAttributes.Sources
+namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisDac.Sources
 {
 	public class Adjust : PXMappedCacheExtension
 	{

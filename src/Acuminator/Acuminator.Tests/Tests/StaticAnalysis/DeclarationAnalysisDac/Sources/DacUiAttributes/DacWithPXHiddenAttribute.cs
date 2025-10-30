@@ -1,6 +1,6 @@
 ﻿using PX.Data;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.DacUiAttributes.Sources
+namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisDac.Sources
 {
 	[PXHidden]
 	public class SOOrder : IBqlTable

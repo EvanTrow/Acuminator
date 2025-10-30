@@ -1,6 +1,6 @@
 ﻿using PX.Data;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.DacUiAttributes.Sources
+namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisDac.Sources
 {
 	[PXCacheName("Enter a cache name for this DAC")]
 	public class SOOrder : IBqlTable
