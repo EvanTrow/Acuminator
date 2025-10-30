@@ -51,6 +51,11 @@ Each test should:
 2. **Negative cases** - scenarios that should NOT trigger the diagnostic  
 3. **Edge cases** - boundary conditions, inheritance chains, generic types
 
+## TEST CATEGORIES TO EXCLUDE
+1. **DO NOT** add several tests for the same test scenario.
+2. **DO NOT** add redundant tests.
+3. **DO NOT** add redundant code in test sources. **DO NOT** add code with additional examples with names following the pattern `AnotherXXX`.
+
 ## ANALYZER SETUP
 - The analyzer should be prepared in the unit test file by the user in advance.
 The setup code depends on the base class of the test class:
