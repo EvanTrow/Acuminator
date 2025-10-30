@@ -181,7 +181,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraph
 																		SemanticModel? semanticModel, PXGraphEventSemanticModel graphExtension)
 		{
 			var baseGraphExtensionInfo = semanticModel != null
-				? BaseTypeSyntaxUtils.GetBaseGraphTypeInfo(semanticModel, pxContext, graphExtension.Node, context.CancellationToken)
+				? BaseTypeSyntaxUtils.GetBaseGraphExtensionTypeInfo(semanticModel, pxContext, graphExtension.Node, context.CancellationToken)
 				: null;
 
 			if (baseGraphExtensionInfo == null)
