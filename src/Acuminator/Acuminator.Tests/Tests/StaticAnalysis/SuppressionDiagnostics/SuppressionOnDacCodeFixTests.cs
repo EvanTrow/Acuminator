@@ -86,7 +86,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.SuppressionDiagnostics
 			protected override void CheckAttributesDeclaredOnDac(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dac)
 			{ }
 
-			protected override void CheckIfDacExtensionHasNonTerminalBaseExtensions(SymbolAnalysisContext context, PXContext pxContext,
+			protected override void CheckIfDacExtensionHasNonAbstractBaseExtensions(SymbolAnalysisContext context, PXContext pxContext,
 																					DacSemanticModel dacExtension)
 			{ }
 		}

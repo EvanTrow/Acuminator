@@ -42,7 +42,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 				CheckIfDacExtensionForInheritanceIssues(context, pxContext, dacOrDacExtension);
 
 				context.CancellationToken.ThrowIfCancellationRequested();
-				CheckIfDacExtensionHasNonTerminalBaseExtensions(context, pxContext, dacOrDacExtension);
+				CheckIfDacExtensionHasNonAbstractBaseExtensions(context, pxContext, dacOrDacExtension);
 			}
 		}
 
@@ -132,7 +132,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
 					pxContext.CodeAnalysisSettings);
 		}
 
-		protected virtual void CheckIfDacExtensionHasNonTerminalBaseExtensions(SymbolAnalysisContext context, PXContext pxContext,
+		protected virtual void CheckIfDacExtensionHasNonAbstractBaseExtensions(SymbolAnalysisContext context, PXContext pxContext,
 																			   DacSemanticModel dacExtension)
 		{
 			var semanticModel = context.Compilation.GetSemanticModel(dacExtension.Node!.SyntaxTree);

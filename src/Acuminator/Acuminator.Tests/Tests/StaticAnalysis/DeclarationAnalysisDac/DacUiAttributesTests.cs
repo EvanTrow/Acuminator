@@ -76,7 +76,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacUiAttributes
 			protected override void CheckForConstructors(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacOrDacExtension)
 			{ }
 
-			protected override void CheckIfDacExtensionHasNonTerminalBaseExtensions(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacExtension)
+			protected override void CheckIfDacExtensionHasNonAbstractBaseExtensions(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacExtension)
 			{ }
 
 			protected override void CheckIfDacExtensionIsSealed(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacExtension)
