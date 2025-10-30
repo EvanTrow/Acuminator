@@ -37,7 +37,7 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1024](diagnostics/PX1024.md) | The DAC class field must be abstract. | Error | Available |
 | [PX1026](diagnostics/PX1026.md) | Underscores cannot be used in the names of DACs and DAC fields. | Error | Available |
 | [PX1027](diagnostics/PX1027.md) | The `CompanyMask`, `CompanyID`, `Notes`, `Files`, `DatabaseRecordStatus`, and `DeletedDatabaseRecord` fields cannot be declared in DACs. The name of a DAC field also cannot begin with the `Company` prefix. | Error | Available |
-| [PX1028](diagnostics/PX1028.md) | Constructors in DACs are prohibited. | Error | Available |
+| [PX1028](diagnostics/PX1028.md) | Constructors in DACs and DAC extensions are prohibited. | Error | Available |
 | [PX1029](diagnostics/PX1029.md) | `PXGraph` instances cannot be used inside DAC properties. | Error | Unavailable |
 | [PX1030](diagnostics/PX1030.md) | The `PXDefault` attribute of the field is used incorrectly. | Warning (ISV Level 1: Significant) or Error | Available |
 | [PX1031](diagnostics/PX1031.md) | DACs and DAC extensions cannot contain instance methods. | Error | Unavailable |
