@@ -27,13 +27,13 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisDac
 
 		[Theory]
 		[EmbeddedFileData(@"AbstractBaseDacExtensions\DacExtensionWithNonAbstractBaseExtensions.cs")]
-		public async Task DacExtension_WithNonAbstractBaseExtensions_NoDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task DacExtension_WithNonAbstractBaseExtensions_NoDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"AbstractBaseDacExtensions\DacExtensionWithAbstractBaseExtensions.cs")]
-		public async Task DacExtension_WithMultipleAbstractBaseExtensions(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task DacExtension_WithMultipleAbstractBaseExtensions(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1115_NonTerminalBaseDacExtension.CreateFor(23, 75),
 				Descriptors.PX1115_NonTerminalBaseDacExtension.CreateFor(33, 64),
 				Descriptors.PX1115_NonTerminalBaseDacExtension.CreateFor(33, 97));
