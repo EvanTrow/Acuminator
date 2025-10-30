@@ -62,6 +62,13 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisDac
 
 			protected override void ReportDacExtensionInheritance(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacExtension)
 			{ }
+
+			protected override void CheckAttributesDeclaredOnDac(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dac)
+			{ }
+
+			protected override void CheckIfDacExtensionHasNonTerminalBaseExtensions(SymbolAnalysisContext context, PXContext pxContext,
+																					DacSemanticModel dacExtension)
+			{ }
 		}
 	}
 }
