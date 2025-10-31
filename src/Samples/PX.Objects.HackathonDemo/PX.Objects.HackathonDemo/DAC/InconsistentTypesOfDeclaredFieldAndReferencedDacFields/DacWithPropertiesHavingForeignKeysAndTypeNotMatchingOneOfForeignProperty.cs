@@ -13,7 +13,7 @@ namespace PX.Objects.HackathonDemo.DAC.InconsistentTypesOfDeclaredFieldAndRefere
 
 	[Serializable]
 	[PXCacheName("Foreign Keys Container")]
-	public class DacWithPropertiesHavingForeignKeysAndTypeNotMatchingOneOfForeignProperty : IBqlTable
+	public class DacWithPropertiesHavingForeignKeysAndTypeNotMatchingOneOfForeignProperty : PXBqlTable, IBqlTable
 	{
 		#region PaymentTermsListID
 		/// <summary>

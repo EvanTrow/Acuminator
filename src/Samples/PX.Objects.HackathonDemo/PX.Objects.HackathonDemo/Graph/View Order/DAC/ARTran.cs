@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PX.Objects.HackathonDemo.ViewOrder
 {
-	public class ARTran : IBqlTable
+	public class ARTran : PXBqlTable, IBqlTable
 	{
 	}
 }

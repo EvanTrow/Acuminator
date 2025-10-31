@@ -4,7 +4,7 @@ using PX.Data.ReferentialIntegrity.Attributes;
 namespace PX.Objects.HackathonDemo.ReferentialIntegrity.IncorrectPrimaryKeyName
 {
 	[PXCacheName("SO Order")]
-	public class SOOrder : IBqlTable
+	public class SOOrder : PXBqlTable, IBqlTable
 	{
 		public class IncorrectPrimaryKeyName : PrimaryKeyOf<SOOrder>.By<orderType, orderNbr>
 		{

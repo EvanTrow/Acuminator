@@ -9,7 +9,7 @@ namespace PX.Objects.HackathonDemo;
 public class SMUserProcess : PXGraph
 {
 	[PXHidden]
-	public class FilterDac : IBqlTable
+	public class FilterDac : PXBqlTable, IBqlTable
 	{
 		#region SomeFlag
 		/// <inheritdoc cref="SomeFlag"/>

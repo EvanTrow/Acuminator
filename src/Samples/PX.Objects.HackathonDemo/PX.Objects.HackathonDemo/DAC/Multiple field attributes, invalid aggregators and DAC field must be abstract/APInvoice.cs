@@ -10,7 +10,7 @@ using PX.Objects.GL;
 namespace PX.Objects.HackathonDemo
 {
 	[PXHidden]
-	public class APInvoice : IBqlTable
+	public class APInvoice : PXBqlTable, IBqlTable
 	{
 		#region BranchID
 		public class branchID : IBqlField

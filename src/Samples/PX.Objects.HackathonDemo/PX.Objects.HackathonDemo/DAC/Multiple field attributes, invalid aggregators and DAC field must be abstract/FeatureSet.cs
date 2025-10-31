@@ -12,7 +12,7 @@ namespace PX.Objects.HackathonDemo
 	[PXCacheName(CS.Messages.FeaturesSet)]
 	[PXPrimaryGraph(typeof(FeaturesMaint))]
 	[Serializable]
-	public class FeaturesSet : IBqlTable 
+	public class FeaturesSet : PXBqlTable, IBqlTable
 	{
 		#region LicenseID
 		public abstract class licenseID : PX.Data.BQL.BqlString.Field<licenseID> { }

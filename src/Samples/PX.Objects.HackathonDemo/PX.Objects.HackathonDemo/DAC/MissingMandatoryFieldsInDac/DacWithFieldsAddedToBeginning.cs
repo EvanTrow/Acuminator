@@ -8,7 +8,7 @@ namespace Acuminator.Tests.Sources
 {
 	/// <exclude/>
 	[PXCacheName("DAC with fields added to beginning")]
-	public class DacWithFieldsAddedToBeginning : IBqlTable
+	public class DacWithFieldsAddedToBeginning : PXBqlTable, IBqlTable
 	{
 		#region CreatedByID
 		public abstract class createdByID : BqlGuid.Field<createdByID> { }

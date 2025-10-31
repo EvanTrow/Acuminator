@@ -20,7 +20,7 @@ namespace PX.Objects.HackathonDemo
             return new PXSelect<ARTran>(maint).Select();
         }
 
-        public class ARTran : IBqlTable
+        public class ARTran : PXBqlTable, IBqlTable
         {
             [PXDBString(15, IsUnicode = true, IsKey = true)]
             [PXDBDefault]

@@ -15,7 +15,7 @@ public class SOInvoiceEntry : PXGraph<SOInvoiceEntry, SOInvoice>
     public PXAction<SOInvoice> Release;
 }
 
-public class SOInvoice : IBqlTable
+public class SOInvoice : PXBqlTable, IBqlTable
 {
     [PXDBString(8, IsKey = true, InputMask = "")]
     public string RefNbr { get; set; }
