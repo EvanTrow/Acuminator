@@ -20,10 +20,13 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
             }
             .ToImmutableHashSet();
 
-        /// <summary>
-        /// The maximum size of the DAC primary key.
-        /// </summary>
-        public const int MaxPrimaryKeySize = 8;
+		/// <summary>
+		/// The maximum size of the DAC primary key.
+		/// </summary>
+		/// <remarks>
+		/// The size of a primary key was increased in Acumatica 2020r201. Earlier versions of Acumatica have max primary key size 8.
+		/// </remarks>
+		public const int MaxPrimaryKeySize = 12;
 
         /// <summary>
         /// Gets the primary key interface.
