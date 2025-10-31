@@ -40,8 +40,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 		protected override List<INamedTypeSymbol> GetDacKeysDeclarations(PXContext context, DacSemanticModel dac, CancellationToken cancellationToken) =>
 			 dac.Symbol.GetFlattenedNestedTypes(shouldWalkThroughNestedTypesPredicate: nestedType => !nestedType.IsDacOrExtension(context),
 												cancellationToken)
-					   .Where(nestedType => nestedType.ImplementsInterface(context.ReferentialIntegritySymbols.IPrimaryKey))
-					   .ToList(capacity: 1);
+					   .Where(nestedType => nestedType.ImplementsInterface(context.ReferentialIntegritySymbols.IPrimaryKey!))
+					   .ToList(capacity: 4);
 
 		/// <summary>
 		/// Gets the list of DAC fields ordered by their metadataname which are used by the DAC primary or unique <paramref name="key"/>.

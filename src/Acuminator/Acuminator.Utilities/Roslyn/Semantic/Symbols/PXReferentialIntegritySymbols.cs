@@ -36,7 +36,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 		/// <value>
 		/// The primary key interface.
 		/// </value>
-		public INamedTypeSymbol IPrimaryKey { get; }
+		public INamedTypeSymbol? IPrimaryKey { get; }
 
 		/// <summary>
 		/// Gets the generic IPrimaryKeyOf<TDAC> interface.
@@ -44,7 +44,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 		/// <value>
 		/// The generic IPrimaryKeyOf<TDAC> interface.
 		/// </value>
-		public INamedTypeSymbol IPrimaryKeyOf1 { get; }
+		public INamedTypeSymbol? IPrimaryKeyOf1 { get; }
 
 		/// <summary>
 		/// Gets the foreign key interface. For earlier versions of Acumatica (2019R1) is not defined so it can be null.
@@ -52,7 +52,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 		/// <value>
 		/// The foreign key interface.
 		/// </value>
-		public INamedTypeSymbol IForeignKey { get; }
+		public INamedTypeSymbol? IForeignKey { get; }
 
 		/// <summary>
 		/// Gets the generic foreign key to the parent DAC interface derived from <see cref="IForeignKey"/>. Contains information about parent DAC referenced by the foreign key.
@@ -61,32 +61,38 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 		/// <value>
 		/// The generic foreign key to the parent DAC interface
 		/// </value>
-		public INamedTypeSymbol IForeignKeyTo1 { get; }
+		public INamedTypeSymbol? IForeignKeyTo1 { get; }
 
-		public INamedTypeSymbol KeysRelation { get; }
+		public INamedTypeSymbol? KeysRelation { get; }
 
-		public INamedTypeSymbol PrimaryKeyOf => Compilation.GetTypeByMetadataName(TypeFullNames.PrimaryKeyOf)!;
+		public INamedTypeSymbol? PrimaryKeyOf => Compilation.GetTypeByMetadataName(TypeFullNames.PrimaryKeyOf);
 
-		public INamedTypeSymbol CompositeKey2 => Compilation.GetTypeByMetadataName(TypeFullNames.CompositeKey2)!;
+		public INamedTypeSymbol? CompositeKey2 => Compilation.GetTypeByMetadataName(TypeFullNames.CompositeKey2);
 
 		internal PXReferentialIntegritySymbols(Compilation compilation) : base(compilation)
 		{
-			IPrimaryKey = Compilation.GetTypeByMetadataName(TypeFullNames.IPrimaryKey)!;
-			IPrimaryKeyOf1 = Compilation.GetTypeByMetadataName(TypeFullNames.IPrimaryKeyOf1)!;
+			IPrimaryKey = Compilation.GetTypeByMetadataName(TypeFullNames.IPrimaryKey);
+			IPrimaryKeyOf1 = Compilation.GetTypeByMetadataName(TypeFullNames.IPrimaryKeyOf1);
 
-			IForeignKey = Compilation.GetTypeByMetadataName(TypeFullNames.IForeignKey)!;
-			IForeignKeyTo1 = Compilation.GetTypeByMetadataName(TypeFullNames.IForeignKeyTo1)!;
+			IForeignKey = Compilation.GetTypeByMetadataName(TypeFullNames.IForeignKey);
+			IForeignKeyTo1 = Compilation.GetTypeByMetadataName(TypeFullNames.IForeignKeyTo1);
 
-			KeysRelation = Compilation.GetTypeByMetadataName(TypeFullNames.KeysRelation)!;
+			KeysRelation = Compilation.GetTypeByMetadataName(TypeFullNames.KeysRelation);
 		}
 
-		public INamedTypeSymbol GetPrimaryKeyBy_TypeSymbol(int arity)
+		public INamedTypeSymbol? GetPrimaryKeyBy_TypeSymbol(int arity)
 		{
-			if (arity <= 0 || arity > MaxPrimaryKeySize)
-				throw new ArgumentOutOfRangeException(nameof(arity));
+			switch (arity)
+			{
+				case < 0:
+					throw new ArgumentOutOfRangeException(nameof(arity));
+				case 0:
+				case > MaxPrimaryKeySize:            // The max size of a primary key may change again in the future, so no exception should be thrown here.
+					return null;
+			}
 
 			string primaryKeyByTypeName = $"{TypeFullNames.PrimaryKeyOfBy}`{arity}";
-			return Compilation.GetTypeByMetadataName(primaryKeyByTypeName)!;
+			return Compilation.GetTypeByMetadataName(primaryKeyByTypeName);
 		}
 	}
 }

@@ -49,7 +49,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 			}
 
 			return from nestedType in allNestedTypes
-				   where nestedType.InheritsFromOrEqualsGeneric(context.ReferentialIntegritySymbols.KeysRelation) &&
+				   where nestedType.InheritsFromOrEqualsGeneric(context.ReferentialIntegritySymbols.KeysRelation!) &&
 						 nestedType.GetBaseTypesAndThis().Any(IsForeignKey)
 				   select nestedType;
 		}
