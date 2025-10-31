@@ -9,10 +9,10 @@ using PX.Data;
 namespace PX.Objects.HackathonDemo
 {
 	[PXCacheName("ARInvoice")]
-	public class ARInvoice : IBqlTable { }
+	public class ARInvoice : PXBqlTable, IBqlTable { }
 
 	[PXCacheName("SOOrder")]
-	public class SOOrder : IBqlTable { }
+	public class SOOrder : PXBqlTable, IBqlTable { }
 
 	public class InvoiceEntryBase<TGraph, TDac> : PXGraph<TGraph, TDac>
 	where TGraph : PXGraph, new()

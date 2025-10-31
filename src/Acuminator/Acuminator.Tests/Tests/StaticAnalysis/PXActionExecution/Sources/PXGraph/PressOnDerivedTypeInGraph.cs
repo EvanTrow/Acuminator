@@ -21,7 +21,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXActionExecution
 	}
 
 	[PXHidden]
-	public class SOInvoice : IBqlTable
+	public class SOInvoice : PXBqlTable, IBqlTable
 	{
 		[PXDBString(8, IsKey = true, InputMask = "")]
 		public string RefNbr { get; set; }

@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.NonNullableTypeForBqlField.Sources
 {
-	public class SomeDocument : IBqlTable
+	public class SomeDocument : PXBqlTable, IBqlTable
 	{
 		#region LineNbr
 		public abstract class lineNbr : IBqlField { }

@@ -13,7 +13,7 @@ using GLBranchAttribute = PX.Objects.GL.BranchAttribute;
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.DacForeignKeyDeclaration.Sources.MissingForeignKeyFix
 {
 	[PXCacheName("SO Order")]
-	public class SOOrder : IBqlTable
+	public class SOOrder : PXBqlTable, IBqlTable
 	{
 		#region OrderType
 		[PXDBString(IsKey = true, InputMask = "")]

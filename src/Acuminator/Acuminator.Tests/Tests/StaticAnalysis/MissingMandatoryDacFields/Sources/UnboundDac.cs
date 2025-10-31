@@ -5,7 +5,7 @@ namespace Acuminator.Tests.Sources
 {
 	/// <exclude/>
 	[PXCacheName("Unbound DAC - should not be checked")]
-	public class UnboundDac : IBqlTable
+	public class UnboundDac : PXBqlTable, IBqlTable
 	{
 		#region DacId
 		[PXInt(IsKey = true)]

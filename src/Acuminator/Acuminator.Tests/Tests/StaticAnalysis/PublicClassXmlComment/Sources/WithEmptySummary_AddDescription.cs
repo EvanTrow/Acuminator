@@ -12,7 +12,7 @@ namespace PX.Objects
 	/// With empty summary
 	/// </summary>
 	[PXCacheName("With Empty Summary")]
-	public class WithEmptySummary : IBqlTable
+	public class WithEmptySummary : PXBqlTable, IBqlTable
 	{
 	}
 
@@ -23,7 +23,7 @@ namespace PX.Objects
 	/// Check that remark is not lost by the code fix.
 	/// </remarks>
 	[PXCacheName("With Empty One Liner Summary")]
-	public class WithEmptyOneLinerSummary : IBqlTable
+	public class WithEmptyOneLinerSummary : PXBqlTable, IBqlTable
 	{
 	}
 }

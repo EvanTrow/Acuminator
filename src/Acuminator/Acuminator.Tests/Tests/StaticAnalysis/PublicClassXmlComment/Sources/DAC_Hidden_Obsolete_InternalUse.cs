@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace PX.Objects
 {
 	[PXHidden]
-	public class DAC1 : IBqlTable
+	public class DAC1 : PXBqlTable, IBqlTable
 	{
 		#region OrderType
 		public abstract class orderType : IBqlField { }
@@ -46,7 +46,7 @@ namespace PX.Objects
 	/// A DAC 2.
 	/// </summary>
 	[PXCacheName("DAC 2")]
-	public class DAC2 : IBqlTable
+	public class DAC2 : PXBqlTable, IBqlTable
 	{
 		#region OrderType
 		public abstract class orderType : IBqlField { }
@@ -61,7 +61,7 @@ namespace PX.Objects
 
 
 	[Obsolete]
-	public class DAC3 : IBqlTable
+	public class DAC3 : PXBqlTable, IBqlTable
 	{
 		#region OrderType
 		public abstract class orderType : IBqlField { }
@@ -76,7 +76,7 @@ namespace PX.Objects
 
 
 	[PX.Common.PXInternalUseOnly]
-	public class DAC4 : IBqlTable
+	public class DAC4 : PXBqlTable, IBqlTable
 	{
 		#region Status
 		public abstract class status : IBqlField { }

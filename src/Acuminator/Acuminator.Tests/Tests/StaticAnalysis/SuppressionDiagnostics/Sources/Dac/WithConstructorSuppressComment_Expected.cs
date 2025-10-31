@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class SOOrder : IBqlTable
+	public class SOOrder : PXBqlTable, IBqlTable
 	{
 		#region Cons
 		// Acuminator disable once PX1028 ConstructorInDacDeclaration [Justification]

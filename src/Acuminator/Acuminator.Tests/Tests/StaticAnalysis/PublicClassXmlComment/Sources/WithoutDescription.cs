@@ -5,7 +5,7 @@ using PX.Data;
 namespace PX.Objects
 {
 	[PXCacheName("Without description")]
-	public class WithoutDescription : IBqlTable
+	public class WithoutDescription : PXBqlTable, IBqlTable
 	{
 	}
 
@@ -13,7 +13,7 @@ namespace PX.Objects
 	/// Test remark is not lost
 	/// </remarks>
 	[PXCacheName("Without description but with remark")]
-	public class WithoutDescriptionButWithRemark : IBqlTable
+	public class WithoutDescriptionButWithRemark : PXBqlTable, IBqlTable
 	{
 	}
 }

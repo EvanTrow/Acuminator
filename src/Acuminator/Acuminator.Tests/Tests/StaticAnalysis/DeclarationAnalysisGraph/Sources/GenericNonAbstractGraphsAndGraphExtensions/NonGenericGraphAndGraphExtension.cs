@@ -16,7 +16,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph.Sources
 
 	// Acuminator disable once PX1069 MissingMandatoryDacFields [Justification]
 	[PXHidden]
-	public class MyDac : IBqlTable
+	public class MyDac : PXBqlTable, IBqlTable
 	{
 		#region ID
 		public abstract class iD : PX.Data.BQL.BqlInt.Field<iD> { }

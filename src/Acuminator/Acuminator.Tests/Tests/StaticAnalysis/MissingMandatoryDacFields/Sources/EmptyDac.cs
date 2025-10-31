@@ -4,7 +4,7 @@ namespace Acuminator.Tests.Sources
 {
 	/// <exclude/>
 	[PXCacheName("Empty DAC - should not be checked")]
-	public class EmptyDac : IBqlTable
+	public class EmptyDac : PXBqlTable, IBqlTable
 	{
 		// No fields defined - should not trigger PX1069 because analyzer checks DacFieldsByNames.Count > 0
 	}

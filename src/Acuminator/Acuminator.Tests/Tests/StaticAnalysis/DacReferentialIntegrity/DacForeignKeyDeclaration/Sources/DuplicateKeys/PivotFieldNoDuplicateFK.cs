@@ -6,7 +6,7 @@ using PX.Data.ReferentialIntegrity.Attributes;
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.DacForeignKeyDeclaration.Sources.DuplicateKeys
 {
 	[PXCacheName("Pivot Field")]
-	public class PivotField : IBqlTable
+	public class PivotField : PXBqlTable, IBqlTable
 	{
 		public class PK : PrimaryKeyOf<PivotField>.By<screenID, pivotTableID, pivotFieldID>
 		{
@@ -49,7 +49,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.DacForei
 	/// A DAC used to provide PK and UK to compile PivotField sources with foreign keys which refer to SiteMap UK
 	/// </summary>
 	[PXHidden]
-	public class SiteMap : IBqlTable
+	public class SiteMap : PXBqlTable, IBqlTable
 	{
 		#region Keys
 		public class PK : PrimaryKeyOf<SiteMap>.By<nodeID>

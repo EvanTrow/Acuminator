@@ -8,11 +8,11 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class SOOrder : IBqlTable { }
+	public class SOOrder : PXBqlTable, IBqlTable { }
 
-	public class SOTran : IBqlTable { }
+	public class SOTran : PXBqlTable, IBqlTable { }
 
-	public class TestDac : IBqlTable { }
+	public class TestDac : PXBqlTable, IBqlTable { }
 
 	public class SOOrderEntryWithNonPrimaryDacView1 : PXGraph<SOOrderEntryWithNonPrimaryDacView1>
 	{

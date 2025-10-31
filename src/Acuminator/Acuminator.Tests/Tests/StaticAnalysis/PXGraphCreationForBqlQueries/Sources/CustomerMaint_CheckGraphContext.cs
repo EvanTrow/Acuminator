@@ -27,7 +27,7 @@ namespace PX.Objects
 	}
 
 	[PXHidden]
-	public class Customer : IBqlTable
+	public class Customer : PXBqlTable, IBqlTable
 	{
 		#region AcctCD
 		[PXDBString(8, IsKey = true, InputMask = "")]

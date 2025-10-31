@@ -3,7 +3,7 @@
 namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisDac.Sources
 {
 	
-	public class SOOrder : IBqlTable
+	public class SOOrder : PXBqlTable, IBqlTable
 	{
 		[PXDBString(IsKey = true, InputMask = "")]
 		[PXDefault]

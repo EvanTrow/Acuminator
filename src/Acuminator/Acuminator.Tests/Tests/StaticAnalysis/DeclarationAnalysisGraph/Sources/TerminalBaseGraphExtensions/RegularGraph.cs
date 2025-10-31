@@ -16,7 +16,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph.Sources
 	// Acuminator disable once PX1069 MissingMandatoryDacFields [Justification]
 	/// <exclude/>
 	[PXCacheName("Sales Order")]
-	public class SOOrder : IBqlTable
+	public class SOOrder : PXBqlTable, IBqlTable
 	{
 		public abstract class orderNbr : BqlString.Field<orderNbr> { }
 

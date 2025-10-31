@@ -7,7 +7,7 @@ namespace Acuminator.Tests.Sources
 {
 	/// <exclude/>
 	[PXCacheName("DAC missing only CreatedByID field")]
-	public class DacAddMissingCreatedByIdToBeginning : IBqlTable
+	public class DacAddMissingCreatedByIdToBeginning : PXBqlTable, IBqlTable
 	{
 		#region CreatedByScreenID
 		[PXDBCreatedByScreenID]
