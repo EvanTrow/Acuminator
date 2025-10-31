@@ -27,27 +27,27 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity
 			await VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1035_MultipleKeyDeclarationsInDacWithSameFields.CreateFor(
 					location: (Line: 9, Column: 16),
-					extraLocations: new (int Line, int Column)[]
-					{
+					extraLocations:
+					[
 						(Line: 14, Column: 16),
 						(Line: 19, Column: 16)
-					}),
+					]),
 
 				Descriptors.PX1035_MultipleKeyDeclarationsInDacWithSameFields.CreateFor(
 					location: (Line: 14, Column: 16),
-					extraLocations: new (int Line, int Column)[]
-					{
+					extraLocations:
+					[
 						(Line: 9, Column: 16),
 						(Line: 19, Column: 16)
-					}),
+					]),
 
 				Descriptors.PX1035_MultipleKeyDeclarationsInDacWithSameFields.CreateFor(
 					location: (Line: 19, Column: 16),
-					extraLocations: new (int Line, int Column)[]
-					{
+					extraLocations:
+					[
 						(Line: 9, Column: 16),
 						(Line: 14, Column: 16)
-					}));
+					]));
 
 		[Theory]
 		[EmbeddedFileData(@"DuplicateKeys\Dac_DuplicateKeys.cs", @"DuplicateKeys\Dac_DuplicateKeys_Expected.cs")]
