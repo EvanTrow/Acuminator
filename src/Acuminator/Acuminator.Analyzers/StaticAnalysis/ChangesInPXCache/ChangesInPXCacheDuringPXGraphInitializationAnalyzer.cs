@@ -10,20 +10,20 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.ChangesInPXCache
 {
-    public class ChangesInPXCacheDuringPXGraphInitializationAnalyzer : PXGraphAggregatedAnalyzerBase
-    {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization);
+	public class ChangesInPXCacheDuringPXGraphInitializationAnalyzer : PXGraphAggregatedAnalyzerBase
+	{
+		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+			ImmutableArray.Create(Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization);
 
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel pxGraph)
-        {
-            Walker walker = new Walker(context, pxContext, Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization);
+		{
+			Walker walker = new Walker(context, pxContext, Descriptors.PX1059_ChangesInPXCacheDuringPXGraphInitialization);
 
-            foreach (GraphInitializerInfo initializer in pxGraph.DeclaredInitializers)
-            {
-                context.CancellationToken.ThrowIfCancellationRequested();
-                walker.Visit(initializer.Node);
-            }
-        }
-    }
+			foreach (GraphInitializerInfo initializer in pxGraph.DeclaredInitializers)
+			{
+				context.CancellationToken.ThrowIfCancellationRequested();
+				walker.Visit(initializer.Node);
+			}
+		}
+	}
 }
