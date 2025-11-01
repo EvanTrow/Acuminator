@@ -50,6 +50,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity
 					]));
 
 		[Theory]
+		[EmbeddedFileData(@"DuplicateKeys\Dac_DirtyAndRegularKeys_NoDuplicates.cs")]
+		public async Task Dac_PrimaryKeys_Regular_And_Dirty_NotDuplicates_NoDiagnostic(string source) =>
+			await VerifyCSharpDiagnosticAsync(source);
+
 		[Theory]
 		[EmbeddedFileData(@"DuplicateKeys\Dac_DuplicateKeys_Expected.cs")]
 		public async Task Dac_DuplicateUniqueKeys_AfterCodeFix_NoDiagnostic(string source) =>

@@ -7,23 +7,17 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.Sources
 	// Acuminator disable once PX1069 MissingMandatoryDacFields [Justification]
 	/// <exclude/>
 	[PXCacheName("SO Order")]
-	public class SOOrder : IBqlTable
+	public class SOOrder : PXBqlTable, IBqlTable
 	{
-		public class PK : PrimaryKeyOf<SOOrder>.By<orderType, orderNbr>
+		public class PK : PrimaryKeyOf<SOOrder>.By<orderNbr>
 		{
-			public static SOOrder Find(PXGraph graph, string orderType, string orderNbr) => FindBy(graph, orderType, orderNbr);
+			public static SOOrder Find(PXGraph graph, string orderNbr) => FindBy(graph, orderNbr);
 		}
 
-		public class PK_Dirty : PrimaryKeyOf<SOOrder>.By<orderType, orderNbr>.Dirty
+		public class PK_Dirty : PrimaryKeyOf<SOOrder>.By<orderNbr>.Dirty
 		{
-			public static SOOrder Find(PXGraph graph, string orderType, string orderNbr) => FindBy(graph, orderType, orderNbr);
+			public static SOOrder Find(PXGraph graph, string orderNbr) => FindBy(graph, orderNbr);
 		}
-
-		[PXDBString(IsKey = true, InputMask = "")]
-		[PXDefault]
-		[PXUIField(DisplayName = "Order Type")]
-		public string OrderType { get; set; }
-		public abstract class orderType : IBqlField { }
 
 		[PXDBString(IsKey = true, InputMask = "")]
 		[PXDefault]
