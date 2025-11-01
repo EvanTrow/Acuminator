@@ -35,6 +35,11 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.Sources
 			public static INUnit Find(PXGraph graph, int? inventoryID, string fromUnit) => FindBy(graph, INUnitType.InventoryItem, inventoryID, fromUnit);
 		}
 
+		public class PK_Dirty : PrimaryKeyOf<INUnit>.By<recordID>.Dirty
+		{
+			public static INUnit Find(PXGraph graph, long? recordID) => FindBy(graph, recordID);
+		}
+
 		#region RecordID
 		public abstract class recordID : PX.Data.BQL.BqlLong.Field<recordID> { }
 
