@@ -11,7 +11,7 @@ namespace Acuminator.Tests.Sources
 		private static readonly Guid ID = Guid.NewGuid();
 
 		[PXHidden]
-		public class SomeDAC : IBqlTable
+		public class SomeDAC : PXBqlTable, IBqlTable
 		{
 		}
 

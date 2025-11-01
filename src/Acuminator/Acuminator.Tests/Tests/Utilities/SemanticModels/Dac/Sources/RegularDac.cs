@@ -3,7 +3,7 @@
 namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Dac.Sources
 {
 	
-	public class SOOrder : IBqlTable
+	public class SOOrder : PXBqlTable, IBqlTable
 	{
 		[PXDBString(IsKey = true, InputMask = "")]
 		[PXDefault]

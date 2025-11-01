@@ -7,7 +7,7 @@ namespace Acuminator.Tests.Sources
 {
 	/// <exclude/>
 	[PXCacheName("Sealed DAC without any mandatory fields")]
-	public sealed class SealedDacWithoutAnyMandatoryField : IBqlTable
+	public sealed class SealedDacWithoutAnyMandatoryField : PXBqlTable, IBqlTable
 	{
 		#region ID
 		[PXDBIdentity(IsKey = true)]

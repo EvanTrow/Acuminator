@@ -24,7 +24,7 @@ namespace PX.Objects
 	}
 
 	[PXHidden]
-	public class SOInvoice : IBqlTable
+	public class SOInvoice : PXBqlTable, IBqlTable
 	{
 		#region RefNbr
 		[PXDBString(8, IsKey = true, InputMask = "")]
@@ -34,7 +34,7 @@ namespace PX.Objects
 	}
 
 	[PXHidden]
-	public class ARInvoice : IBqlTable
+	public class ARInvoice : PXBqlTable, IBqlTable
 	{
 	}
 }

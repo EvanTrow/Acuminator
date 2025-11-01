@@ -7,6 +7,6 @@ using PX.Data;
 
 namespace PX.Analyzers.Test.Sources
 {
-	public class SOOrder : IBqlTable { }
+	public class SOOrder : PXBqlTable, IBqlTable { }
 	public class SOOrderExt : PXCacheExtension<SOOrder> { }
 }

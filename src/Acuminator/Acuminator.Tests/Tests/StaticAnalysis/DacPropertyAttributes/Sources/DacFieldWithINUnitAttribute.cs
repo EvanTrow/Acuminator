@@ -11,7 +11,7 @@ using PX.Objects.PO;
 namespace PX.Objects.HackathonDemo
 {
 	[PXHidden]
-	public class DacFieldWithINUnitAttribute : IBqlTable
+	public class DacFieldWithINUnitAttribute : PXBqlTable, IBqlTable
 	{
 		#region UOM
 		public abstract class uOM : BqlString.Field<uOM> { }

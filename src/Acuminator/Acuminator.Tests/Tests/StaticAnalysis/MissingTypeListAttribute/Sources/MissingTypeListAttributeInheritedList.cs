@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.MissingTypeListAttribute.Sources
 {
-    public class InheritedListDac : IBqlTable
+    public class InheritedListDac : PXBqlTable, IBqlTable
     {
         public abstract class someField { }
         [PXDBDecimal]

@@ -8,7 +8,7 @@ namespace Acuminator.Tests.Sources
 	/// <exclude/>
 	[PXProjection(typeof(Select<BaseDac>))]
 	[PXCacheName("Projection DAC")]
-	public class ProjectionDac : IBqlTable
+	public class ProjectionDac : PXBqlTable, IBqlTable
 	{
 		#region ID
 		public abstract class iD : BqlInt.Field<iD> { }
@@ -28,7 +28,7 @@ namespace Acuminator.Tests.Sources
 	/// <exclude/>
 	[PXProjection(typeof(Select<BaseDac>), Persistent = true)]
 	[PXCacheName("Projection DAC")]
-	public class PersistentProjectionDac : IBqlTable
+	public class PersistentProjectionDac : PXBqlTable, IBqlTable
 	{
 		#region ID
 		public abstract class iD : BqlInt.Field<iD> { }

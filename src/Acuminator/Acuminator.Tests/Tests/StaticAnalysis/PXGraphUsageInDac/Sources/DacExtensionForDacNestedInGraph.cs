@@ -28,7 +28,7 @@ namespace Acuminator.Tests.Sources
 	public class SOOrderMaintSync : PXGraph<SOOrderMaintSync>
 	{
 		[PXHidden]
-		public class NestedSOOrder : IBqlTable
+		public class NestedSOOrder : PXBqlTable, IBqlTable
 		{
 			public abstract class orderNbr : IBqlField { }
 

@@ -9,7 +9,7 @@ using PX.Data;
 namespace PX.Objects.HackathonDemo
 {
 	[PXCacheName("ARInvoice")]
-	public class ARInvoice : IBqlTable { }
+	public class ARInvoice : PXBqlTable, IBqlTable { }
 
 	public abstract class InvoiceEntryBase : PXGraph<InvoiceEntryBase, ARInvoice>
 	{

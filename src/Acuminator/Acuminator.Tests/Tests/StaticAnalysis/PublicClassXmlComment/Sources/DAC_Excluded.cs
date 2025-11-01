@@ -9,7 +9,7 @@ using PX.Data;
 namespace PX.Objects
 {
 	/// <exclude/>
-	public class ExcludedDac : IBqlTable
+	public class ExcludedDac : PXBqlTable, IBqlTable
 	{
 	}
 }

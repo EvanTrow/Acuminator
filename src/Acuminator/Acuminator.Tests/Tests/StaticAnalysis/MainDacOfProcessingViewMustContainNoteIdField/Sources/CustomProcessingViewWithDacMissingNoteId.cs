@@ -28,7 +28,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MainDacOfProcessingViewMustConta
 
 	/// <exclude/>
 	[PXCacheName("Order DAC")]
-	public class OrderDac : IBqlTable
+	public class OrderDac : PXBqlTable, IBqlTable
 	{
 		#region OrderID
 		public abstract class orderID : PX.Data.BQL.BqlInt.Field<orderID> { }

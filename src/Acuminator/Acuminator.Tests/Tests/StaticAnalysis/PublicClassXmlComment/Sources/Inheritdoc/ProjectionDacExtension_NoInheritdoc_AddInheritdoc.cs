@@ -63,7 +63,7 @@ namespace PX.Objects
 			LeftJoin<Branch, On<Branch.branchID, Equal<GLTran.branchID>>>,
 			Where<GLTran.released, Equal<True>>>))]
 	[PXCacheName("Projection DAC")]
-	public class GLTranScoreWithReclass : IBqlTable
+	public class GLTranScoreWithReclass : PXBqlTable, IBqlTable
 	{
 		
 	}

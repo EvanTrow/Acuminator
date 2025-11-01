@@ -1,6 +1,6 @@
 ﻿using PX.Data;
 
-public class BAccount : IBqlTable { }
+public class BAccount : PXBqlTable, IBqlTable { }
 public class Vendor : BAccount { }
 public class Customer : BAccount { }
 

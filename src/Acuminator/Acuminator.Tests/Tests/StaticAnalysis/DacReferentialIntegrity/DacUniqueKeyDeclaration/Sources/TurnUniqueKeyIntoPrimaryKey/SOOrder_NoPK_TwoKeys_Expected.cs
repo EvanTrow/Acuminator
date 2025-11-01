@@ -4,7 +4,7 @@ using PX.Data.ReferentialIntegrity.Attributes;
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.Sources
 {
 	[PXCacheName("SO Order")]
-	public class SOOrderNoPKTwoKeys : IBqlTable
+	public class SOOrderNoPKTwoKeys : PXBqlTable, IBqlTable
 	{
 		public class PK : PrimaryKeyOf<SOOrderNoPKTwoKeys>.By<orderType, orderNbr>
 		{

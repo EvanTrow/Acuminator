@@ -22,7 +22,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MissingTypeListAttribute.Sources
 	}
 
 	[PXHidden]
-	public partial class SOOrder : IBqlTable
+	public partial class SOOrder : PXBqlTable, IBqlTable
 	{
 		#region Status
 		/// <inheritdoc cref="Status"/>
