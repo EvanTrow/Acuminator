@@ -23,26 +23,32 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity
 
 		[Theory]
 		[EmbeddedFileData(@"MissingPrimaryKey\INUnit_MultipleUniqueKeys_NoPK_NoSuitableUK.cs")]
-		public async Task MultipleUKs_WithoutPrimaryKey_NoUniqueKeySuitableToBePK(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task MultipleUKs_WithoutPrimaryKey_NoUniqueKeySuitableToBePK(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1033_MissingDacPrimaryKeyDeclaration.CreateFor(9, 23));
 
 		[Theory]
 		[EmbeddedFileData(@"MissingPrimaryKey\SOOrder_NoPK_And_SingleUK_NotSuitableToBePK.cs")]
-		public async Task SingleUK_WithoutPrimaryKey_NoUniqueKeySuitableToBePK(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task SingleUK_WithoutPrimaryKey_NoUniqueKeySuitableToBePK(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1033_MissingDacPrimaryKeyDeclaration.CreateFor(7, 15));
+
+		[Theory]
+		[EmbeddedFileData(@"MissingPrimaryKey\SOOrder_NoPK_And_SingleDirtyPKKey_NotSuitableToBePK.cs")]
+		public Task SingleDirtyPK_WithoutPrimaryKey_NoKeySuitableToBePK(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
+				Descriptors.PX1033_MissingDacPrimaryKeyDeclaration.CreateFor(9, 15));
 
 		[Theory]
 		[EmbeddedFileData(@"MissingPrimaryKey\INUnit_MultipleUniqueKeys_NoPK_NoSuitableUK.cs",
 						  @"MissingPrimaryKey\INUnit_MultipleUniqueKeys_NoPK_NoSuitableUK_Expected.cs")]
-		public async Task AddPrimaryKeyDeclaration_MultipleUKs_VerifyCodeFix(string actual, string expected) =>
-			await VerifyCSharpFixAsync(actual, expected);
+		public Task AddPrimaryKeyDeclaration_MultipleUKs_VerifyCodeFix(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected);
 
 		[Theory]
 		[EmbeddedFileData(@"MissingPrimaryKey\SOOrder_NoPK_And_SingleUK_NotSuitableToBePK.cs",
 						  @"MissingPrimaryKey\SOOrder_NoPK_And_SingleUK_NotSuitableToBePK_Expected.cs")]
-		public async Task AddPrimaryKeyDeclaration_SingleUK_VerifyCodeFix(string actual, string expected) =>
-			await VerifyCSharpFixAsync(actual, expected);
+		public Task AddPrimaryKeyDeclaration_SingleUK_VerifyCodeFix(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected);
 	}
 }

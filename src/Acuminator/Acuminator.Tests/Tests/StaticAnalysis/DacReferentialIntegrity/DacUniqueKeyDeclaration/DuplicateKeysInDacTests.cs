@@ -23,8 +23,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity
 
 		[Theory]
 		[EmbeddedFileData(@"DuplicateKeys\Dac_DuplicateKeys.cs")]
-		public async Task Dac_DuplicateUniqueKeys(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task Dac_DuplicateUniqueKeys(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1035_MultipleKeyDeclarationsInDacWithSameFields.CreateFor(
 					location: (Line: 9, Column: 16),
 					extraLocations:
@@ -51,17 +51,17 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity
 
 		[Theory]
 		[EmbeddedFileData(@"DuplicateKeys\Dac_DirtyAndRegularKeys_NoDuplicates.cs")]
-		public async Task Dac_PrimaryKeys_Regular_And_Dirty_NotDuplicates_NoDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task Dac_PrimaryKeys_Regular_And_Dirty_NotDuplicates_NoDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"DuplicateKeys\Dac_DuplicateKeys_Expected.cs")]
-		public async Task Dac_DuplicateUniqueKeys_AfterCodeFix_NoDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task Dac_DuplicateUniqueKeys_AfterCodeFix_NoDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"DuplicateKeys\Dac_DuplicateKeys.cs", @"DuplicateKeys\Dac_DuplicateKeys_Expected.cs")]
-		public async Task Delete_OtherDuplicateKeys_VerifyCodeFix(string actual, string expected) =>
-			await VerifyCSharpFixAsync(actual, expected);
+		public Task Delete_OtherDuplicateKeys_VerifyCodeFix(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected);
 	}
 }
