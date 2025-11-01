@@ -8,6 +8,7 @@ using System.Threading;
 using Acuminator.Analyzers.StaticAnalysis.Dac;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression;
+using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.PXFieldAttributes;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
@@ -218,6 +219,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 				if (stringHash == null)
 					continue;
 
+				if (IsDirtyKey(key))
+				{
+					// Add prefix for dirty keys to group them into a separate group 
+					// even if they use the same set of DAC fields as some other non-dirty key
+					stringHash = $"{stringHash}${TypeNames.ReferentialIntegrity.Dirty}";
+				}
+
 				if (processedKeysByHash.TryGetValue(stringHash, out var processedKeysList))
 				{
 					processedKeysList.Add(key);
@@ -231,6 +239,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 
 			return processedKeysByHash;
 		}
+
+		private bool IsDirtyKey(INamedTypeSymbol key) => key.BaseType?.Name == TypeNames.ReferentialIntegrity.Dirty;
 
 		private IEnumerable<List<INamedTypeSymbol>> GetDuplicateKeysGroupsForSameTargetDAC(PXContext context, List<INamedTypeSymbol> keysWithSameDacFields)
 		{
