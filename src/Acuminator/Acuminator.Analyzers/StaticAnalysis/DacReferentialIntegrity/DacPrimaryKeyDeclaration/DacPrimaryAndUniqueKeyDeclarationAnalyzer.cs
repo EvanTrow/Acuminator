@@ -153,7 +153,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 		private void AnalyzeSinglePrimaryKeyDeclaration(SymbolAnalysisContext symbolContext, PXContext context, DacSemanticModel dac, 
 														INamedTypeSymbol keyDeclaration, Dictionary<INamedTypeSymbol, List<ITypeSymbol>> dacFieldsByKey)
 		{
-			if (keyDeclaration.Name != ReferentialIntegrity.PrimaryKeyClassName)
+			// Do not consider dirty keys for the renaming
+			if (keyDeclaration.Name != ReferentialIntegrity.PrimaryKeyClassName && !IsDirtyKey(keyDeclaration))
 			{
 				string keysHash = GetHashForDacKeys(dac);
 
@@ -189,8 +190,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 				? secondKeyDeclaration
 				: firstKeyDeclaration;
 
-			//The second key is a unique key. If it does not named "UK" we should rename it
-			if (uniqueKeyDeclaration.Name != ReferentialIntegrity.UniqueKeyClassName)
+			//The second key is a unique key. If it does not named "UK" we should rename it unless it is a dirty key
+			if (uniqueKeyDeclaration.Name != ReferentialIntegrity.UniqueKeyClassName && !IsDirtyKey(uniqueKeyDeclaration))
 			{
 				ReportKeyDeclarationWithWrongName(symbolContext, context, dac, uniqueKeyDeclaration, RefIntegrityDacKeyType.UniqueKey);
 			}			
@@ -252,18 +253,17 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 		private List<INamedTypeSymbol> GetKeysNotInContainer(List<INamedTypeSymbol> keyDeclarations, INamedTypeSymbol? uniqueKeysContainer, INamedTypeSymbol primaryKey)
 		{
 			bool containerDeclaredIncorrectly = uniqueKeysContainer?.DeclaredAccessibility != Accessibility.Public || !uniqueKeysContainer.IsStatic;
+			var nonDirtyNonPrimaryKeys = keyDeclarations.Where(key => !IsDirtyKey(key) && !key.Equals(primaryKey, SymbolEqualityComparer.Default));
 
 			if (containerDeclaredIncorrectly)
 			{
-				return keyDeclarations.Where(key => !key.Equals(primaryKey, SymbolEqualityComparer.Default))
-									  .ToList(capacity: keyDeclarations.Count - 1);
+				return nonDirtyNonPrimaryKeys.ToList(capacity: keyDeclarations.Count - 1);
 			}
 			else
 			{
-				return keyDeclarations.Where(key => !key.Equals(primaryKey, SymbolEqualityComparer.Default) && 
-													!SymbolEqualityComparer.Default.Equals(key.ContainingType, uniqueKeysContainer) && 
-													!key.GetContainingTypes().Contains(uniqueKeysContainer, SymbolEqualityComparer.Default))
-									  .ToList(capacity: keyDeclarations.Count - 1);
+				return nonDirtyNonPrimaryKeys.Where(key => !SymbolEqualityComparer.Default.Equals(key.ContainingType, uniqueKeysContainer) && 
+															!key.GetContainingTypes().Contains(uniqueKeysContainer, SymbolEqualityComparer.Default))
+											 .ToList(capacity: keyDeclarations.Count - 1);
 			}
 		}
 
@@ -276,6 +276,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 			foreach (INamedTypeSymbol uniqueKey in keyDeclarations)
 			{
 				symbolContext.CancellationToken.ThrowIfCancellationRequested();
+
+				if (IsDirtyKey(uniqueKey))  // Do not consider dirty keys for renaming
+					continue;
 
 				string? uniqueKeyHash = GetHashForSetOfDacFieldsUsedByKey(uniqueKey, dacFieldsByKey);
 				

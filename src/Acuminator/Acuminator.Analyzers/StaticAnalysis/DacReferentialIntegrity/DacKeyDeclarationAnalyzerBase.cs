@@ -240,7 +240,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 			return processedKeysByHash;
 		}
 
-		private bool IsDirtyKey(INamedTypeSymbol key) => key.BaseType?.Name == TypeNames.ReferentialIntegrity.Dirty;
+		protected bool IsDirtyKey(INamedTypeSymbol key) => key.BaseType?.Name == TypeNames.ReferentialIntegrity.Dirty;
 
 		private IEnumerable<List<INamedTypeSymbol>> GetDuplicateKeysGroupsForSameTargetDAC(PXContext context, List<INamedTypeSymbol> keysWithSameDacFields)
 		{
