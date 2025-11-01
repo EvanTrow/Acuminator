@@ -50,8 +50,14 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity
 					]));
 
 		[Theory]
+		[Theory]
+		[EmbeddedFileData(@"DuplicateKeys\Dac_DuplicateKeys_Expected.cs")]
+		public async Task Dac_DuplicateUniqueKeys_AfterCodeFix_NoDiagnostic(string source) =>
+			await VerifyCSharpDiagnosticAsync(source);
+
+		[Theory]
 		[EmbeddedFileData(@"DuplicateKeys\Dac_DuplicateKeys.cs", @"DuplicateKeys\Dac_DuplicateKeys_Expected.cs")]
-		public async Task DeleteOtherDuplicateKeys_VerifyCodeFix(string actual, string expected) =>
+		public async Task Delete_OtherDuplicateKeys_VerifyCodeFix(string actual, string expected) =>
 			await VerifyCSharpFixAsync(actual, expected);
 	}
 }
