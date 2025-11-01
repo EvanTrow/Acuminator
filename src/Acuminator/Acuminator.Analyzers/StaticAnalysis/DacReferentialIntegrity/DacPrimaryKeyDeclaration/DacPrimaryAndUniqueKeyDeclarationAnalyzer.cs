@@ -150,19 +150,24 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 			} 
 		}
 
-		private void AnalyzeSinglePrimaryKeyDeclaration(SymbolAnalysisContext symbolContext, PXContext context, DacSemanticModel dac, 
+		private void AnalyzeSinglePrimaryKeyDeclaration(SymbolAnalysisContext symbolContext, PXContext context, DacSemanticModel dac,
 														INamedTypeSymbol keyDeclaration, Dictionary<INamedTypeSymbol, List<ITypeSymbol>> dacFieldsByKey)
 		{
-			// Do not consider dirty keys for the renaming
-			if (keyDeclaration.Name != ReferentialIntegrity.PrimaryKeyClassName && !IsDirtyKey(keyDeclaration))
+			if (keyDeclaration.Name == ReferentialIntegrity.PrimaryKeyClassName)
+				return;
+
+			bool hasSuitableUniqueKeyForRenaming = !IsDirtyKey(keyDeclaration);  // Do not suggest dirty keys for renaming
+
+			if (hasSuitableUniqueKeyForRenaming)
 			{
 				string keysHash = GetHashForDacKeys(dac);
+				hasSuitableUniqueKeyForRenaming = keysHash == GetHashForSetOfDacFieldsUsedByKey(keyDeclaration, dacFieldsByKey);
+			}
 
-				if (keysHash == GetHashForSetOfDacFieldsUsedByKey(keyDeclaration, dacFieldsByKey))
-					ReportKeyDeclarationWithWrongName(symbolContext, context, dac, keyDeclaration, RefIntegrityDacKeyType.PrimaryKey);
-				else
-					ReportNoPrimaryKeyDeclarationsInDac(symbolContext, context, dac);
-			}		
+			if (hasSuitableUniqueKeyForRenaming)
+				ReportKeyDeclarationWithWrongName(symbolContext, context, dac, keyDeclaration, RefIntegrityDacKeyType.PrimaryKey);
+			else
+				ReportNoPrimaryKeyDeclarationsInDac(symbolContext, context, dac);
 		}
 
 		private void AnalyzeDeclarationOfTwoPrimaryKeys(SymbolAnalysisContext symbolContext, PXContext context, DacSemanticModel dac, 
