@@ -59,10 +59,15 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphLongOperationDuringInitia
 	}
 
 	// Acuminator disable once PX1016 ExtensionDoesNotDeclareIsActiveMethod extension should be constantly active
-	public class SMAccessExtBase : PXGraphExtension<SMAccessPersonalMaint>
+	public class SMAccessExtBase : PXGraphExtension<CustomSMAccessPersonalMaint>
 	{
 		public override void Initialize()
 		{
 		}
+	}
+
+	public class CustomSMAccessPersonalMaint : PXGraph<CustomSMAccessPersonalMaint>
+	{
+		public PXSelect<Users> Identities = null!;
 	}
 }
