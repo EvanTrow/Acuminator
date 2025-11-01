@@ -50,5 +50,11 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity
 						  @"MissingPrimaryKey\SOOrder_NoPK_And_SingleUK_NotSuitableToBePK_Expected.cs")]
 		public Task AddPrimaryKeyDeclaration_SingleUK_VerifyCodeFix(string actual, string expected) =>
 			VerifyCSharpFixAsync(actual, expected);
+
+		[Theory]
+		[EmbeddedFileData(@"MissingPrimaryKey\SOOrder_NoPK_And_SingleDirtyPKKey_NotSuitableToBePK.cs",
+						  @"MissingPrimaryKey\SOOrder_NoPK_And_SingleDirtyPKKey_NotSuitableToBePK_Expected.cs")]
+		public Task AddPrimaryKeyDeclaration_SingleDirtyPK_VerifyCodeFix(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected);
 	}
 }
