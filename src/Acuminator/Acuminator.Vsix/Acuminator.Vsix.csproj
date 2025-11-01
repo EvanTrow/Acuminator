@@ -241,7 +241,7 @@
     <Resource Include="Resources\CodeMap\IsActiveMethod.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-     <Resource Include="Resources\CodeMap\PXAccumulator.png">
+    <Resource Include="Resources\CodeMap\PXAccumulator.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\CodeMap\Overrides\BaseMemberOverrideCategory.png">
@@ -262,7 +262,7 @@
     <Resource Include="Resources\CodeMap\Overrides\PropertyOverrideDark.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-     <Resource Include="Resources\CodeMap\Overrides\PropertyOverrideLight.png">
+    <Resource Include="Resources\CodeMap\Overrides\PropertyOverrideLight.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
@@ -383,8 +383,11 @@
     <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.v110_xp">
       <Version>1.1.2</Version>
     </PackageReference>
+    <PackageReference Include="System.Collections.Immutable">
+      <Version>8.0.0</Version>
+    </PackageReference>
     <PackageReference Include="System.Memory">
-      <Version>4.5.5</Version>
+      <Version>4.6.3</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />
