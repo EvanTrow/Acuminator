@@ -8,7 +8,7 @@ using PX.Data;
 namespace PX.Analyzers.Test.Sources
 {
 	public class SOOrderSecondLevelExt : SOOrderSuperExt { }
-	public class SOOrder : PXBqlTable, IBqlTable { }
+	public class SOOrder : IBqlTable { }
 	public class SOOrderExt : PXCacheExtension<SOOrder> { }
 	public class SOOrderSuperExt : PXCacheExtension<SOOrderExt, SOOrder> { }
 }

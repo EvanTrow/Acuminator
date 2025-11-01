@@ -3,7 +3,7 @@ using System;
 
 namespace Acuminator.Tests.Sources
 {
-    public class ARSPCommissionPeriod : PXBqlTable, IBqlTable
+    public class ARSPCommissionPeriod : IBqlTable
     {
         [PXDate]
         [PXUIField(DisplayName = "From", Visibility = PXUIVisibility.SelectorVisible)]

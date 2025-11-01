@@ -40,7 +40,7 @@ namespace PX.Objects.HackathonDemo.DAC.InconsistentTypesOfDeclaredFieldAndRefere
 {
 	[Serializable]
 	[PXCacheName("Foreign Keys Container")]
-	public class DacWithForeignKeys : PXBqlTable, IBqlTable
+	public class DacWithForeignKeys : IBqlTable
 	{
 		#region PaymentTermsListID
 		[SMDBRecipient]
@@ -108,7 +108,7 @@ namespace PX.Objects.HackathonDemo.DAC.InconsistentTypesOfDeclaredFieldAndRefere
 
 	[Serializable]
 	[PXCacheName("Foreign Dac")]
-	public class ForeignDac : PXBqlTable, IBqlTable
+	public class ForeignDac : IBqlTable
 	{
 		#region PaymentTermsListID
 		/// <summary>

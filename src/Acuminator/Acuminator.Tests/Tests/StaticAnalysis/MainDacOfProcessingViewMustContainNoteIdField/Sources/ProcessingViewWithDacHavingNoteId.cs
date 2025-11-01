@@ -21,7 +21,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MainDacOfProcessingViewMustConta
 	// Acuminator disable once PX1067 MissingBqlFieldRedeclarationInDerivedDac [Justification]
 	/// <exclude/>
 	[PXCacheName("Order Dac")]
-	public class OrderDac : PXBqlTable, IBqlTable
+	public class OrderDac : IBqlTable
 	{
 		#region OrderID
 		public abstract class orderID : PX.Data.BQL.BqlInt.Field<orderID> { }

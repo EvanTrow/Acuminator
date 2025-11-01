@@ -33,7 +33,7 @@ namespace PX.Objects.HackathonDemo
 	}
 
 
-	public class DacWithInvalidAggregatorAttributes : PXBqlTable, IBqlTable
+	public class DacWithInvalidAggregatorAttributes : IBqlTable
 	{
 		#region SomeField
 		public abstract class someField : IBqlField { }

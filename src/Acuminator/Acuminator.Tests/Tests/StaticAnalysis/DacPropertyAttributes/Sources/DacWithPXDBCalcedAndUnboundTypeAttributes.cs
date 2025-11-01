@@ -7,7 +7,7 @@ using System;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacFieldWithDBCalcedAttribute.Sources
 {
-	public class Activity : PXBqlTable, IBqlTable
+	public class Activity : IBqlTable
 	{
 		[PXDate]
 		[PXDBCalced(

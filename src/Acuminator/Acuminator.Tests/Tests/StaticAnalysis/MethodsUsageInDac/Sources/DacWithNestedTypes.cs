@@ -3,7 +3,7 @@ using System;
 
 namespace Acuminator.Tests.Sources
 {
-    public class SOOrder : PXBqlTable, IBqlTable
+    public class SOOrder : IBqlTable
     {
 	    private class SOShipmentNbrAttribute : PXIntAttribute
 	    {

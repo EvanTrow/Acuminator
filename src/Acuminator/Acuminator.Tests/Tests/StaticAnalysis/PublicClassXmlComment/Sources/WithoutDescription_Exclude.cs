@@ -6,7 +6,7 @@ namespace PX.Objects
 {
 	/// <exclude/>
 	[PXCacheName("Without description")]
-	public class WithoutDescription : PXBqlTable, IBqlTable
+	public class WithoutDescription : IBqlTable
 	{
 	}
 
@@ -15,7 +15,7 @@ namespace PX.Objects
 	/// Test remark is not lost
 	/// </remarks>
 	[PXCacheName("Without description but with remark")]
-	public class WithoutDescriptionButWithRemark : PXBqlTable, IBqlTable
+	public class WithoutDescriptionButWithRemark : IBqlTable
 	{
 	}
 }

@@ -40,7 +40,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MainDacOfProcessingViewMustConta
 	}
 
 	[PXHidden]
-	public class BaseDac : PXBqlTable, IBqlTable
+	public class BaseDac : IBqlTable
 	{
 		#region NoteID
 		public abstract class noteID : PX.Data.BQL.BqlGuid.Field<noteID> { }

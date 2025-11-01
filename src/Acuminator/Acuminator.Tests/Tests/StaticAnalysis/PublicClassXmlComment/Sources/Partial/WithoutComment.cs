@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PX.Objects
 {
-	public partial class Helper : PXBqlTable, IBqlTable
+	public partial class Helper : IBqlTable
 	{
 		
 	}

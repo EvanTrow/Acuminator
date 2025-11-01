@@ -6,7 +6,7 @@ namespace Acuminator.Tests.Sources
 {
 	/// <exclude/>
 	[PXCacheName("DAC missing multiple audit fields")]
-	public class DacMissingMultipleAuditFields : PXBqlTable, IBqlTable
+	public class DacMissingMultipleAuditFields : IBqlTable
 	{
 		#region tstamp
 		[PXDBTimestamp]

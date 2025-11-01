@@ -42,7 +42,7 @@ namespace PX.Analyzers.Test.Sources
 	}
 
 	[PXHidden]
-	public class SomeDocument : PXBqlTable, IBqlTable
+	public class SomeDocument : IBqlTable
 	{
 	}
 }

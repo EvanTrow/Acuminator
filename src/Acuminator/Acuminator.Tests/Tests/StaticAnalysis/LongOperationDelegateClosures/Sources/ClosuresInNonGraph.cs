@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace Acuminator.Tests.Sources
 {
 	[PXHidden]
-	public class SomeDAC : PXBqlTable, IBqlTable
+	public class SomeDAC : IBqlTable
 	{
 	}
 

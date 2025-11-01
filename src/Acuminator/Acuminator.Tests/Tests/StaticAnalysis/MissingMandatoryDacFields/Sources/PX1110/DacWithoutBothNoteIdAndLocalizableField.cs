@@ -5,7 +5,7 @@ namespace Acuminator.Tests.Sources
 {
 	/// <exclude/>
 	[PXCacheName("DAC without both NoteID and localizable field")]
-	public class DacWithoutBothNoteIdAndLocalizableField : PXBqlTable, IBqlTable
+	public class DacWithoutBothNoteIdAndLocalizableField : IBqlTable
 	{
 		#region DacId
 		[PXDBIdentity(IsKey = true)]

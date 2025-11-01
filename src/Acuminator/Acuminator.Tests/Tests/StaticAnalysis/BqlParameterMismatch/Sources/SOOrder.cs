@@ -8,7 +8,7 @@ using PX.Data;
 namespace PX.Objects.HackathonDemo
 {
 	[PXHidden]
-	public class SOOrder : PXBqlTable, IBqlTable
+	public class SOOrder : IBqlTable
 	{
 		#region OrderType
 		public abstract class orderType : PX.Data.BQL.BqlString.Field<orderType> { }

@@ -16,7 +16,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXActionExecution
         }
     }
 
-    public class SOInvoice : PXBqlTable, IBqlTable
+    public class SOInvoice : IBqlTable
     {
         [PXDBString(8, IsKey = true, InputMask = "")]
         public string RefNbr { get; set; }

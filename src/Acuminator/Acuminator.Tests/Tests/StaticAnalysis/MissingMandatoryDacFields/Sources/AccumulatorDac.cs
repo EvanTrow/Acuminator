@@ -6,7 +6,7 @@ namespace Acuminator.Tests.Sources
 	/// <exclude/>
 	[PXAccumulator]
 	[PXCacheName("Accumulator DAC - should not be checked")]
-	public class AccumulatorDac : PXBqlTable, IBqlTable
+	public class AccumulatorDac : IBqlTable
 	{
 		#region DacId
 		[PXDBIdentity(IsKey = true)]
@@ -24,7 +24,7 @@ namespace Acuminator.Tests.Sources
 	/// <exclude/>
 	[DerivedAccumulator]
 	[PXCacheName("Derived Accumulator DAC - should not be checked")]
-	public class DerivedAccumulatorDac : PXBqlTable, IBqlTable
+	public class DerivedAccumulatorDac : IBqlTable
 	{
 		#region ID
 		[PXDBIdentity(IsKey = true)]

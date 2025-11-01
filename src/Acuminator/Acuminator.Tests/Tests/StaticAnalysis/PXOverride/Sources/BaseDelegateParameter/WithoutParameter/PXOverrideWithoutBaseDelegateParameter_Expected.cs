@@ -32,7 +32,7 @@ namespace Acuminator.Tests.Sources
 
 	// Acuminator disable once PX1016 ExtensionDoesNotDeclareIsActiveMethod extension should be constantly active
 	public abstract class BaseExtension<TDac> : PXGraphExtension<MyGraph>
-	where TDac : PXBqlTable, IBqlTable
+	where TDac : IBqlTable
 	{
 		public virtual TDac TestMethod1(TDac x, bool drilldown, double y)
 		{
@@ -58,7 +58,7 @@ namespace Acuminator.Tests.Sources
 	}
 
 	[PXHidden]
-	public class MyDac : PXBqlTable, IBqlTable
+	public class MyDac : IBqlTable
 	{
 	}
 }

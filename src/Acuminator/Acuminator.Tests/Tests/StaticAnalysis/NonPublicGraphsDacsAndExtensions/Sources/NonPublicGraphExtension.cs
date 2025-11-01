@@ -52,7 +52,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.NonPublicGraphsDacsAndExtensions
 	}
 
 	[PXHidden]
-	public class SOOrder : PXBqlTable, IBqlTable
+	public class SOOrder : IBqlTable
 	{
 
 	}

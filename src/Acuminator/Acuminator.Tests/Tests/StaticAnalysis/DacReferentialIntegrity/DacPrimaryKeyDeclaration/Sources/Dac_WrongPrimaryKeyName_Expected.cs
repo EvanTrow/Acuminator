@@ -4,7 +4,7 @@ using PX.Data.ReferentialIntegrity.Attributes;
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.Sources
 {
 	[PXPrimaryGraph(typeof(PX.Objects.SO.SOOrderEntry))]
-	public class SOOrder : PXBqlTable, IBqlTable
+	public class SOOrder : IBqlTable
 	{
 		public class PK : PrimaryKeyOf<SOOrder>.By<orderType, orderNbr>
 		{

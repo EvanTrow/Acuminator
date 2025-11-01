@@ -88,7 +88,7 @@ namespace PX.Objects
 			throw new PXSetupNotEnteredException("Setup is not entered", typeof(SOInvoice));
 	}
 
-	public class SOInvoice : PXBqlTable, IBqlTable
+	public class SOInvoice : IBqlTable
 	{
 		#region RefNbr
 		[PXDBString(8, IsKey = true, InputMask = "")]

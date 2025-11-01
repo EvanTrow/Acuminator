@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace PX.Objects
 {
 	[PXHidden]
-	public class Dac : PXBqlTable, IBqlTable
+	public class Dac : IBqlTable
 	{
 	}
 

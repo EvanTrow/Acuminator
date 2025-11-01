@@ -4,7 +4,7 @@ using PX.Data.ReferentialIntegrity.Attributes;
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.DacForeignKeyDeclaration.Sources.UnboundFieldInKey
 {
 	[PXCacheName("SO Line")]
-	public partial class SOLineWithUnboundFieldInCompositeFK : PXBqlTable, IBqlTable
+	public partial class SOLineWithUnboundFieldInCompositeFK : IBqlTable
 	{
 		public class PK : PrimaryKeyOf<SOLineWithUnboundFieldInCompositeFK>.By<orderType, orderNbr, lineNbr>
 		{

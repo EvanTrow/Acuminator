@@ -17,7 +17,7 @@ namespace PX.Analyzers.Test.Sources
 	}
 
 	[PXHidden]
-	public class Dac : PXBqlTable, IBqlTable
+	public class Dac : IBqlTable
 	{
 	}
 }

@@ -47,7 +47,7 @@ namespace PX.Objects.HackathonDemo
 	}
 
 
-	public class Foo : PXBqlTable, IBqlTable
+	public class Foo : IBqlTable
 	{
 		public abstract class unboundField : IBqlField { }
 

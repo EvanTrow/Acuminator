@@ -6,7 +6,7 @@ namespace PX.Objects
 {
 	///
 	[PXCacheName("Without Summary")]
-	public class WithoutSummary : PXBqlTable, IBqlTable
+	public class WithoutSummary : IBqlTable
 	{
 	}
 }

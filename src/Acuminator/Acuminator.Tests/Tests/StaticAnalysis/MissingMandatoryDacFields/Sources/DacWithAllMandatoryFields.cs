@@ -6,7 +6,7 @@ namespace Acuminator.Tests.Sources
 {
 	/// <exclude/>
 	[PXCacheName("DAC with All Mandatory Fields")]
-	public class DacWithAllMandatoryFields : PXBqlTable, IBqlTable
+	public class DacWithAllMandatoryFields : IBqlTable
 	{
 		#region DacId
 		[PXDBIdentity(IsKey = true)]

@@ -60,7 +60,7 @@ namespace PX.Objects
 			throw new InvalidOperationException("Something bad happened");
 	}
 
-	public class SOInvoice : PXBqlTable, IBqlTable
+	public class SOInvoice : IBqlTable
 	{
 		#region RefNbr
 		[PXDBString(8, IsKey = true, InputMask = "")]

@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.MissingTypeListAttribute.Sources
 {
-	public class BadDac : PXBqlTable, IBqlTable
+	public class BadDac : IBqlTable
 	{
 		public abstract class someField { }
 		[PXStringList(new[] { "O", "N" }, new[] { "Open", "New" })]

@@ -27,7 +27,7 @@ namespace PX.Analyzers.Test.Sources
 	}
 
 	[PXHidden]
-	public class BaseDac : PXBqlTable, IBqlTable
+	public class BaseDac : IBqlTable
 	{
 		#region Status
 		public abstract class stattus : PX.Data.BQL.BqlString.Field<stattus> { }

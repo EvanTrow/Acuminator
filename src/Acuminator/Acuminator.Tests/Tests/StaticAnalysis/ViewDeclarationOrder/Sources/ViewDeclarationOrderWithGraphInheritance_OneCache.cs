@@ -1,6 +1,6 @@
 ﻿using PX.Data;
 
-public class ARInvoice : PXBqlTable, IBqlTable
+public class ARInvoice : IBqlTable
 {
 }
 

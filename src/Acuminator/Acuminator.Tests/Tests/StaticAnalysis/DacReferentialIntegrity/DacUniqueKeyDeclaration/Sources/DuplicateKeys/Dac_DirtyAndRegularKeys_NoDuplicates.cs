@@ -7,7 +7,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.Sources
 	// Acuminator disable once PX1069 MissingMandatoryDacFields [Justification]
 	/// <exclude/>
 	[PXCacheName("SO Order")]
-	public class SOOrder : PXBqlTable, IBqlTable
+	public class SOOrder : IBqlTable
 	{
 		public class PK : PrimaryKeyOf<SOOrder>.By<orderType, orderNbr>
 		{

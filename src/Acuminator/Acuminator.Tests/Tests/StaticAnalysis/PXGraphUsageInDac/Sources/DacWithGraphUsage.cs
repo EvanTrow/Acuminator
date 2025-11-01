@@ -4,7 +4,7 @@ using System;
 namespace Acuminator.Tests.Sources
 {
     [Serializable]
-    public class SOOrder : PXBqlTable, IBqlTable
+    public class SOOrder : IBqlTable
     {
         public abstract class shipmentNbr : IBqlField { }
         [PXInt]

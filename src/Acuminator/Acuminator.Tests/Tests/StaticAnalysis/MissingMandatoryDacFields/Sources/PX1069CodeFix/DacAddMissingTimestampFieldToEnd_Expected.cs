@@ -7,7 +7,7 @@ namespace Acuminator.Tests.Sources
 {
 	/// <exclude/>
 	[PXCacheName("DAC missing only tstamp field")]
-	public class DacAddMissingTimestampFieldToEnd : PXBqlTable, IBqlTable
+	public class DacAddMissingTimestampFieldToEnd : IBqlTable
 	{
 		#region CreatedByID
 		[PXDBCreatedByID]

@@ -7,7 +7,7 @@ using PX.Data;
 namespace PX.Analyzers.Test.Sources
 {
 	[PXHidden]
-	public class DacWithoutBqlFields : PXBqlTable, IBqlTable
+	public class DacWithoutBqlFields : IBqlTable
 	{
 		public abstract class boolField : PX.Data.BQL.BqlBool.Field<boolField> { }
 

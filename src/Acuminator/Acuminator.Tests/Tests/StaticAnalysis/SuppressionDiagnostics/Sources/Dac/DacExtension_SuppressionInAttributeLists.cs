@@ -28,7 +28,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.NoIsActiveMethodForExtension.Sou
 
 	// Acuminator disable once PX1069 MissingMandatoryDacFields [Justification]
 	[PXHidden]
-	public class SOOrder : PXBqlTable, IBqlTable
+	public class SOOrder : IBqlTable
 	{
 		#region OrderType
 		public abstract class orderType : IBqlField { }

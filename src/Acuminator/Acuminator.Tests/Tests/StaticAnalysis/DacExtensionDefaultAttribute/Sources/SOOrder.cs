@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PX.Objects.HackathonDemo
 {
-    public class SOOrder : PXBqlTable, IBqlTable
+    public class SOOrder : IBqlTable
     {
     }
 }

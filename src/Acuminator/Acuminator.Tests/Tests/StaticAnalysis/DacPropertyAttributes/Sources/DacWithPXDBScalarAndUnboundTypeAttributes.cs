@@ -7,7 +7,7 @@ using System;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacFieldWithDBCalcedAttribute.Sources
 {
-	public class Activity2 : PXBqlTable, IBqlTable
+	public class Activity2 : IBqlTable
 	{
 		#region OffsetCashAccountID
 		public abstract class offsetCashAccountID : PX.Data.BQL.BqlInt.Field<offsetCashAccountID> { }

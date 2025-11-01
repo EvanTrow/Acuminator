@@ -3,7 +3,7 @@
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.DacForeignKeyDeclaration.Sources
 {
 	[PXCacheName("SO Order")]
-	public class SOOrderUnbound : PXBqlTable, IBqlTable
+	public class SOOrderUnbound : IBqlTable
 	{
 		[PXString(IsKey = true, InputMask = "")]
 		[PXDefault]

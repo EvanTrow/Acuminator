@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class IIGPOALCLandedCost : PXBqlTable, IBqlTable
+	public class IIGPOALCLandedCost : IBqlTable
 	{
 		#region Selected
 		public abstract class selected : PX.Data.IBqlField { }

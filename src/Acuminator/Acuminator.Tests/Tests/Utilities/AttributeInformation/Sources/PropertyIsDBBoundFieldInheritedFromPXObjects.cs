@@ -3,7 +3,7 @@ using PX.Objects.GL;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class IIGPOALCLandedCost : PXBqlTable, IBqlTable
+	public class IIGPOALCLandedCost : IBqlTable
 	{
 		#region AcctSubBound
 		public abstract class cost : PX.Data.IBqlField { }

@@ -47,7 +47,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreationInGraphInWrongPla
         }
     }
 
-    public class SOOrder : PXBqlTable, IBqlTable
+    public class SOOrder : IBqlTable
     {
         [PXDBString(8, IsKey = true, InputMask = "")]
         public string RefNbr { get; set; }

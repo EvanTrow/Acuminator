@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class DacWithNotAcumaticaAttribute : PXBqlTable, IBqlTable
+	public class DacWithNotAcumaticaAttribute : IBqlTable
 	{
 		public abstract class someField : IBqlField { }
 

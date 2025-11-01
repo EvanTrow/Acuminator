@@ -3,7 +3,7 @@
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.Sources
 {
 	[PXCacheName("SO Line")]
-	public class SOLine : PXBqlTable, IBqlTable
+	public class SOLine : IBqlTable
 	{
 		public abstract class orderType : PX.Data.BQL.BqlString.Field<orderType> { }
 

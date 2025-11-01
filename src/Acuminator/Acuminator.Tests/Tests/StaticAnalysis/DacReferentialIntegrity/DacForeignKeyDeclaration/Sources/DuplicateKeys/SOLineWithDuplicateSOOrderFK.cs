@@ -5,7 +5,7 @@ using PX.Objects.IN;
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.DacForeignKeyDeclaration.Sources.DuplicateKeys
 {
 	[PXCacheName("SO Line")]
-	public partial class SOLineWithDuplicateSOOrderFK : PXBqlTable, IBqlTable
+	public partial class SOLineWithDuplicateSOOrderFK : IBqlTable
 	{
 		public class PK : PrimaryKeyOf<SOLineWithDuplicateSOOrderFK>.By<orderType, orderNbr, lineNbr>
 		{
@@ -66,7 +66,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.DacForei
 	/// A DAC used to provide PK to compile SOLine sources with foreign keys which refer to SOOrder PK
 	/// </summary>
 	[PXHidden]
-	public class SOOrder : PXBqlTable, IBqlTable
+	public class SOOrder : IBqlTable
 	{
 		public class PK : PrimaryKeyOf<SOOrder>.By<orderType, orderNbr>
 		{

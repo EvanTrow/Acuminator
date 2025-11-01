@@ -5,7 +5,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph.Sources
 {
 	// Acuminator disable once PX1016 ExtensionDoesNotDeclareIsActiveMethod [Justification]
 	public class FirstLevelGenericGraphExtension<TDac> : PXGraphExtension<SomeGraph>
-	where TDac : PXBqlTable, IBqlTable, new()
+	where TDac : IBqlTable, new()
 	{
 	}
 
@@ -31,7 +31,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph.Sources
 	// Acuminator disable once PX1016 ExtensionDoesNotDeclareIsActiveMethod extension should be constantly active
 	public class GenericChainedGraphExtension<TDac> : PXGraphExtension<FirstLevelGenericGraphExtension<TDac>, 
 																	   FirstLevelAbstractWithPXProtectedGraphExtension, SomeGraph>
-	where TDac : PXBqlTable, IBqlTable, new()
+	where TDac : IBqlTable, new()
 	{
 	}
 
@@ -42,7 +42,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph.Sources
 
 	// Acuminator disable once PX1069 MissingMandatoryDacFields [Justification]
 	[PXHidden]
-	public class SOOrder : PXBqlTable, IBqlTable
+	public class SOOrder : IBqlTable
 	{
 		public abstract class orderNbr : BqlString.Field<orderNbr> { }
 

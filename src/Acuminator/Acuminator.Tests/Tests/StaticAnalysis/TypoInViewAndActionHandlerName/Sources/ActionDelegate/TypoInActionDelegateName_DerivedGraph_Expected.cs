@@ -6,7 +6,7 @@ using PX.Data;
 namespace PX.Analyzers.Test.Sources
 {
 	[PXHidden]
-	public class MyDac : PXBqlTable, IBqlTable
+	public class MyDac : IBqlTable
 	{
 	}
 

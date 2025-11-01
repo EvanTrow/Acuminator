@@ -24,7 +24,7 @@ namespace PX.Analyzers.Test.Sources
 		}
 	}
 
-	public class MyDac : PXBqlTable, IBqlTable
+	public class MyDac : IBqlTable
 	{
 	}
 }

@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.IN
 {
-	public class InventoryItem : PXBqlTable, IBqlTable
+	public class InventoryItem : IBqlTable
 	{
 		#region ItemClassID
 		public abstract class itemClassID : PX.Data.IBqlField

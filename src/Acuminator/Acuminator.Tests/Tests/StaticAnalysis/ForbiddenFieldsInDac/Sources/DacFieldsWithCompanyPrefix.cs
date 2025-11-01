@@ -5,7 +5,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ForbiddenFieldsInDac.Sources
 {
 	/// <exclude/>
 	[PXHidden]
-	public partial class SomeOrder : PXBqlTable, IBqlTable
+	public partial class SomeOrder : IBqlTable
 	{
 		#region CompanyLocation
 		public abstract class companyLocation : PX.Data.BQL.BqlString.Field<companyLocation> { }

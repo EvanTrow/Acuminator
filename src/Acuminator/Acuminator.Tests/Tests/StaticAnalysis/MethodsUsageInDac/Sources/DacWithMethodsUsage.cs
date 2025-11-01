@@ -4,7 +4,7 @@ using System;
 namespace Acuminator.Tests.Sources
 {
     [Serializable]
-    public class IIGPOALCLandedCost : PXBqlTable, IBqlTable
+    public class IIGPOALCLandedCost : IBqlTable
     {
         public abstract class hold : IBqlField { }
         protected bool? _Hold;

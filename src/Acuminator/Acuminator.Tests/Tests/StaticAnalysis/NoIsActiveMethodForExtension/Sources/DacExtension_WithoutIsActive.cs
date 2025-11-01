@@ -38,7 +38,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.NoIsActiveMethodForExtension.Sou
 
 
 	[PXHidden]
-	public class SOOrder : PXBqlTable, IBqlTable
+	public class SOOrder : IBqlTable
 	{
 		#region OrderType
 		public abstract class orderType : IBqlField { }

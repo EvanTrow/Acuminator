@@ -8,7 +8,7 @@ namespace Acuminator.Tests.Sources
 	// Acuminator disable once PX1069 MissingMandatoryDacFields This DAC should not be reported, the goal of test is to check the projection DAC
 	/// <exclude/>
 	[PXCacheName("Base DAC")]
-	public class BaseDac : PXBqlTable, IBqlTable
+	public class BaseDac : IBqlTable
 	{
 		#region ID
 		[PXDBIdentity(IsKey = true)]

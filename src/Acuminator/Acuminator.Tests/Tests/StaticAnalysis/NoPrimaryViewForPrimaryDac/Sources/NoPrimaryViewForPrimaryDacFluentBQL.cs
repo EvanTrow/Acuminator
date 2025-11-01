@@ -11,9 +11,9 @@ using PX.Data.BQL.Fluent;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class PRSVRepairPrice : PXBqlTable, IBqlTable { }
+	public class PRSVRepairPrice : IBqlTable { }
 
-	public class PRSVRepairPriceDetails : PXBqlTable, IBqlTable { }
+	public class PRSVRepairPriceDetails : IBqlTable { }
 
 	public class PRSVRepairPriceMaint : PXGraph<PRSVRepairPriceMaint, PRSVRepairPrice>
 	{

@@ -18,7 +18,7 @@ namespace PX.Analyzers.Test.Sources
 		}
 	}
 
-	public class TypoInViewDelegateName_Good_DAC : PXBqlTable, IBqlTable
+	public class TypoInViewDelegateName_Good_DAC : IBqlTable
 	{
 	}
 }

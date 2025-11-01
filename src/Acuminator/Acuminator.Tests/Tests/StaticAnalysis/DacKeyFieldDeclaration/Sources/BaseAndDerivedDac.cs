@@ -3,7 +3,7 @@
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacKeyFieldDeclaration.Sources
 {
 	[PXHidden]
-	public class APRegister : PXBqlTable, IBqlTable
+	public class APRegister : IBqlTable
 	{
 
 		#region RegisterID

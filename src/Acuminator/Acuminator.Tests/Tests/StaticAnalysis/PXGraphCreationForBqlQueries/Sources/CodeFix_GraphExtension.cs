@@ -20,7 +20,7 @@ namespace PX.Objects
 	{
 	}
 
-	public class ARInvoice : PXBqlTable, IBqlTable
+	public class ARInvoice : IBqlTable
 	{
 		#region RefNbr
 		[PXDBString(8, IsKey = true, InputMask = "")]

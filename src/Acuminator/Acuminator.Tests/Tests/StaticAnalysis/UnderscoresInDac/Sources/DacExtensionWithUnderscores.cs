@@ -31,7 +31,7 @@ namespace PX.Objects.HackathonDemo
 		#endregion
 	}
 
-	public class SOOrder : PXBqlTable, IBqlTable
+	public class SOOrder : IBqlTable
 	{
 		//Dummy DAC for tests
 	}

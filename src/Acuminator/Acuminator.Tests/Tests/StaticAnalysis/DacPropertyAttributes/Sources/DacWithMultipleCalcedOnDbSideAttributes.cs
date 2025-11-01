@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class DacWithMultipleSpecialTypeAttributes : PXBqlTable, IBqlTable
+	public class DacWithMultipleSpecialTypeAttributes : IBqlTable
 	{
 		#region OrderType
 		public abstract class orderType : IBqlField { }

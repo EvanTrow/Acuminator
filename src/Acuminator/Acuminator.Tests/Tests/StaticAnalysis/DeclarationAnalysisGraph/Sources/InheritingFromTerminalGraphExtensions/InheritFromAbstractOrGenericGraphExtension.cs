@@ -47,7 +47,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisGraph.Sources
 	}
 
 	[PXHidden]
-	public class SomeDac : PXBqlTable, IBqlTable
+	public class SomeDac : IBqlTable
 	{
 	}
 }

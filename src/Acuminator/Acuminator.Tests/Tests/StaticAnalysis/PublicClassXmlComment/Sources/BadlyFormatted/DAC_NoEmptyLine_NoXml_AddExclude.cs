@@ -11,7 +11,7 @@ namespace PX.Objects
 	/// Some description here to avoid displaying diagnostic on the DAC itself in order to test how exclude code fix application to DAC properties.
 	/// </summary>
 	[PXCacheName("DAC")]
-	public class DAC : PXBqlTable, IBqlTable
+	public class DAC : IBqlTable
 	{
 		#region OrderType
 		public abstract class orderType : IBqlField { }

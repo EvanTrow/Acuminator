@@ -8,7 +8,7 @@ using PX.Data;
 
 namespace PX1000
 {
-	public class APRegister : PXBqlTable, IBqlTable
+	public class APRegister : IBqlTable
 	{ }
 	class PXBaseCuryAttribute : PXDecimalAttribute
 	{

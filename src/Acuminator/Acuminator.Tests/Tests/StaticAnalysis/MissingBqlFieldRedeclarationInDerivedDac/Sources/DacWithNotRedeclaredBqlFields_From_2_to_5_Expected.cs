@@ -23,7 +23,7 @@ namespace PX.Analyzers.Test.Sources
 	}
 
 	[PXHidden]
-	public class BaseDac : PXBqlTable, IBqlTable
+	public class BaseDac : IBqlTable
 	{
 		#region Status
 		[PXString]

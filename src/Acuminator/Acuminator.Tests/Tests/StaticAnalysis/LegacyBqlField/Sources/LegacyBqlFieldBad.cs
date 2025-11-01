@@ -7,7 +7,7 @@ using PX.Objects.CR;
 
 namespace PX.Analyzers.Test.Sources
 {
-	public class BadDac : PXBqlTable, IBqlTable
+	public class BadDac : IBqlTable
 	{
 		public abstract class legacyBoolField : IBqlField { }
 		[PXBool]

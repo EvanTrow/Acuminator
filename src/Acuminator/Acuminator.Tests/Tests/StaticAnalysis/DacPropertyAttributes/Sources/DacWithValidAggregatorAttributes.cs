@@ -10,7 +10,7 @@ namespace PX.Objects.HackathonDemo
 {
 	[Serializable]
 	[PXNonInstantiatedExtension]
-	public sealed class BCBindingCommerce : PXBqlTable, IBqlTable
+	public sealed class BCBindingCommerce : IBqlTable
 	{
 		#region BranchID
 		[Branch(typeof(AccessInfo.branchID))]

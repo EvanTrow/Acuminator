@@ -2,7 +2,7 @@
 
 namespace PX.Objects.HackathonDemo
 {
-	public class CFINCategory : PXBqlTable, IBqlTable
+	public class CFINCategory : IBqlTable
 	{
 		#region CategoryID
 		public abstract class categoryID : IBqlField { }

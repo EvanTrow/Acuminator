@@ -8,7 +8,7 @@ using PX.Objects.CR;
 
 namespace PX.Analyzers.Test.Sources
 {
-	public class GoodDac : PXBqlTable, IBqlTable
+	public class GoodDac : IBqlTable
 	{
 		public abstract class modernBoolField : PX.Data.BQL.BqlBool.Field<modernBoolField> { }
 		[PXBool]

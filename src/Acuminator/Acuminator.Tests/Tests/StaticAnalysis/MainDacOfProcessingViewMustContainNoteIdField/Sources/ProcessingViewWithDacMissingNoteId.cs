@@ -19,7 +19,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MainDacOfProcessingViewMustConta
 		}
 
 		[PXHidden]
-		public class Filter : PXBqlTable, IBqlTable
+		public class Filter : IBqlTable
 		{
 			#region Type
 			public abstract class type : PX.Data.BQL.BqlString.Field<type> { }
@@ -47,7 +47,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.MainDacOfProcessingViewMustConta
 
 	/// <exclude/>
 	[PXCacheName("Order DAC")]
-	public class OrderDac : PXBqlTable, IBqlTable
+	public class OrderDac : IBqlTable
 	{
 		#region OrderID
 		public abstract class orderID : PX.Data.BQL.BqlInt.Field<orderID> { }

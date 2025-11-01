@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo.Suppression.Comments
 {
-	public partial class POOrder : PXBqlTable, IBqlTable
+	public partial class POOrder : IBqlTable
 	{
 		#region CompanyMask
 		public abstract class companyMask : IBqlField { }

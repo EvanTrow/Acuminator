@@ -9,7 +9,7 @@ namespace PX.Objects
 {
 	//
 	/// <exclude/>
-	public partial class Helper : PXBqlTable, IBqlTable
+	public partial class Helper : IBqlTable
 	{
 		
 	}
