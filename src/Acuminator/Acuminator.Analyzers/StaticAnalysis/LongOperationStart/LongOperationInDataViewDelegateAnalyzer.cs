@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
 using Acuminator.Utilities;
@@ -11,22 +10,22 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 {
-    public class LongOperationInDataViewDelegateAnalyzer : PXGraphAggregatedAnalyzerBase
-    {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Descriptors.PX1080_DataViewDelegateLongOperationStart);
+	public class LongOperationInDataViewDelegateAnalyzer : PXGraphAggregatedAnalyzerBase
+	{
+		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+			ImmutableArray.Create(Descriptors.PX1080_DataViewDelegateLongOperationStart);
 
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel pxGraph)
-        {
-            context.CancellationToken.ThrowIfCancellationRequested();
+		{
+			context.CancellationToken.ThrowIfCancellationRequested();
 
-            var walker = new StartLongOperationWalker(context, pxContext, Descriptors.PX1080_DataViewDelegateLongOperationStart);
+			var walker = new StartLongOperationWalker(context, pxContext, Descriptors.PX1080_DataViewDelegateLongOperationStart);
 
-            foreach (DataViewDelegateInfo del in pxGraph.ViewDelegates)
-            {
-                context.CancellationToken.ThrowIfCancellationRequested();
-                walker.Visit(del.Node);
-            }
-        }
-    }
+			foreach (DataViewDelegateInfo del in pxGraph.ViewDelegates)
+			{
+				context.CancellationToken.ThrowIfCancellationRequested();
+				walker.Visit(del.Node);
+			}
+		}
+	}
 }

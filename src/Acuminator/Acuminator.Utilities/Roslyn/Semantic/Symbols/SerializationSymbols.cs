@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Runtime.Serialization;
 
 using Microsoft.CodeAnalysis;
@@ -9,13 +7,13 @@ using Acuminator.Utilities.Roslyn.Constants;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 {
-    public class SerializationSymbols : SymbolsSetBase
-    {
-        internal SerializationSymbols(Compilation compilation) : base(compilation)
-        {
+	public class SerializationSymbols : SymbolsSetBase
+	{
+		internal SerializationSymbols(Compilation compilation) : base(compilation)
+		{
 			NonSerializedAttribute = Compilation.GetTypeByMetadataName(typeof(NonSerializedAttribute).FullName)!;
-			SerializationInfo      = Compilation.GetTypeByMetadataName(typeof(SerializationInfo).FullName)!;
-			StreamingContext       = Compilation.GetTypeByMetadataName(typeof(StreamingContext).FullName)!;
+			SerializationInfo 	   = Compilation.GetTypeByMetadataName(typeof(SerializationInfo).FullName)!;
+			StreamingContext 	   = Compilation.GetTypeByMetadataName(typeof(StreamingContext).FullName)!;
 		}
 
 		public INamedTypeSymbol NonSerializedAttribute { get; }
