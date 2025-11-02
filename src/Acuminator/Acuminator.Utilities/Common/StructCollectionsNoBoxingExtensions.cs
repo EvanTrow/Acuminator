@@ -558,6 +558,35 @@ namespace Acuminator.Utilities.Common
 			return -1;
 		}
 
+		/// <summary>
+		/// Contains method implementation for <see cref="ImmutableArray{TSymbol}"/> without boxing.
+		/// </summary>
+		/// <typeparam name="TSymbol">Generic type parameter representing symbol.</typeparam>
+		/// <param name="source">The source to act on.</param>
+		/// <param name="item">The item.</param>
+		/// <param name="customComparer">(Optional) The custom comparer.</param>
+		/// <returns>
+		/// True if the object is in this collection, false if not.
+		/// </returns>
+		[DebuggerStepThrough]
+		public static bool Contains<TSymbol>(this ImmutableArray<TSymbol> source, TSymbol item, 
+											IEqualityComparer<TSymbol>? customComparer = null)
+		where TSymbol : ISymbol
+		{
+			if (source.IsDefaultOrEmpty)
+				return false;
+
+			IEqualityComparer<TSymbol> comparer = customComparer ?? (SymbolEqualityComparer.Default as IEqualityComparer<TSymbol>)!;
+
+			for (int i = 0; i < source.Length; i++)
+			{
+				if (comparer.Equals(source[i], item))
+					return true;
+			}
+
+			return false;
+		}
+
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int FindIndex<TNode>(this in SeparatedSyntaxList<TNode> source, Func<TNode, bool> condition)
