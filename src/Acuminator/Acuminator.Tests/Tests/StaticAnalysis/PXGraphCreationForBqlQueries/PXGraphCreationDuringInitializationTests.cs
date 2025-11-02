@@ -27,66 +27,66 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreationForBqlQueries
 
 		[Theory]
 		[EmbeddedFileData("ExternalServiceWithPXGraphConstructor.cs", "Customer.cs", "CustomerMaint.cs")]
-		public async Task ExternalServiceWithPXGraphConstructor(string source, string dacSource, string graphSource) =>
-			await VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
+		public Task ExternalServiceWithPXGraphConstructor(string source, string dacSource, string graphSource) =>
+			VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
 				Descriptors.PX1072_PXGraphCreationForBqlQueries_ReuseExistingGraphVariable.CreateFor(17, 13));
 
 		[Theory]
 		[EmbeddedFileData("ExternalServiceWithCreateInstance.cs", "Customer.cs", "CustomerMaint.cs")]
-		public async Task ExternalServiceWithCreateInstance(string source, string dacSource, string graphSource) =>
-			await VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
+		public Task ExternalServiceWithCreateInstance(string source, string dacSource, string graphSource) =>
+			VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
 				Descriptors.PX1072_PXGraphCreationForBqlQueries_ReuseExistingGraphVariable.CreateFor(17, 13));
 
 		[Theory]
 		[EmbeddedFileData("InstanceMethodInPXGraphWithPXGraphConstructor.cs")]
-		public async Task InstanceMethodInPXGraphWithPXGraphConstructor(string source) => await VerifyCSharpDiagnosticAsync(source,
+		public Task InstanceMethodInPXGraphWithPXGraphConstructor(string source) => VerifyCSharpDiagnosticAsync(source,
 			Descriptors.PX1072_PXGraphCreationForBqlQueries_ReuseExistingGraphVariable.CreateFor(15, 13));
 
 		[Theory]
 		[EmbeddedFileData("InstanceMethodInPXGraphWithCreateInstance.cs")]
-		public async Task InstanceMethodInPXGraphWithCreateInstance(string source) => await VerifyCSharpDiagnosticAsync(source,
+		public Task InstanceMethodInPXGraphWithCreateInstance(string source) => VerifyCSharpDiagnosticAsync(source,
 			Descriptors.PX1072_PXGraphCreationForBqlQueries_ReuseExistingGraphVariable.CreateFor(15, 13));
 
 		[Theory]
 		[EmbeddedFileData("PXGraphConstructorInVariable.cs", "Customer.cs", "CustomerMaint.cs")]
-		public async Task PXGraphConstructorInVariable(string source, string dacSource, string graphSource) =>
-			await VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
+		public Task PXGraphConstructorInVariable(string source, string dacSource, string graphSource) =>
+			VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
 				Descriptors.PX1072_PXGraphCreationForBqlQueries_ReuseExistingGraphVariable.CreateFor(18, 13));
 
 		[Theory]
 		[EmbeddedFileData("ExternalServiceWithCreateInstanceInVariable.cs", "Customer.cs", "CustomerMaint.cs")]
-		public async Task ExternalServiceWithCreateInstanceInVariable(string source, string dacSource, string graphSource) =>
-			await VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
+		public Task ExternalServiceWithCreateInstanceInVariable(string source, string dacSource, string graphSource) =>
+			VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
 				Descriptors.PX1072_PXGraphCreationForBqlQueries_ReuseExistingGraphVariable.CreateFor(18, 13));
 
 		[Theory]
 		[EmbeddedFileData("ExternalServiceWithMethodParameter.cs", "Customer.cs", "CustomerMaint.cs")]
-		public async Task ExternalServiceWithMethodParameter(string source, string dacSource, string graphSource) =>
-			await VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
+		public Task ExternalServiceWithMethodParameter(string source, string dacSource, string graphSource) =>
+			VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
 				Descriptors.PX1072_PXGraphCreationForBqlQueries_ReuseExistingGraphVariable.CreateFor(17, 13));
 
 		[Theory]
 		[EmbeddedFileData("PropertyInExternalService.cs", "Customer.cs", "CustomerMaint.cs")]
-		public async Task PropertyInExternalService(string source, string dacSource, string graphSource) =>
-			await VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
+		public Task PropertyInExternalService(string source, string dacSource, string graphSource) =>
+			VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
 				Descriptors.PX1072_PXGraphCreationForBqlQueries_ReuseExistingGraphVariable.CreateFor(19, 14));
 
 		[Theory]
 		[EmbeddedFileData("InstanceMethodInPXGraphExtensionWithPXGraphConstructor.cs", "Customer.cs", "CustomerMaint.cs")]
-		public async Task InstanceMethodInPXGraphExtensionWithPXGraphConstructor(string source, string dacSource, string graphSource) =>
-			await VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
+		public Task InstanceMethodInPXGraphExtensionWithPXGraphConstructor(string source, string dacSource, string graphSource) =>
+			VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
 				Descriptors.PX1072_PXGraphCreationForBqlQueries_ReuseExistingGraphVariable.CreateFor(15, 13));
 
 		[Theory]
 		[EmbeddedFileData("CustomerMaint_CheckGraphContext.cs")]
-		public async Task InsideGraph_OnlyInstanceMethodsAreReported_WithThisReferenceSuggestion(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task InsideGraph_OnlyInstanceMethodsAreReported_WithThisReferenceSuggestion(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1072_PXGraphCreationForBqlQueries_ReuseExistingGraphVariable.CreateFor(17, 50));
 
 		[Theory]
 		[EmbeddedFileData("ExternalService_TwoQueryWithGraphCreation.cs", "Customer.cs", "CustomerMaint.cs")]
-		public async Task TwoQuery_WithGraphCreationInArgument(string source, string dacSource, string graphSource) =>
-			await VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
+		public Task TwoQuery_WithGraphCreationInArgument(string source, string dacSource, string graphSource) =>
+			VerifyCSharpDiagnosticAsync(source, dacSource, graphSource,
 				Descriptors.PX1072_PXGraphCreationForBqlQueries_CreateSharedGraphVariable.CreateFor(14, 51),
 				Descriptors.PX1072_PXGraphCreationForBqlQueries_CreateSharedGraphVariable.CreateFor(15, 51));
 		#endregion
@@ -95,39 +95,39 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreationForBqlQueries
 
 		[Theory]
 		[EmbeddedFileData("ExternalService.cs", "Customer.cs", "CustomerMaint.cs")]
-		public async Task ExternalService_ShouldNotShowDiagnostic(string source, string dacSource, string graphSource) =>
-			await VerifyCSharpDiagnosticAsync(source, dacSource, graphSource);
+		public Task ExternalService_ShouldNotShowDiagnostic(string source, string dacSource, string graphSource) =>
+			VerifyCSharpDiagnosticAsync(source, dacSource, graphSource);
 
 		[Theory]
 		[EmbeddedFileData("StaticMethodInPXGraphWithPXGraphConstructor.cs")]
-		public async Task StaticMethodInPXGraphWithPXGraphConstructor_ShouldNotShowDiagnostic(string source) =>
-			await VerifyCSharpDiagnosticAsync(source);
+		public Task StaticMethodInPXGraphWithPXGraphConstructor_ShouldNotShowDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData("ExternalService_SingleQueryWithGraphCreation.cs", "Customer.cs", "CustomerMaint.cs")]
-		public async Task SingleQuery_WithGraphCreationInArgument_ShouldNotShowDiagnostic(string source, string dacSource, string graphSource) =>
-			await VerifyCSharpDiagnosticAsync(source, dacSource, graphSource);
+		public Task SingleQuery_WithGraphCreationInArgument_ShouldNotShowDiagnostic(string source, string dacSource, string graphSource) =>
+			VerifyCSharpDiagnosticAsync(source, dacSource, graphSource);
 
 		[Theory]
 		[EmbeddedFileData("ExternalService_TwoQueriesReuseGraphField.cs", "Customer.cs")]
-		public async Task TwoQueries_ReusingSameGraph_InArguments_ShouldNotShowDiagnostic(string source, string dacSource) =>
-			await VerifyCSharpDiagnosticAsync(source, dacSource);
+		public Task TwoQueries_ReusingSameGraph_InArguments_ShouldNotShowDiagnostic(string source, string dacSource) =>
+			VerifyCSharpDiagnosticAsync(source, dacSource);
 
 		[Theory]
 		[EmbeddedFileData("ExternalService_TwoQueries_UseDifferentGraphFields.cs", "Customer.cs")]
-		public async Task TwoQueries_UseDifferentGraphFields_InArguments_ShouldNotShowDiagnostic(string source, string dacSource) =>
-			await VerifyCSharpDiagnosticAsync(source, dacSource);
+		public Task TwoQueries_UseDifferentGraphFields_InArguments_ShouldNotShowDiagnostic(string source, string dacSource) =>
+			VerifyCSharpDiagnosticAsync(source, dacSource);
 
 
 		[Theory]
 		[EmbeddedFileData("InstanceIsUsedOutsideBql.cs", "Customer.cs", "CustomerMaint.cs")]
-		public async Task InstanceIsUsedOutsideBql_ShouldNotShowDiagnostic(string source, string dacSource, string graphSource) =>
-			await VerifyCSharpDiagnosticAsync(source, dacSource, graphSource);
+		public Task InstanceIsUsedOutsideBql_ShouldNotShowDiagnostic(string source, string dacSource, string graphSource) =>
+			VerifyCSharpDiagnosticAsync(source, dacSource, graphSource);
 
 		[Theory]
 		[EmbeddedFileData("ExternalServiceWithUsedVariable.cs", "Customer.cs", "CustomerMaint.cs")]
-		public async Task ExternalServiceWithUsedVariable_ShouldNotShowDiagnostic(string source, string dacSource, string graphSource) =>
-			await VerifyCSharpDiagnosticAsync(source, dacSource, graphSource);
+		public Task ExternalServiceWithUsedVariable_ShouldNotShowDiagnostic(string source, string dacSource, string graphSource) =>
+			VerifyCSharpDiagnosticAsync(source, dacSource, graphSource);
 
 		#endregion
 
@@ -135,28 +135,28 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreationForBqlQueries
 
 		[Theory]
 		[EmbeddedFileData("CodeFix.cs", "CodeFix_Expected_ThisKeyword.cs")]
-		public async Task CodeFix_ThisKeyword(string actual, string expected) =>
-			await VerifyCSharpFixAsync(actual, expected, 0);
+		public Task CodeFix_ThisKeyword(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected, 0);
 
 		[Theory]
 		[EmbeddedFileData("CodeFix.cs", "CodeFix_Expected_MethodParameter.cs")]
-		public async Task CodeFix_MethodParameter(string actual, string expected) =>
-			await VerifyCSharpFixAsync(actual, expected, 1);
+		public Task CodeFix_MethodParameter(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected, 1);
 
 		[Theory]
 		[EmbeddedFileData("CodeFix.cs", "CodeFix_Expected_LocalVariable1.cs")]
-		public async Task CodeFix_LocalVariable1(string actual, string expected) =>
-			await VerifyCSharpFixAsync(actual, expected, 2);
+		public Task CodeFix_LocalVariable1(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected, 2);
 
 		[Theory]
 		[EmbeddedFileData("CodeFix.cs", "CodeFix_Expected_LocalVariable2.cs")]
-		public async Task CodeFix_LocalVariable2(string actual, string expected) =>
-			await VerifyCSharpFixAsync(actual, expected, 3);
+		public Task CodeFix_LocalVariable2(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected, 3);
 
 		[Theory]
 		[EmbeddedFileData("CodeFix_GraphExtension.cs", "CodeFix_GraphExtension_Expected.cs")]
-		public async Task CodeFix_GraphExtension(string actual, string expected) =>
-			await VerifyCSharpFixAsync(actual, expected);
+		public Task CodeFix_GraphExtension(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected);
 
 		#endregion
 	}
