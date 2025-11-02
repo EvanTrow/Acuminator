@@ -1,9 +1,7 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
@@ -21,6 +19,8 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 	/// </summary>
 	public abstract class DelegatesWalkerBase : NestedInvocationWalker
 	{
+		private const int MaxRecursionDepth = 100;
+
 		protected DelegatesWalkerBase(PXContext pxContext, CancellationToken cancellationToken, Func<IMethodSymbol, bool>? extraBypassCheck = null) :
 								 base(pxContext, cancellationToken, extraBypassCheck)
 		{
@@ -33,49 +33,62 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 		/// <returns>
 		/// The delegate expression symbol and node.
 		/// </returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		protected (ISymbol? DelegateSymbol, SyntaxNode? DelegateNode) GetDelegateSymbolAndNode(ExpressionSyntax delegateExpression)
 		{
 			delegateExpression.ThrowOnNull();
+			return GetDelegateSymbolAndNode(delegateExpression, recursionDepth: 0);
+		}
+
+		private (ISymbol? DelegateSymbol, SyntaxNode? DelegateNode) GetDelegateSymbolAndNode(ExpressionSyntax delegateExpression, int recursionDepth)
+		{
 			ThrowIfCancellationRequested();
+
+			if (recursionDepth > MaxRecursionDepth)
+				return default;
 
 			switch (delegateExpression)
 			{
 				case AnonymousFunctionExpressionSyntax anonymousFunction:
-					{
-						var delegateNode = anonymousFunction.Body;
-						var delegateSymbol = GetSemanticModel(delegateNode.SyntaxTree)
-												?.GetSymbolInfo(anonymousFunction, CancellationToken).Symbol;
+				{
+					var delegateNode = anonymousFunction.Body ?? anonymousFunction.ExpressionBody;
 
-						return (delegateSymbol, delegateNode);
-					}
+					if (delegateNode == null)
+						return default;
+
+					var delegateSymbol = GetSemanticModel(delegateNode.SyntaxTree)
+											?.GetSymbolInfo(anonymousFunction, CancellationToken).Symbol;
+
+					return (delegateSymbol, delegateNode);
+				}
 				case CastExpressionSyntax castExpression:
-					{
-						return GetDelegateSymbolAndNode(castExpression.Expression);
-					}
-				case ObjectCreationExpressionSyntax objectCreationExpression:
-					{
-						if (objectCreationExpression.ArgumentList?.Arguments.Count != 1)
-							return default;
+				{
+					return GetDelegateSymbolAndNode(castExpression.Expression, recursionDepth + 1);
+				}
+				case BaseObjectCreationExpressionSyntax objectCreationExpression:
+				{
+					if (objectCreationExpression.ArgumentList?.Arguments.Count != 1)
+						return default;
 
-						ArgumentSyntax delegateCreationArg = objectCreationExpression.ArgumentList.Arguments[0];
-						return GetDelegateSymbolAndNode(delegateCreationArg.Expression);
-					}
+					ArgumentSyntax delegateCreationArg = objectCreationExpression.ArgumentList.Arguments[0];
+					return GetDelegateSymbolAndNode(delegateCreationArg.Expression, recursionDepth + 1);
+				}
 				default:
-					{
-						// Case when an identifier is passed as an expression for a delegate
-						var delegateSymbol = GetSymbol<ISymbol>(delegateExpression);
-						var delegateNode = delegateSymbol?.DeclaringSyntaxReferences
-														  .FirstOrDefault()
-														 ?.GetSyntax(CancellationToken);
+				{
+					// Case when an identifier is passed as an expression for a delegate
+					var delegateSymbol = GetSymbol<ISymbol>(delegateExpression);
+					var delegateNode   = delegateSymbol?.DeclaringSyntaxReferences
+														.FirstOrDefault()
+														?.GetSyntax(CancellationToken);
 
-						// Method is the most simple and frequent case for identifiers passed as expressions for delegates.
-						// It is very difficult to analyze local variables, properties, fields and general expressions and they are rarely used
-						// for identifiers passed as expressions for delegates. 
-						// Therefore, they are deemed as non recognized.
-						return delegateNode != null && delegateSymbol?.Kind == SymbolKind.Method
-							? (delegateSymbol, delegateNode)
-							: default;
-					}
+					// Method is the most simple and frequent case for identifiers passed as expressions for delegates.
+					// It is very difficult to analyze local variables, properties, fields and general expressions and they are rarely used
+					// for identifiers passed as expressions for delegates. 
+					// Therefore, they are deemed as non recognized.
+					return delegateNode != null && delegateSymbol?.Kind == SymbolKind.Method
+						? (delegateSymbol, delegateNode)
+						: default;
+				}
 			}
 		}
 
@@ -86,25 +99,34 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 		/// <returns>
 		/// The delegate syntax node.
 		/// </returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		protected SyntaxNode? GetDelegateNode(ExpressionSyntax delegateExpression)
 		{
 			delegateExpression.ThrowOnNull();
+			return GetDelegateNode(delegateExpression, recursionDepth: 0);
+		}
+
+		private SyntaxNode? GetDelegateNode(ExpressionSyntax delegateExpression, int recursionDepth)
+		{
 			ThrowIfCancellationRequested();
+
+			if (recursionDepth > MaxRecursionDepth)
+				return null;
 
 			switch (delegateExpression)
 			{
 				case AnonymousFunctionExpressionSyntax anonymousFunction:
-					return anonymousFunction.Body;
+					return anonymousFunction.Body ?? anonymousFunction.ExpressionBody;
 
 				case CastExpressionSyntax castExpression:
-					return GetDelegateNode(castExpression.Expression);
+					return GetDelegateNode(castExpression.Expression, recursionDepth + 1);
 
-				case ObjectCreationExpressionSyntax objectCreationExpression:
+				case BaseObjectCreationExpressionSyntax objectCreationExpression:
 					if (objectCreationExpression.ArgumentList?.Arguments.Count != 1)
 						return null;
 
 					ArgumentSyntax delegateCreationArg = objectCreationExpression.ArgumentList.Arguments[0];
-					return GetDelegateNode(delegateCreationArg.Expression);
+					return GetDelegateNode(delegateCreationArg.Expression, recursionDepth + 1);
 
 				default:
 					// Case when an identifier is passed as an expression for a delegate
