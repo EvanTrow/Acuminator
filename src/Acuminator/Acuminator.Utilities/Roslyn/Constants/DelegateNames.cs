@@ -16,8 +16,7 @@ namespace Acuminator.Utilities.Roslyn.Constants
 		public const string SetNeutralDisplayName = "SetNeutralDisplayName";
 
 		public const string Initialize = "Initialize";
-		public const string StartOperation = "StartOperation";
-		
+
 		public const string SetCaption = "SetCaption";
 		public const string SetTooltip = "SetTooltip";
 		public const string Press = "Press";
@@ -87,6 +86,13 @@ namespace Acuminator.Utilities.Roslyn.Constants
 
 			public const string ReflectionSerializer_GetObjectData      = "GetObjectData";
 			public const string ReflectionSerializer_RestoreObjectProps = "RestoreObjectProps";
+		}
+
+		public static class Async
+		{
+			public const string StartOperation = "StartOperation";
+			public const string StartAsyncOperation = "StartAsyncOperation";
+			public const string Await = "Await";
 		}
 
 		internal static class Workflow
