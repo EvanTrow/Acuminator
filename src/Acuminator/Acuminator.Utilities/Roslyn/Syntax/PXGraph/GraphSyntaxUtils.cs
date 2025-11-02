@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
@@ -54,9 +52,9 @@ namespace Acuminator.Utilities.Roslyn.Syntax.PXGraph
 			return GraphInstantiationType.None;
 		}
 
-		internal static IEnumerable<(ITypeSymbol GraphSymbol, SyntaxNode GraphNode)> GetDeclaredGraphsAndExtensions(
-																						this SyntaxNode root, SemanticModel semanticModel,
-																						PXContext context, CancellationToken cancellationToken = default)
+		internal static IEnumerable<(ITypeSymbol GraphSymbol, ClassDeclarationSyntax GraphNode)> GetDeclaredGraphsAndExtensions(
+																				this SyntaxNode root, SemanticModel semanticModel,
+																				PXContext context, CancellationToken cancellationToken = default)
 		{
 			root.ThrowOnNull();
 			context.ThrowOnNull();
@@ -67,44 +65,22 @@ namespace Acuminator.Utilities.Roslyn.Syntax.PXGraph
 				? GetDeclaredGraphsAndExtensionsImpl()
 				: [];
 
-
-			IEnumerable<(ITypeSymbol GraphSymbol, SyntaxNode GraphNode)> GetDeclaredGraphsAndExtensionsImpl()
+			//------------------------------------------------Local Function------------------------------------------------
+			IEnumerable<(ITypeSymbol GraphSymbol, ClassDeclarationSyntax GraphNode)> GetDeclaredGraphsAndExtensionsImpl()
 			{
-				var declaredClasses = root.DescendantNodesAndSelf().OfType<ClassDeclarationSyntax>();
+				var declaredClasses = root.DescendantNodesAndSelf()
+										  .OfType<ClassDeclarationSyntax>();
 
-				foreach (ClassDeclarationSyntax classNode in declaredClasses)
+				foreach (ClassDeclarationSyntax classDeclaration in declaredClasses)
 				{
-					ITypeSymbol? classTypeSymbol = classNode.GetTypeSymbolFromClassDeclaration(semanticModel, cancellationToken);
+					var classTypeSymbol = semanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken) as ITypeSymbol;
 
 					if (classTypeSymbol != null && classTypeSymbol.IsPXGraphOrExtension(context))
 					{
-						yield return (classTypeSymbol, classNode);
+						yield return (classTypeSymbol, classDeclaration);
 					}
 				}
 			}
-		}
-
-		public static ITypeSymbol? GetTypeSymbolFromClassDeclaration(this ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel,
-																	 CancellationToken cancellationToken = default)
-		{
-			classDeclaration.ThrowOnNull();
-			semanticModel.ThrowOnNull();
-			cancellationToken.ThrowIfCancellationRequested();
-
-			var typeSymbol = semanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken) as ITypeSymbol;
-
-			if (typeSymbol != null)
-				return typeSymbol;
-
-			SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(classDeclaration, cancellationToken);
-			typeSymbol = symbolInfo.Symbol as ITypeSymbol;
-
-			if (typeSymbol == null && symbolInfo.CandidateSymbols.Length == 1)
-			{
-				typeSymbol = symbolInfo.CandidateSymbols[0] as ITypeSymbol;
-			}
-
-			return typeSymbol;
 		}
 	}
 }
