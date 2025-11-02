@@ -108,7 +108,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreationForBqlQueries
 			if (parGraph != null)
 				existingGraphs.Add(parGraph);
 
-			existingGraphs.AddRange(localVarGraphs);				
+			existingGraphs.AddRange(localVarGraphs);
 
 			return existingGraphs;
 		}
@@ -169,7 +169,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreationForBqlQueries
 		{
 			var instantiationType = graphArgSyntax.GetGraphInstantiationType(context.SemanticModel, pxContext, context.CancellationToken);
 
-			// New PXGraph() / new TGraph() / PXGraph.CreateInstance<TGraph> are reported at all times
+			// New PXGraph() / new TGraph() / new() / PXGraph.CreateInstance<TGraph> are reported at all times
 			// All other usages are reported only if:
 			// 1. There is at least one existing PXGraph instance available
 			// 2. PXGraph parameter is not used in any way because its modifications might affect the BQL query results
