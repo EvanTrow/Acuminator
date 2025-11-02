@@ -34,9 +34,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 				return;
 			}
 
-			if (PxContext.StartOperation.Contains(methodSymbol, SymbolEqualityComparer.Default) ||
+			if (PxContext.AsyncOperations.StartOperation_AllMethods.Contains(methodSymbol, SymbolEqualityComparer.Default) ||
 				(!methodSymbol.IsDefinition && methodSymbol.OriginalDefinition != null &&
-				  PxContext.StartOperation.Contains(methodSymbol.OriginalDefinition, SymbolEqualityComparer.Default)))
+				  PxContext.AsyncOperations.StartOperation_AllMethods.Contains(methodSymbol.OriginalDefinition, SymbolEqualityComparer.Default)))
 			{
 				ReportDiagnostic(_reportDiagnostic, _descriptor, node);
 			}

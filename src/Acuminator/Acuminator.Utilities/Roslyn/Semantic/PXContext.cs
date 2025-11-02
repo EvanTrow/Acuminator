@@ -97,12 +97,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		private readonly Lazy<PXGraphExtensionSymbols> _pxGraphExtensionSymbols;
 		public PXGraphExtensionSymbols PXGraphExtension => _pxGraphExtensionSymbols.Value;
 
+		private readonly Lazy<AsyncOperationsSymbols> _asyncOperationsSymbols;
+		public AsyncOperationsSymbols AsyncOperations => _asyncOperationsSymbols.Value;
+
 		public IGraphWithInitializationSymbols IGraphWithInitializationSymbols { get; }
 
 		public INamedTypeSymbol PXCacheExtensionType => Compilation.GetTypeByMetadataName(TypeFullNames.PXCacheExtension)!;
 		public INamedTypeSymbol PXMappedCacheExtensionType => Compilation.GetTypeByMetadataName(TypeFullNames.PXMappedCacheExtension)!;
-		public INamedTypeSymbol PXLongOperation => Compilation.GetTypeByMetadataName(TypeFullNames.PXLongOperation)!;
-
+		
 		public INamedTypeSymbol PXSelectBase2018R2NewType => Compilation.GetTypeByMetadataName(TypeFullNames.PXSelectBase_Acumatica2018R2)!;
 		public INamedTypeSymbol IViewConfig2018R2 => Compilation.GetTypeByMetadataName(TypeFullNames.IViewConfig_Acumatica2018R2)!;
 
@@ -124,8 +126,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
         public INamedTypeSymbol IPXLocalizableList => Compilation.GetTypeByMetadataName(TypeFullNames.IPXLocalizableList)!;
 		public INamedTypeSymbol PXConnectionScope => Compilation.GetTypeByMetadataName(TypeFullNames.PXConnectionScope)!;
-
-        public ImmutableArray<IMethodSymbol> StartOperation => PXLongOperation.GetMethods(DelegateNames.StartOperation).ToImmutableArray();
 
 		public INamedTypeSymbol IImplementType => Compilation.GetTypeByMetadataName(TypeFullNames.IImplementType)!;
 
@@ -149,6 +149,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 			_localizationMethods 		 = new Lazy<LocalizationSymbols>(() => new LocalizationSymbols(Compilation));
 			_pxGraph 					 = new Lazy<PXGraphSymbols>(() => new PXGraphSymbols(this));
 			_pxGraphExtensionSymbols 	 = new Lazy<PXGraphExtensionSymbols>(() => new PXGraphExtensionSymbols(this));
+			_asyncOperationsSymbols		 = new Lazy<AsyncOperationsSymbols>(() => new AsyncOperationsSymbols(Compilation));
 			_pxCache 					 = new Lazy<PXCacheSymbols>(() => new PXCacheSymbols(Compilation));
 			_pxAction 					 = new Lazy<PXActionSymbols>(() => new PXActionSymbols(Compilation));
 			_pxDatabase 				 = new Lazy<PXDatabaseSymbols>(() => new PXDatabaseSymbols(Compilation));
