@@ -15,41 +15,85 @@ namespace Acuminator.Utilities.Roslyn.Syntax.PXGraph
 	public static class GraphSyntaxUtils
 	{
 		/// <summary>
-		/// Determines PXGraph instantiation type for the syntax node (e.g. new PXGraph(), PXGraph.CreateInstance, etc.)
+		/// Get PXGraph instantiation type for the syntax node (e.g. new PXGraph(), PXGraph.CreateInstance, etc.)
 		/// </summary>
+		/// <param name="node">The syntax node to act on.</param>
+		/// <param name="semanticModel">The semantic model.</param>
+		/// <param name="pxContext">The context.</param>
+		/// <param name="cancellation">A token that allows processing to be cancelled.</param>
+		/// <returns>
+		/// The graph instantiation type.
+		/// </returns>
 		public static GraphInstantiationType GetGraphInstantiationType(this SyntaxNode node, SemanticModel semanticModel, 
-			PXContext pxContext)
+																	   PXContext pxContext, CancellationToken cancellation)
 		{
 			node.ThrowOnNull();
 			semanticModel.ThrowOnNull();
 			pxContext.ThrowOnNull();
 
-			// new PXGraph()
-			if (node is ObjectCreationExpressionSyntax objCreationSyntax && objCreationSyntax.Type != null
-			                                                             && semanticModel
-				                                                             .GetSymbolInfo(objCreationSyntax.Type)
-				                                                             .Symbol is ITypeSymbol typeSymbol
-			                                                             && typeSymbol.IsPXGraph(pxContext))
+			switch (node)
 			{
-				return typeSymbol.Equals(pxContext.PXGraph.Type, SymbolEqualityComparer.Default)
-					? GraphInstantiationType.ConstructorOfBaseType
-					: GraphInstantiationType.ConstructorOfSpecificType;
-			}
-
-			// PXGraph.CreateInstance
-			if (node is InvocationExpressionSyntax invocationSyntax)
-			{
-				var symbolInfo = semanticModel.GetSymbolInfo(invocationSyntax);
-				var methodSymbol = (symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault()) as IMethodSymbol;
-				methodSymbol = methodSymbol?.OverriddenMethod?.OriginalDefinition ?? methodSymbol?.OriginalDefinition;
-
-				if (methodSymbol != null && pxContext.PXGraph.CreateInstance.Contains<IMethodSymbol>(methodSymbol, SymbolEqualityComparer.Default))
+				// new PXGraph()
+				case ObjectCreationExpressionSyntax objCreationSyntax:
 				{
-					return GraphInstantiationType.CreateInstance;
-				}
-			}
+					var typeSymbol = semanticModel.GetSymbolOrFirstCandidate(objCreationSyntax.Type, cancellation) as ITypeSymbol;
 
-			return GraphInstantiationType.None;
+					if (typeSymbol == null || !typeSymbol.IsPXGraph(pxContext))
+						return GraphInstantiationType.None;
+
+					return typeSymbol.Equals(pxContext.PXGraph.Type, SymbolEqualityComparer.Default)
+						? GraphInstantiationType.ConstructorOfBaseType
+						: GraphInstantiationType.ConstructorOfSpecificType;
+				}
+
+				// new()
+				case ImplicitObjectCreationExpressionSyntax implicitObjectCreationSyntax:
+				{
+					if (implicitObjectCreationSyntax.ArgumentList.Arguments.Count == 0)
+						return GraphInstantiationType.None;
+
+					var expressionTypeInfo = semanticModel.GetTypeInfo(node, cancellation);
+					
+					if (expressionTypeInfo.Type is not { } typeSymbol || !typeSymbol.IsPXGraph(pxContext))
+						return GraphInstantiationType.None;
+
+					return typeSymbol.Equals(pxContext.PXGraph.Type, SymbolEqualityComparer.Default)
+						? GraphInstantiationType.ConstructorOfBaseType
+						: GraphInstantiationType.ConstructorOfSpecificType;
+				}
+
+				// PXGraph.CreateInstance
+				case InvocationExpressionSyntax invocationSyntax:
+				{
+						var methodSymbol = semanticModel.GetSymbolOrFirstCandidate(invocationSyntax, cancellation) as IMethodSymbol;
+
+						if (methodSymbol == null || methodSymbol.MethodKind != MethodKind.Ordinary)
+							return GraphInstantiationType.None;
+
+						IMethodSymbol? methodToCheck;
+
+						if (methodSymbol.IsOverride)
+						{
+							methodToCheck = methodSymbol.GetOverriddenAndThis().LastOrDefault()?.OriginalDefinition ?? 
+											methodSymbol?.OriginalDefinition; ;
+						}
+						else
+						{
+							methodToCheck = methodSymbol.OriginalDefinition;
+						}
+
+						if (methodToCheck != null &&
+							pxContext.PXGraph.CreateInstance.Contains<IMethodSymbol>(methodToCheck, SymbolEqualityComparer.Default))
+						{
+							return GraphInstantiationType.CreateInstance;
+						}
+						else
+							return GraphInstantiationType.None;
+				}
+
+				default:
+					return GraphInstantiationType.None;
+			}
 		}
 
 		internal static IEnumerable<(ITypeSymbol GraphSymbol, ClassDeclarationSyntax GraphNode)> GetDeclaredGraphsAndExtensions(
