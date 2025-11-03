@@ -18,32 +18,32 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>
 			new PXGraphAnalyzer(
 				CodeAnalysisSettings.Default
-				.WithRecursiveAnalysisEnabled()
-				.WithStaticAnalysisEnabled(),
+									.WithRecursiveAnalysisEnabled()
+									.WithStaticAnalysisEnabled(),
 				new LongOperationInGraphAnalyzer());
 
 		[Theory]
-		[EmbeddedFileData(@"PXGraph\DataViewFromGraphStartsLongOperation.cs")]
+		[EmbeddedFileData(@"PXGraph\DataView\DataViewFromGraphStartsLongOperation.cs")]
 		public Task DataViewDelegateFromGraph_ReportsDiagnostic(string source) =>
 			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(17, 13));
 
 		[Theory]
-		[EmbeddedFileData(@"PXGraph\DataViewFromGraphStartsLongOperationViaMethod.cs")]
+		[EmbeddedFileData(@"PXGraph\DataView\DataViewFromGraphStartsLongOperationViaMethod.cs")]
 		public Task DataViewDelegateWithMethodFromGraph_ReportsDiagnostic(string source) =>
 			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(17, 13));
 
 		[Theory]
-		[EmbeddedFileData(@"PXGraph\DataViewFromGraphExtensionStartsLongOperation.cs")]
+		[EmbeddedFileData(@"PXGraph\DataView\DataViewFromGraphExtensionStartsLongOperation.cs")]
 		public Task DataViewDelegateFromGraphExtension_ReportsDiagnostic(string source) =>
 			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(15, 13));
 
 		[Theory]
-		[EmbeddedFileData(@"PXGraph\DataViewWithParameterStartsLongOperation.cs")]
+		[EmbeddedFileData(@"PXGraph\DataView\DataViewWithParameterStartsLongOperation.cs")]
 		public Task DataViewDelegateWithParameter_ReportsDiagnostic(string source) =>
 			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(19, 17));
 
 		[Theory]
-		[EmbeddedFileData(@"PXGraph\StaticDataViewStartsLongOperation.cs")]
+		[EmbeddedFileData(@"PXGraph\DataView\StaticDataViewStartsLongOperation.cs")]
 		public Task StaticDataViewDelegate_ReportsDiagnostic(string source) =>
 			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1080_DataViewDelegateLongOperationStart.CreateFor(15, 13));
 	}
