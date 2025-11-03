@@ -1,16 +1,18 @@
-﻿#nullable enable
-
+﻿using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis;
-using Acuminator.Analyzers.StaticAnalysis.ConstructorInDac;
 using Acuminator.Analyzers.StaticAnalysis.Dac;
 using Acuminator.Analyzers.StaticAnalysis.DacExtensionDefaultAttribute;
+using Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac;
 using Acuminator.Analyzers.StaticAnalysis.ForbiddenFieldsInDac;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
+using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.Dac;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -28,7 +30,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.SuppressionDiagnostics
 									.WithSuppressionMechanismEnabled(),
 
 				new ForbiddenFieldsInDacAnalyzer(),
-				new ConstructorInDacAnalyzer(),
+				new DacAndDacExtensionDeclarationAnalyzerForPX1028Tests(),
 				new DacExtensionDefaultAttributeAnalyzer());
 
 		protected override CodeFixProvider GetCSharpCodeFixProvider() => new SuppressDiagnosticTestCodeFix();
@@ -65,5 +67,28 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.SuppressionDiagnostics
 						  @"Dac\DacExtension_SuppressionInAttributeLists_Expected.cs")]
 		public virtual Task DacExtension_Alert_InAttributes_SuppressComment_CodeFix(string actual, string expected) =>
 			VerifyCSharpFixAsync(actual, expected);
+
+
+		private sealed class DacAndDacExtensionDeclarationAnalyzerForPX1028Tests : DacAndDacExtensionDeclarationAnalyzer
+		{
+			public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+				ImmutableArray.Create
+				(
+					Descriptors.PX1028_ConstructorInDacDeclaration
+				);
+
+			protected override void CheckIfDacExtensionIsSealed(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacExtension)
+			{ }
+
+			protected override void ReportDacExtensionInheritance(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacExtension)
+			{ }
+
+			protected override void CheckAttributesDeclaredOnDac(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dac)
+			{ }
+
+			protected override void CheckIfDacExtensionHasNonAbstractBaseExtensions(SymbolAnalysisContext context, PXContext pxContext,
+																					DacSemanticModel dacExtension)
+			{ }
+		}
 	}
 }

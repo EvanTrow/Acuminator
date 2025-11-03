@@ -732,7 +732,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Constructors in DACs are prohibited.
+        ///   Looks up a localized string similar to Constructors in DACs and DAC extensions are prohibited.
         /// </summary>
         public static string PX1028Title {
             get {
@@ -2336,6 +2336,24 @@ namespace Acuminator.Analyzers {
         public static string PX1114Title {
             get {
                 return ResourceManager.GetString("PX1114Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only non-abstract DAC extensions can be used as base DAC extensions.
+        /// </summary>
+        public static string PX1115TitleDacExtension {
+            get {
+                return ResourceManager.GetString("PX1115TitleDacExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only terminal graph extensions can be used as base graph extensions.
+        /// </summary>
+        public static string PX1115TitleGraphExtension {
+            get {
+                return ResourceManager.GetString("PX1115TitleGraphExtension", resourceCulture);
             }
         }
         

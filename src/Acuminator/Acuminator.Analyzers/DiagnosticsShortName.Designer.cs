@@ -1121,5 +1121,23 @@ namespace Acuminator.Analyzers {
                 return ResourceManager.GetString("PX1114", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NonAbstractBaseDacExtension.
+        /// </summary>
+        public static string PX1115DacExtension {
+            get {
+                return ResourceManager.GetString("PX1115DacExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NonTerminalBaseGraphExtension.
+        /// </summary>
+        public static string PX1115GraphExtension {
+            get {
+                return ResourceManager.GetString("PX1115GraphExtension", resourceCulture);
+            }
+        }
     }
 }

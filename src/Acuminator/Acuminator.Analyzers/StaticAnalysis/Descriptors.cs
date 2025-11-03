@@ -80,7 +80,7 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			Rule("PX1008", nameof(Resources.PX1008Title).GetLocalized(), Category.Acuminator,
 				DiagnosticSeverity.Error, DiagnosticsShortName.PX1008);
 
-		public static DiagnosticDescriptor PX1009_InheritanceFromPXCacheExtension { get; } =
+		public static DiagnosticDescriptor PX1009_InheritanceFromDacExtension { get; } =
 			Rule("PX1009", nameof(Resources.PX1009Title).GetLocalized(), Category.Acuminator,
 				DiagnosticSeverity.Error, DiagnosticsShortName.PX1009);
 
@@ -88,7 +88,7 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			Rule("PX1010", nameof(Resources.PX1010Title).GetLocalized(), Category.Acuminator,
 				DiagnosticSeverity.Warning, DiagnosticsShortName.PX1010);
 
-		public static DiagnosticDescriptor PX1011_InheritanceFromPXCacheExtension { get; } =
+		public static DiagnosticDescriptor PX1011_NotSealedDacExtension { get; } =
 			Rule("PX1011", nameof(Resources.PX1011Title).GetLocalized(), Category.Acuminator,
 				DiagnosticSeverity.Warning, DiagnosticsShortName.PX1011);
 
@@ -547,5 +547,13 @@ namespace Acuminator.Analyzers.StaticAnalysis
 
 		public static DiagnosticDescriptor PX1114_GraphExtensionInheritFromNonAbstractGraphExtension { get; } =
 			Rule("PX1114", nameof(Resources.PX1114Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1114);
+
+		public static DiagnosticDescriptor PX1115_NonTerminalBaseGraphExtension { get; } =
+			Rule("PX1115", nameof(Resources.PX1115TitleGraphExtension).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error,
+				 DiagnosticsShortName.PX1115GraphExtension);
+
+		public static DiagnosticDescriptor PX1115_NonTerminalBaseDacExtension { get; } =
+			Rule("PX1115", nameof(Resources.PX1115TitleDacExtension).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, 
+				DiagnosticsShortName.PX1115DacExtension);
 	}
 }

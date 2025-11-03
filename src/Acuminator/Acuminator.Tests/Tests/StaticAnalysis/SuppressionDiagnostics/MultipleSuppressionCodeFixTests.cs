@@ -1,17 +1,18 @@
-﻿#nullable enable
-
+﻿using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis;
-using Acuminator.Analyzers.StaticAnalysis.ConstructorInDac;
 using Acuminator.Analyzers.StaticAnalysis.Dac;
 using Acuminator.Analyzers.StaticAnalysis.DacExtensionDefaultAttribute;
 using Acuminator.Analyzers.StaticAnalysis.ForbiddenFieldsInDac;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities;
+
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
+
 using Xunit;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.SuppressionDiagnostics
@@ -31,13 +32,13 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.SuppressionDiagnostics
 
 		[Theory]
 		[EmbeddedFileData(@"Dac\SuppressMuiltipleDiagnostics_All.cs",
-			@"Dac\SuppressMuiltipleDiagnostics_All_Suppressed.cs")]
+						  @"Dac\SuppressMuiltipleDiagnostics_All_Suppressed.cs")]
 		public virtual Task SuppressMuiltipleDiagnostics_All_CodeFix(string actual, string expected) => 
 			VerifyCSharpFixAsync(actual, expected);
 
 		[Theory]
 		[EmbeddedFileData(@"Dac\SuppressMuiltipleDiagnostics_One.cs",
-		@"Dac\SuppressMuiltipleDiagnostics_One_Suppressed.cs")]
+						  @"Dac\SuppressMuiltipleDiagnostics_One_Suppressed.cs")]
 		public virtual Task SuppressMuiltipleDiagnostics_One_CodeFix(string actual, string expected) =>
 			VerifyCSharpFixAsync(actual, expected);
 

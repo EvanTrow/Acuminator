@@ -1,0 +1,99 @@
+﻿
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Composition;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Acuminator.Utilities.Roslyn.Constants;
+using Acuminator.Utilities.Roslyn.Semantic;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Editing;
+
+namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisDac
+{
+	[ExportCodeFixProvider(LanguageNames.CSharp), Shared]
+	public class InheritanceFromDacExtensionFix : PXCodeFixProvider
+	{
+		public override ImmutableArray<string> FixableDiagnosticIds { get; } =
+			ImmutableArray.Create(Descriptors.PX1009_InheritanceFromDacExtension.Id);
+
+		protected override async Task RegisterCodeFixesForDiagnosticAsync(CodeFixContext context, Diagnostic diagnostic)
+		{
+			var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
+											 .ConfigureAwait(false);
+			var node = root?.FindNode(context.Span).FirstAncestorOrSelf<ClassDeclarationSyntax>();
+
+			if (node?.BaseList == null)
+				return;
+
+			string title = nameof(Resources.PX1009Fix).GetLocalized().ToString();
+			CodeAction codeAction = CodeAction.Create(title, 
+													  cancellation => ChangeBaseTypeToPXCacheExtensionOverloadAsync(context.Document, root!, node, cancellation),
+													  equivalenceKey: title);
+
+			context.RegisterCodeFix(codeAction, diagnostic);
+		}
+
+		private static async Task<Document> ChangeBaseTypeToPXCacheExtensionOverloadAsync(Document document, SyntaxNode root, ClassDeclarationSyntax node,
+																						  CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+			var semanticModel = await document.GetSemanticModelAsync(cancellationToken)
+											  .ConfigureAwait(false);
+			if (semanticModel == null)
+				return document;
+
+			var pxContext = new PXContext(semanticModel.Compilation, codeAnalysisSettings: null);
+			INamedTypeSymbol? classType = semanticModel.GetDeclaredSymbol(node, cancellationToken);
+
+			if (classType == null)
+				return document;
+	
+			var genericArgs = GetNewGenericArgumentsForFix(classType, pxContext);	
+			BaseTypeSyntax? oldBaseNode = node.BaseList?.Types.FirstOrDefault();
+
+			if (oldBaseNode == null)
+				return document;
+
+			cancellationToken.ThrowIfCancellationRequested();
+
+			var generator = SyntaxGenerator.GetGenerator(document);
+			var cacheExtensionTypeNode = generator.GenericName(TypeNames.PXCacheExtension, genericArgs) as TypeSyntax;
+
+			if (cacheExtensionTypeNode == null)
+				return document;
+
+			var newBaseNode = SyntaxFactory.SimpleBaseType(cacheExtensionTypeNode);
+			var newRoot = root.ReplaceNode(oldBaseNode, newBaseNode);
+
+			return document.WithSyntaxRoot(newRoot);
+		}
+
+		private static List<ITypeSymbol> GetNewGenericArgumentsForFix(INamedTypeSymbol classType, PXContext pxContext)
+		{
+			var genericArgs = new List<ITypeSymbol>();
+			INamedTypeSymbol? currentType = classType.BaseType;
+
+			while (currentType != null && !currentType.Equals(pxContext.PXCacheExtensionType, SymbolEqualityComparer.Default))
+			{
+				if (currentType.Name == TypeNames.PXCacheExtension)
+				{
+					genericArgs.AddRange(currentType.TypeArguments);
+					break;
+				}
+
+				genericArgs.Add(currentType);
+				currentType = currentType.BaseType;
+			}
+
+			return genericArgs;
+		}
+	}
+}
