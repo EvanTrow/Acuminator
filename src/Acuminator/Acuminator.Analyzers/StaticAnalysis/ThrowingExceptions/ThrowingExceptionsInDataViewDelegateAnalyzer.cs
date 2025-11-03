@@ -87,8 +87,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 			cancellation.ThrowIfCancellationRequested();
 
 			var loDelegateNodeList = new List<SyntaxNode>();
-			var declaringNodes = symbol.DeclaringSyntaxReferences
-								 .Select(r => r.GetSyntax(cancellation));
+			var declaringNodes = symbol.DeclaringSyntaxReferences.Select(r => r.GetSyntax(cancellation));
 
 			foreach (var node in declaringNodes)
 			{
@@ -97,6 +96,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 				var loStartWalker = new StartLongOperationDelegateWalker(pxContext, cancellation);
 
 				loStartWalker.Visit(node);
+
+
 				loDelegateNodeList.AddRange(loStartWalker.Delegates);
 			}
 
