@@ -1094,5 +1094,14 @@ namespace Acuminator.Analyzers {
                 return ResourceManager.GetString("PX1111", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GenericNonAbstractGraphOrGraphExtension.
+        /// </summary>
+        public static string PX1112 {
+            get {
+                return ResourceManager.GetString("PX1112", resourceCulture);
+            }
+        }
     }
 }

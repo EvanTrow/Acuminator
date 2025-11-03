@@ -462,4 +462,7 @@
   <data name="PX1111" xml:space="preserve">
     <value>MainDacOfProcessingViewMustContainNoteIdField</value>
   </data>
+  <data name="PX1112" xml:space="preserve">
+    <value>GenericNonAbstractGraphOrGraphExtension</value>
+  </data>
 </root>

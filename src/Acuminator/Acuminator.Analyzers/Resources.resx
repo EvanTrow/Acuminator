@@ -869,6 +869,12 @@ Reason: {2}</value>
   <data name="PX1111TitleFormat" xml:space="preserve">
     <value>The primary DAC "{0}" of the processing view "{1}" must contain the "NoteID" field</value>
   </data>
+  <data name="PX1112Fix" xml:space="preserve">
+    <value>Make the type abstract</value>
+  </data>
+  <data name="PX1112Title" xml:space="preserve">
+    <value>Graphs and graph extensions with generic type parameters must be abstract</value>
+  </data>
   <data name="SuppressDiagnosticGroupCodeActionTitle" xml:space="preserve">
     <value>Suppress the {0} diagnostic with Acuminator</value>
   </data>
