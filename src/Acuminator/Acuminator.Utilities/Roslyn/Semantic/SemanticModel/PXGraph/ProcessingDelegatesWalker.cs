@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
@@ -60,17 +59,20 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			if (methodSymbol == null)
 				return;
 
-			var isSetProcessDelegate =
+			bool isSetProcessDelegate =
 					PxContext.PXProcessingBase.SetProcessDelegate.Contains<IMethodSymbol>(methodSymbol.OriginalDefinition, 
 																							SymbolEqualityComparer.Default);
-			if (isSetProcessDelegate)
+			bool isSetAsyncProcessDelegate =
+					PxContext.PXProcessingBase.SetAsyncProcessDelegate.Contains<IMethodSymbol>(methodSymbol.OriginalDefinition,
+																								SymbolEqualityComparer.Default);
+			if (isSetProcessDelegate || isSetAsyncProcessDelegate)
 			{
 				AnalyzeSetProcessDelegate(viewName, node.ArgumentList);
 				base.VisitInvocationExpression(node);
 				return;
 			}
 
-			var isSetParametersDelegate =
+			bool isSetParametersDelegate =
 					PxContext.PXProcessingBase.SetParametersDelegate.Equals(methodSymbol.OriginalDefinition, SymbolEqualityComparer.Default);
 
 			if (isSetParametersDelegate)
@@ -83,11 +85,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			base.VisitInvocationExpression(node);
 		}
 
-		private void AnalyzeSetParametersDelegate(string viewName, ArgumentListSyntax? argumentList)
+		private void AnalyzeSetParametersDelegate(string viewName, ArgumentListSyntax argumentList)
 		{
 			ThrowIfCancellationRequested();
 
-			var handlerNode = argumentList?.Arguments.FirstOrDefault()?.Expression;
+			var handlerNode = argumentList.Arguments.FirstOrDefault()?.Expression;
 			if (handlerNode == null)
 			{
 				return;
@@ -109,11 +111,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			}
 		}
 
-		private void AnalyzeSetProcessDelegate(string viewName, ArgumentListSyntax? argumentList)
+		private void AnalyzeSetProcessDelegate(string viewName, ArgumentListSyntax argumentList)
 		{
 			ThrowIfCancellationRequested();
 
-			ExpressionSyntax? handlerNode = argumentList?.Arguments.FirstOrDefault()?.Expression;
+			ExpressionSyntax? handlerNode = argumentList.Arguments.FirstOrDefault()?.Expression;
 			if (handlerNode == null)
 			{
 				return;
