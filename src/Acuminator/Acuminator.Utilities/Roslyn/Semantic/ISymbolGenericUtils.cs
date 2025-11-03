@@ -122,11 +122,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		}
 
 		/// <summary>
-		/// Gets the <paramref name="symbol"/> and its overriden symbols.
+		/// Gets the <paramref name="symbol"/> and its overridden symbols.
 		/// </summary>
 		/// <param name="symbol">The symbol to act on.</param>
 		/// <returns>
-		/// The <paramref name="symbol"/> and its overriden symbols.
+		/// The <paramref name="symbol"/> and its overridden symbols.
 		/// </returns>
 		public static IEnumerable<TSymbol> GetOverriddenAndThis<TSymbol>(this TSymbol symbol)
 		where TSymbol : class, ISymbol
@@ -138,11 +138,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		}
 
 		/// <summary>
-		/// Gets the overriden symbols of <paramref name="symbol"/>.
+		/// Gets the overridden symbols of <paramref name="symbol"/>.
 		/// </summary>
 		/// <param name="symbol">The symbol to act on.</param>
 		/// <returns>
-		/// The overriden symbols of <paramref name="symbol"/>.
+		/// The overridden symbols of <paramref name="symbol"/>.
 		/// </returns>
 		public static IEnumerable<TSymbol> GetOverridden<TSymbol>(this TSymbol symbol)
 		where TSymbol : class, ISymbol
@@ -199,8 +199,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// <remarks>
 		/// This method is a safety wrapper for locations that are obtained from <see cref="SyntaxToken.GetLocation"/> tokens.<br/>
 		/// Syntax tokens may return a special null-object location with <see cref="LocationKind.None"/> kind.<br/>
-		/// Such "null-object" location will prevent the usage of any fallback location that could have been obtained from coalesce chainings if the location was null.<br/>
-		/// This helper allows to use coalsesce chaining with fallback locations in a safe manner.<br/><br/>
+		/// Such "null-object" location will prevent the usage of any fallback location that could have been obtained from coalesce chaining if the location was null.<br/>
+		/// This helper allows to use coalesce chaining with fallback locations in a safe manner.<br/><br/>
 		/// Note, that locations obtained from <see cref="CSharpSyntaxNode.GetLocation"/> do not need to be checked this way.
 		/// </remarks>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

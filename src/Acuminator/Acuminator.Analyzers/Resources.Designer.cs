@@ -2331,6 +2331,15 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Graph extension should not inherit from non-terminal graph extensions.
+        /// </summary>
+        public static string PX1114Title {
+            get {
+                return ResourceManager.GetString("PX1114Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Suppress the {0} diagnostic with Acuminator.
         /// </summary>
         public static string SuppressDiagnosticGroupCodeActionTitle {

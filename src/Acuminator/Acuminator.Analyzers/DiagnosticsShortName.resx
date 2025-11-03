@@ -468,4 +468,7 @@
   <data name="PX1113" xml:space="preserve">
     <value>SealedGraphOrGraphExtension</value>
   </data>
+  <data name="PX1114" xml:space="preserve">
+    <value>GraphExtensionInheritFromNonAbstractGraphExtension</value>
+  </data>
 </root>

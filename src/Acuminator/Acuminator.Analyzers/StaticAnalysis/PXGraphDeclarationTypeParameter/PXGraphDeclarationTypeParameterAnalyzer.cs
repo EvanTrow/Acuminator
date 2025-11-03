@@ -5,6 +5,7 @@ using System.Linq;
 using Acuminator.Utilities;
 using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Syntax.PXGraph;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -45,12 +46,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphDeclarationTypeParameter
 				return;
 			}
 
-			if (classDeclaration.BaseList == null)
-			{
-				return;
-			}
-
-			var graphArgumentNode = GetBaseGraphTypeNode(context, pxContext, classDeclaration.BaseList.Types);
+			var graphArgumentNode = GetBaseGraphTypeNode(context, pxContext, classDeclaration);
 			if (graphArgumentNode == null)
 			{
 				return;
@@ -75,39 +71,26 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphDeclarationTypeParameter
 		}
 
 		private TypeSyntax? GetBaseGraphTypeNode(SyntaxNodeAnalysisContext context, PXContext pxContext,
-												 SeparatedSyntaxList<BaseTypeSyntax> baseTypes)
+												 ClassDeclarationSyntax graphNode)
 		{
-			foreach (var typeSyntax in baseTypes)
-			{
-				context.CancellationToken.ThrowIfCancellationRequested();
+			var baseGraphTypeInfo = GraphSyntaxUtils.GetBaseGraphTypeInfo(context.SemanticModel, pxContext, graphNode, 
+																		  context.CancellationToken);
+			if (baseGraphTypeInfo == null)
+				return null;
 
-				if (typeSyntax?.Type == null)
-				{
-					continue;
-				}
+			var (baseTypeSymbol, baseTypeNode) = baseGraphTypeInfo.Value;
+			var isGraphBaseType = baseTypeSymbol.ConstructedFrom.Equals(pxContext.PXGraph.GenericTypeGraph, SymbolEqualityComparer.Default) ||
+								  baseTypeSymbol.ConstructedFrom.Equals(pxContext.PXGraph.GenericTypeGraphDac, SymbolEqualityComparer.Default) ||
+								  baseTypeSymbol.ConstructedFrom.Equals(pxContext.PXGraph.GenericTypeGraphDacField, SymbolEqualityComparer.Default);
 
-				if (context.SemanticModel.GetTypeInfo(typeSyntax.Type).Type is not INamedTypeSymbol baseTypeSymbol)
-				{
-					continue;
-				}
+			if (!isGraphBaseType)
+				return null;
 
-				var isGraphBaseType = baseTypeSymbol.ConstructedFrom.Equals(pxContext.PXGraph.GenericTypeGraph, SymbolEqualityComparer.Default) ||
-									  baseTypeSymbol.ConstructedFrom.Equals(pxContext.PXGraph.GenericTypeGraphDac, SymbolEqualityComparer.Default) ||
-									  baseTypeSymbol.ConstructedFrom.Equals(pxContext.PXGraph.GenericTypeGraphDacField, SymbolEqualityComparer.Default);
+			var typeArgumentsListNode = baseTypeNode.DescendantNodes()
+													.OfType<TypeArgumentListSyntax>()
+													.FirstOrDefault();
 
-				if (!isGraphBaseType)
-				{
-					continue;
-				}
-
-				var typeArgumentsListNode = typeSyntax.DescendantNodes()
-													  .OfType<TypeArgumentListSyntax>()
-													  .FirstOrDefault();
-
-				return typeArgumentsListNode?.Arguments.FirstOrDefault();
-			}
-
-			return null;
+			return typeArgumentsListNode?.Arguments.FirstOrDefault();
 		}
 	}
 }
