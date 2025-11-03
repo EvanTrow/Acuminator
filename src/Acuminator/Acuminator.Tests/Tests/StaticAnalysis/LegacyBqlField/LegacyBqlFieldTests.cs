@@ -24,7 +24,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LegacyBqlField
 
 		[Theory]
 		[EmbeddedFileData("LegacyBqlFieldBad.cs")]
-		public async Task Dac_WithLegacyBqlFields(string actual) => 
+		public async Task Dac_WithLegacyBqlFields(string actual) =>
 			await VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1060_LegacyBqlField.CreateFor(12, 25, "legacyBoolField"),
 				Descriptors.PX1060_LegacyBqlField.CreateFor(16, 25, "legacyByteField"),
@@ -38,7 +38,9 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LegacyBqlField
 				Descriptors.PX1060_LegacyBqlField.CreateFor(48, 25, "legacyDateField"),
 				Descriptors.PX1060_LegacyBqlField.CreateFor(52, 25, "legacyGuidField"),
 				Descriptors.PX1060_LegacyBqlField.CreateFor(56, 25, "legacyBinaryField"),
-				Descriptors.PX1060_LegacyBqlField.CreateFor(60, 25, "attributes"));
+				Descriptors.PX1060_LegacyBqlField.CreateFor(60, 25, "attributes"),
+				Descriptors.PX1060_LegacyBqlField.CreateFor(68, 25, "legacyNullableStringField"),
+				Descriptors.PX1060_LegacyBqlField.CreateFor(75, 25, "legacyNullableBinaryField"));
 
 		[Theory]
 		[EmbeddedFileData("LegacyBqlFieldBad.cs", "LegacyBqlFieldBad_Expected.cs")]
