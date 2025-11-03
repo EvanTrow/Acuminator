@@ -619,17 +619,40 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 		/// <summary>
 		/// Gets a simplified name for type if it is a primitive type.
+		/// For nullable ref types returns the name without the "?" annotation.
 		/// </summary>
 		/// <param name="type">The type to act on.</param>
 		/// <returns/>
 		public static string GetSimplifiedName(this ITypeSymbol type)
 		{
-			type.ThrowOnNull();
-
-			switch (type.SpecialType)
+			switch (type.CheckIfNull().SpecialType)
 			{
-				case SpecialType.None when type.TypeKind == TypeKind.Array:
 				case SpecialType.System_Object:
+				case SpecialType.System_String:
+				case SpecialType.None when type.TypeKind == TypeKind.Dynamic:
+				{
+					string simpleTypeName = type.ToString();
+					return simpleTypeName[^1] == '?'
+						? simpleTypeName[..^1]
+						: simpleTypeName;
+				}
+
+				case SpecialType.None when type.TypeKind == TypeKind.Array:
+				case SpecialType.System_Array:
+				{
+					string simpleTypeName = type.ToString();
+
+					if (type is IArrayTypeSymbol arrayType && arrayType.ElementNullableAnnotation == NullableAnnotation.Annotated &&
+						(arrayType.ElementType.SpecialType == SpecialType.System_Nullable_T || arrayType.ElementType.IsValueType))
+					{
+						return simpleTypeName.Replace("?", string.Empty);
+					}
+						
+					return simpleTypeName[^1] == '?'
+						? simpleTypeName[..^1]
+						: simpleTypeName;
+				}
+
 				case SpecialType.System_Void:
 				case SpecialType.System_Boolean:
 				case SpecialType.System_Char:
@@ -644,8 +667,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				case SpecialType.System_Decimal:
 				case SpecialType.System_Single:
 				case SpecialType.System_Double:
-				case SpecialType.System_String:
-				case SpecialType.System_Array:
 				case SpecialType.System_Nullable_T:
 					return type.ToString();
 				default:
