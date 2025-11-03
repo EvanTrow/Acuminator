@@ -1,7 +1,4 @@
-﻿#nullable enable
-
-using System;
-
+﻿using System;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
