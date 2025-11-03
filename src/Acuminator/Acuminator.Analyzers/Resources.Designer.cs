@@ -2313,6 +2313,24 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove &quot;sealed&quot; modifier from the type.
+        /// </summary>
+        public static string PX1113Fix {
+            get {
+                return ResourceManager.GetString("PX1113Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Graphs and graph extensions should not be sealed types.
+        /// </summary>
+        public static string PX1113Title {
+            get {
+                return ResourceManager.GetString("PX1113Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Suppress the {0} diagnostic with Acuminator.
         /// </summary>
         public static string SuppressDiagnosticGroupCodeActionTitle {
