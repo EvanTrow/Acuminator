@@ -49,9 +49,6 @@ namespace Acuminator.Utilities.Roslyn.Syntax.PXGraph
 				// new()
 				case ImplicitObjectCreationExpressionSyntax implicitObjectCreationSyntax:
 				{
-					if (implicitObjectCreationSyntax.ArgumentList.Arguments.Count == 0)
-						return GraphInstantiationType.None;
-
 					var expressionTypeInfo = semanticModel.GetTypeInfo(node, cancellation);
 					
 					if (expressionTypeInfo.Type is not { } typeSymbol || !typeSymbol.IsPXGraph(pxContext))
