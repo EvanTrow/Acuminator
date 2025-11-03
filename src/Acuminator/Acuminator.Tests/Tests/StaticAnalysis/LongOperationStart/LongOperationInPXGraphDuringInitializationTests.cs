@@ -20,7 +20,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
 				CodeAnalysisSettings.Default
 									.WithRecursiveAnalysisEnabled()
 									.WithStaticAnalysisEnabled(),
-				new LongOperationInPXGraphDuringInitializationAnalyzer());
+				new LongOperationInGraphAnalyzer());
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\PXGraphStartsLongOperationInInitialization.cs")]
