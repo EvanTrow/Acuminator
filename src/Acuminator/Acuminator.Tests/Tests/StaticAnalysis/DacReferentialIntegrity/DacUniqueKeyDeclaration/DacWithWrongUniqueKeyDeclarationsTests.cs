@@ -23,16 +23,16 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity
 
 		[Theory]
 		[EmbeddedFileData(@"WrongUniqueKeyDeclaration\SOOrder_SingleUniqueKey_WrongName.cs")]
-		public async Task Dac_SingleUniqueKey_WrongName(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task Dac_SingleUniqueKey_WrongName(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1036_WrongDacSingleUniqueKeyName.CreateFor(
 					location: (Line: 14, Column: 16),
 					extraLocation: (Line: 6, Column: 2)));
 
 		[Theory]
 		[EmbeddedFileData(@"WrongUniqueKeyDeclaration\INUnit_MultipleKeys_AllNotInUK.cs")]
-		public async Task Dac_MultipleUniqueKeys_AllNotInUK(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task Dac_MultipleUniqueKeys_AllNotInUK(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1036_WrongDacMultipleUniqueKeyDeclarations.CreateFor(
 					location: (Line: 11, Column: 16),
 					extraLocations: new (int Line, int Column)[]
@@ -60,8 +60,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity
 
 		[Theory]
 		[EmbeddedFileData(@"WrongUniqueKeyDeclaration\INUnit_MultipleKeys_SomeNotInUK.cs")]
-		public async Task Dac_MultipleUniqueKeys_SomeNotInUK(string source) =>
-			await VerifyCSharpDiagnosticAsync(source,
+		public Task Dac_MultipleUniqueKeys_SomeNotInUK(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1036_WrongDacMultipleUniqueKeyDeclarations.CreateFor(
 					location: (Line: 30, Column: 17),
 					extraLocations: new (int Line, int Column)[]
@@ -80,19 +80,19 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity
 		[Theory]
 		[EmbeddedFileData(@"WrongUniqueKeyDeclaration\SOOrder_SingleUniqueKey_WrongName.cs", 
 						  @"WrongUniqueKeyDeclaration\SOOrder_SingleUniqueKey_WrongName_Expected.cs")]
-		public async Task RenameUniqueKeyWithIncorrectName_VerifyCodeFix(string actual, string expected) =>
-			await VerifyCSharpFixAsync(actual, expected);
+		public Task RenameUniqueKeyWithIncorrectName_VerifyCodeFix(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected);
 
 		[Theory]
 		[EmbeddedFileData(@"WrongUniqueKeyDeclaration\INUnit_MultipleKeys_AllNotInUK.cs", 
 						  @"WrongUniqueKeyDeclaration\INUnit_MultipleKeys_AllNotInUK_Expected.cs")]
-		public async Task PlaceAllUniqueKeysIntoNewUK_VerifyCodeFix(string actual, string expected) =>
-			await VerifyCSharpFixAsync(actual, expected);
+		public Task PlaceAllUniqueKeysIntoNewUK_VerifyCodeFix(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected);
 
 		[Theory]
 		[EmbeddedFileData(@"WrongUniqueKeyDeclaration\INUnit_MultipleKeys_SomeNotInUK.cs",
 						  @"WrongUniqueKeyDeclaration\INUnit_MultipleKeys_SomeNotInUK_Expected.cs")]
-		public async Task PlaceUniqueKeysIntoExistingUK_VerifyCodeFix(string actual, string expected) =>
-			await VerifyCSharpFixAsync(actual, expected);
+		public Task PlaceUniqueKeysIntoExistingUK_VerifyCodeFix(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected);
 	}
 }

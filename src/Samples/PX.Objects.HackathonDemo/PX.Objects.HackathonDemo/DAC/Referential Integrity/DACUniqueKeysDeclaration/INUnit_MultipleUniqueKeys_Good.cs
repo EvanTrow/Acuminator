@@ -6,7 +6,7 @@ using PX.Objects.IN;
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.Sources
 {
 	[PXCacheName("INUnit")]
-	public partial class INUnitMultipleUniqueKeysGood : IBqlTable
+	public partial class INUnitMultipleUniqueKeysGood : PXBqlTable, IBqlTable
 	{
 		public class PK : PrimaryKeyOf<INUnitMultipleUniqueKeysGood>.By<recordID>
 		{

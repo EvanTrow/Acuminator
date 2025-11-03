@@ -128,7 +128,8 @@
     <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.linux" Version="1.1.2" />
     <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.osx" Version="1.1.2" />
     <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.v110_xp" Version="1.1.2" />
-    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
+    <PackageReference Include="System.Memory" Version="4.6.3" />
     <PackageReference Include="System.Reflection.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Handles" Version="4.0.1" />
     <PackageReference Include="xunit" Version="2.4.0" />

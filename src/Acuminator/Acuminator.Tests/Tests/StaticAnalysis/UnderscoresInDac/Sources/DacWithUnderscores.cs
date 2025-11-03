@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class SO_Order : IBqlTable
+	public class SO_Order : PXBqlTable, IBqlTable
 	{
 		#region OrderType
 		public abstract class order_Type : IBqlField { }

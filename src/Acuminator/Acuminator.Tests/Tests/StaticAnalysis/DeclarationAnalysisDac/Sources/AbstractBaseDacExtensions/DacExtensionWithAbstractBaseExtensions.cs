@@ -4,7 +4,7 @@ using PX.Data.BQL;
 namespace Acuminator.Tests.Tests.StaticAnalysis.DeclarationAnalysisDac.Sources
 {
 	[PXHidden]
-	public class SomeDac : IBqlTable
+	public class SomeDac : PXBqlTable, IBqlTable
 	{
 	}
 

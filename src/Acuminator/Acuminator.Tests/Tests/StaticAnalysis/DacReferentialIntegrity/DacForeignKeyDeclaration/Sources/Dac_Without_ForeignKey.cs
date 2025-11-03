@@ -3,7 +3,7 @@
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.DacForeignKeyDeclaration.Sources
 {
 	[PXPrimaryGraph(typeof(PX.Objects.SO.SOOrderEntry))]
-	public class SOOrder : IBqlTable
+	public class SOOrder : PXBqlTable, IBqlTable
 	{
 		[PXDBString(IsKey = true, InputMask = "")]
 		[PXDefault]

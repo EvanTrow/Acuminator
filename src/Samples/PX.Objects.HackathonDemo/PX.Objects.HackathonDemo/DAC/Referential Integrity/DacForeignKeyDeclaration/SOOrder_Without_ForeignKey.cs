@@ -13,7 +13,7 @@ using GLBranchAttribute = PX.Objects.GL.BranchAttribute;
 namespace PX.Objects.HackathonDemo.ReferentialIntegrity
 {
 	[PXCacheName("SO Order")]
-	public class SOOrder : IBqlTable
+	public class SOOrder : PXBqlTable, IBqlTable
 	{
 		#region OrderType
 		[PXDBString(IsKey = true, InputMask = "")]

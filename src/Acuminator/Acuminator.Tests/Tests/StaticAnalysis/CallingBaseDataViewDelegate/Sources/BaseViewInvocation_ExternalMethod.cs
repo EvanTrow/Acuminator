@@ -43,7 +43,7 @@ namespace PX.Objects
         public PXSelect<SOInvoice> Invoices2;
     }
 
-    public class SOInvoice : IBqlTable
+    public class SOInvoice : PXBqlTable, IBqlTable
     {
         [PXDBString(8, IsKey = true, InputMask = "")]
         public string RefNbr { get; set; }

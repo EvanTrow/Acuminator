@@ -119,7 +119,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 		private SyntaxNode MakeBaseClassNode(SyntaxGenerator generator, PXContext pxContext, DacSemanticModel dacSemanticModel,
 											 List<DacPropertyInfo> dacKeys)
 		{
-			var primaryKeyOfTypeNode = generator.GenericName(pxContext.ReferentialIntegritySymbols.PrimaryKeyOf.Name,
+			var primaryKeyOfTypeNode = generator.GenericName(pxContext.ReferentialIntegritySymbols.PrimaryKeyOf!.Name,
 															 generator.TypeExpression(dacSemanticModel.Symbol));
 			var dacFieldTypeArgNodes = dacKeys.Select(keyProperty => dacSemanticModel.BqlFieldsByNames[keyProperty.Name])
 											  .Select(keyField => generator.TypeExpression(keyField.Symbol));

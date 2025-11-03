@@ -11,7 +11,7 @@ namespace PX.Objects
 	/// <summary>
 	/// A base DAC. Description is present to avoid diagnostic alert.
 	/// </summary>
-	public class BaseDAC : IBqlTable
+	public class BaseDAC : PXBqlTable, IBqlTable
 	{ }
 
 	/// <summary>

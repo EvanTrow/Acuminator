@@ -67,7 +67,7 @@ namespace PX.Objects.HackathonDemo.OverrideTest
 	}
 
 	[PXHidden]
-	public class MyDac : IBqlTable
+	public class MyDac : PXBqlTable, IBqlTable
 	{
 	}
 }

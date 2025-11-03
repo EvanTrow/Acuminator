@@ -11,7 +11,7 @@ namespace PX.Objects
 	{
 		protected virtual void _(Events.FieldDefaulting<SOInvoice, SOInvoice.refNbr> e)
 		{
-			((PXCache<SOInvoice>) e.Cache).Update(e.Row);
+			((PXCache<SOInvoice>) e.Cache).Update(e.Row);       // The typed PXCache<T>.Update(T row) overload is called here because e.Row has type SOInvoice
 		}
 
 		protected virtual void _(Events.FieldVerifying<SOInvoice.refNbr> e)
@@ -45,7 +45,7 @@ namespace PX.Objects
 		}
 	}
 
-	public class SOInvoice : IBqlTable
+	public class SOInvoice : PXBqlTable, IBqlTable
 	{
 		#region RefNbr
 		[PXDBString(8, IsKey = true, InputMask = "")]

@@ -8,7 +8,7 @@ using PX.Data;
 namespace PX.Objects.HackathonDemo
 {
 	[Serializable]
-	public partial class CreateAccountsFilter : IBqlTable
+	public partial class CreateAccountsFilter : PXBqlTable, IBqlTable
 	{
 		#region BAccountID
 		public abstract class bAccountID : PX.Data.BQL.BqlString.Field<bAccountID> { }

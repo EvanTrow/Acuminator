@@ -14,7 +14,7 @@ using GLBranchAttribute = PX.Objects.GL.BranchAttribute;
 namespace PX.Objects.HackathonDemo.ReferentialIntegrity
 {
 	[PXCacheName("SO Line")]
-	public partial class SOLine : PX.Data.IBqlTable
+	public partial class SOLine : PXBqlTable, PX.Data.IBqlTable
 	{
 		public class PK : PrimaryKeyOf<SOLine>.By<orderType, orderNbr, lineNbr>
 		{
@@ -91,7 +91,7 @@ namespace PX.Objects.HackathonDemo.ReferentialIntegrity
 		#region SiteID
 		public abstract class siteID : PX.Data.BQL.BqlInt.Field<siteID> { }
 
-		[SiteAvail(typeof(SOLine.inventoryID), typeof(SOLine.subItemID))]
+		[SOSiteAvail(DocumentBranchType = typeof(SOOrder.branchID))]
 		[PXParent(typeof(Select<SOOrderSite, 
 							Where<SOOrderSite.orderType, Equal<Current<SOLine.orderType>>, 
 								And<SOOrderSite.orderNbr, Equal<Current<SOLine.orderNbr>>, 

@@ -114,7 +114,7 @@ namespace PX.Objects.HackathonDemo.OverrideTest
 
 	/// <exclude/>
 	[PXHidden]
-	public class SomeDac : IBqlTable
+	public class SomeDac : PXBqlTable, IBqlTable
 	{
 		#region BranchID
 		public abstract class branchID : PX.Data.BQL.BqlInt.Field<branchID> {}

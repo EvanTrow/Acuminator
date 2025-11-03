@@ -7,7 +7,7 @@ namespace PX.Owin.IdentityServerIntegration.DAC
 {
 	[Serializable]
 	[PXCacheName("OAuthClientClaim")]
-	public class OAuthClientClaim : IBqlTable
+	public class OAuthClientClaim : PXBqlTable, IBqlTable
 	{
 		#region ClientID
 		public abstract class clientID : PX.Data.BQL.BqlGuid.Field<clientID> { }

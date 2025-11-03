@@ -10,7 +10,7 @@ using PX.Objects.GL;
 namespace PX.Objects.HackathonDemo
 {
 	[PXHidden]
-	public partial class NonStringAutoNumberingDac : IBqlTable
+	public partial class NonStringAutoNumberingDac : PXBqlTable, IBqlTable
 	{
 		#region ScheduleID
 		public abstract class scheduleID : PX.Data.BQL.BqlString.Field<scheduleID> { }

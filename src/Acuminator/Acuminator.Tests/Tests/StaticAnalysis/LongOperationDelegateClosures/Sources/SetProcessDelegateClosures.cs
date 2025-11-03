@@ -5,7 +5,7 @@ namespace Acuminator.Tests.Sources
 {
 	public class SomeGraph : PXGraph<SomeGraph>
 	{
-		public class SomeDAC : IBqlTable
+		public class SomeDAC : PXBqlTable, IBqlTable
 		{
 		}
 

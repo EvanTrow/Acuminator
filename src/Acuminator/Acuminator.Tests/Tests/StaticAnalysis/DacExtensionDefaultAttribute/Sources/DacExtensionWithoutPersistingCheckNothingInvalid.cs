@@ -9,7 +9,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacExtensionDefaultAttribute.Sou
         public int? OrderNbr { get; set; }
     }
 
-    public class MySalesOrder : IBqlTable
+    public class MySalesOrder : PXBqlTable, IBqlTable
     {
         [PXDBInt(IsKey = true)]
         public int? Id { get; set; }

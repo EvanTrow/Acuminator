@@ -9,7 +9,7 @@ namespace Acuminator.Tests.Sources
 	public class ProcessingGraph_ComplexMapping : PXGraph<ProcessingGraph_ComplexMapping>
 	{
 		[PXHidden]
-		public class SomeDAC : IBqlTable
+		public class SomeDAC : PXBqlTable, IBqlTable
 		{
 		}
 

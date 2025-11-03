@@ -36,7 +36,7 @@ namespace PX.Analyzers.Test.Sources
 	}
 
 	[PXHidden]
-	public class SomeDocument : IBqlTable
+	public class SomeDocument : PXBqlTable, IBqlTable
 	{
 	}
 }

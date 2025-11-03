@@ -5,7 +5,7 @@ using PX.Data;
 namespace PX.Analyzers.Test.Sources
 {
 	[PXHidden]
-	public class DacWithMultipleWrongBqlFields : IBqlTable
+	public class DacWithMultipleWrongBqlFields : PXBqlTable, IBqlTable
 	{
 		public abstract class n0teID : PX.Data.BQL.BqlGuid.Field<n0teID> { }
 

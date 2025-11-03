@@ -30,7 +30,7 @@ namespace PX.Analyzers.Test.Sources
 	}
 
 	[PXHidden]
-	public class Dac : IBqlTable
+	public class Dac : PXBqlTable, IBqlTable
 	{
 		#region NoteID
 		public abstract class noteID : PX.Data.BQL.BqlGuid.Field<noteID> { }

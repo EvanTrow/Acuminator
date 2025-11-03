@@ -40,6 +40,8 @@ namespace Acuminator.Utilities.Roslyn.Constants
 			public const string WithTablesOf_TypeName = "WithTablesOf";
 			public const string IsRelatedTo = "IsRelatedTo";
 			public const string Field = "Field";
+
+			public const string Dirty = "Dirty";
 		}
 
 		/// <summary>

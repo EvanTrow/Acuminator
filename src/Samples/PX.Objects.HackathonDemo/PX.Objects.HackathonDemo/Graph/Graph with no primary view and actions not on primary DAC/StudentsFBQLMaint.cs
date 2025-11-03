@@ -10,7 +10,7 @@ using PX.Data.BQL.Fluent;
 namespace PX.Objects.HackathonDemo
 {
     [PXHidden]
-    public class Student : IBqlTable
+    public class Student : PXBqlTable, IBqlTable
     {
 
     }

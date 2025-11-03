@@ -59,7 +59,7 @@ namespace Acuminator.Tests.Sources
 		public override string ToString() => "DAC";
 	}
 
-	public class IIGPOALCLandedCost : IBqlTable
+	public class IIGPOALCLandedCost : PXBqlTable, IBqlTable
 	{
 		//DAC is required for correct collection of DAC semantic model for DAC extension
 	}

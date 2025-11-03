@@ -8,7 +8,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class CFPMItemReq : IBqlTable
+	public class CFPMItemReq : PXBqlTable, IBqlTable
 	{
 		#region ItemReqID
 		public abstract class itemReqID : PX.Data.IBqlField

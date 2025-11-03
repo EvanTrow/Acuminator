@@ -4,7 +4,7 @@ using PX.Data.ReferentialIntegrity.Attributes;
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.Sources
 {
 	[PXCacheName("SO Line")]
-	public class SOLine : IBqlTable
+	public class SOLine : PXBqlTable, IBqlTable
 	{
 		public class PK : PrimaryKeyOf<SOLine>.By<orderType, orderNbr, lineNbr>
 		{

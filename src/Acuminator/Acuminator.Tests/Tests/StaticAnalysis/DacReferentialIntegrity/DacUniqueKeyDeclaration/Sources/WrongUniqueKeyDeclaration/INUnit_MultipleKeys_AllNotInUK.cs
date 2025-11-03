@@ -6,7 +6,7 @@ using PX.Objects.IN;
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.Sources
 {
 	[PXCacheName("INUnit")]
-	public class INUnit : IBqlTable
+	public class INUnit : PXBqlTable, IBqlTable
 	{
 		public class ByGlobal : PrimaryKeyOf<INUnit>.By<unitType, fromUnit, toUnit>
 		{
@@ -33,6 +33,11 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.Sources
 		public class ByInventory : PrimaryKeyOf<INUnit>.By<unitType, inventoryID, fromUnit>
 		{
 			public static INUnit Find(PXGraph graph, int? inventoryID, string fromUnit) => FindBy(graph, INUnitType.InventoryItem, inventoryID, fromUnit);
+		}
+
+		public class PK_Dirty : PrimaryKeyOf<INUnit>.By<recordID>.Dirty
+		{
+			public static INUnit Find(PXGraph graph, long? recordID) => FindBy(graph, recordID);
 		}
 
 		#region RecordID

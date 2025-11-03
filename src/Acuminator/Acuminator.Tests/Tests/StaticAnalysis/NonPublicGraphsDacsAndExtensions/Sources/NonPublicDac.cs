@@ -3,7 +3,7 @@ using PX.Data;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.NonPublicGraphsDacsAndExtensions.Sources
 {
-	internal sealed class SOOrder : IBqlTable
+	internal sealed class SOOrder : PXBqlTable, IBqlTable
 	{
 		#region Total
 		public abstract class total : IBqlField { }
@@ -13,7 +13,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.NonPublicGraphsDacsAndExtensions
 		#endregion
 	}
 
-	sealed class SOOrderDiscount : IBqlTable
+	sealed class SOOrderDiscount : PXBqlTable, IBqlTable
 	{
 		#region TotalDiscount
 		public abstract class totalDiscount : IBqlField { }
@@ -28,7 +28,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.NonPublicGraphsDacsAndExtensions
 	{
 		private class SalesInfo
 		{
-			public class SOOrderExtSales1 : IBqlTable
+			public class SOOrderExtSales1 : PXBqlTable, IBqlTable
 			{
 				#region TotalSales
 				public abstract class totalSales : IBqlField { }
@@ -40,7 +40,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.NonPublicGraphsDacsAndExtensions
 				#endregion
 			}
 
-			protected internal sealed class SOOrderExtSales2 : IBqlTable
+			protected internal sealed class SOOrderExtSales2 : PXBqlTable, IBqlTable
 			{
 				#region TotalSales
 				public abstract class totalSales : IBqlField { }
