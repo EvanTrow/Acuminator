@@ -21,10 +21,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 
 			var walker = new StartLongOperationWalker(context, pxContext, Descriptors.PX1080_DataViewDelegateLongOperationStart);
 
-			foreach (DataViewDelegateInfo del in pxGraph.ViewDelegates)
+			foreach (DataViewDelegateInfo del in pxGraph.DeclaredViewDelegates)
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
-				walker.Visit(del.Node);
+
+				if (del.Node != null)
+					walker.Visit(del.Node);
 			}
 		}
 	}

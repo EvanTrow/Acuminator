@@ -34,9 +34,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 				return;
 			}
 
-			if (PxContext.AsyncOperations.StartOperation_AllMethods.Contains(methodSymbol, SymbolEqualityComparer.Default) ||
-				(!methodSymbol.IsDefinition && methodSymbol.OriginalDefinition != null &&
-				  PxContext.AsyncOperations.StartOperation_AllMethods.Contains(methodSymbol.OriginalDefinition, SymbolEqualityComparer.Default)))
+			if (DoesMethodStartLongRunOperation(methodSymbol))
 			{
 				ReportDiagnostic(_reportDiagnostic, _descriptor, node);
 			}
@@ -44,6 +42,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 			{
 				base.VisitInvocationExpression(node);
 			}
+		}
+
+		private bool DoesMethodStartLongRunOperation(IMethodSymbol methodSymbol)
+		{
+			if (PxContext.AsyncOperations.StartOperation_AllMethods.Contains(methodSymbol))
+				return true;
+
+			return !methodSymbol.IsDefinition && methodSymbol.OriginalDefinition != null &&
+					PxContext.AsyncOperations.StartOperation_AllMethods.Contains(methodSymbol.OriginalDefinition);
 		}
 	}
 }
