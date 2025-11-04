@@ -34,6 +34,8 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Threading;
 
+using AcuminatorConstants = Acuminator.Vsix.Utilities.Constants;
+
 namespace Acuminator.Vsix
 {
 	/// <summary>
@@ -64,6 +66,8 @@ namespace Acuminator.Vsix
 	[Guid(AcuminatorVSPackage.PackageGuidString)]
 	[ProvideOptionPage(typeof(GeneralOptionsPage), SettingsCategoryName, GeneralOptionsPage.PageTitle,
 					   categoryResourceID: 201, pageNameResourceID: 202, supportsAutomation: true, SupportsProfiles = true)]
+	[ProvideOptionPage(typeof(CodeMapOptionsPage), SettingsCategoryName, CodeMapOptionsPage.PageTitle,
+					   categoryResourceID: 201, pageNameResourceID: 203, supportsAutomation: true, SupportsProfiles = true)]
 	[ProvideToolWindow(typeof(CodeMapWindow), MultiInstances = false, Transient = false, Orientation = ToolWindowOrientation.Left,
 					   Style = VsDockStyle.Linked)]
 	public sealed class AcuminatorVSPackage : AsyncPackage
@@ -94,9 +98,14 @@ namespace Acuminator.Vsix
 		public static AcuminatorVSPackage Instance { get; private set; } = null!;
 
 		private readonly Lazy<GeneralOptionsPage?> _generalOptionsPage =
-			new Lazy<GeneralOptionsPage?>(() => Instance.GetDialogPage(typeof(GeneralOptionsPage)) as GeneralOptionsPage, isThreadSafe: true);
+			new(() => Instance.GetDialogPage(typeof(GeneralOptionsPage)) as GeneralOptionsPage, isThreadSafe: true);
 
 		public GeneralOptionsPage? GeneralOptionsPage => _generalOptionsPage.Value;
+
+		private readonly Lazy<CodeMapOptionsPage?> _codeMapOptionsPage =
+			new(() => Instance.GetDialogPage(typeof(CodeMapOptionsPage)) as CodeMapOptionsPage, isThreadSafe: true);
+
+		public CodeMapOptionsPage? CodeMapOptionsPage => _codeMapOptionsPage.Value;
 
 		internal AcuminatorLogger AcuminatorLogger
 		{
@@ -214,7 +223,7 @@ namespace Acuminator.Vsix
 
 			_vsWorkspace = await this.GetVSWorkspaceAsync();
 
-			await InitializeCodeAnalysisSettingsAsync(deployedBannedApisFile, deployedAllowedApisFile);
+			await InitializePackageSettingsAsync(deployedBannedApisFile, deployedAllowedApisFile);
 			#endregion
 
 			#region Initialize Logger
@@ -442,7 +451,7 @@ namespace Acuminator.Vsix
 			return (deployedBannedApisFile, deployedAllowedApisFile);
 		}
 
-		private async System.Threading.Tasks.Task InitializeCodeAnalysisSettingsAsync(string? deployedBannedApisFile, string? deployedAllowedApisFile)
+		private async System.Threading.Tasks.Task InitializePackageSettingsAsync(string? deployedBannedApisFile, string? deployedAllowedApisFile)
 		{
 			CodeAnalysisSettings codeAnalysisSettings;
 			BannedApiSettings bannedApiSettings;
@@ -460,7 +469,11 @@ namespace Acuminator.Vsix
 				bannedApiSettings	 = BannedApiSettings.Default;
 			}
 
-			GlobalSettings.InitializeGlobalSettingsOnce(codeAnalysisSettings, bannedApiSettings);
+			CodeMapSettings codeMapSettings = CodeMapOptionsPage != null
+				? new CodeMapSettingsFromOptionsPage(CodeMapOptionsPage)
+				: CodeMapSettings.Default;
+
+			GlobalSettings.InitializeGlobalSettingsOnce(codeAnalysisSettings, bannedApiSettings, codeMapSettings);
 
 			VSVersion = await VSVersionProvider.GetVersionAsync(this);
 			SharedVsSettings.VSVersion = VSVersion;
@@ -493,25 +506,34 @@ namespace Acuminator.Vsix
 			}
 		}
 
-		#region Package Settings         
-		public bool ColoringEnabled => GeneralOptionsPage?.ColoringEnabled ?? true;
+		#region Package Settings
+		public bool ColoringEnabled => GeneralOptionsPage?.ColoringEnabled ?? AcuminatorConstants.Settings.Coloring.ColoringEnabledDefault;
 
 
-		public bool UseRegexColoring => GeneralOptionsPage?.UseRegexColoring ?? false;
+		public bool UseRegexColoring => GeneralOptionsPage?.UseRegexColoring ?? AcuminatorConstants.Settings.Coloring.UseRegexColoringDefault;
 
-		public bool UseBqlOutlining => GeneralOptionsPage?.UseBqlOutlining ?? true;
+		public bool UseBqlOutlining => GeneralOptionsPage?.UseBqlOutlining ?? AcuminatorConstants.Settings.Outlining.UseBqlOutliningDefault;
 
-		public bool UseBqlDetailedOutlining => GeneralOptionsPage?.UseBqlDetailedOutlining ?? true;
+		public bool UseBqlDetailedOutlining => 
+			GeneralOptionsPage?.UseBqlDetailedOutlining ?? AcuminatorConstants.Settings.Outlining.UseBqlDetailedOutliningDefault;
 
-		public bool PXGraphColoringEnabled => GeneralOptionsPage?.PXGraphColoringEnabled ?? true;
+		public bool PXGraphColoringEnabled => 
+			GeneralOptionsPage?.PXGraphColoringEnabled ?? AcuminatorConstants.Settings.Coloring.PXGraphColoringEnabledDefault;
 
-		public bool PXActionColoringEnabled => GeneralOptionsPage?.PXActionColoringEnabled ?? true;
+		public bool PXActionColoringEnabled => 
+			GeneralOptionsPage?.PXActionColoringEnabled ?? AcuminatorConstants.Settings.Coloring.PXActionColoringEnabledDefault;
 
-		public bool ColorOnlyInsideBQL => GeneralOptionsPage?.ColorOnlyInsideBQL ?? false;
+		public bool ColorOnlyInsideBQL => 
+			GeneralOptionsPage?.ColorOnlyInsideBQL ?? AcuminatorConstants.Settings.Coloring.ColorOnlyInsideBQLDefault;
 
 		public string? BannedApiFilePath => GeneralOptionsPage?.BannedApiFilePath;
 
 		public string? AllowedApiFilePath => GeneralOptionsPage?.AllowedApiFilePath;
+
+
+		public bool ExpandRegularNodes => CodeMapOptionsPage?.ExpandRegularNodes ?? CodeMapSettings.DefaultExpandRegularNodes;
+
+		public bool ExpandAttributeNodes => CodeMapOptionsPage?.ExpandAttributeNodes ?? CodeMapSettings.DefaultExpandAttributeNodes;
 		#endregion
 	}
 }
