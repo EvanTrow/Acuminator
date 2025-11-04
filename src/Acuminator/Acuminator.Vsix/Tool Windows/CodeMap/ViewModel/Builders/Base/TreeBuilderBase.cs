@@ -35,6 +35,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			{
 				AttributesGroupNodeViewModel 	  => AcuminatorVSPackage.Instance.ExpandAttributeNodes,
 				AttributeNodeViewModel 			  => AcuminatorVSPackage.Instance.ExpandAttributeNodes,
+				CacheAttachedNodeViewModel		  => AcuminatorVSPackage.Instance.ExpandAttributeNodes,
+				NonBqlDacPropertyNodeViewModel	  => AcuminatorVSPackage.Instance.ExpandAttributeNodes,
+				DacFieldPropertyNodeViewModel	  => AcuminatorVSPackage.Instance.ExpandAttributeNodes,
 				BaseDacPlaceholderNodeViewModel   => false,
 				BaseGraphPlaceholderNodeViewModel => false,
 				_ 								  => AcuminatorVSPackage.Instance.ExpandRegularNodes
