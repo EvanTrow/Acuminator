@@ -18,9 +18,9 @@ public class FilterViewModel : ViewModelBase
 		get => _filterText;
 		set
 		{
-			string? newValue = value.IsNullOrEmpty() 
+			string? newValue = value.IsNullOrWhiteSpace() 
 				? null 
-				: value;
+				: value.Trim();
 
 			if (_filterText != newValue)
 			{
