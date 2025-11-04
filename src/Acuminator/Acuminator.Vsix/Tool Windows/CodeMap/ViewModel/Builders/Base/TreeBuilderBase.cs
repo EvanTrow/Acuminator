@@ -23,9 +23,22 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			private set;
 		} = CancellationToken.None;
 
+		protected Func<TreeNodeViewModel, bool> ExpandCreatedNodes { get; }
+
 		protected TreeBuilderBase() : base([])
 		{
+			ExpandCreatedNodes = ExpandCreatedNodeCalculation;
 		}
+
+		protected virtual bool ExpandCreatedNodeCalculation(TreeNodeViewModel treeNode) =>
+			treeNode switch
+			{
+				AttributesGroupNodeViewModel 	  => AcuminatorVSPackage.Instance.ExpandAttributeNodes,
+				AttributeNodeViewModel 			  => AcuminatorVSPackage.Instance.ExpandAttributeNodes,
+				BaseDacPlaceholderNodeViewModel   => false,
+				BaseGraphPlaceholderNodeViewModel => false,
+				_ 								  => AcuminatorVSPackage.Instance.ExpandRegularNodes
+			};
 
 		public virtual TreeViewModel CreateEmptyCodeMapTree(CodeMapWindowViewModel windowViewModel) => new TreeViewModel(windowViewModel);
 
@@ -187,15 +200,5 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			BaseGraphPlaceholderNodeViewModel => true,
 			_ 								  => throw new NotImplementedException($"Nodes of type \"{node.GetType().Name}\" are not supported")
 		};
-
-		protected virtual bool ExpandCreatedNode(TreeNodeViewModel treeNode) =>
-			treeNode switch
-			{
-				AttributesGroupNodeViewModel 	  => AcuminatorVSPackage.Instance.ExpandAttributeNodes,
-				AttributeNodeViewModel 		 	  => AcuminatorVSPackage.Instance.ExpandAttributeNodes,
-				BaseDacPlaceholderNodeViewModel   => false,
-				BaseGraphPlaceholderNodeViewModel => false,
-				_ 							 	  => AcuminatorVSPackage.Instance.ExpandRegularNodes
-			};
 	}
 }

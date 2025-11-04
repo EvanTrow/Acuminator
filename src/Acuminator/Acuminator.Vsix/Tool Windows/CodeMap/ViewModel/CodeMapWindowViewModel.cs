@@ -410,9 +410,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 						return;
 
 					FilterOptions filterOptions = FilterVM.CreateFilterOptionsFromCurrentFilter();
-					bool expandRoots = AcuminatorVSPackage.Instance.ExpandRegularNodes;
-					bool expandChildren = AcuminatorVSPackage.Instance.ExpandRegularNodes;
-					TreeViewModel? newTreeVM = TreeBuilder.BuildCodeMapTree(this, filterOptions, expandRoots, expandChildren, cancellationToken);
+					TreeViewModel? newTreeVM = TreeBuilder.BuildCodeMapTree(this, filterOptions, cancellationToken);
 
 					if (newTreeVM == null)
 						return;
