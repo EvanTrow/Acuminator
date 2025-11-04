@@ -27,6 +27,9 @@
     <WarningLevel>9999</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+      <InternalsVisibleTo Include="Acuminator.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="BannedApi\Data\AllowedApis.txt" />
     <None Remove="BannedApi\Data\BannedApis.txt" />
   </ItemGroup>

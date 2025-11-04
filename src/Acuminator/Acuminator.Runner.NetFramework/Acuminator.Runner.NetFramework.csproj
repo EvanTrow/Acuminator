@@ -35,6 +35,9 @@
 	<PropertyGroup>
 	  <NoWarn>$(NoWarn);1701;1702;CA1822</NoWarn>
 	</PropertyGroup>
+	 <ItemGroup>
+      <InternalsVisibleTo Include="Acuminator.Tests" />
+  </ItemGroup>
 	<ItemGroup>
 	  <Content Include="Resources\acumatica.ico">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
