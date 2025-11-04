@@ -23,7 +23,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
 				new LongOperationInGraphAnalyzer());
 
 		[Theory]
-		[EmbeddedFileData(@"PXGraph\PXGraphStartsLongOperationInInitialization.cs")]
+		[EmbeddedFileData(@"PXGraph\Initialization\PXGraphStartsLongOperationInInitialization.cs")]
 		public Task Graph_Initialization_StartLongOperation(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(19, 5),
@@ -31,7 +31,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
 				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(29, 4));
 
 		[Theory]
-		[EmbeddedFileData(@"PXGraph\PXGraphStartsLongOperationInInitializationViaMethod.cs")]
+		[EmbeddedFileData(@"PXGraph\Initialization\PXGraphStartsLongOperationInInitializationViaMethod.cs")]
 		public Task Graph_Initialization_StartLongOperation_ViaMethod(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(19, 5),
@@ -39,7 +39,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
 				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(28, 4));
 
 		[Theory]
-		[EmbeddedFileData(@"PXGraph\PXGraphExtensionStartsLongOperationInInitialization.cs")]
+		[EmbeddedFileData(@"PXGraph\Initialization\PXGraphExtensionStartsLongOperationInInitialization.cs")]
 		public Task GraphExtension_Initialization_StartLongOperation(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(14, 4),
@@ -47,7 +47,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
 				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(30, 4));
 
 		[Theory]
-		[EmbeddedFileData(@"PXGraph\PXGraphDoesntStartLongOperationInInitialization.cs")]
+		[EmbeddedFileData(@"PXGraph\Initialization\PXGraphDoesntStartLongOperationInInitialization.cs")]
 		public Task GraphInstanceConstructor_DoesntReportsDiagnostic(string source) => 
 			VerifyCSharpDiagnosticAsync(source);
 	}
