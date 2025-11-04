@@ -45,8 +45,8 @@ namespace Acuminator.Tests.Tests.Utilities.CodeAnalysisSettingsSerialization
 																		px1007DocumentationDiagnosticEnabled);
 			var expectedBannedApiSettings = new BannedApiSettings(bannedApiAnalysisEnabled, bannedApiFilePath, allowedApisFilePath);
 
-			GlobalSettings.InitializeGlobalSettingsThreadUnsafeForTestsOnly(expectedCodeAnalysisSettings, expectedBannedApiSettings);
-
+			GlobalSettings.InitializeGlobalSettingsThreadUnsafeForTestsOnly(expectedCodeAnalysisSettings, expectedBannedApiSettings, 
+																			CodeMapSettings.Default);
 			var analyzer = new ReadingFromMemoryAnalyzer(expectedCodeAnalysisSettings, expectedBannedApiSettings);
 			var diagnosticVerifier = new DiagnosticVerifierWithPredefinedAnalyzer(analyzer);
 

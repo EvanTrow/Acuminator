@@ -12,39 +12,47 @@ namespace Acuminator.Utilities
 
 		private static CodeAnalysisSettings? _cachedCodeAnalysisSettings;
 		private static BannedApiSettings? _cachedBannedApiSettings;
+		private static CodeMapSettings? _cachedCodeMapSettings;
 
 		public static CodeAnalysisSettings AnalysisSettings => _cachedCodeAnalysisSettings ?? CodeAnalysisSettings.Default;
 
 		public static BannedApiSettings BannedApiSettings => _cachedBannedApiSettings ?? BannedApiSettings.Default;
 
+		public static CodeMapSettings CodeMapSettings => _cachedCodeMapSettings ?? CodeMapSettings.Default;
+
 		/// <summary>
 		/// Initializes the global settings once. Must be called on package initialization.
 		/// </summary>
-		/// <param name="codeAnalysisSettings">The instance.</param>
-		public static void InitializeGlobalSettingsOnce(CodeAnalysisSettings codeAnalysisSettings, BannedApiSettings bannedApiSettings)
+		/// <param name="codeAnalysisSettings">The code analysis settings.</param>
+		/// <param name="bannedApiSettings">The banned API settings.</param>
+		/// <param name="codeMapSettings">The code map settings.</param>
+		public static void InitializeGlobalSettingsOnce(CodeAnalysisSettings codeAnalysisSettings, BannedApiSettings bannedApiSettings,
+														CodeMapSettings codeMapSettings)
 		{
 			codeAnalysisSettings.ThrowOnNull();
 			bannedApiSettings.ThrowOnNull();
+			codeMapSettings.ThrowOnNull();
 
 			if (Interlocked.CompareExchange(ref _isInitialized, value: INITIALIZED, comparand: NOT_INITIALIZED) == NOT_INITIALIZED)
 			{
 				_cachedCodeAnalysisSettings = codeAnalysisSettings;
-				_cachedBannedApiSettings = bannedApiSettings;
+				_cachedBannedApiSettings 	= bannedApiSettings;
+				_cachedCodeMapSettings 		= codeMapSettings;
 			}
 		}
 
 		/// <summary>
 		/// Initializes the global settings in a thread unsafe way. For tests only.
 		/// </summary>
-		/// <param name="codeAnalysisSettings">The instance.</param>
+		/// <param name="codeAnalysisSettings">The code analysis settings.</param>
 		/// <param name="bannedApiSettings">The banned API settings.</param>
-		/// <remarks>
-		/// TODO make internal after removal of the assembly signing.
-		/// </remarks>
-		public static void InitializeGlobalSettingsThreadUnsafeForTestsOnly(CodeAnalysisSettings codeAnalysisSettings, BannedApiSettings bannedApiSettings)
+		/// <param name="codeMapSettings">The code map settings.</param>
+		internal static void InitializeGlobalSettingsThreadUnsafeForTestsOnly(CodeAnalysisSettings codeAnalysisSettings, BannedApiSettings bannedApiSettings,
+																			  CodeMapSettings codeMapSettings)
 		{
 			_cachedCodeAnalysisSettings = codeAnalysisSettings.CheckIfNull();
-			_cachedBannedApiSettings = bannedApiSettings.CheckIfNull();
+			_cachedBannedApiSettings 	= bannedApiSettings.CheckIfNull();
+			_cachedCodeMapSettings 		= codeMapSettings.CheckIfNull();
 		}
 	}
 }
