@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-using Acuminator.Utilities;
 using Acuminator.Utilities.Common;
 using Acuminator.Vsix.Settings;
 
@@ -40,9 +39,9 @@ namespace Acuminator.Vsix
 			}
 		}
 
-		private bool _expandRegularNodes = CodeMapSettings.DefaultExpandRegularNodes;
+		private bool _expandRegularNodes = Constants.Settings.CodeMap.ExpandRegularNodesDefault;
 
-		[DefaultValue(CodeMapSettings.DefaultExpandRegularNodes)]
+		[DefaultValue(Constants.Settings.CodeMap.ExpandRegularNodesDefault)]
 		[CategoryFromResources(nameof(VSIXResource.Category_NodeExpansion), NodeExpansionCategoryName)]
 		[DisplayNameFromResources(resourceKey: nameof(VSIXResource.Setting_CodeMap_ExpandRegularNodes_Title))]
 		[DescriptionFromResources(resourceKey: nameof(VSIXResource.Setting_CodeMap_ExpandRegularNodes_Description))]
@@ -59,9 +58,9 @@ namespace Acuminator.Vsix
 			}
 		}
 
-		private bool _expandAttributeNodes = CodeMapSettings.DefaultExpandAttributeNodes;
+		private bool _expandAttributeNodes = Constants.Settings.CodeMap.ExpandAttributeNodesDefault;
 
-		[DefaultValue(CodeMapSettings.DefaultExpandAttributeNodes)]
+		[DefaultValue(Constants.Settings.CodeMap.ExpandAttributeNodesDefault)]
 		[CategoryFromResources(nameof(VSIXResource.Category_NodeExpansion), NodeExpansionCategoryName)]
 		[DisplayNameFromResources(resourceKey: nameof(VSIXResource.Setting_CodeMap_ExpandAttributeNodes_Title))]
 		[DescriptionFromResources(resourceKey: nameof(VSIXResource.Setting_CodeMap_ExpandAttributeNodes_Description))]
@@ -80,8 +79,8 @@ namespace Acuminator.Vsix
 
 		public override void ResetSettings()
 		{
-			_expandRegularNodes   = CodeMapSettings.DefaultExpandRegularNodes;
-			_expandAttributeNodes = CodeMapSettings.DefaultExpandAttributeNodes;
+			_expandRegularNodes   = Constants.Settings.CodeMap.ExpandRegularNodesDefault;
+			_expandAttributeNodes = Constants.Settings.CodeMap.ExpandAttributeNodesDefault;
 			
 			base.ResetSettings();
 

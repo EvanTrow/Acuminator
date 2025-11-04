@@ -41,6 +41,12 @@ namespace Acuminator.Vsix.Utilities
 				public const bool UseBqlOutliningDefault 		 = true;
 				public const bool UseBqlDetailedOutliningDefault = true;
 			}
+
+			public static class CodeMap
+			{
+				public const bool ExpandRegularNodesDefault    = true;
+				public const bool ExpandAttributeNodesDefault  = false;
+			}
 		}
 
 		/// <summary>

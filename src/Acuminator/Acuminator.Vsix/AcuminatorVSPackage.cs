@@ -469,11 +469,7 @@ namespace Acuminator.Vsix
 				bannedApiSettings	 = BannedApiSettings.Default;
 			}
 
-			CodeMapSettings codeMapSettings = CodeMapOptionsPage != null
-				? new CodeMapSettingsFromOptionsPage(CodeMapOptionsPage)
-				: CodeMapSettings.Default;
-
-			GlobalSettings.InitializeGlobalSettingsOnce(codeAnalysisSettings, bannedApiSettings, codeMapSettings);
+			GlobalSettings.InitializeGlobalSettingsOnce(codeAnalysisSettings, bannedApiSettings);
 
 			VSVersion = await VSVersionProvider.GetVersionAsync(this);
 			SharedVsSettings.VSVersion = VSVersion;
@@ -531,9 +527,9 @@ namespace Acuminator.Vsix
 		public string? AllowedApiFilePath => GeneralOptionsPage?.AllowedApiFilePath;
 
 
-		public bool ExpandRegularNodes => CodeMapOptionsPage?.ExpandRegularNodes ?? CodeMapSettings.DefaultExpandRegularNodes;
+		public bool ExpandRegularNodes => CodeMapOptionsPage?.ExpandRegularNodes ?? AcuminatorConstants.Settings.CodeMap.ExpandRegularNodesDefault;
 
-		public bool ExpandAttributeNodes => CodeMapOptionsPage?.ExpandAttributeNodes ?? CodeMapSettings.DefaultExpandAttributeNodes;
+		public bool ExpandAttributeNodes => CodeMapOptionsPage?.ExpandAttributeNodes ?? AcuminatorConstants.Settings.CodeMap.ExpandAttributeNodesDefault;
 		#endregion
 	}
 }
