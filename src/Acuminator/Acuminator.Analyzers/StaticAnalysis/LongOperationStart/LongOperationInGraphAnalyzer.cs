@@ -60,6 +60,23 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 				if (initializer.Node != null)
 					walker.Visit(initializer.Node);
 			}
+
+			if (pxGraphOrGraphExt.GraphType != GraphType.PXGraphExtension)
+				return;
+
+			if (pxGraphOrGraphExt.IsActiveMethodInfo?.Node != null)
+			{
+				context.CancellationToken.ThrowIfCancellationRequested();
+
+				walker.Visit(pxGraphOrGraphExt.IsActiveMethodInfo.Node);
+			}
+
+			if (pxGraphOrGraphExt.IsActiveForGraphMethodInfo?.Node != null)
+			{
+				context.CancellationToken.ThrowIfCancellationRequested();
+
+				walker.Visit(pxGraphOrGraphExt.IsActiveForGraphMethodInfo.Node);
+			}
 		}
 	}
 }
