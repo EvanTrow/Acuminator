@@ -989,6 +989,24 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expand Code Map root nodes on opening..
+        /// </summary>
+        public static string Setting_CodeMap_ExpandRootNodes_Description {
+            get {
+                return ResourceManager.GetString("Setting_CodeMap_ExpandRootNodes_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand Root Nodes.
+        /// </summary>
+        public static string Setting_CodeMap_ExpandRootNodes_Title {
+            get {
+                return ResourceManager.GetString("Setting_CodeMap_ExpandRootNodes_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Colorize BQL syntax. If set to false, all Acuminator coloring is turned off..
         /// </summary>
         public static string Setting_ColoringEnabled_Description {

@@ -44,8 +44,9 @@ namespace Acuminator.Vsix.Utilities
 
 			public static class CodeMap
 			{
-				public const bool ExpandRegularNodesDefault    = true;
-				public const bool ExpandAttributeNodesDefault  = false;
+				public const bool ExpandRootNodesDefault	  = true;
+				public const bool ExpandRegularNodesDefault	  = true;
+				public const bool ExpandAttributeNodesDefault = false;
 			}
 		}
 

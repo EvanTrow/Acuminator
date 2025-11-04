@@ -39,6 +39,25 @@ namespace Acuminator.Vsix
 			}
 		}
 
+		private bool _expandRootNodes = Constants.Settings.CodeMap.ExpandRootNodesDefault;
+
+		[DefaultValue(Constants.Settings.CodeMap.ExpandRootNodesDefault)]
+		[CategoryFromResources(nameof(VSIXResource.Category_NodeExpansion), NodeExpansionCategoryName)]
+		[DisplayNameFromResources(resourceKey: nameof(VSIXResource.Setting_CodeMap_ExpandRootNodes_Title))]
+		[DescriptionFromResources(resourceKey: nameof(VSIXResource.Setting_CodeMap_ExpandRootNodes_Description))]
+		public bool ExpandRootNodes
+		{
+			get => _expandRootNodes;
+			set
+			{
+				if (_expandRootNodes != value)
+				{
+					_expandRootNodes = value;
+					_settingsChanged = true;
+				}
+			}
+		}
+
 		private bool _expandRegularNodes = Constants.Settings.CodeMap.ExpandRegularNodesDefault;
 
 		[DefaultValue(Constants.Settings.CodeMap.ExpandRegularNodesDefault)]
@@ -79,6 +98,7 @@ namespace Acuminator.Vsix
 
 		public override void ResetSettings()
 		{
+			_expandRootNodes	  = Constants.Settings.CodeMap.ExpandRootNodesDefault;
 			_expandRegularNodes   = Constants.Settings.CodeMap.ExpandRegularNodesDefault;
 			_expandAttributeNodes = Constants.Settings.CodeMap.ExpandAttributeNodesDefault;
 			

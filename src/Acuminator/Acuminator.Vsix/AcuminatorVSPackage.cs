@@ -526,6 +526,7 @@ namespace Acuminator.Vsix
 
 		public string? AllowedApiFilePath => GeneralOptionsPage?.AllowedApiFilePath;
 
+		public bool ExpandRootNodes => CodeMapOptionsPage?.ExpandRootNodes ?? AcuminatorConstants.Settings.CodeMap.ExpandRootNodesDefault;
 
 		public bool ExpandRegularNodes => CodeMapOptionsPage?.ExpandRegularNodes ?? AcuminatorConstants.Settings.CodeMap.ExpandRegularNodesDefault;
 
