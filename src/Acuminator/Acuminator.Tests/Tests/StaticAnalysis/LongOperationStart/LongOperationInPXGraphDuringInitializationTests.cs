@@ -47,8 +47,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
 				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(30, 4));
 
 		[Theory]
-		[EmbeddedFileData(@"PXGraph\Initialization\PXGraphDoesntStartLongOperationInInitialization.cs")]
-		public Task GraphInstanceConstructor_DoesntReportsDiagnostic(string source) => 
+		[EmbeddedFileData(@"PXGraph\Initialization\PXGraphAndGraphExt_NoLongOperationInInitialization.cs")]
+		public Task Graph_And_GraphExtension_With_All_Initializers_NoDiagnostic(string source) => 
 			VerifyCSharpDiagnosticAsync(source);
 	}
 }
