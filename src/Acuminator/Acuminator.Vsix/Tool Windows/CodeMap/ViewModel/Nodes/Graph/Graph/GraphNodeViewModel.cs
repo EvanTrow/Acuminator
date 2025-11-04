@@ -28,8 +28,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override GraphOrGraphExtInfoBase GraphOrGraphExtInfo => GraphSemanticModel.GraphOrGraphExtInfo;
 
-		public GraphNodeViewModel(GraphSemanticModelForCodeMap codeMapGraphModel, TreeViewModel tree, TreeNodeViewModel? parent, bool isExpanded) : 
-							 base(tree, parent, isExpanded)
+		public GraphNodeViewModel(GraphSemanticModelForCodeMap codeMapGraphModel, TreeViewModel tree, TreeNodeViewModel? parent,
+								  Func<TreeNodeViewModel, bool> isExpandedCalculator) : 
+							 base(tree, parent, isExpandedCalculator)
 		{
 			CodeMapGraphModel = codeMapGraphModel;
 			ExtraInfos = new ExtendedObservableCollection<ExtraInfoViewModel>(GetGraphExtraInfos());

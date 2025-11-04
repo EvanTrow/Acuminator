@@ -9,8 +9,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public class GraphAttributeNodeViewModel : AttributeNodeViewModel<GraphAttributeInfo>
 	{
-		public GraphAttributeNodeViewModel(TreeNodeViewModel parent, GraphAttributeInfo attributeInfo, bool isExpanded = false) :
-									  base(parent, attributeInfo, isExpanded)
+		public GraphAttributeNodeViewModel(TreeNodeViewModel parent, GraphAttributeInfo attributeInfo, 
+										   Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+									  base(parent, attributeInfo, isExpandedCalculator)
 		{
 		}
 

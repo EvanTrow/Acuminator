@@ -20,8 +20,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public DacBqlFieldInfo BqlFieldInfo => (MemberInfo as DacBqlFieldInfo)!;
 
 		public DacBqlFieldNodeViewModel(DacMemberCategoryNodeViewModel dacMemberCategoryVM, TreeNodeViewModel parent,
-										DacBqlFieldInfo bqlFieldInfo, bool isExpanded = false) :
-										base(dacMemberCategoryVM, parent, bqlFieldInfo, isExpanded)
+										DacBqlFieldInfo bqlFieldInfo, Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+										base(dacMemberCategoryVM, parent, bqlFieldInfo, isExpandedCalculator)
 		{
 		}
 
