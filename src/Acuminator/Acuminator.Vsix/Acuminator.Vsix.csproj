@@ -364,7 +364,7 @@
       <Version>16.2.29116.78</Version>
     </PackageReference>
     <PackageReference Include="PolySharp">
-      <Version>1.14.1</Version>
+      <Version>1.15.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
