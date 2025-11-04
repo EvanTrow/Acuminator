@@ -130,7 +130,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 			if (filterVM.HasFilterText)
 			{
-				int selectionIndex = textBox.Text.IndexOf(filterVM.FilterText, StringComparison.OrdinalIgnoreCase);
+				string filterTextTrimmed = filterVM.FilterText.Trim();
+				int selectionIndex = textBox.Text.IndexOf(filterTextTrimmed, StringComparison.OrdinalIgnoreCase);
 
 				if (selectionIndex < 0)
 				{
@@ -138,7 +139,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 					return;
 				}
 
-				textBox.Select(selectionIndex, filterVM.FilterText.Length);
+				textBox.Select(selectionIndex, filterTextTrimmed.Length);
 			}
 			else
 			{
