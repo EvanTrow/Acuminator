@@ -23,11 +23,11 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			private set;
 		} = CancellationToken.None;
 
-		protected Func<TreeNodeViewModel, bool> ExpandCreatedNodes { get; }
+		protected Func<TreeNodeViewModel, bool> ExpandCreatedNodesCalculator { get; }
 
 		protected TreeBuilderBase() : base([])
 		{
-			ExpandCreatedNodes = ExpandCreatedNodeCalculation;
+			ExpandCreatedNodesCalculator = ExpandCreatedNodeCalculation;
 		}
 
 		protected virtual bool ExpandCreatedNodeCalculation(TreeNodeViewModel treeNode) =>
