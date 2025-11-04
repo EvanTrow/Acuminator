@@ -289,10 +289,17 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>VSIXResource.resx</DependentUpon>
     </Compile>
+
     <Compile Remove="Settings\UI\GeneralOptionsPage.cs" />
     <Compile Include="Settings\UI\GeneralOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
+
+    <Compile Remove="Settings\UI\CodeMapOptionsPage.cs" />
+    <Compile Include="Settings\UI\CodeMapOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+
     <Compile Remove="Coloriser\Regex\Test\*.cs" />
     <EmbeddedResource Include="Coloriser\Regex\Test\*.cs" />
     <EmbeddedResource Include="Resources\VSIXResource.resx">
