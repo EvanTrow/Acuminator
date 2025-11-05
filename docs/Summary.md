@@ -62,7 +62,7 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1051](diagnostics/PX1051.md) | The strings defined in a class without the `PXLocalizable` attribute cannot be used as parameters for localization methods, `PXException` and `PXExceptionInfo` constructors. | Error | Unavailable |
 | [PX1052](diagnostics/PX1052.md) | Plain text strings cannot be used in the methods of the `LocalizeFormat` family. | Error | Unavailable |
 | [PX1053](diagnostics/PX1053.md) | Concatenated strings cannot be used as parameters for localization methods, `PXException` and `PXExceptionInfo` constructors. | Error | Unavailable |
-| [PX1054](diagnostics/PX1054.md) | A `PXGraph` instance cannot start a long-running operation during the `PXGraph` initialization. | Error | Unavailable |
+| [PX1054](diagnostics/PX1054.md) | Long-running operations cannot be started during the `PXGraph` and `PXGraphExtension` initialization. | Error | Unavailable |
 | [PX1055](diagnostics/PX1055.md) | An invalid primary key of the DAC is used. | Error | Available |
 | [PX1056](diagnostics/PX1056.md) | A PXGraph instance cannot be initialized inside the `IsActive` or `IsActiveForGraph<TGraph>` method. | Error | Unavailable |
 | [PX1057](diagnostics/PX1057.md) | A `PXGraph` instance cannot be initialized while another `PXGraph` instance is being initialized. | Error | Unavailable |

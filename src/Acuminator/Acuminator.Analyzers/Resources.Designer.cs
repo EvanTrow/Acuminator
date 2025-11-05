@@ -1240,7 +1240,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A PXGraph instance should not start PXLongOperation during the initialization phase.
+        ///   Looks up a localized string similar to PXGraph and PXGraphExtension instances should not start long-running operations during the initialization phase.
         /// </summary>
         public static string PX1054Title {
             get {
