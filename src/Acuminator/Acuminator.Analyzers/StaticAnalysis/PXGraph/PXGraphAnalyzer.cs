@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis.ActionHandlerAttributes;
-using Acuminator.Analyzers.StaticAnalysis.ActionHandlerReturnType;
 using Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator;
 using Acuminator.Analyzers.StaticAnalysis.CallingBaseActionHandler;
 using Acuminator.Analyzers.StaticAnalysis.CallingBaseDataViewDelegate;
@@ -64,7 +63,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 			new ViewDeclarationOrderAnalyzer(),
 			new NoPrimaryViewForPrimaryDacAnalyzer(),
 			new ActionHandlerAttributesAnalyzer(),
-			new ActionHandlerReturnTypeAnalyzer(),
 			new NonPublicGraphAndDacAndExtensionsAnalyzer(),
 			new InvalidPXActionSignatureAnalyzer(),
 			new StaticFieldOrPropertyInGraphAnalyzer(),

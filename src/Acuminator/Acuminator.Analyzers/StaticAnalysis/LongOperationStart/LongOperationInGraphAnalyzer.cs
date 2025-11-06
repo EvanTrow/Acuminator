@@ -1,11 +1,14 @@
 ﻿using System.Collections.Immutable;
+using System.Linq;
+using System.Threading;
 
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
-using Acuminator.Utilities;
+using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
@@ -15,6 +18,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
 			ImmutableArray.Create
 			(
+				Descriptors.PX1013_PXActionHandlerInvalidReturnType,
 				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization,
 				Descriptors.PX1080_DataViewDelegateLongOperationStart
 			);
@@ -77,6 +81,50 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 
 				walker.Visit(pxGraphOrGraphExt.IsActiveForGraphMethodInfo.Node);
 			}
+		}
+
+		protected virtual void CheckActionDelegateStartingLongRunOperationsHasCorrectSignatures(SymbolAnalysisContext context, PXContext pxContext,
+																								PXGraphEventSemanticModel pxGraphOrGraphExt)
+		{
+			if (pxGraphOrGraphExt.ActionHandlersByNames.Count == 0)
+				return;
+
+			foreach (var actionHandler in pxGraphOrGraphExt.DeclaredActionHandlers)
+			{
+				context.CancellationToken.ThrowIfCancellationRequested();
+
+				if (actionHandler.Node != null)
+				{
+					CheckActionHandlerReturnType(context, pxContext, actionHandler);
+				}
+			}
+		}
+
+		private void CheckActionHandlerReturnType(SymbolAnalysisContext context, PXContext pxContext, ActionHandlerInfo actionHandlerInfo)
+		{
+			context.CancellationToken.ThrowIfCancellationRequested();
+
+			if (pxContext.SystemTypes.IEnumerable.Equals(actionHandlerInfo.Symbol.ReturnType, SymbolEqualityComparer.Default) ||
+				!StartsLongOperation(pxContext, actionHandlerInfo.Node!, context.CancellationToken))
+			{
+				return;
+			}
+
+			var location = actionHandlerInfo.Node!.Identifier.GetLocation().NullIfLocationKindIsNone() ??
+						   actionHandlerInfo.Symbol.Locations.FirstOrDefault();
+			var diagnostic = Diagnostic.Create(Descriptors.PX1013_PXActionHandlerInvalidReturnType,
+											  location);
+
+			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
+		}
+
+		private bool StartsLongOperation(PXContext pxContext, SyntaxNode node, CancellationToken cancellation)
+		{
+			var walker = new StartLongOperationDelegateWalker(pxContext, cancellation);
+
+			walker.Visit(node);
+
+			return walker.Delegates.Length > 0;
 		}
 	}
 }

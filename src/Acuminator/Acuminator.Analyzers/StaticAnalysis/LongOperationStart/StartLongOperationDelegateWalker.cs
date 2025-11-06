@@ -38,7 +38,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 				return;
 			}
 
-			var delegateArgument = GetProcessingDelegateArgument(methodSymbol, node);
+			var delegateArgument = GetLongRunDelegateArgument(methodSymbol, node);
 
 			if (delegateArgument != null)
 			{
@@ -49,7 +49,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 			}
 		}
 
-		private ExpressionSyntax? GetProcessingDelegateArgument(IMethodSymbol methodSymbol, InvocationExpressionSyntax methodNode)
+		private ExpressionSyntax? GetLongRunDelegateArgument(IMethodSymbol methodSymbol, InvocationExpressionSyntax methodNode)
 		{
 			var arguments = methodNode.ArgumentList.Arguments;
 			var delegateExists = arguments.Count > 1;
