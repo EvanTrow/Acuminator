@@ -68,8 +68,8 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1057](diagnostics/PX1057.md) | A `PXGraph` instance cannot be initialized while another `PXGraph` instance is being initialized. | Error | Unavailable |
 | [PX1058](diagnostics/PX1058.md) | A `PXGraph` instance cannot save changes to the database during the `PXGraph` initialization. | Error | Unavailable |
 | [PX1059](diagnostics/PX1059.md) | Changes to `PXCache` cannot be performed during the `PXGraph` initialization. | Error | Unavailable |
-| [PX1060](diagnostics/PX1060.md) | DAC fields should be strongly typed to be used in fluent BQL queries. | Message | Available |
-| [PX1061](diagnostics/PX1061.md) | Constants should be strongly typed to be used in fluent BQL queries. | Message | Available |
+| [PX1060](diagnostics/PX1060.md) | DAC fields should be strongly typed to be used in fluent BQL queries. | Warning | Available |
+| [PX1061](diagnostics/PX1061.md) | Constants should be strongly typed to be used in fluent BQL queries. | Warning | Available |
 | [PX1062](diagnostics/PX1062.md) | You cannot declare static views, actions, mutable fields, and mutable properties in graphs or graph extensions  | Error | Available |
 | [PX1063](diagnostics/PX1063.md) | The declaration of the exception class does not contain a serialization constructor. This will cause an incorrect deserialization of the exception data and will lead to runtime errors in Acumatica ERP. | Error | Available |
 | [PX1064](diagnostics/PX1064.md) | The declaration of the exception class introduces new serializable fields but does not declare an override for the `GetObjectData` method. This will cause an incorrect serialization of the exception data and will lead to runtime errors in Acumatica ERP. | Error | Available |
