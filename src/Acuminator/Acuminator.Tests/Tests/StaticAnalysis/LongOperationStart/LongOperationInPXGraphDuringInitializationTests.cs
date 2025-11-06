@@ -26,17 +26,41 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
 		[EmbeddedFileData(@"PXGraph\Initialization\PXGraphStartsLongOperationInInitialization.cs")]
 		public Task Graph_Initialization_StartLongOperation(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(19, 5),
-				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(24, 4),
-				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(29, 4));
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(24, 5),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(25, 5),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(29, 5),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(32, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(41, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(42, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(43, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(44, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(46, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(56, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(57, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(58, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(59, 4));
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\Initialization\PXGraphStartsLongOperationInInitializationViaMethod.cs")]
 		public Task Graph_Initialization_StartLongOperation_ViaMethod(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
-				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(19, 5),
-				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(23, 31),
-				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(28, 4));
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(21, 5),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(22, 5),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(23, 5),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(26, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(27, 4),
+
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(32, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(33, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(34, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(35, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(36, 4),
+
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(43, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(44, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(45, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(46, 4),
+				Descriptors.PX1054_PXGraphLongRunOperationDuringInitialization.CreateFor(47, 4));
 
 		[Theory]
 		[EmbeddedFileData(@"PXGraph\Initialization\PXGraphExtensionStartsLongOperationInInitialization.cs")]
