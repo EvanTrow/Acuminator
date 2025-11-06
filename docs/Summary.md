@@ -24,7 +24,7 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1010](diagnostics/PX1010.md) | If a delegate applies paging in an inner select, `StartRow` must be reset. (If `StartRow` is not reset, paging will be applied twice.) | Warning (ISV Level 1: Significant) | Available |
 | [PX1011](diagnostics/PX1011.md) | Because multiple levels of inheritance are not supported for `PXCacheExtension`, the derived type can be marked as sealed. | Warning (ISV Level 3: Informational) | Available |
 | [PX1012](diagnostics/PX1012.md) | `PXAction` is declared on a non-primary view. | Warning (ISV Level 2: Production Quality) | Available |
-| [PX1013](diagnostics/PX1013.md) | The action handler that initiates a background operation or is executed by a background operation must return `IEnumerable`. | Error | Available   | 
+| [PX1013](diagnostics/PX1013.md) | The return type of graph action's action delegate that initiates a long-running operation must be `IEnumerable`. | Error | Available |
 | [PX1014](diagnostics/PX1014.md) | A DAC field must have a nullable type. | Error   | Available |
 | [PX1015](diagnostics/PX1015.md) | For a BQL statement that contains parameters, the number of arguments of a `Select` method is different from the number of parameters. | Warning (ISV Level 1: Significant) | Unavailable |
 | [PX1016](diagnostics/PX1016.md) | A DAC or graph extension must include the public static `IsActive` method with no parameters and the `bool` return type. Extensions that are constantly active reduce performance. Suppress the error if you need the DAC extension to be constantly active. | Error | Unavailable | 

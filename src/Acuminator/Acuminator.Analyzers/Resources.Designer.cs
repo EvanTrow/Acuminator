@@ -381,7 +381,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Change the return type to IEnumerable.
+        ///   Looks up a localized string similar to Change the return type of the action delegate to IEnumerable.
         /// </summary>
         public static string PX1013Fix {
             get {
@@ -390,7 +390,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The action handler that initiates a background operation or is executed by a background operation must return IEnumerable.
+        ///   Looks up a localized string similar to The return type of the action delegate that initiates a long-running operation must be &quot;IEnumerable&quot;.
         /// </summary>
         public static string PX1013Title {
             get {

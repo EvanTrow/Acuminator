@@ -228,10 +228,10 @@ public virtual int? SomeDacField{ get; set; }</value>
     <value>The type parameter of the {0} action is not the primary DAC. You should specify the {1} DAC as the type parameter to make the action available on the toolbar.</value>
   </data>
   <data name="PX1013Fix" xml:space="preserve">
-    <value>Change the return type to IEnumerable</value>
+    <value>Change the return type of the action delegate to IEnumerable</value>
   </data>
   <data name="PX1013Title" xml:space="preserve">
-    <value>The action handler that initiates a background operation or is executed by a background operation must return IEnumerable</value>
+    <value>The return type of the action delegate that initiates a long-running operation must be "IEnumerable"</value>
   </data>
   <data name="PX1014Fix" xml:space="preserve">
     <value>Make the type nullable</value>
