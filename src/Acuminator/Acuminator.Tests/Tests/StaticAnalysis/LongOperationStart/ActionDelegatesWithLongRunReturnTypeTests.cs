@@ -30,7 +30,12 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
 		[Theory]
 		[EmbeddedFileData(@"ActionHandlerReturnType\GraphWithActionDelegatesWithBadSignatures.cs")]
 		public Task ActionDelegates_StartingLongRuns_WithIncorrectSignatures(string source) =>
-			VerifyCSharpDiagnosticAsync(source, Descriptors.PX1013_PXActionHandlerInvalidReturnType.CreateFor(15, 21));
+			VerifyCSharpDiagnosticAsync(source,
+				Descriptors.PX1013_PXActionHandlerInvalidReturnType.CreateFor(22, 15),
+				Descriptors.PX1013_PXActionHandlerInvalidReturnType.CreateFor(36, 15),
+				Descriptors.PX1013_PXActionHandlerInvalidReturnType.CreateFor(41, 15),
+				Descriptors.PX1013_PXActionHandlerInvalidReturnType.CreateFor(48, 15),
+				Descriptors.PX1013_PXActionHandlerInvalidReturnType.CreateFor(55, 15));
 
 		[Theory]
 		[EmbeddedFileData(@"ActionHandlerReturnType\GraphWithActionDelegatesWithBadSignatures_Expected.cs")]
