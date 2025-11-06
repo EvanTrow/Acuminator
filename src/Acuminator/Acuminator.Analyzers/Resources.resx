@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="PX1000Fix" xml:space="preserve">
-    <value>Fix PXAction handler signature</value>
+    <value>Fix action delegate return type and parameters</value>
   </data>
   <data name="PX1000Title" xml:space="preserve">
-    <value>Invalid PXAction handler signature</value>
+    <value>The action delegate has incompatible return type and parameters</value>
   </data>
   <data name="PX1001Fix" xml:space="preserve">
     <value>Create a graph instance by using the factory method</value>

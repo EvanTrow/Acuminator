@@ -61,7 +61,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fix PXAction handler signature.
+        ///   Looks up a localized string similar to Fix action delegate return type and parameters.
         /// </summary>
         public static string PX1000Fix {
             get {
@@ -70,7 +70,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid PXAction handler signature.
+        ///   Looks up a localized string similar to The action delegate has incompatible return type and parameters.
         /// </summary>
         public static string PX1000Title {
             get {

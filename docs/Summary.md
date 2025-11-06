@@ -9,9 +9,9 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 
 **Note:** In the following table, the types of the diagnostics are specified for the ISV solution certification&#8212;that is, if the **Enable additional diagnostics for ISV Solution Certification** option (in **Tools > Options > Acuminator > Code Analysis**) is set to `True`. The type of the diagnostic can be different if this option is set to `False`. For details about the type of the diagnostic, see the description of the diagnostic.
 
-| Code   | Short Description                                       | Type  | Code Fix  |
-| ------ | ------------------------------------------------------- | ----- | --------- |
-| [PX1000](diagnostics/PX1000.md) | An invalid signature of the `PXAction` handler is used. | Error | Available |
+| Code   | Short Description                                                                         | Type  | Code Fix  |
+| ------ | ----------------------------------------------------------------------------------------- | ----- | --------- |
+| [PX1000](diagnostics/PX1000.md) | The action delegate has incompatible return type and parameters. | Error | Available |
 | [PX1001](diagnostics/PX1001.md) | A `PXGraph` instance must be created with the `PXGraph.CreateInstance()` factory method. | Error | Available |
 | [PX1002](diagnostics/PX1002.md) | The field must have a type attribute that corresponds to the list attribute. | Error | Available |
 | [PX1003](diagnostics/PX1003.md) | Consider using a specific implementation of `PXGraph`. | Warning (ISV Level 2: Production Quality) | Unavailable |
