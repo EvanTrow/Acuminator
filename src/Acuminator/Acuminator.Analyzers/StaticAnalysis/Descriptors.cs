@@ -115,11 +115,11 @@ namespace Acuminator.Analyzers.StaticAnalysis
 				nameof(Resources.PX1015MessageFormatWithRequiredAndOptionalParams).GetLocalized());
 
 		public static DiagnosticDescriptor PX1016_NoIsActiveMethodForDacExtension { get; } =
-			Rule("PX1016", nameof(Resources.PX1016DacExtensionTitle).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error,
+			Rule("PX1016", nameof(Resources.PX1016DacExtensionTitle).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning,
 				 DiagnosticsShortName.PX1016, diagnosticDefaultJustification: DiagnosticsDefaultJustification.PX1016);
 
 		public static DiagnosticDescriptor PX1016_NoIsActiveMethodForGraphExtension { get; } =
-			Rule("PX1016", nameof(Resources.PX1016GraphExtensionTitle).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error,
+			Rule("PX1016", nameof(Resources.PX1016GraphExtensionTitle).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning,
 				 DiagnosticsShortName.PX1016, diagnosticDefaultJustification: DiagnosticsDefaultJustification.PX1016);
 
 		public static DiagnosticDescriptor PX1018_NoPrimaryViewForPrimaryDac { get; } =
@@ -352,10 +352,10 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			Rule("PX1059", nameof(Resources.PX1059Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1059);
 
 		public static DiagnosticDescriptor PX1060_LegacyBqlField { get; } =
-			Rule("PX1060", nameof(Resources.PX1060Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Info, DiagnosticsShortName.PX1060);
+			Rule("PX1060", nameof(Resources.PX1060Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1060);
 
 		public static DiagnosticDescriptor PX1061_LegacyBqlConstant { get; } =
-			Rule("PX1061", nameof(Resources.PX1061Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Info, DiagnosticsShortName.PX1061);
+			Rule("PX1061", nameof(Resources.PX1061Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1061);
 
 		public static DiagnosticDescriptor PX1062_StaticFieldOrPropertyInGraph { get; } =
 			Rule("PX1062", nameof(Resources.PX1062MessageFormat).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1062);
