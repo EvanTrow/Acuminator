@@ -30,6 +30,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 
 			context.CancellationToken.ThrowIfCancellationRequested();
 			CheckGraphInitializationForLongRunOperations(context, pxContext, pxGraphOrGraphExt);
+
+			context.CancellationToken.ThrowIfCancellationRequested();
+			CheckActionDelegateStartingLongRunOperationsHasCorrectSignatures(context, pxContext, pxGraphOrGraphExt);
 		}
 
 		protected virtual void CheckDataViewsForLongRunOperations(SymbolAnalysisContext context, PXContext pxContext, 
