@@ -79,14 +79,18 @@ namespace Acuminator.Analyzers.StaticAnalysis.InvalidPXActionSignature
 				var pxContext = new PXContext(semanticModel.Compilation, codeAnalysisSettings: null);
 				var generator = SyntaxGenerator.GetGenerator(_document);
 				var newReturnType = GetNewReturnType(generator, semanticModel);
-				var newParametersList = GetNewParametersList(generator, method, pxContext);
+				var newParametersList = GetNewParametersList(generator, method, pxContext, semanticModel, cancellationToken);
 
 				if (newReturnType == null || newParametersList == null)
 					return _document;
 
 				cancellationToken.ThrowIfCancellationRequested();
-				var newMethod = method.WithReturnType(newReturnType)
-									  .WithParameterList(newParametersList);
+				var newMethod = method.WithReturnType(newReturnType);
+
+				if (!ReferenceEquals(method.ParameterList, newParametersList))
+				{
+					newMethod = newMethod.WithParameterList(newParametersList);
+				}
 
 				if (method.Body != null)
 				{
@@ -119,15 +123,26 @@ namespace Acuminator.Analyzers.StaticAnalysis.InvalidPXActionSignature
 				return ienumerableTypeNode;
 			}
 
-			private ParameterListSyntax? GetNewParametersList(SyntaxGenerator generator, MethodDeclarationSyntax method, PXContext pxContext)
+			private ParameterListSyntax? GetNewParametersList(SyntaxGenerator generator, MethodDeclarationSyntax method, PXContext pxContext,
+															  SemanticModel semanticModel, CancellationToken cancellation)
 			{
+				var oldParameters = method.ParameterList.Parameters;
+
+				if (oldParameters.Count > 0)
+				{
+					var firstParameter = oldParameters[0];
+					var parameterSymbol = semanticModel.GetDeclaredSymbol(firstParameter, cancellation);
+
+					if (pxContext.PXAdapterType.Equals(parameterSymbol?.Type, SymbolEqualityComparer.Default))
+						return method.ParameterList;
+				}
+
 				var pxAdapterTypeNode = generator.TypeExpression(pxContext.PXAdapterType);
 				var adapterPar		  = generator.ParameterDeclaration(AdapterParameterName, pxAdapterTypeNode) as ParameterSyntax;
 
 				if (adapterPar == null)
 					return null;
 
-				var oldParameters = method.ParameterList.Parameters;
 				var newParameters = oldParameters.Insert(0, adapterPar);
 				return method.ParameterList.WithParameters(newParameters);
 			}
