@@ -22,7 +22,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ThrowingExceptions
 									.WithRecursiveAnalysisEnabled()
 									.WithSuppressionMechanismDisabled(),
 				new ThrowingExceptionsInLongRunningOperationAnalyzer());
-		=
+
 		[Theory]
 		[EmbeddedFileData(@"LongOperations\LongOperationStart_Bad.cs")]
 		public Task LongOperationStart_Throws_SetupNotEnteredException_InLongRun(string source) =>
