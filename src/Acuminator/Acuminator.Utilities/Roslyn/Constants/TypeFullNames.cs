@@ -252,9 +252,13 @@
 
 		public static class Async
 		{
-			public const string PXLongOperation 		 = "PX.Data.PXLongOperation";
+			public const string PXLongOperation = "PX.Data.PXLongOperation";
+
 			public const string ILongOperationManager 	 = "PX.Async.ILongOperationManager";
 			public const string ILongOperationManagerOld = "PX.Concurrency.ILongOperationManager";
+
+			public const string IGraphLongOperationManager 	  = "PX.Async.IGraphLongOperationManager";
+			public const string IGraphLongOperationManagerOld = "PX.Concurrency.IGraphLongOperationManager";
 		}
 	}
 }
