@@ -32,7 +32,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 			IMethodSymbol? methodSymbol = GetSymbol<IMethodSymbol>(node);
 
 			if (methodSymbol == null || node.ArgumentList?.Arguments.Count is null or 0 ||
-				!PxContext.AsyncOperations.StartOperation_AllMethods.Contains<IMethodSymbol>(methodSymbol, SymbolEqualityComparer.Default))
+				!PxContext.AsyncOperations.AllMethodsStartingLongRun.Contains<IMethodSymbol>(methodSymbol, SymbolEqualityComparer.Default))
 			{
 				base.VisitInvocationExpression(node);
 				return;
@@ -52,16 +52,25 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 		private ExpressionSyntax? GetLongRunDelegateArgument(IMethodSymbol methodSymbol, InvocationExpressionSyntax methodNode)
 		{
 			var arguments = methodNode.ArgumentList.Arguments;
-			var delegateExists = arguments.Count > 1;
 
-			if (!delegateExists)
-				return null;
-			
-			var firstArgument = methodSymbol.Name == DelegateNames.Async.Await 
-				? arguments[0].Expression
-				: arguments[1].Expression;
+			switch (arguments.Count)
+			{
+				case 0:
+					return null;
 
-			return firstArgument;
+				case 1:
+					return methodSymbol.IsDeclaredInType(PxContext.AsyncOperations.IGraphLongOperationManager)
+						? arguments[0].Expression
+						: null;
+
+				default:
+				{
+					var firstArgument = methodSymbol.Name == DelegateNames.Async.Await
+											? arguments[0].Expression
+											: arguments[1].Expression;
+					return firstArgument;
+				}
+			}
 		}
 	}
 }
