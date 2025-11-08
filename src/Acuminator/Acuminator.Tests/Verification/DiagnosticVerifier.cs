@@ -2,12 +2,20 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Acuminator.Tests.Helpers;
+using Acuminator.Utilities.Common;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Text;
+
+using PX.Data.SQLTree;
+
 using Xunit;
 
 namespace Acuminator.Tests.Verification
@@ -160,7 +168,8 @@ namespace Acuminator.Tests.Verification
 		{
 			try
 			{
-				var diagnostics = await GetSortedDiagnosticsAsync(sources, language, analyzer, checkOnlyFirstDocument).ConfigureAwait(false);
+				var diagnostics = await GetSortedDiagnosticsAsync(sources, language, analyzer, checkOnlyFirstDocument)
+											.ConfigureAwait(false);
 				VerifyDiagnosticResults(diagnostics, analyzer, expected);
 			}
 			catch (AggregateException aggregateException)
@@ -190,22 +199,18 @@ namespace Acuminator.Tests.Verification
 		/// <param name="actualResults">The Diagnostics found by the compiler after running the analyzer on the source code</param>
 		/// <param name="analyzer">The analyzer that was being run on the sources</param>
 		/// <param name="expectedResults">Diagnostic Results that should have appeared in the code</param>
-		private static void VerifyDiagnosticResults(IEnumerable<Diagnostic> actualResults, DiagnosticAnalyzer analyzer, params DiagnosticResult[] expectedResults)
+		private static void VerifyDiagnosticResults(Diagnostic[] actualResults, DiagnosticAnalyzer analyzer, 
+													params DiagnosticResult[] expectedResults)
 		{
-			int expectedCount = expectedResults.Count();
-			int actualCount = actualResults.Count();
-
-			if (expectedCount != actualCount)
+			if (expectedResults.Length != actualResults.Length)
 			{
-				string diagnosticsOutput = actualResults.Any() ? FormatDiagnostics(analyzer, actualResults.ToArray()) : "    NONE.";
-                
-				Assert.True(false,
-					string.Format("Mismatch between number of diagnostics returned, expected \"{0}\" actual \"{1}\"\r\n\r\nDiagnostics:\r\n{2}\r\n", expectedCount, actualCount, diagnosticsOutput));
+				ProcessDiagnosticCountMismatch(actualResults, analyzer, expectedResults);
+				return;
 			}
 
 			for (int i = 0; i < expectedResults.Length; i++)
 			{
-				var actual = actualResults.ElementAt(i);
+				var actual = actualResults[i];
 				var expected = expectedResults[i];
 
 				if (expected.Line == -1 && expected.Column == -1)
@@ -298,6 +303,65 @@ namespace Acuminator.Tests.Verification
 				}
 			}
 		}
+		
+		
+		private static void ProcessDiagnosticCountMismatch(Diagnostic[] actualResults, DiagnosticAnalyzer analyzer, DiagnosticResult[] expectedResults)
+		{
+			string diagnosticsOutput = actualResults.Length > 0
+					? FormatDiagnostics(analyzer, actualResults)
+					: "    NONE.";
+
+			var addedDiagnosticsLocations = actualResults.ToDictionary(d => GetDiagnosticLocationInfo(d));
+			var expectedDiagnosticLocations = expectedResults.ToDictionary(d => (d.Path, d.Line, d.Column));
+
+			var unexpectedDiagnostics = (from addedDiagnosticKey in addedDiagnosticsLocations.Keys
+										 where !expectedDiagnosticLocations.ContainsKey(addedDiagnosticKey)
+										 let diagnostic = addedDiagnosticsLocations[addedDiagnosticKey]
+										 select (diagnostic.Id, addedDiagnosticKey.Line, addedDiagnosticKey.Column, addedDiagnosticKey.Path).ToString()
+										 )
+										 .Join(Environment.NewLine);
+
+			var missingDiagnostics = (from expectedDiagnosticKey in expectedDiagnosticLocations.Keys
+									  where !addedDiagnosticsLocations.ContainsKey(expectedDiagnosticKey)
+									  let diagnostic = expectedDiagnosticLocations[expectedDiagnosticKey]
+									  select (diagnostic.Id,
+											  diagnostic.Line,
+											  diagnostic.Column,
+											  Path: diagnostic.Path.NullIfWhiteSpace()).ToString())
+									.Join(Environment.NewLine);
+
+			var errorOutput = $"""
+								   Mismatch between number of diagnostics returned, expected \"{expectedResults.Length}\", actual \"{actualResults.Length}\"
+								   
+								   Found Diagnostics:
+								   {diagnosticsOutput}
+
+								   Difference - Unexpected Added Diagnostics:
+								   {unexpectedDiagnostics}
+
+								   Difference - Unexpected Missing Diagnostics:
+								   {missingDiagnostics}
+
+								   """;
+			Assert.True(false, errorOutput);
+		}
+
+		private static (string? Path, int Line, int Column) GetDiagnosticLocationInfo(Diagnostic diagnostic)
+		{
+			if (diagnostic.Location == Location.None)
+				return (null, -1, -1);
+
+			var lineSpan = diagnostic.Location.GetLineSpan();
+			string? path = lineSpan.Path.NullIfWhiteSpace();
+			int line = lineSpan.StartLinePosition.Line >= 0 
+						? lineSpan.StartLinePosition.Line + 1 
+						: -1;
+			int column = lineSpan.StartLinePosition.Character >= 0
+						? lineSpan.StartLinePosition.Character + 1
+						: -1;
+
+			return (path, line, column);
+		}
 		#endregion
 
 		#region Formatting Diagnostics
@@ -310,6 +374,7 @@ namespace Acuminator.Tests.Verification
 		private static string FormatDiagnostics(DiagnosticAnalyzer analyzer, params Diagnostic[] diagnostics)
 		{
 			var builder = new StringBuilder();
+
 			for (int i = 0; i < diagnostics.Length; ++i)
 			{
 				builder.AppendLine("// " + diagnostics[i].ToString());
@@ -331,7 +396,9 @@ namespace Acuminator.Tests.Verification
 							Assert.True(location.IsInSource,
 								$"Test base does not currently handle diagnostics in metadata locations. Diagnostic in metadata: {diagnostics[i]}\r\n");
 
-							string resultMethodName = diagnostics[i].Location.SourceTree.FilePath.EndsWith(".cs") ? "GetCSharpResultAt" : "GetBasicResultAt";
+							string resultMethodName = (diagnostics[i].Location.SourceTree?.FilePath.EndsWith(".cs", StringComparison.OrdinalIgnoreCase) ?? false)
+														? "GetCSharpResultAt" 
+														: "GetBasicResultAt";
 							var linePosition = diagnostics[i].Location.GetLineSpan().StartLinePosition;
 
 							builder.AppendFormat("{0}({1}, {2}, {3}.{4})",
@@ -352,6 +419,7 @@ namespace Acuminator.Tests.Verification
 					}
 				}
 			}
+
 			return builder.ToString();
 		}
 		#endregion
