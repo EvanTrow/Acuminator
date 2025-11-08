@@ -175,7 +175,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.InvalidPXActionSignature
 					return method;
 
 				var body = SyntaxFactory.Block(oldBodyStatement, returnStatement);
-				return method.WithBody(body);
+				return method.WithExpressionBody(null)
+							 .WithSemicolonToken(default)
+							 .WithBody(body);
 			}
 
 			private SyntaxNode AddCollectionsUsing(SyntaxNode root, SyntaxGenerator generator)
