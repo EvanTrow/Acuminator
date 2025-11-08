@@ -65,14 +65,14 @@ namespace PX.Analyzers.Test.Sources
 		#nullable enable
 
 		#region LegacyNullableStringField
-		public abstract class legacyNullableStringField : PX.Data.BQL.BqlString.Field<legacyStringField> { }
+		public abstract class legacyNullableStringField : PX.Data.BQL.BqlString.Field<legacyNullableStringField> { }
 
 		[PXDBString(50)]
 		public string? LegacyNullableStringField { get; set; }
 		#endregion
 
 		#region LegacyNullableBinaryField
-		public abstract class legacyNullableBinaryField : PX.Data.BQL.BqlByteArray.Field<legacyBinaryField> { }
+		public abstract class legacyNullableBinaryField : PX.Data.BQL.BqlByteArray.Field<legacyNullableBinaryField> { }
 
 		[PXDBBinary]
 		public byte[]? LegacyNullableBinaryField { get; set; }
