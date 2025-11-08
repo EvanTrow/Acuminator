@@ -56,6 +56,9 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationStart
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(80, 4),
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(81, 4),
 
+				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(86, 4),
+				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(87, 4),
+
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(92, 4),
 				Descriptors.PX1046_LongOperationInEventHandlers.CreateFor(93, 4));
 
