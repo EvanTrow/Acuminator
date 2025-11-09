@@ -51,7 +51,7 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 			{
 				case AnonymousFunctionExpressionSyntax anonymousFunction:
 				{
-					var delegateNode = anonymousFunction.Body ?? anonymousFunction.ExpressionBody;
+					var delegateNode = anonymousFunction.Body;
 
 					if (delegateNode == null)
 						return default;
@@ -116,7 +116,7 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 			switch (delegateExpression)
 			{
 				case AnonymousFunctionExpressionSyntax anonymousFunction:
-					return anonymousFunction.Body ?? anonymousFunction.ExpressionBody;
+					return anonymousFunction.Body;
 
 				case CastExpressionSyntax castExpression:
 					return GetDelegateNode(castExpression.Expression, recursionDepth + 1);

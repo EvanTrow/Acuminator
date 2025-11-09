@@ -34,36 +34,43 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 			cancellation.ThrowIfCancellationRequested();
 
 			if (!pxGraph.IsProcessing)
-			{
 				return;
-			}
 
 			var processingViews = pxGraph.Views.Where(v => v.IsProcessing);
 
 			foreach (var viewDel in processingViews)
 			{
-				var finallyDelegates = viewDel.FinallyProcessDelegates.Where(d => d.Node != null);
-
-				foreach (var finDel in finallyDelegates)
+				if (!viewDel.FinallyProcessDelegates.IsDefaultOrEmpty)
 				{
-					cancellation.ThrowIfCancellationRequested();
-					walker.Visit(finDel.Node);
+					var finallyDelegates = viewDel.FinallyProcessDelegates.Where(d => d.Node != null);
+
+					foreach (var finDel in finallyDelegates)
+					{
+						cancellation.ThrowIfCancellationRequested();
+						walker.Visit(finDel.Node);
+					}
 				}
 
-				var parametersDelegates = viewDel.ParametersDelegates.Where(d => d.Node != null);
-
-				foreach (var parDel in parametersDelegates)
+				if (!viewDel.ParametersDelegates.IsDefaultOrEmpty)
 				{
-					cancellation.ThrowIfCancellationRequested();
-					walker.Visit(parDel.Node);
+					var parametersDelegates = viewDel.ParametersDelegates.Where(d => d.Node != null);
+
+					foreach (var parDel in parametersDelegates)
+					{
+						cancellation.ThrowIfCancellationRequested();
+						walker.Visit(parDel.Node);
+					}
 				}
 
-				var processDelegates = viewDel.ProcessDelegates.Where(d => d.Node != null);
-
-				foreach (var processDel in processDelegates)
+				if (!viewDel.ProcessDelegates.IsDefaultOrEmpty)
 				{
-					cancellation.ThrowIfCancellationRequested();
-					walker.Visit(processDel.Node);
+					var processDelegates = viewDel.ProcessDelegates.Where(d => d.Node != null);
+
+					foreach (var processDel in processDelegates)
+					{
+						cancellation.ThrowIfCancellationRequested();
+						walker.Visit(processDel.Node);
+					}
 				}
 			}
 		}
