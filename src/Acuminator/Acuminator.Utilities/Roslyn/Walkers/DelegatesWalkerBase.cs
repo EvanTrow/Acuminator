@@ -77,17 +77,16 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 				{
 					// Case when an identifier is passed as an expression for a delegate
 					var delegateSymbol = GetSymbol<ISymbol>(delegateExpression);
-					var delegateNode   = delegateSymbol?.DeclaringSyntaxReferences
-														.FirstOrDefault()
-														?.GetSyntax(CancellationToken);
 
 					// Method is the most simple and frequent case for identifiers passed as expressions for delegates.
 					// It is very difficult to analyze local variables, properties, fields and general expressions and they are rarely used
 					// for identifiers passed as expressions for delegates. 
 					// Therefore, they are deemed as non recognized.
-					return delegateNode != null && delegateSymbol?.Kind == SymbolKind.Method
-						? (delegateSymbol, delegateNode)
-						: default;
+					if (delegateSymbol == null || delegateSymbol.Kind != SymbolKind.Method)
+						return default;
+
+					var delegateNode = delegateExpression.GetBody() ?? delegateExpression;
+					return (delegateSymbol, delegateNode);
 				}
 			}
 		}
@@ -131,17 +130,16 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 				default:
 					// Case when an identifier is passed as an expression for a delegate
 					var delegateSymbol = GetSymbol<ISymbol>(delegateExpression);
-					var delegateNode = delegateSymbol?.DeclaringSyntaxReferences
-													  .FirstOrDefault()
-													 ?.GetSyntax(CancellationToken);
 
 					// Method is the most simple and frequent case for identifiers passed as expressions for delegates.
 					// It is difficult to analyze local variables, parameters, properties and fields in a general case and they are rarely used
 					// for identifiers passed as expressions for delegates. 
 					// Therefore, they are deemed as non recognized.
-					return delegateNode != null && delegateSymbol?.Kind == SymbolKind.Method
-						? delegateNode
-						: null;
+					if (delegateSymbol == null || delegateSymbol.Kind != SymbolKind.Method)
+						return null;
+
+					var delegateNode = delegateExpression.GetBody() ?? delegateExpression;
+					return delegateNode;
 			}
 		}
 	}
