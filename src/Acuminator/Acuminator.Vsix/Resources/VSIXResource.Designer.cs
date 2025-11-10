@@ -250,6 +250,15 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Node Expansion.
+        /// </summary>
+        public static string Category_NodeExpansion {
+            get {
+                return ResourceManager.GetString("Category_NodeExpansion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to BQL Outlining.
         /// </summary>
         public static string Category_Outlining {
@@ -940,6 +949,60 @@ namespace Acuminator.Vsix {
         public static string Setting_CodeAnalysis_SuppressionMechanismEnabled_Title {
             get {
                 return ResourceManager.GetString("Setting_CodeAnalysis_SuppressionMechanismEnabled_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand Code Map attribute nodes on opening..
+        /// </summary>
+        public static string Setting_CodeMap_ExpandAttributeNodes_Description {
+            get {
+                return ResourceManager.GetString("Setting_CodeMap_ExpandAttributeNodes_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand Attribute Nodes.
+        /// </summary>
+        public static string Setting_CodeMap_ExpandAttributeNodes_Title {
+            get {
+                return ResourceManager.GetString("Setting_CodeMap_ExpandAttributeNodes_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand Code Map regular non-attribute nodes on opening..
+        /// </summary>
+        public static string Setting_CodeMap_ExpandRegularNodes_Description {
+            get {
+                return ResourceManager.GetString("Setting_CodeMap_ExpandRegularNodes_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand Regular Nodes .
+        /// </summary>
+        public static string Setting_CodeMap_ExpandRegularNodes_Title {
+            get {
+                return ResourceManager.GetString("Setting_CodeMap_ExpandRegularNodes_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand Code Map root nodes on opening..
+        /// </summary>
+        public static string Setting_CodeMap_ExpandRootNodes_Description {
+            get {
+                return ResourceManager.GetString("Setting_CodeMap_ExpandRootNodes_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand Root Nodes.
+        /// </summary>
+        public static string Setting_CodeMap_ExpandRootNodes_Title {
+            get {
+                return ResourceManager.GetString("Setting_CodeMap_ExpandRootNodes_Title", resourceCulture);
             }
         }
         

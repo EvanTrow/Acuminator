@@ -39,8 +39,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		#endregion
 
 		public BaseGraphPlaceholderNodeViewModel(GraphOrGraphExtInfoBase graphOrGraphExtInfo, GraphNodeViewModel containingGraphNode,
-												 TreeNodeViewModel parent, bool isExpanded) :
-											base(containingGraphNode.CheckIfNull().Tree, parent, isExpanded)
+												 TreeNodeViewModel parent, Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+											base(containingGraphNode.CheckIfNull().Tree, parent, isExpandedCalculator)
 		{
 			GraphOrGraphExtInfo = graphOrGraphExtInfo.CheckIfNull();
 			ContainingGraphNode = containingGraphNode;

@@ -28,8 +28,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public bool IsGraph => GraphOrGraphExtInfo is GraphInfo;
 
-		protected GraphNodeViewModelBase(TreeViewModel tree, TreeNodeViewModel? parent, bool isExpanded) : 
-									base(tree, parent, isExpanded)
+		protected GraphNodeViewModelBase(TreeViewModel tree, TreeNodeViewModel? parent, Func<TreeNodeViewModel, bool> isExpandedCalculator) : 
+									base(tree, parent, isExpandedCalculator)
 		{
 		}
 

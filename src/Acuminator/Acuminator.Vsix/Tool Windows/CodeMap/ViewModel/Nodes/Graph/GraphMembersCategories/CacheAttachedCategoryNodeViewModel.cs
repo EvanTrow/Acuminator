@@ -11,8 +11,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public class CacheAttachedCategoryNodeViewModel : GraphEventHandlerCategoryNodeViewModel
 	{
-		public CacheAttachedCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) :
-											 base(graphViewModel, parent, GraphMemberCategory.CacheAttached, isExpanded)
+		public CacheAttachedCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, 
+												  Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+											 base(graphViewModel, parent, GraphMemberCategory.CacheAttached, isExpandedCalculator)
 		{
 		}
 

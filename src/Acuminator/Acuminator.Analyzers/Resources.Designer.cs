@@ -444,7 +444,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A DAC extension must include the public static IsActive method with the bool return type. Extensions which are constantly active reduce performance. Suppress the error if you need the DAC extension to be constantly active..
+        ///   Looks up a localized string similar to A DAC extension should include the public static IsActive method with the bool return type. Extensions which are constantly active reduce performance. Suppress the warning if you need the DAC extension to be constantly active..
         /// </summary>
         public static string PX1016DacExtensionTitle {
             get {
@@ -453,7 +453,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A graph extension must include a public static IsActive method with the bool return type. Extensions which are constantly active reduce performance. Suppress the error if you need the graph extension to be constantly active..
+        ///   Looks up a localized string similar to A graph extension should include a public static IsActive method with the bool return type. Extensions which are constantly active reduce performance. Suppress the warning if you need the graph extension to be constantly active..
         /// </summary>
         public static string PX1016GraphExtensionTitle {
             get {

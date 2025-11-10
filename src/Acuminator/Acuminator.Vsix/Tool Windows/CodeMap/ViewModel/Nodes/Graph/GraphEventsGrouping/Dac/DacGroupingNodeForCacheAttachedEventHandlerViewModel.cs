@@ -9,8 +9,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	public class DacGroupingNodeForCacheAttachedEventHandlerViewModel : DacGroupingNodeForFieldEventHandlerBaseViewModel<GraphCacheAttachedEventHandlerInfo>
 	{
 		public DacGroupingNodeForCacheAttachedEventHandlerViewModel(GraphEventHandlerCategoryNodeViewModel graphEventsCategoryVM, string dacName,
-																	IEnumerable<GraphCacheAttachedEventHandlerInfo> cacheAttachedEvents, bool isExpanded) :
-															   base(graphEventsCategoryVM, dacName, cacheAttachedEvents, isExpanded)
+																	IEnumerable<GraphCacheAttachedEventHandlerInfo> cacheAttachedEvents,
+																	Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+															   base(graphEventsCategoryVM, dacName, cacheAttachedEvents, isExpandedCalculator)
 		{
 		}
 

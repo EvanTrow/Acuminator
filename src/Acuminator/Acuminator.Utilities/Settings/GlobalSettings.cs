@@ -1,7 +1,4 @@
-﻿#nullable enable
-
-using System;
-
+﻿using System;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
@@ -23,7 +20,8 @@ namespace Acuminator.Utilities
 		/// <summary>
 		/// Initializes the global settings once. Must be called on package initialization.
 		/// </summary>
-		/// <param name="codeAnalysisSettings">The instance.</param>
+		/// <param name="codeAnalysisSettings">The code analysis settings.</param>
+		/// <param name="bannedApiSettings">The banned API settings.</param>
 		public static void InitializeGlobalSettingsOnce(CodeAnalysisSettings codeAnalysisSettings, BannedApiSettings bannedApiSettings)
 		{
 			codeAnalysisSettings.ThrowOnNull();
@@ -32,22 +30,20 @@ namespace Acuminator.Utilities
 			if (Interlocked.CompareExchange(ref _isInitialized, value: INITIALIZED, comparand: NOT_INITIALIZED) == NOT_INITIALIZED)
 			{
 				_cachedCodeAnalysisSettings = codeAnalysisSettings;
-				_cachedBannedApiSettings = bannedApiSettings;
+				_cachedBannedApiSettings 	= bannedApiSettings;
 			}
 		}
 
 		/// <summary>
 		/// Initializes the global settings in a thread unsafe way. For tests only.
 		/// </summary>
-		/// <param name="codeAnalysisSettings">The instance.</param>
+		/// <param name="codeAnalysisSettings">The code analysis settings.</param>
 		/// <param name="bannedApiSettings">The banned API settings.</param>
-		/// <remarks>
-		/// TODO make internal after removal of the assembly signing.
-		/// </remarks>
-		public static void InitializeGlobalSettingsThreadUnsafeForTestsOnly(CodeAnalysisSettings codeAnalysisSettings, BannedApiSettings bannedApiSettings)
+		internal static void InitializeGlobalSettingsThreadUnsafeForTestsOnly(CodeAnalysisSettings codeAnalysisSettings, 
+																			  BannedApiSettings bannedApiSettings)
 		{
 			_cachedCodeAnalysisSettings = codeAnalysisSettings.CheckIfNull();
-			_cachedBannedApiSettings = bannedApiSettings.CheckIfNull();
+			_cachedBannedApiSettings 	= bannedApiSettings.CheckIfNull();
 		}
 	}
 }

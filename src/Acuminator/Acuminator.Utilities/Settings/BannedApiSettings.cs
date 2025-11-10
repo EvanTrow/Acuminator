@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Composition;
 
 using Acuminator.Utilities.Common;

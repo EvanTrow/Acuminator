@@ -18,9 +18,10 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override Icon NodeIcon => Icon.InitializationAndActivationGraphCategory;
 
-		public GraphInitializationAndActivationCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) :
-																base(graphViewModel, parent, GraphMemberCategory.InitializationAndActivation, 
-																	 isExpanded)
+		public GraphInitializationAndActivationCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent,
+																	 Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+																base(graphViewModel, parent, GraphMemberCategory.InitializationAndActivation,
+																	 isExpandedCalculator)
 		{
 		}
 

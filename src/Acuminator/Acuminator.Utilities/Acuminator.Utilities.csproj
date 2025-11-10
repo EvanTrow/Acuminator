@@ -10,8 +10,7 @@
     <Authors>$(Company)</Authors>
     <Copyright>Copyright © 2017-$([System.DateTime]::Now.Year) $(Company)</Copyright>
     
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\key.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>False</SignAssembly>
     <LangVersion>13.0</LangVersion>
     <RestorePackagesPath>../../packages</RestorePackagesPath>
     <Nullable>enable</Nullable>
@@ -28,6 +27,9 @@
     <WarningLevel>9999</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+      <InternalsVisibleTo Include="Acuminator.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="BannedApi\Data\AllowedApis.txt" />
     <None Remove="BannedApi\Data\BannedApis.txt" />
   </ItemGroup>
@@ -43,7 +45,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" PrivateAssets="all" />
-    <PackageReference Include="PolySharp" Version="1.14.1">
+    <PackageReference Include="PolySharp" Version="1.15.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

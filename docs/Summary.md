@@ -27,7 +27,7 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1013](diagnostics/PX1013.md) | The return type of graph action's action delegate that initiates a long-running operation must be `IEnumerable`. | Error | Available |
 | [PX1014](diagnostics/PX1014.md) | A DAC field must have a nullable type. | Error   | Available |
 | [PX1015](diagnostics/PX1015.md) | For a BQL statement that contains parameters, the number of arguments of a `Select` method is different from the number of parameters. | Warning (ISV Level 1: Significant) | Unavailable |
-| [PX1016](diagnostics/PX1016.md) | A DAC or graph extension must include the public static `IsActive` method with no parameters and the `bool` return type. Extensions that are constantly active reduce performance. Suppress the error if you need the DAC extension to be constantly active. | Error | Unavailable | 
+| [PX1016](diagnostics/PX1016.md) | A DAC or graph extension should include the public static `IsActive` method with no parameters and the `bool` return type. Extensions that are constantly active reduce performance. Suppress the error if you need the DAC extension to be constantly active. | Warning | Unavailable | 
 | [PX1018](diagnostics/PX1018.md) | The graph with the specified primary view type parameter doesn't contain the primary view of the specified type. | Error | Unavailable |
 | [PX1019](diagnostics/PX1019.md) | A DAC property field with the `AutoNumber` attribute must have the string type.                                  | Error | Available   |
 | [PX1020](diagnostics/PX1020.md) | For the DAC property with the `AutoNumber` attribute, the string length must be greater than or equal to PX.Objects.CS.NumberingSequence.StartNbr value.     | Error | Available   |
@@ -68,8 +68,8 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1057](diagnostics/PX1057.md) | A `PXGraph` instance cannot be initialized while another `PXGraph` instance is being initialized. | Error | Unavailable |
 | [PX1058](diagnostics/PX1058.md) | A `PXGraph` instance cannot save changes to the database during the `PXGraph` initialization. | Error | Unavailable |
 | [PX1059](diagnostics/PX1059.md) | Changes to `PXCache` cannot be performed during the `PXGraph` initialization. | Error | Unavailable |
-| [PX1060](diagnostics/PX1060.md) | DAC fields should be strongly typed to be used in fluent BQL queries. | Message | Available |
-| [PX1061](diagnostics/PX1061.md) | Constants should be strongly typed to be used in fluent BQL queries. | Message | Available |
+| [PX1060](diagnostics/PX1060.md) | DAC fields should be strongly typed to be used in fluent BQL queries. | Warning | Available |
+| [PX1061](diagnostics/PX1061.md) | Constants should be strongly typed to be used in fluent BQL queries. | Warning | Available |
 | [PX1062](diagnostics/PX1062.md) | You cannot declare static views, actions, mutable fields, and mutable properties in graphs or graph extensions  | Error | Available |
 | [PX1063](diagnostics/PX1063.md) | The declaration of the exception class does not contain a serialization constructor. This will cause an incorrect deserialization of the exception data and will lead to runtime errors in Acumatica ERP. | Error | Available |
 | [PX1064](diagnostics/PX1064.md) | The declaration of the exception class introduces new serializable fields but does not declare an override for the `GetObjectData` method. This will cause an incorrect serialization of the exception data and will lead to runtime errors in Acumatica ERP. | Error | Available |
@@ -114,5 +114,5 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1111](diagnostics/PX1111.md) | The primary DAC of a processing view must contain the `NoteID` field. | Error | Unavailable |
 | [PX1112](diagnostics/PX1112.md) | Graphs and graph extensions with generic type parameters must be abstract. | Error | Available |
 | [PX1113](diagnostics/PX1113.md) | Graphs and graph extensions should not be `sealed` types. | Warning | Available |
-| [PX1114](diagnostics/PX1114.md) | Graph extension should not inherit from a terminal graph extension. | Warning | Unavailable |
-| [PX1115](diagnostics/PX1115.md) | Only terminal graph extensions and non-abstract DAC extensions can be used as base extensions. | Error | Unavailable |
+| [PX1114](diagnostics/PX1114.md) | A graph extension should not inherit from a terminal graph extension. | Warning | Unavailable |
+| [PX1115](diagnostics/PX1115.md) | Only a terminal graph extension and a non-abstract DAC extension can be used as a base extension. | Error | Unavailable |

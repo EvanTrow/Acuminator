@@ -23,9 +23,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public IsActiveMethodInfo IsActiveMethodInfo => (IsActiveMethodInfo)MemberInfo;
 
 		public IsActiveDacMethodNodeViewModel(DacInitializationAndActivationCategoryNodeViewModel dacInitializationAndActivationCategoryVM, 
-											  IsActiveMethodInfo isActiveMethodInfo, bool isExpanded = false) :
+											  IsActiveMethodInfo isActiveMethodInfo, Func<TreeNodeViewModel, bool> isExpandedCalculator) :
 										 base(dacInitializationAndActivationCategoryVM, dacInitializationAndActivationCategoryVM, 
-											  isActiveMethodInfo, isExpanded)
+											  isActiveMethodInfo, isExpandedCalculator)
 		{
 			
 		}

@@ -14,8 +14,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public ImmutableArray<TFieldEventHandlerInfo> AllFieldEventHandlers { get; }
 
 		public DacGroupingNodeForFieldEventHandlerBaseViewModel(GraphEventHandlerCategoryNodeViewModel graphEventHandlersCategoryVM, string dacName,
-																IEnumerable<TFieldEventHandlerInfo> fieldEventHandlers, bool isExpanded) :
-															base(graphEventHandlersCategoryVM, dacName, isExpanded)
+																IEnumerable<TFieldEventHandlerInfo> fieldEventHandlers,
+																Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+															base(graphEventHandlersCategoryVM, dacName, isExpandedCalculator)
 		{
 			AllFieldEventHandlers = fieldEventHandlers?.ToImmutableArray() ?? ImmutableArray.Create<TFieldEventHandlerInfo>();
 		}

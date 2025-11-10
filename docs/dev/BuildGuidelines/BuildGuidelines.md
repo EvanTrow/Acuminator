@@ -12,7 +12,7 @@
 To build Acuminator, you need to perform the following preparatory steps:
 
 1. In the root folder of the Acuminator solution, create the _lib_ folder. 
-2. Add the following DLL files from Acumatica ERP 2022 R2 or later versions to the _lib_ folder: 
+2. Add the following DLL files from Acumatica ERP 2026 R1 Preview 1 to the _lib_ folder: 
    * _PX.Data.dll_
    * _PX.Data.BQL.Fluent.dll_
    * _PX.Common.dll_
@@ -21,19 +21,13 @@ To build Acuminator, you need to perform the following preparatory steps:
    * _PX.Objects.dll_
    * _PX.DbServices.dll_ ()
    These DLLs are used by Acuminator unit tests.
-   You can use older versions of Acumatica ERP DLLs but there is no guarantee that Acuminator will work correctly. The current recommended version is Acumatica ERP 2022 R2 GA.
-3. Configure assembly signing in one of the following ways:
-    * Add your strong-name key file as _src/key.snk_. If you don't have it, run Developer Command Prompt and generate the key by using the following command: 
-      ``` 
-      sn.exe -k "src\key.snk"
-      ```
-    * Turn off assembly signing for all projects in the solution. 
-      (To turn off assembly signing for a project, open the project properties and, in the **Signing** pane, clear the **Sign the assembly** check box.)
-4. Build _Acuminator.sln_.
-5. Make sure that the `<repo folder>\src\Acuminator\Acuminator.Tests\ExternalRunner\src\Acuminator Libs\` folder contains the `Acuminator.Analyzers` and `Acuminator.Utilities` assemblies. 
+   You can use older versions of Acumatica ERP DLLs but there is no guarantee that Acuminator tests will work correctly and pass. The current recommended version is Acumatica ERP 2026 R1 Preview 1.
+3. Build _Acuminator.sln_.
+4. Make sure that the `<repo folder>\src\Acuminator\Acuminator.Tests\ExternalRunner\src\Acuminator Libs\` folder contains the `Acuminator.Analyzers` and `Acuminator.Utilities` assemblies. 
    If the assembly files are not in the specified folder, copy them from the `bin` folder of the `Acuminator.Analyzers` and `Acuminator.Utilities` projects.
-6. Build the External Runner solution located in the `<repo folder>\src\Acuminator\Acuminator.Tests\ExternalRunner\src\ExternalRunner.sln` file. 
+5. Build the External Runner solution located in the `<repo folder>\src\Acuminator\Acuminator.Tests\ExternalRunner\src\ExternalRunner.sln` file. 
    This step required for some of the unit tests to pass.
+6. Set _Acuminator.Vsix_ as the startup project in Visual Studio to debug Acuminator in an experimental version of Visual Studio. You can learn more about experimantal instances of Visual Studio [here](https://learn.microsoft.com/en-us/visualstudio/extensibility/the-experimental-instance?view=vs-2022).
 
 ## Acuminator Version Policy
 

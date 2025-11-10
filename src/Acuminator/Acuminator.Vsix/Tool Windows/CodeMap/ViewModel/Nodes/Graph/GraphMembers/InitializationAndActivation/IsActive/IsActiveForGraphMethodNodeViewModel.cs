@@ -14,8 +14,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public IsActiveForGraphMethodInfo IsActiveMethodForGraphInfo => (IsActiveForGraphMethodInfo)MemberInfo;
 
 		public IsActiveForGraphMethodNodeViewModel(GraphInitializationAndActivationCategoryNodeViewModel graphInitializationAndActivationCategoryVM,
-												   IsActiveForGraphMethodInfo isActiveMethodForGraphInfo, bool isExpanded = false) :
-											  base(graphInitializationAndActivationCategoryVM, isActiveMethodForGraphInfo, isExpanded)
+												   IsActiveForGraphMethodInfo isActiveMethodForGraphInfo, 
+												   Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+											  base(graphInitializationAndActivationCategoryVM, isActiveMethodForGraphInfo, isExpandedCalculator)
 		{
 		}
 

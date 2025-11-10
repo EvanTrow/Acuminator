@@ -46,8 +46,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public AttributePlacement Placement => AttributeInfo.Placement;
 
-		protected AttributeNodeViewModel(TreeNodeViewModel parent, AttributeInfoBase attributeInfo, bool isExpanded) :
-									base(parent?.Tree!, parent, isExpanded)
+		protected AttributeNodeViewModel(TreeNodeViewModel parent, AttributeInfoBase attributeInfo, Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+									base(parent?.Tree!, parent, isExpandedCalculator)
 		{
 			AttributeInfo = attributeInfo.CheckIfNull();
 			int lastDotIndex = AttributeInfo.AttributeType?.Name.LastIndexOf('.') ?? -1;

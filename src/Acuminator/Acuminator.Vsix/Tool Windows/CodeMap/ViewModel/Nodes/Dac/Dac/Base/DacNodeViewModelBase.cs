@@ -34,8 +34,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			protected set { }
 		}
 
-		protected DacNodeViewModelBase(TreeViewModel tree, TreeNodeViewModel? parent, bool isExpanded) : 
-								  base(tree, parent, isExpanded)
+		protected DacNodeViewModelBase(TreeViewModel tree, TreeNodeViewModel? parent, Func<TreeNodeViewModel, bool> isExpandedCalculator) : 
+								  base(tree, parent, isExpandedCalculator)
 		{
 		}
 
