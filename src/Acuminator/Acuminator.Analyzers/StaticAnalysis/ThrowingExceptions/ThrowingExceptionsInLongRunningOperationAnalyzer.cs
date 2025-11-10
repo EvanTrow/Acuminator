@@ -47,7 +47,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 					foreach (var finDel in finallyDelegates)
 					{
 						cancellation.ThrowIfCancellationRequested();
-						walker.Visit(finDel.Node);
+						walker.VisitProcessingDelegate(finDel);
 					}
 				}
 
@@ -58,7 +58,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 					foreach (var parDel in parametersDelegates)
 					{
 						cancellation.ThrowIfCancellationRequested();
-						walker.Visit(parDel.Node);
+						walker.VisitProcessingDelegate(parDel);
 					}
 				}
 
@@ -69,7 +69,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 					foreach (var processDel in processDelegates)
 					{
 						cancellation.ThrowIfCancellationRequested();
-						walker.Visit(processDel.Node);
+						walker.VisitProcessingDelegate(processDel);
 					}
 				}
 			}

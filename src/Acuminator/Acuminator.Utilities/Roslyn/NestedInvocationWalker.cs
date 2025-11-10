@@ -333,7 +333,7 @@ namespace Acuminator.Utilities.Roslyn
 			}
 		}
 
-		private void VisitCalledMethod(IMethodSymbol? calledMethod, ExpressionSyntax callSite)
+		protected void VisitCalledMethod(IMethodSymbol? calledMethod, ExpressionSyntax callSite)
 		{
 			if (calledMethod == null || IsMethodInStack(calledMethod) || calledMethod.GetSyntax(CancellationToken) is not CSharpSyntaxNode calledMethodNode)
 				return;
