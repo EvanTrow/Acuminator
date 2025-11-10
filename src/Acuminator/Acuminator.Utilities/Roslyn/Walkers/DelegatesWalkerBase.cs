@@ -90,57 +90,5 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 				}
 			}
 		}
-
-		/// <summary>
-		/// Gets delegate syntax node from the <paramref name="delegateExpression"/>.
-		/// </summary>
-		/// <param name="delegateExpression">The delegate expression node.</param>
-		/// <returns>
-		/// The delegate syntax node.
-		/// </returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		protected SyntaxNode? GetDelegateNode(ExpressionSyntax delegateExpression)
-		{
-			delegateExpression.ThrowOnNull();
-			return GetDelegateNode(delegateExpression, recursionDepth: 0);
-		}
-
-		private SyntaxNode? GetDelegateNode(ExpressionSyntax delegateExpression, int recursionDepth)
-		{
-			ThrowIfCancellationRequested();
-
-			if (recursionDepth > MaxRecursionDepth)
-				return null;
-
-			switch (delegateExpression)
-			{
-				case AnonymousFunctionExpressionSyntax anonymousFunction:
-					return anonymousFunction.Body;
-
-				case CastExpressionSyntax castExpression:
-					return GetDelegateNode(castExpression.Expression, recursionDepth + 1);
-
-				case BaseObjectCreationExpressionSyntax objectCreationExpression:
-					if (objectCreationExpression.ArgumentList?.Arguments.Count != 1)
-						return null;
-
-					ArgumentSyntax delegateCreationArg = objectCreationExpression.ArgumentList.Arguments[0];
-					return GetDelegateNode(delegateCreationArg.Expression, recursionDepth + 1);
-
-				default:
-					// Case when an identifier is passed as an expression for a delegate
-					var delegateSymbol = GetSymbol<ISymbol>(delegateExpression);
-
-					// Method is the most simple and frequent case for identifiers passed as expressions for delegates.
-					// It is difficult to analyze local variables, parameters, properties and fields in a general case and they are rarely used
-					// for identifiers passed as expressions for delegates. 
-					// Therefore, they are deemed as non recognized.
-					if (delegateSymbol == null || delegateSymbol.Kind != SymbolKind.Method)
-						return null;
-
-					var delegateNode = delegateExpression.GetBody() ?? delegateExpression;
-					return delegateNode;
-			}
-		}
 	}
 }

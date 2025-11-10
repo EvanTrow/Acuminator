@@ -1,4 +1,6 @@
-﻿using Acuminator.Utilities.Common;
+﻿using System.Runtime.CompilerServices;
+
+using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
@@ -17,18 +19,26 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 			_descriptor = descriptor.CheckIfNull();
 		}
 
-		public void VisitProcessingDelegate(ProcessingDelegateInfo? processingDelegateInfo)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void VisitProcessingDelegate(ProcessingDelegateInfo? processingDelegateInfo) =>
+			VisitDelegateNode(processingDelegateInfo?.Node, processingDelegateInfo?.Symbol);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void VisitLongRunDelegate(SyntaxNode? delegateNode, ISymbol? delegateSymbol) =>
+			VisitDelegateNode(delegateNode, delegateSymbol);
+
+		private void VisitDelegateNode(SyntaxNode? delegateNode, ISymbol? delegateSymbol)
 		{
-			if (processingDelegateInfo?.Node == null)
+			if (delegateNode == null || delegateSymbol == null)
 				return;
 
-			if (processingDelegateInfo.Node is NameSyntax methodIdentifier && processingDelegateInfo.Symbol is IMethodSymbol method)
+			if (delegateNode is NameSyntax methodIdentifier && delegateSymbol is IMethodSymbol method)
 			{
 				VisitCalledMethod(method, methodIdentifier);
 			}
 			else
 			{
-				Visit(processingDelegateInfo.Node);
+				Visit(delegateNode);
 			}
 		}
 

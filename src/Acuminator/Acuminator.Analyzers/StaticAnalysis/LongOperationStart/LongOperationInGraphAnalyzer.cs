@@ -127,7 +127,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 
 			walker.Visit(node);
 
-			return walker.Delegates.Length > 0;
+			return walker.DelegateInfos.Count > 0;
 		}
 	}
 }

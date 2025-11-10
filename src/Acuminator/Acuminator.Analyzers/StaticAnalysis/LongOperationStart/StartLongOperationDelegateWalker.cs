@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
@@ -16,9 +15,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 {
 	public class StartLongOperationDelegateWalker : DelegatesWalkerBase
 	{
-		private readonly HashSet<SyntaxNode> _delegates = new HashSet<SyntaxNode>();
+		private readonly Dictionary<SyntaxNode, (ISymbol? DelegateSymbol, SyntaxNode? DelegateNode)> _delegateInfos = [];
 
-		public ImmutableArray<SyntaxNode> Delegates => _delegates.ToImmutableArray();
+		public IReadOnlyDictionary<SyntaxNode, (ISymbol? DelegateSymbol, SyntaxNode? DelegateNode)> DelegateInfosByNode => _delegateInfos;
+
+		public IReadOnlyCollection<(ISymbol? DelegateSymbol, SyntaxNode? DelegateNode)> DelegateInfos => _delegateInfos.Values;
 
 		public StartLongOperationDelegateWalker(PXContext pxContext, CancellationToken cancellation)
 			: base(pxContext, cancellation)
@@ -42,11 +43,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 
 			if (delegateArgument != null)
 			{
-				var delegateBody = GetDelegateNode(delegateArgument);
+				var delegateSymbolAndBody = GetDelegateSymbolAndNode(delegateArgument);
 
-				if (delegateBody != null)
-					_delegates.Add(delegateBody);
+				if (delegateSymbolAndBody.DelegateNode != null && !_delegateInfos.ContainsKey(delegateSymbolAndBody.DelegateNode))
+				{
+					_delegateInfos.Add(delegateSymbolAndBody.DelegateNode, delegateSymbolAndBody);
+				}
 			}
+
+			base.VisitInvocationExpression(node);
 		}
 
 		private ExpressionSyntax? GetLongRunDelegateArgument(IMethodSymbol methodSymbol, InvocationExpressionSyntax methodNode)
