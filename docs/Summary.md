@@ -114,5 +114,5 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1111](diagnostics/PX1111.md) | The primary DAC of a processing view must contain the `NoteID` field. | Error | Unavailable |
 | [PX1112](diagnostics/PX1112.md) | Graphs and graph extensions with generic type parameters must be abstract. | Error | Available |
 | [PX1113](diagnostics/PX1113.md) | Graphs and graph extensions should not be `sealed` types. | Warning | Available |
-| [PX1114](diagnostics/PX1114.md) | Graph extension should not inherit from a terminal graph extension. | Warning | Unavailable |
-| [PX1115](diagnostics/PX1115.md) | Only terminal graph extensions and non-abstract DAC extensions can be used as base extensions. | Error | Unavailable |
+| [PX1114](diagnostics/PX1114.md) | A graph extension should not inherit from a terminal graph extension. | Warning | Unavailable |
+| [PX1115](diagnostics/PX1115.md) | Only a terminal graph extension and a non-abstract DAC extension can be used as a base extension. | Error | Unavailable |
