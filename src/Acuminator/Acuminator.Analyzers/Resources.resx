@@ -882,7 +882,7 @@ Reason: {2}</value>
     <value>Graphs and graph extensions should not be sealed types</value>
   </data>
   <data name="PX1114Title" xml:space="preserve">
-    <value>Graph extension should not inherit from non-terminal graph extensions</value>
+    <value>A graph extension should not inherit from a non-terminal graph extension</value>
   </data>
   <data name="PX1115TitleDacExtension" xml:space="preserve">
     <value>Only non-abstract DAC extensions can be used as base DAC extensions</value>
