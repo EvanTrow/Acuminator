@@ -249,10 +249,10 @@ public virtual int? SomeDacField{ get; set; }</value>
     <value>The number of arguments passed to the method does not match the number of BQL statement parameters</value>
   </data>
   <data name="PX1016DacExtensionTitle" xml:space="preserve">
-    <value>A DAC extension must include the public static IsActive method with the bool return type. Extensions which are constantly active reduce performance. Suppress the error if you need the DAC extension to be constantly active.</value>
+    <value>A DAC extension should include the public static IsActive method with the bool return type. Extensions which are constantly active reduce performance. Suppress the warning if you need the DAC extension to be constantly active.</value>
   </data>
   <data name="PX1016GraphExtensionTitle" xml:space="preserve">
-    <value>A graph extension must include a public static IsActive method with the bool return type. Extensions which are constantly active reduce performance. Suppress the error if you need the graph extension to be constantly active.</value>
+    <value>A graph extension should include a public static IsActive method with the bool return type. Extensions which are constantly active reduce performance. Suppress the warning if you need the graph extension to be constantly active.</value>
   </data>
   <data name="PX1018Title" xml:space="preserve">
     <value>The graph with the specified primary DAC type does not contain a view of this type</value>
