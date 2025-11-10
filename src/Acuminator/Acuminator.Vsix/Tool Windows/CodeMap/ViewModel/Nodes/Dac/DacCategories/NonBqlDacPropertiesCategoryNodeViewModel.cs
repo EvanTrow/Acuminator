@@ -16,8 +16,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override Icon NodeIcon => Icon.DacNonBqlPropertiesCategory;
 
-		public NonBqlDacPropertiesCategoryNodeViewModel(DacNodeViewModel dacViewModel, TreeNodeViewModel parent, bool isExpanded) : 
-												   base(dacViewModel, parent, DacMemberCategory.NonBqlProperties, isExpanded)
+		public NonBqlDacPropertiesCategoryNodeViewModel(DacNodeViewModel dacViewModel, TreeNodeViewModel parent, 
+														Func<TreeNodeViewModel, bool> isExpandedCalculator) : 
+												   base(dacViewModel, parent, DacMemberCategory.NonBqlProperties, isExpandedCalculator)
 		{
 		}
 

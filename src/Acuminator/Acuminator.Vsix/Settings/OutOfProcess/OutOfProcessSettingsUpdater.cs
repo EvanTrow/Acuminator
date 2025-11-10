@@ -19,10 +19,10 @@ namespace Acuminator.Vsix.Settings
 		
 		private readonly string _sharedMemoryName;
 
-		private readonly ISettingsEvents _settingsEvents;
+		private readonly IGeneralSettingsEvents _settingsEvents;
 		private readonly MemoryMappedFile _memoryMappedFile;
 
-		public OutOfProcessSettingsUpdater(ISettingsEvents settingsEvents, CodeAnalysisSettings initialAnalysisSettings, 
+		public OutOfProcessSettingsUpdater(IGeneralSettingsEvents settingsEvents, CodeAnalysisSettings initialAnalysisSettings, 
 										   BannedApiSettings initialBannedApiSettings, string? sharedMemoryName = null)
 		{
 			initialAnalysisSettings.ThrowOnNull();

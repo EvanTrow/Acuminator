@@ -38,8 +38,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		}
 
 		public GraphMemberInfoNodeViewModel(GraphMemberNodeViewModel graphMemberVM, SymbolItem memberInfoData, 
-											GraphMemberInfoType graphMemberInfoType, bool isExpanded) :
-										base(graphMemberVM?.Tree!, graphMemberVM, isExpanded)
+											GraphMemberInfoType graphMemberInfoType, Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+										base(graphMemberVM?.Tree!, graphMemberVM, isExpandedCalculator)
 		{
 			GraphMemberInfoData = memberInfoData.CheckIfNull();
 			GraphMember = graphMemberVM!;

@@ -11,8 +11,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public abstract class DacFieldCategoryNodeViewModel : DacMemberCategoryNodeViewModel
 	{
-		protected DacFieldCategoryNodeViewModel(DacNodeViewModel dacViewModel, TreeNodeViewModel parent, DacMemberCategory dacCategoryType, bool isExpanded) : 
-										   base(dacViewModel, parent, dacCategoryType, isExpanded)
+		protected DacFieldCategoryNodeViewModel(DacNodeViewModel dacViewModel, TreeNodeViewModel parent, DacMemberCategory dacCategoryType, 
+												Func<TreeNodeViewModel, bool> isExpandedCalculator) : 
+										   base(dacViewModel, parent, dacCategoryType, isExpandedCalculator)
 		{}
 
 		public abstract IEnumerable<DacFieldInfo> GetCategoryDacFields();

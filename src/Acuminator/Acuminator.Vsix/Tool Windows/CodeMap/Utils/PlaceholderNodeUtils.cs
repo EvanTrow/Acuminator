@@ -60,7 +60,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				return;
 
 			var subTreeRoot = treeBuilder.CreateAttachedRootWithSubTree(semanticModel, tree, rootParent, filterOptions,
-																		expandRoots: true, expandChildren: false, cancellation);
+																		cancellation);
 			if (subTreeRoot == null)
 				return;
 

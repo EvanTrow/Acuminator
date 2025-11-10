@@ -34,9 +34,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			protected set { }
 		}
 
-		public GraphMemberNodeViewModel(GraphMemberCategoryNodeViewModel graphMemberCategoryVM, TreeNodeViewModel parent, SymbolItem memberInfo, 
-										bool isExpanded) :
-								   base(graphMemberCategoryVM?.Tree!, parent, isExpanded)
+		public GraphMemberNodeViewModel(GraphMemberCategoryNodeViewModel graphMemberCategoryVM, TreeNodeViewModel parent, SymbolItem memberInfo,
+										Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+								   base(graphMemberCategoryVM?.Tree!, parent, isExpandedCalculator)
 		{
 			MemberInfo = memberInfo.CheckIfNull();
 			MemberCategory = graphMemberCategoryVM!;

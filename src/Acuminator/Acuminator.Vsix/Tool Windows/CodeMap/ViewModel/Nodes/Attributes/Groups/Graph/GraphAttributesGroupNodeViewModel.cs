@@ -20,8 +20,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		protected override bool AllowNavigation => true;
 
-		public GraphAttributesGroupNodeViewModel(PXGraphEventSemanticModel graphSemanticModel, TreeNodeViewModel parent, bool isExpanded = false) :
-												 base(parent, isExpanded)
+		public GraphAttributesGroupNodeViewModel(PXGraphEventSemanticModel graphSemanticModel, TreeNodeViewModel parent, 
+												 Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+												 base(parent, isExpandedCalculator)
 		{
 			GraphModel = graphSemanticModel.CheckIfNull();
 		}

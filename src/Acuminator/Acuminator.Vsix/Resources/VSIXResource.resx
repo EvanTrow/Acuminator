@@ -180,6 +180,9 @@
   <data name="Category_Coloring" xml:space="preserve">
     <value>BQL Coloring</value>
   </data>
+  <data name="Category_NodeExpansion" xml:space="preserve">
+    <value>Node Expansion</value>
+  </data>
   <data name="Category_Outlining" xml:space="preserve">
     <value>BQL Outlining</value>
   </data>
@@ -411,6 +414,24 @@ This option should be used together with the "Banned API File" setting.</value>
   </data>
   <data name="Setting_CodeAnalysis_SuppressionMechanismEnabled_Title" xml:space="preserve">
     <value>Enable Acuminator diagnostic suppression</value>
+  </data>
+  <data name="Setting_CodeMap_ExpandAttributeNodes_Description" xml:space="preserve">
+    <value>Expand attribute nodes when the Code Map is opened.</value>
+  </data>
+  <data name="Setting_CodeMap_ExpandAttributeNodes_Title" xml:space="preserve">
+    <value>Expand Attribute Nodes</value>
+  </data>
+  <data name="Setting_CodeMap_ExpandRegularNodes_Description" xml:space="preserve">
+    <value>Expand regular non-attribute nodes when the Code Map is opened.</value>
+  </data>
+  <data name="Setting_CodeMap_ExpandRegularNodes_Title" xml:space="preserve">
+    <value>Expand Regular Nodes</value>
+  </data>
+  <data name="Setting_CodeMap_ExpandRootNodes_Description" xml:space="preserve">
+    <value>Expand root nodes when the Code Map is opened.</value>
+  </data>
+  <data name="Setting_CodeMap_ExpandRootNodes_Title" xml:space="preserve">
+    <value>Expand Root Nodes</value>
   </data>
   <data name="Setting_ColorOnlyInsideBQL_Description" xml:space="preserve">
     <value>Colorize code only inside BQL commands (only for Roslyn coloring).</value>

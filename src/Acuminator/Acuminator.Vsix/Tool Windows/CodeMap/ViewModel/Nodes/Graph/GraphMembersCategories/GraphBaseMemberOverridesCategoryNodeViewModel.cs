@@ -16,14 +16,16 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override Icon NodeIcon => Icon.BaseMemberOverrideGraphCategory;
 
-		public GraphBaseMemberOverridesCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) : 
-														base(graphViewModel, parent, GraphMemberCategory.BaseMemberOverride, isExpanded)
+		public GraphBaseMemberOverridesCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent,
+															 Func<TreeNodeViewModel, bool> isExpandedCalculator) : 
+														base(graphViewModel, parent, GraphMemberCategory.BaseMemberOverride, isExpandedCalculator)
 		{		
 		}
 
 		public override IEnumerable<SymbolItem> GetCategoryGraphNodeSymbols() => CodeMapGraphModel.BaseMemberOverrides;
 
-		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => treeVisitor.VisitNode(this, input);
+		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => 
+			treeVisitor.VisitNode(this, input);
 
 		public override TResult AcceptVisitor<TResult>(CodeMapTreeVisitor<TResult> treeVisitor) => treeVisitor.VisitNode(this);
 

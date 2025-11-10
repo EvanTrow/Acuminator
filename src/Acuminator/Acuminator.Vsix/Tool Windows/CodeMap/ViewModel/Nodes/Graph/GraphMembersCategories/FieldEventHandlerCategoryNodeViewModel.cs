@@ -11,8 +11,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public class FieldEventHandlerCategoryNodeViewModel : GraphEventHandlerCategoryNodeViewModel
 	{
-		public FieldEventHandlerCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) :
-										  base(graphViewModel, parent, GraphMemberCategory.FieldEvent, isExpanded)
+		public FieldEventHandlerCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, 
+													  Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+										  base(graphViewModel, parent, GraphMemberCategory.FieldEvent, isExpandedCalculator)
 		{
 		}
 

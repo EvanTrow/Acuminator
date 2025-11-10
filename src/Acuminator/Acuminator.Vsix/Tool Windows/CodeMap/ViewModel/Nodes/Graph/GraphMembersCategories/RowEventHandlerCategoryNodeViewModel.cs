@@ -12,8 +12,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public class RowEventHandlerCategoryNodeViewModel : GraphEventHandlerCategoryNodeViewModel
 	{
-		public RowEventHandlerCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) : 
-											   base(graphViewModel, parent, GraphMemberCategory.RowEvent, isExpanded)
+		public RowEventHandlerCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent,
+													Func<TreeNodeViewModel, bool> isExpandedCalculator) : 
+											   base(graphViewModel, parent, GraphMemberCategory.RowEvent, isExpandedCalculator)
 		{
 		}
 

@@ -17,8 +17,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override Icon NodeIcon => Icon.DacKeysCategory;
 
-		public KeyDacFieldsCategoryNodeViewModel(DacNodeViewModel dacViewModel, TreeNodeViewModel parent, bool isExpanded) : 
-											base(dacViewModel, parent, DacMemberCategory.Keys, isExpanded)
+		public KeyDacFieldsCategoryNodeViewModel(DacNodeViewModel dacViewModel, TreeNodeViewModel parent, 
+												 Func<TreeNodeViewModel, bool> isExpandedCalculator) : 
+											base(dacViewModel, parent, DacMemberCategory.Keys, isExpandedCalculator)
 		{		
 		}
 

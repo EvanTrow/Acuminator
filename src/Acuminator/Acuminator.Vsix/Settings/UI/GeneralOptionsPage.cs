@@ -23,7 +23,7 @@ using Constants = Acuminator.Vsix.Utilities.Constants;
 namespace Acuminator.Vsix
 {
 	[ComVisible(true)]
-	public class GeneralOptionsPage : DialogPage, ISettingsEvents
+	public class GeneralOptionsPage : DialogPage, IGeneralSettingsEvents
 	{
 		private const string InitializingFieldName = "_initializing";
 		private static readonly Func<DialogPage, object>? _getInitializingField;

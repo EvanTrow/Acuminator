@@ -21,8 +21,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override Icon NodeIcon => Icon.RowEvent;
 
-		public RowEventHandlerNodeViewModel(DacGroupingNodeBaseViewModel dacViewModel, GraphRowEventHandlerInfo eventInfo, bool isExpanded = false) :
-									   base(dacViewModel?.GraphEventHandlersCategoryVM!, dacViewModel!, eventInfo, isExpanded)
+		public RowEventHandlerNodeViewModel(DacGroupingNodeBaseViewModel dacViewModel, GraphRowEventHandlerInfo eventInfo,
+											Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+									   base(dacViewModel?.GraphEventHandlersCategoryVM!, dacViewModel!, eventInfo, isExpandedCalculator)
 		{
 			DacViewModel = dacViewModel!;
 			Name = eventInfo.EventType.ToString();
@@ -31,7 +32,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override bool NameMatchesPattern(string? pattern) => MatchPattern(_dacNameWithEventTypeForSearch, pattern);
 
-		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => treeVisitor.VisitNode(this, input);
+		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => 
+			treeVisitor.VisitNode(this, input);
 
 		public override TResult AcceptVisitor<TResult>(CodeMapTreeVisitor<TResult> treeVisitor) => treeVisitor.VisitNode(this);
 

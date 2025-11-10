@@ -20,9 +20,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			protected set;
 		}
 
-		public FieldEventHandlerNodeViewModel(DacFieldGroupingNodeBaseViewModel dacFieldVM, GraphFieldEventHandlerInfo eventHandlerInfo, 
-											  bool isExpanded = false) :
-										 base(dacFieldVM?.GraphEventHandlersCategoryVM!, dacFieldVM!, eventHandlerInfo, isExpanded)
+		public FieldEventHandlerNodeViewModel(DacFieldGroupingNodeBaseViewModel dacFieldVM, GraphFieldEventHandlerInfo eventHandlerInfo,
+											  Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+										 base(dacFieldVM?.GraphEventHandlersCategoryVM!, dacFieldVM!, eventHandlerInfo, isExpandedCalculator)
 		{
 			DacFieldVM = dacFieldVM!;
 			Name = eventHandlerInfo.EventType.ToString();

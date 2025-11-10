@@ -8,8 +8,8 @@ using Acuminator.Utilities.Roslyn.Semantic.Dac;
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public class KeyDacFieldNodeViewModel(DacMemberCategoryNodeViewModel dacMemberCategoryVM, TreeNodeViewModel parent, 
-										  DacFieldInfo fieldInfo, bool isExpanded) : 
-						DacFieldNodeViewModelBase(dacMemberCategoryVM, parent, fieldInfo, isExpanded)
+										  DacFieldInfo fieldInfo, Func<TreeNodeViewModel, bool> isExpandedCalculator) : 
+						DacFieldNodeViewModelBase(dacMemberCategoryVM, parent, fieldInfo, isExpandedCalculator)
 	{
 		public override Icon NodeIcon => Icon.DacKeyField;
 
