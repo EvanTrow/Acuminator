@@ -311,19 +311,25 @@ namespace Acuminator.Tests.Verification
 					? FormatDiagnostics(analyzer, actualResults)
 					: "    NONE.";
 
-			var addedDiagnosticsLocations = actualResults.ToDictionary(d => GetDiagnosticLocationInfo(d));
-			var expectedDiagnosticLocations = expectedResults.ToDictionary(d => (d.Path, d.Line, d.Column));
+			var addedDiagnosticsLocations   = actualResults.GroupBy(d => GetDiagnosticLocationInfo(d))
+														   .ToDictionary(group => group.Key, 
+																		 group => group.ToList());
+			var expectedDiagnosticLocations = expectedResults.GroupBy(d => (d.Path, d.Line, d.Column))
+															 .ToDictionary(group => group.Key,
+																		   group => group.ToList());
 
 			var unexpectedDiagnostics = (from addedDiagnosticKey in addedDiagnosticsLocations.Keys
 										 where !expectedDiagnosticLocations.ContainsKey(addedDiagnosticKey)
-										 let diagnostic = addedDiagnosticsLocations[addedDiagnosticKey]
+										 let diagnostics = addedDiagnosticsLocations[addedDiagnosticKey]
+										 from diagnostic in diagnostics
 										 select (diagnostic.Id, addedDiagnosticKey.Line, addedDiagnosticKey.Column, addedDiagnosticKey.Path).ToString()
 										 )
 										 .Join(Environment.NewLine);
 
 			var missingDiagnostics = (from expectedDiagnosticKey in expectedDiagnosticLocations.Keys
 									  where !addedDiagnosticsLocations.ContainsKey(expectedDiagnosticKey)
-									  let diagnostic = expectedDiagnosticLocations[expectedDiagnosticKey]
+									  let diagnostics = expectedDiagnosticLocations[expectedDiagnosticKey]
+									  from diagnostic in diagnostics
 									  select (diagnostic.Id,
 											  diagnostic.Line,
 											  diagnostic.Column,
