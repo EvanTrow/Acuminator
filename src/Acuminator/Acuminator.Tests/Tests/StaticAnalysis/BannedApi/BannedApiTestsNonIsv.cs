@@ -11,6 +11,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 using Xunit;
 
+using static PX.Data.BQL.BqlPlaceholder;
+using static PX.Objects.CR.ContactTypesAttribute;
+using static PX.Objects.RQ.RQRequestLine.FK;
+using static PX.SM.PXSyncPriority;
+using static PX.SM.UploadAllowedFileTypes;
+
 using Resources = Acuminator.Analyzers.Resources;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.BannedApi
@@ -104,22 +110,22 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.BannedApi
 					" It also prevents Acumatica request profiler and resource governor from correctly managing system resources."),
 
 				Descriptors.PX1099_ForbiddenApiUsage_WithReason.CreateFor(33, 39, Resources.PX1099Title_MethodFormatArg,
-					"System.Threading.Tasks.TaskFactory.StartNew``1(System.Func{``0})",
+					"System.Threading.Tasks.TaskFactory.StartNew<TResult>(System.Func<TResult>)",
 					"Use of the TaskFactory.StartNew method is forbidden in Acumatica because it may lead to deadlocks and a loss of Acumatica synchronization context." +
 					" It also prevents Acumatica request profiler and resource governor from correctly managing system resources."),
 
 				Descriptors.PX1099_ForbiddenApiUsage_WithReason.CreateFor(35, 22, Resources.PX1099Title_MethodFormatArg,
-					"System.Threading.Tasks.Task.Wait(System.Int32,System.Threading.CancellationToken)",
+					"System.Threading.Tasks.Task.Wait(int, System.Threading.CancellationToken)",
 					"Use of the Task.Wait method is forbidden in Acumatica because it may lead to deadlocks and a loss of Acumatica synchronization context." +
 					" It also prevents Acumatica request profiler and resource governor from correctly managing system resources."),
 
 				Descriptors.PX1099_ForbiddenApiUsage_WithReason.CreateFor(36, 30, Resources.PX1099Title_PropertyFormatArg,
-					"System.Threading.Tasks.Task{``0}.Result",
+					"System.Threading.Tasks.Task<TResult>.Result",
 					"Use of the Task<T>.Result property is forbidden in Acumatica because it may lead to deadlocks and a loss of Acumatica synchronization context." +
 					" It also prevents Acumatica request profiler and resource governor from correctly managing system resources."),
 
 				Descriptors.PX1099_ForbiddenApiUsage_WithReason.CreateFor(38, 38, Resources.PX1099Title_MethodFormatArg,
-					"System.Runtime.CompilerServices.TaskAwaiter{``0}.GetResult",
+					"System.Runtime.CompilerServices.TaskAwaiter<TResult>.GetResult()",
 					"Use of the Task.GetAwaiter.GetResult() pattern is forbidden in Acumatica because it may lead to deadlocks and a loss of Acumatica synchronization context." +
 					" It also prevents Acumatica request profiler and resource governor from correctly managing system resources.")
 				);
