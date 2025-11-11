@@ -2358,6 +2358,15 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Incorrect work with Task in the Acumatica asynchronous code. You can only immediately await or return Task in the Acumatica asynchronous code..
+        /// </summary>
+        public static string PX1120Title {
+            get {
+                return ResourceManager.GetString("PX1120Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Suppress the {0} diagnostic with Acuminator.
         /// </summary>
         public static string SuppressDiagnosticGroupCodeActionTitle {

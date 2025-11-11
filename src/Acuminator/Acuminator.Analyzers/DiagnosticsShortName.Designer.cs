@@ -1139,5 +1139,14 @@ namespace Acuminator.Analyzers {
                 return ResourceManager.GetString("PX1115GraphExtension", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IncorrectTaskUsageInAsyncCode.
+        /// </summary>
+        public static string PX1120 {
+            get {
+                return ResourceManager.GetString("PX1120", resourceCulture);
+            }
+        }
     }
 }
