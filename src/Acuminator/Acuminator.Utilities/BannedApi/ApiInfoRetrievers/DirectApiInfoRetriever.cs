@@ -56,14 +56,6 @@ public class DirectApiInfoRetriever(IApiStorage apiStorage, CodeAnalysisSettings
 				return (apiInfoForOriginalExtensionMethod, symbolName);
 		}
 
-		if (method.OriginalDefinition != null && !SymbolEqualityComparer.Default.Equals(method, method.OriginalDefinition))
-		{
-			var (apiInfoForOriginalGenericMethod, symbolName) = GetInfoForRegularSymbol(method.OriginalDefinition, ApiKind.Method);
-
-			if (apiInfoForOriginalGenericMethod != null)
-				return (apiInfoForOriginalGenericMethod, symbolName);
-		}
-
 		return GetInfoForRegularSymbol(method, ApiKind.Method);
 	}
 
@@ -72,7 +64,7 @@ public class DirectApiInfoRetriever(IApiStorage apiStorage, CodeAnalysisSettings
 		if (type == null)
 			return default;
 
-		if (type.IsGenericType && type.OriginalDefinition != null)
+		if (type.IsGenericType && !SymbolEqualityComparer.Default.Equals(type, type.OriginalDefinition))
 		{
 			var (apiInfoForOriginalGenericType, symbolName) = GetInfoForRegularSymbol(type.OriginalDefinition, ApiKind.Type);
 
@@ -91,6 +83,18 @@ public class DirectApiInfoRetriever(IApiStorage apiStorage, CodeAnalysisSettings
 			return default;
 
 		Api? symbolApiInfo = Storage.GetApi(symbolKind, symbolDocID);
+
+		// Fallback to generic definition if not found directly
+		if (symbolApiInfo == null && !SymbolEqualityComparer.Default.Equals(symbol, symbol.OriginalDefinition))
+		{
+			string? originalDefinitionSymbolDocID = symbol.OriginalDefinition.GetDocumentationCommentId().NullIfWhiteSpace();
+
+			if (originalDefinitionSymbolDocID == null)
+				return default;
+
+			symbolApiInfo = Storage.GetApi(symbolKind, originalDefinitionSymbolDocID);
+		}
+
 		return symbolApiInfo?.BanKind switch
 		{
 			ApiBanKind.General => (symbolApiInfo, symbol.ToString()),
