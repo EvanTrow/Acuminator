@@ -83,6 +83,7 @@ public class DirectApiInfoRetriever(IApiStorage apiStorage, CodeAnalysisSettings
 			return default;
 
 		Api? symbolApiInfo = Storage.GetApi(symbolKind, symbolDocID);
+		bool originalDefinitionIsUsed = false;
 
 		// Fallback to generic definition if not found directly
 		if (symbolApiInfo == null && !SymbolEqualityComparer.Default.Equals(symbol, symbol.OriginalDefinition))
@@ -93,12 +94,19 @@ public class DirectApiInfoRetriever(IApiStorage apiStorage, CodeAnalysisSettings
 				return default;
 
 			symbolApiInfo = Storage.GetApi(symbolKind, originalDefinitionSymbolDocID);
+			originalDefinitionIsUsed = true;
 		}
 
 		return symbolApiInfo?.BanKind switch
 		{
-			ApiBanKind.General => (symbolApiInfo, symbol.ToString()),
-			ApiBanKind.ISV 	   => AnalysisSettings.IsvSpecificAnalyzersEnabled ? (symbolApiInfo, symbol.ToString()) : default,
+			ApiBanKind.General => (symbolApiInfo, originalDefinitionIsUsed 
+													? symbol.OriginalDefinition.ToString() 
+													: symbol.ToString()),
+			ApiBanKind.ISV	   => AnalysisSettings.IsvSpecificAnalyzersEnabled 
+									? (symbolApiInfo, originalDefinitionIsUsed 
+														? symbol.OriginalDefinition.ToString() 
+														: symbol.ToString()) 
+									: default,
 			_ 				   => default
 		};
 	}
