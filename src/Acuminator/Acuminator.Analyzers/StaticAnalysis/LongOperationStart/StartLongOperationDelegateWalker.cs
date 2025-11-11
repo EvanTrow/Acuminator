@@ -64,9 +64,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 					return null;
 
 				case 1:
-					return methodSymbol.IsDeclaredInType(PxContext.AsyncOperations.IGraphLongOperationManager)
-						? arguments[0].Expression
-						: null;
+					if (methodSymbol.Name == DelegateNames.Async.Await ||
+						methodSymbol.IsDeclaredInType(PxContext.AsyncOperations.IGraphLongOperationManager))
+					{
+						return arguments[0].Expression;
+					}
+					else
+						return null;
 
 				default:
 				{
