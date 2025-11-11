@@ -28,10 +28,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 		public IncorrectTaskUsageInAsyncCodeAnalyzer(CodeAnalysisSettings? codeAnalysisSettings) : base(codeAnalysisSettings)
 		{ }
 
+		protected override bool ShouldAnalyze(PXContext pxContext) => 
+			base.ShouldAnalyze(pxContext) && 
+			pxContext.AsyncOperations.Task != null && pxContext.AsyncOperations.Task_Generic != null;
+
 		protected override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, PXContext pxContext)
 		{
-			compilationStartContext.RegisterSyntaxNodeAction(c => AnalyzeTaskUsageInTypes(c, pxContext), 
-															 SyntaxKind.CompilationUnit);
+			compilationStartContext.RegisterSyntaxNodeAction(c => AnalyzeTaskUsageInTypes(c, pxContext), SyntaxKind.CompilationUnit);
 		}
 
 		private static void AnalyzeTaskUsageInTypes(SyntaxNodeAnalysisContext syntaxContext, PXContext pxContext)
