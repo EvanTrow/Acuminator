@@ -1933,7 +1933,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to PXSetupNotEnteredException cannot be thrown in long-running operations.
+        ///   Looks up a localized string similar to PXSetupNotEnteredException cannot be thrown in long-running operations and processing delegates.
         /// </summary>
         public static string PX1086Title {
             get {
@@ -2331,7 +2331,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Graph extension should not inherit from non-terminal graph extensions.
+        ///   Looks up a localized string similar to A graph extension should not inherit from a non-terminal graph extension.
         /// </summary>
         public static string PX1114Title {
             get {
