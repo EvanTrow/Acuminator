@@ -24,11 +24,24 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationDelegateClosures
 		[EmbeddedFileData("ClosuresInNonGraph.cs")]
 		public Task SetProcessDelegate_ReportOnlyCapturedPassedParameters_NonGraphHelper(string actual)
 		{
-			string[] formatArgsGraph   = [AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg];
-			string[] formatArgsAdapter = [AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg];
+			string[] formatArgGraphLongRunDelegate = [AnalyzerResources.PX1008Title_CapturedGraphFormatArg,
+													  AnalyzerResources.PX1008Title_LongRunDelegateFormatArg];
+			string[] formatArgAdapterLongRunDelegate = [AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg,
+														AnalyzerResources.PX1008Title_LongRunDelegateFormatArg];
+			string[] formatArgsGraphProcDelegate = [AnalyzerResources.PX1008Title_CapturedGraphFormatArg, 
+													AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg];
+			string[] formatArgsAdapterProcDelegate = [AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, 
+													  AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg];
 			return VerifyCSharpDiagnosticAsync(actual,
-				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 24, column: 4, formatArgsGraph),
-				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 25, column: 4, formatArgsAdapter));
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 24, column: 4, formatArgGraphLongRunDelegate),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 25, column: 4, formatArgGraphLongRunDelegate),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 26, column: 4, formatArgsGraphProcDelegate),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 27, column: 4, formatArgsAdapterProcDelegate),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 29, column: 4, formatArgGraphLongRunDelegate),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 30, column: 4, formatArgGraphLongRunDelegate),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 31, column: 4, formatArgAdapterLongRunDelegate),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 32, column: 4, formatArgGraphLongRunDelegate),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 33, column: 4, formatArgGraphLongRunDelegate));
 		}
 
 		[Theory]
@@ -41,11 +54,23 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationDelegateClosures
 				[AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg];
 			string[] formatArgsAdapterAndProcDelegate =
 				[AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg];
+			string[] formatArgsAdapterAndLongRunDelegate =
+				[AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg];
+
 			return VerifyCSharpDiagnosticAsync(actual, helper,
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 19, column: 4, formatArgsGraphAndProcDelegate),
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 20, column: 4, formatArgsAdapterAndProcDelegate),
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 22, column: 4, formatArgsGraphAndLongRunDelegate),
-				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 24, column: 4, formatArgsGraphAndLongRunDelegate));
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 24, column: 4, formatArgsGraphAndLongRunDelegate),
+
+				// TODO Should show diagnostic for collection expressions, no diagnosic now due to an old version of Roslyn used, ATR-923
+				//Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 25, column: 4, formatArgsGraphAndLongRunDelegate),
+
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 27, column: 4, formatArgsGraphAndLongRunDelegate),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 28, column: 4, formatArgsGraphAndLongRunDelegate),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 29, column: 4, formatArgsAdapterAndLongRunDelegate),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 30, column: 4, formatArgsGraphAndLongRunDelegate),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 31, column: 4, formatArgsGraphAndLongRunDelegate));
 		}
 
 		[Theory]
@@ -93,16 +118,29 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationDelegateClosures
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 86, column: 4, formatArgsGraph),
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 89, column: 4, formatArgsGraph),
 
+				// Test capturing graph via ILongOperationManager and IGraphLongOperationManager methods
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 92, column: 4, formatArgsGraph),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 93, column: 4, formatArgsGraph),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 96, column: 4, formatArgsGraph),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 97, column: 4, formatArgsGraph),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 98, column: 4, formatArgsGraph),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 101, column: 4, formatArgsGraph),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 102, column: 4, formatArgsGraph),
+
 				// adapter capture
-				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 125, column: 4, formatArgsAdapter),
-				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 128, column: 4, formatArgsAdapter),
-				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 129, column: 4, formatArgsAdapter),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 147, column: 4, formatArgsAdapter),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 150, column: 4, formatArgsAdapter),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 151, column: 4, formatArgsAdapter),
+
+				// Test capturing adapter via ILongOperationManager and IGraphLongOperationManager methods
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 162, column: 4, formatArgsAdapter),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 168, column: 4, formatArgsAdapter),
 
 				//recursive analysis adapter capture
-				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 141, column: 4, formatArgsAdapter),
-				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 143, column: 4, formatArgsAdapter),
-				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 144, column: 4, formatArgsAdapter),
-				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 145, column: 4, formatArgsAdapter));
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 171, column: 4, formatArgsAdapter),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 173, column: 4, formatArgsAdapter),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 174, column: 4, formatArgsAdapter),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 175, column: 4, formatArgsAdapter));
 		}
 
 		[Theory]
