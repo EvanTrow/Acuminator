@@ -104,8 +104,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 					return;
 				}
 
-				var longOperationDelegateType = LongOperationDelegateTypeClassifier.GetLongOperationDelegateType(invocationExpression,
-																												 semanticModel, PxContext, CancellationToken);
+				var longOperationDelegateInfo = LongOperationDelegateTypeClassifier.GetLongOperationDelegateInfo(invocationExpression,
+																							semanticModel, PxContext, CancellationToken);
+				if (longOperationDelegateInfo == null)
+				{
+					base.VisitInvocationExpression(invocationExpression);
+					return;
+				}
+
+				var (longOperationDelegateType, longOperationDelegateSymbol) = longOperationDelegateInfo.Value;
+
 				switch (longOperationDelegateType)
 				{
 					case LongOperationDelegateType.ProcessingDelegate:
@@ -113,7 +121,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 						return;
 
 					case LongOperationDelegateType.LongRunDelegate:
-						AnalyzeStartOperationDelegateMethod(semanticModel, invocationExpression);
+						AnalyzeStartOperationDelegateMethod(semanticModel, invocationExpression, longOperationDelegateSymbol);
 						return;
 
 					default:
@@ -139,14 +147,44 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 				}
 			}
 
-			private void AnalyzeStartOperationDelegateMethod(SemanticModel semanticModel, InvocationExpressionSyntax startOperationInvocation)
+			private void AnalyzeStartOperationDelegateMethod(SemanticModel semanticModel, InvocationExpressionSyntax startOperationInvocation,
+															 IMethodSymbol longOperationDelegateSymbol)
 			{
-				if (startOperationInvocation.ArgumentList.Arguments.Count < 2)
+				var longRunDelegateArgument = GetLongRunDelegateArgument(longOperationDelegateSymbol, startOperationInvocation);
+
+				if (longRunDelegateArgument == null)
 					return;
 
-				ExpressionSyntax longRunDelegateParameter = startOperationInvocation.ArgumentList.Arguments[1].Expression;
-				CheckDataFlowForDelegateMethod(semanticModel, startOperationInvocation, longRunDelegateParameter,
+				CheckDataFlowForDelegateMethod(semanticModel, startOperationInvocation, longRunDelegateArgument,
 											   LongOperationDelegateType.LongRunDelegate);
+			}
+
+			private ExpressionSyntax? GetLongRunDelegateArgument(IMethodSymbol methodSymbol, InvocationExpressionSyntax methodNode)
+			{
+				var arguments = methodNode.ArgumentList.Arguments;
+
+				switch (arguments.Count)
+				{
+					case 0:
+						return null;
+
+					case 1:
+						if (methodSymbol.Name == DelegateNames.Async.Await ||
+							methodSymbol.IsDeclaredInType(PxContext.AsyncOperations.IGraphLongOperationManager))
+						{
+							return arguments[0].Expression;
+						}
+						else
+							return null;
+
+					default:
+					{
+						var firstArgument = methodSymbol.Name == DelegateNames.Async.Await
+												? arguments[0].Expression
+												: arguments[1].Expression;
+						return firstArgument;
+					}
+				}
 			}
 
 			private bool CheckDataFlowForDelegateMethod(SemanticModel semanticModel, InvocationExpressionSyntax longOperationSetupMethodInvocationNode,
@@ -181,7 +219,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 			}
 
 			private PassedParametersToNotBeCaptured? GetNonCapturableParametersForDelegateMethodWithReassignmentCheck(SemanticModel semanticModel,
-																							InvocationExpressionSyntax longOperationSetupMethodInvocationNode)
+																							InvocationExpressionSyntax longOperationStartMethodInvocationNode)
 			{			
 				if (IsInsideRecursiveCall)     // if we inside the call stack then we need to check captured elements for reassignment
 				{
@@ -190,7 +228,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 					if (nonCapturableParametersOfMethodContainingCallSite == null)
 						return null;
 
-					var callingNode = GetDeclarationContainingCallSite(longOperationSetupMethodInvocationNode);
+					var callingNode = GetDeclarationContainingCallSite(longOperationStartMethodInvocationNode);
 
 					if (callingNode == null)
 						return null;
@@ -207,7 +245,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 				}
 				else                           // if we are at the top of call stack then we need to look for adapter parameter in case we are in action handler
 				{
-					var callingMethodNode = GetDeclarationContainingCallSite(longOperationSetupMethodInvocationNode);
+					var callingMethodNode = GetDeclarationContainingCallSite(longOperationStartMethodInvocationNode);
 
 					if (callingMethodNode == null)
 						return null;
@@ -235,7 +273,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 
 				//---------------------------------------Local Function-----------------------------------------------------------------------
 				HashSet<string>? GetReassignedParametersNames(SyntaxNode callingNode, IReadOnlyCollection<string> parametersNames) =>
-					_parametersReassignedFinder.GetParametersReassignedBeforeCallsite(callingNode, longOperationSetupMethodInvocationNode,
+					_parametersReassignedFinder.GetParametersReassignedBeforeCallsite(callingNode, longOperationStartMethodInvocationNode,
 																					  parametersNames, semanticModel, CancellationToken);
 			} 
 			#endregion

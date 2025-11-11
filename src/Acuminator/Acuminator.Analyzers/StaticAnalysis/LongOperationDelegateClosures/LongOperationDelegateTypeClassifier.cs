@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -16,9 +15,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 {
 	internal static class LongOperationDelegateTypeClassifier
 	{
-		public static LongOperationDelegateType? GetLongOperationDelegateType(InvocationExpressionSyntax? longOperationSetupMethodInvocationNode,
-																			  SemanticModel? semanticModel, PXContext pxContext, 
-																			  CancellationToken cancellationToken)
+		public static (LongOperationDelegateType Type, IMethodSymbol Method)? GetLongOperationDelegateInfo(
+																				InvocationExpressionSyntax? longOperationSetupMethodInvocationNode,
+																				SemanticModel? semanticModel, PXContext pxContext, 
+																				CancellationToken cancellationToken)
 		{
 			if (semanticModel == null)
 				return null;
@@ -31,21 +31,21 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 				case MemberAccessExpressionSyntax memberAccessNode
 				when memberAccessNode.OperatorToken.IsKind(SyntaxKind.DotToken):
 					methodName = memberAccessNode.Name?.Identifier.ValueText;
-					return GetLongOperationDelegateTypeFromMethodAccessNode(semanticModel, pxContext, memberAccessNode, methodName, cancellationToken);
+					return GetLongOperationDelegateInfoFromMethodAccessNode(semanticModel, pxContext, memberAccessNode, methodName, cancellationToken);
 
 				case MemberBindingExpressionSyntax memberBindingNode
 				when memberBindingNode.OperatorToken.IsKind(SyntaxKind.DotToken):
 					methodName = memberBindingNode.Name?.Identifier.ValueText;
-					return GetLongOperationDelegateTypeFromMethodAccessNode(semanticModel, pxContext, memberBindingNode, methodName, cancellationToken);
+					return GetLongOperationDelegateInfoFromMethodAccessNode(semanticModel, pxContext, memberBindingNode, methodName, cancellationToken);
 
 				default:
 					return null;
 			}
 		}
 
-		private static LongOperationDelegateType? GetLongOperationDelegateTypeFromMethodAccessNode(SemanticModel semanticModel, PXContext pxContext,
-																								   ExpressionSyntax methodAccessNode, string? methodName,
-																								   CancellationToken cancellationToken)
+		private static (LongOperationDelegateType Type, IMethodSymbol Method)? GetLongOperationDelegateInfoFromMethodAccessNode(SemanticModel semanticModel, 
+																									PXContext pxContext, ExpressionSyntax methodAccessNode, 
+																									string? methodName, CancellationToken cancellationToken)
 		{
 			switch (methodName)
 			{
@@ -54,28 +54,25 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 					var setDelegateSymbol = semanticModel.GetSymbolOrFirstCandidate(methodAccessNode, cancellationToken) as IMethodSymbol;
 
 					if (setDelegateSymbol != null && setDelegateSymbol.ContainingType.ConstructedFrom.InheritsFromOrEquals(pxContext.PXProcessingBase.Type))
-						return LongOperationDelegateType.ProcessingDelegate;
+						return (LongOperationDelegateType.ProcessingDelegate, setDelegateSymbol);
 
 					return null;
 
 				case DelegateNames.Async.StartOperation:
+				case DelegateNames.Async.StartAsyncOperation:
+				case DelegateNames.Async.Await:
 					var longRunDelegate = semanticModel.GetSymbolOrFirstCandidate(methodAccessNode, cancellationToken) as IMethodSymbol;
 
 					if (longRunDelegate == null)
 						return null;
 
-					if (longRunDelegate.IsStatic && longRunDelegate.DeclaredAccessibility == Accessibility.Public &&
-						pxContext.AsyncOperations.PXLongOperation.Equals(longRunDelegate.ContainingType, SymbolEqualityComparer.Default))
-					{
-						return LongOperationDelegateType.LongRunDelegate;
-					}
-
-					return null;
+					return pxContext.AsyncOperations.AllMethodsStartingLongRun.Contains(longRunDelegate)
+						? (LongOperationDelegateType.LongRunDelegate, longRunDelegate)
+						: null;
 
 				default:
 					return null;
 			}
-
 		}
 	}
 }
