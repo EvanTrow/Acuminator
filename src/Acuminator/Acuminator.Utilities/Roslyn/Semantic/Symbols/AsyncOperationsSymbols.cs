@@ -24,6 +24,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 
 		public INamedTypeSymbol? IGraphLongOperationManager { get; }
 
+		public INamedTypeSymbol? Task { get; }
+
+		public INamedTypeSymbol? Task_Generic { get; }
+
+		public INamedTypeSymbol? ValueTask { get; }
+
+		public INamedTypeSymbol? ValueTask_Generic { get; }
+
 		/// <summary>
 		/// All methods that can start async long running operations.
 		/// </summary>
@@ -31,7 +39,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 
 		internal AsyncOperationsSymbols(Compilation compilation) : base(compilation)
 		{
-			PXLongOperation = Compilation.GetTypeByMetadataName(TypeFullNames.Async.PXLongOperation)!;
+			Task 			  = Compilation.GetTypeByMetadataName(TypeFullNames.DotNetTypes.Task);
+			Task_Generic 	  = Compilation.GetTypeByMetadataName(TypeFullNames.DotNetTypes.Task_Generic);
+			ValueTask 		  = Compilation.GetTypeByMetadataName(TypeFullNames.DotNetTypes.ValueTask);
+			ValueTask_Generic = Compilation.GetTypeByMetadataName(TypeFullNames.DotNetTypes.ValueTask_Generic);
+
+			PXLongOperation		  = Compilation.GetTypeByMetadataName(TypeFullNames.Async.PXLongOperation)!;
 			ILongOperationManager = Compilation.GetTypeByMetadataName(TypeFullNames.Async.ILongOperationManager) ??
 									Compilation.GetTypeByMetadataName(TypeFullNames.Async.ILongOperationManagerOld);
 			IGraphLongOperationManager = Compilation.GetTypeByMetadataName(TypeFullNames.Async.IGraphLongOperationManager) ??
