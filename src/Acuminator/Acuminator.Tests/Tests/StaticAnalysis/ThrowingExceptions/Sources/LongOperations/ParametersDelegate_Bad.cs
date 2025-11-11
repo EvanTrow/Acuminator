@@ -58,9 +58,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.InvalidViewUsageInProcessingDele
 			});
 
 			OurUsers.SetParametersDelegate(users => throw new PXSetupNotEnteredException<Users>(null));
-
-			// Should be reported. Not reported due to the bug ATR-922
-			Helper.ThrowPXSetupNotEnteredException();
+			OurUsers.SetParametersDelegate(users => Helper.ThrowPXSetupNotEnteredException());
 		}
 
 		[SuppressMessage("Acuminator", "PX1050:Hardcoded strings are not allowed as parameters for localization methods and PXException constructors. " +
@@ -84,6 +82,6 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.InvalidViewUsageInProcessingDele
 	public static class Helper
 	{
 		// Acuminator disable once PX1050 HardcodedStringInLocalizationMethod [Justification]
-		public static void ThrowPXSetupNotEnteredException() => throw new PXSetupNotEnteredException<Users>(null);
+		public static bool ThrowPXSetupNotEnteredException() => throw new PXSetupNotEnteredException<Users>(null);
 	}
 }
