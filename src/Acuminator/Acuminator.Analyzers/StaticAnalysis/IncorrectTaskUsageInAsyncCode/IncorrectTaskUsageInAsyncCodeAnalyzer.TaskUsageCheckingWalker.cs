@@ -4,9 +4,11 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -72,6 +74,55 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 
 				base.VisitInvocationExpression(node);
 			}
+
+			public override void VisitReturnStatement(ReturnStatementSyntax returnStatement)
+			{
+				Cancellation.ThrowIfCancellationRequested();
+				CheckTypeMemberReturningTaskHasTaskReturnType(returnStatement.Expression);
+				base.VisitReturnStatement(returnStatement);
+			}
+
+			public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax arrowExpressionMethodBody)
+			{
+				Cancellation.ThrowIfCancellationRequested();
+				CheckTypeMemberReturningTaskHasTaskReturnType(arrowExpressionMethodBody.Expression);
+				base.VisitArrowExpressionClause(arrowExpressionMethodBody);
+			}
+
+			private void CheckTypeMemberReturningTaskHasTaskReturnType(ExpressionSyntax? returnExpression)
+			{
+				if (returnExpression == null)
+					return;
+
+				var returnExpressionType = SemanticModel.GetTypeInfo(returnExpression, Cancellation).Type;
+
+				if (returnExpressionType == null || !IsTaskType(returnExpressionType))
+					return;
+
+				var containingMethodOrLocalFunction = returnExpression.GetContainingMemberOrLocalFunction();
+				var returnTypeNode = containingMethodOrLocalFunction switch
+				{
+					MethodDeclarationSyntax methodDeclaration	  => methodDeclaration.ReturnType,
+					PropertyDeclarationSyntax propertyDeclaration => propertyDeclaration.Type,
+					LocalFunctionStatementSyntax localFunction	  => localFunction.ReturnType,
+					_ 											  => null
+				};
+
+				if (returnTypeNode == null)
+					return;
+
+				var returnTypeSymbol = SemanticModel.GetSymbolOrFirstCandidate(returnTypeNode, Cancellation) as ITypeSymbol;
+
+				if (returnTypeSymbol == null || IsTaskType(returnTypeSymbol))
+					return;
+
+				var location   = returnExpression.GetLocation();
+				var diagnostic = Diagnostic.Create(Descriptors.PX1120_IncorrectTaskUsageInAsyncCode, location);
+
+				_syntaxContext.ReportDiagnosticWithSuppressionCheck(diagnostic, _pxContext.CodeAnalysisSettings);
+			}
+
+			
 
 			private bool IsTaskType(ITypeSymbol typeSymbol) =>
 				typeSymbol.Equals(_pxContext.AsyncOperations.Task, SymbolEqualityComparer.Default) ||
