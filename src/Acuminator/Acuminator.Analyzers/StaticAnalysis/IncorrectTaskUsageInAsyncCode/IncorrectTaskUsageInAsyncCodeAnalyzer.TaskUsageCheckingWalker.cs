@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.Roslyn.Semantic;
@@ -66,13 +65,30 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 				base.VisitVariableDeclaration(variableDeclaration);
 			}
 
-			public override void VisitInvocationExpression(InvocationExpressionSyntax node)
+			public override void VisitInvocationExpression(InvocationExpressionSyntax invocationExpression)
 			{
 				Cancellation.ThrowIfCancellationRequested();
-				
 
+				// Do a cheaper check for awaited invocations first to avoid semantic model query
+				if (invocationExpression.Parent is AwaitExpressionSyntax)
+				{
+					base.VisitInvocationExpression(invocationExpression);
+					return;
+				}
 
-				base.VisitInvocationExpression(node);
+				var invocationType = SemanticModel.GetTypeInfo(invocationExpression, Cancellation).Type;
+
+				if (invocationType == null || invocationType.SpecialType != SpecialType.None || !IsTaskType(invocationType))
+				{
+					base.VisitInvocationExpression(invocationExpression);
+					return;
+				}
+
+				var location = invocationExpression.GetLocation();
+				var diagnostic = Diagnostic.Create(Descriptors.PX1120_IncorrectTaskUsageInAsyncCode, location);
+
+				_syntaxContext.ReportDiagnosticWithSuppressionCheck(diagnostic, _pxContext.CodeAnalysisSettings);
+				base.VisitInvocationExpression(invocationExpression);
 			}
 
 			public override void VisitReturnStatement(ReturnStatementSyntax returnStatement)
@@ -121,8 +137,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 
 				_syntaxContext.ReportDiagnosticWithSuppressionCheck(diagnostic, _pxContext.CodeAnalysisSettings);
 			}
-
-			
 
 			private bool IsTaskType(ITypeSymbol typeSymbol) =>
 				typeSymbol.Equals(_pxContext.AsyncOperations.Task, SymbolEqualityComparer.Default) ||
