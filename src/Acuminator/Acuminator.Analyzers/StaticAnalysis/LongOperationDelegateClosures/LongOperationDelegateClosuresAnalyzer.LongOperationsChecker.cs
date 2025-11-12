@@ -228,7 +228,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 					if (nonCapturableParametersOfMethodContainingCallSite == null)
 						return null;
 
-					var callingNode = GetDeclarationContainingCallSite(longOperationStartMethodInvocationNode);
+					var callingNode = longOperationStartMethodInvocationNode.GetContainingMemberOrLocalFunction();
 
 					if (callingNode == null)
 						return null;
@@ -245,7 +245,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 				}
 				else                           // if we are at the top of call stack then we need to look for adapter parameter in case we are in action handler
 				{
-					var callingMethodNode = GetDeclarationContainingCallSite(longOperationStartMethodInvocationNode);
+					var callingMethodNode = longOperationStartMethodInvocationNode.GetContainingMemberOrLocalFunction();
 
 					if (callingMethodNode == null)
 						return null;
@@ -321,7 +321,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 				if (argumentsList == null || (argumentsList.Arguments.Count == 0 && calledMethod.MethodKind != MethodKind.LocalFunction))
 					return null;
 
-				var callingTypeMemberOrLocalFunctionNode = GetDeclarationContainingCallSite(callSite);
+				var callingTypeMemberOrLocalFunctionNode = callSite.GetContainingMemberOrLocalFunction();
 
 				if (callingTypeMemberOrLocalFunctionNode == null)
 					return null;
@@ -698,21 +698,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 			private PassedParametersToNotBeCaptured? PeekPassedParametersFromStack() => NonCapturablePassedParameters.Count > 0
 					? NonCapturablePassedParameters.Peek()
 					: null;
-
-			private SyntaxNode? GetDeclarationContainingCallSite(SyntaxNode callSiteNode)
-			{
-				SyntaxNode? curNode = callSiteNode.Parent;
-
-				while (curNode != null)
-				{
-					if (curNode is (MemberDeclarationSyntax or LocalFunctionStatementSyntax))
-						return curNode;
-
-					curNode = curNode.Parent;
-				}
-
-				return null;
-			}
 		}
 	}
 }
