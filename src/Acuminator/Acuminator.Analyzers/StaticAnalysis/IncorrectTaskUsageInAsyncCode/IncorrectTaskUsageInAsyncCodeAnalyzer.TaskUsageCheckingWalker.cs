@@ -48,19 +48,32 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 
 			public override void VisitVariableDeclaration(VariableDeclarationSyntax variableDeclaration)
 			{
-				var variableType = SemanticModel.GetSymbolOrFirstCandidate(variableDeclaration.Type, Cancellation) as ITypeSymbol;
+				CheckVariableOrParameterTypeIsNotTask(variableDeclaration.Type);
+				base.VisitVariableDeclaration(variableDeclaration);
+			}
+
+			public override void VisitParameter(ParameterSyntax parameter)
+			{
+				CheckVariableOrParameterTypeIsNotTask(parameter.Type);
+				base.VisitParameter(parameter);
+			}
+
+			private void CheckVariableOrParameterTypeIsNotTask(TypeSyntax? typeNode)
+			{
+				Cancellation.ThrowIfCancellationRequested();
+
+				if (typeNode == null)
+					return;
+
+				var variableType = SemanticModel.GetSymbolOrFirstCandidate(typeNode, Cancellation) as ITypeSymbol;
 
 				if (variableType == null || !IsTaskType(variableType))
-				{
-					base.VisitVariableDeclaration(variableDeclaration);
 					return;
-				}
 
-				var location   = variableDeclaration.Type.GetLocation();
+				var location   = typeNode.GetLocation();
 				var diagnostic = Diagnostic.Create(Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable, location);
 
 				_syntaxContext.ReportDiagnosticWithSuppressionCheck(diagnostic, _pxContext.CodeAnalysisSettings);
-				base.VisitVariableDeclaration(variableDeclaration);
 			}
 
 			public override void VisitInvocationExpression(InvocationExpressionSyntax invocationExpression)
