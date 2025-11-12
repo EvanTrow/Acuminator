@@ -1141,11 +1141,29 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IncorrectTaskUsageInAsyncCode.
+        ///   Looks up a localized string similar to MethodReturnTypeIsNotTask.
         /// </summary>
-        public static string PX1120 {
+        public static string PX1120_MethodReturnTypeIsNotTask {
             get {
-                return ResourceManager.GetString("PX1120", resourceCulture);
+                return ResourceManager.GetString("PX1120_MethodReturnTypeIsNotTask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NotAwaitedTaskReturningExpression.
+        /// </summary>
+        public static string PX1120_NotAwaitedTaskReturningExpression {
+            get {
+                return ResourceManager.GetString("PX1120_NotAwaitedTaskReturningExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to StoreTaskInVariable.
+        /// </summary>
+        public static string PX1120_StoreTaskInVariable {
+            get {
+                return ResourceManager.GetString("PX1120_StoreTaskInVariable", resourceCulture);
             }
         }
     }

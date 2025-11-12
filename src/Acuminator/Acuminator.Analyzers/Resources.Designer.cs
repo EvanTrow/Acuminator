@@ -2358,11 +2358,29 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Incorrect work with Task in the Acumatica asynchronous code. You can only immediately await or return Task in the Acumatica asynchronous code..
+        ///   Looks up a localized string similar to Incorrect work with Task types in the Acumatica asynchronous code. Method returning a Task-typed expression should have Task type as its return type..
         /// </summary>
-        public static string PX1120Title {
+        public static string PX1120Title_MethodReturnTypeIsNotTask {
             get {
-                return ResourceManager.GetString("PX1120Title", resourceCulture);
+                return ResourceManager.GetString("PX1120Title_MethodReturnTypeIsNotTask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect work with Task types in the Acumatica asynchronous code. Task-typed expressions should be awaited..
+        /// </summary>
+        public static string PX1120Title_NotAwaitedTaskReturningExpression {
+            get {
+                return ResourceManager.GetString("PX1120Title_NotAwaitedTaskReturningExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect work with Task types in the Acumatica asynchronous code. You should not store Task instance in a local variable..
+        /// </summary>
+        public static string PX1120Title_StoreTaskInVariable {
+            get {
+                return ResourceManager.GetString("PX1120Title_StoreTaskInVariable", resourceCulture);
             }
         }
         
