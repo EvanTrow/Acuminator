@@ -67,8 +67,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 			{
 				Cancellation.ThrowIfCancellationRequested();
 
-				// Do a cheaper check for awaited invocations first to avoid semantic model query
-				if (invocationExpression.Parent is AwaitExpressionSyntax)
+				// Do a cheaper check for awaited or immediately returned invocations first to avoid extra queries to the semantic model
+				if (invocationExpression.Parent is AwaitExpressionSyntax or ReturnStatementSyntax or ArrowExpressionClauseSyntax)
 				{
 					base.VisitInvocationExpression(invocationExpression);
 					return;
