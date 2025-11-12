@@ -19,7 +19,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
 			ImmutableArray.Create
 			(
-				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode
+				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable,
+				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_NotAwaitedTaskReturningExpression,
+				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_MethodReturnTypeIsNotTask
 			);
 
 		public IncorrectTaskUsageInAsyncCodeAnalyzer() : this(null)

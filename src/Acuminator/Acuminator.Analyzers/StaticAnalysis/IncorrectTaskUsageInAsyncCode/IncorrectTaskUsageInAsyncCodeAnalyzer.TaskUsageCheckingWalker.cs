@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
 using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.Roslyn.Semantic;
@@ -59,7 +57,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 				}
 
 				var location   = variableDeclaration.Type.GetLocation();
-				var diagnostic = Diagnostic.Create(Descriptors.PX1120_IncorrectTaskUsageInAsyncCode, location);
+				var diagnostic = Diagnostic.Create(Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable, location);
 
 				_syntaxContext.ReportDiagnosticWithSuppressionCheck(diagnostic, _pxContext.CodeAnalysisSettings);
 				base.VisitVariableDeclaration(variableDeclaration);
@@ -85,7 +83,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 				}
 
 				var location = invocationExpression.GetLocation();
-				var diagnostic = Diagnostic.Create(Descriptors.PX1120_IncorrectTaskUsageInAsyncCode, location);
+				var diagnostic = Diagnostic.Create(Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_NotAwaitedTaskReturningExpression, location);
 
 				_syntaxContext.ReportDiagnosticWithSuppressionCheck(diagnostic, _pxContext.CodeAnalysisSettings);
 				base.VisitInvocationExpression(invocationExpression);
@@ -133,7 +131,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 					return;
 
 				var location   = returnExpression.GetLocation();
-				var diagnostic = Diagnostic.Create(Descriptors.PX1120_IncorrectTaskUsageInAsyncCode, location);
+				var diagnostic = Diagnostic.Create(Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_MethodReturnTypeIsNotTask, location);
 
 				_syntaxContext.ReportDiagnosticWithSuppressionCheck(diagnostic, _pxContext.CodeAnalysisSettings);
 			}
