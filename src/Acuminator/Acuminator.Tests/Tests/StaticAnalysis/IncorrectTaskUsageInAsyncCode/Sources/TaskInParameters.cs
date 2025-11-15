@@ -12,7 +12,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.IncorrectTaskUsageInAsyncCode.So
 	{
 		public int this[Task task] => 0;
 
-		public MyService(Task task, int i) : this (task)
+		public MyService(Task task, int i)
 		{
 		}
 
