@@ -446,7 +446,7 @@ namespace Acuminator.Tests.Verification
 		protected static Task<Diagnostic[]> GetSortedDiagnosticsAsync(string[] sources, string language, 
 																	  DiagnosticAnalyzer analyzer, bool checkOnlyFirstDocument)
 		{
-			return GetSortedDiagnosticsFromDocumentsAsync(analyzer, VerificationHelper.GetDocuments(sources, language), checkOnlyFirstDocument);
+			return GetSortedDiagnosticsFromDocumentsAsync(analyzer, SolutionBuilder.GetDocuments(sources, language), checkOnlyFirstDocument);
 		}
 
 		/// <summary>

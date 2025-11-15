@@ -38,7 +38,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels
 		{
 			code.Should().NotBeNullOrWhiteSpace();
 
-			Document document = VerificationHelper.CreateDocument(code);
+			Document document = SolutionBuilder.CreateDocument(code);
 
 			var compilationTask   = document.Project.GetCompilationAsync(cancellation);
 			var rootTask 		  = document.GetSyntaxRootAsync(cancellation);

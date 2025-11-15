@@ -1,5 +1,4 @@
-﻿
-#nullable enable
+﻿#nullable enable
 
 using System;
 using System.Collections.Generic;
@@ -25,24 +24,24 @@ using FbqlCommand = PX.Data.BQL.Fluent.FbqlCommand;
 
 namespace Acuminator.Tests.Verification
 {
-	public static class VerificationHelper
+	public static class SolutionBuilder
 	{
 		private const string GeneratedFileNameSeed = "Test";
-		private const string CSharpDefaultFileExt = "cs";
+		private const string CSharpDefaultFileExt  = "cs";
 		private const string VisualBasicDefaultExt = "vb";
-		private const string GeneratedProjectName = "GenProject";
-		private const string BuildFailMessage = "External assembly build failure";
+		private const string GeneratedProjectName  = "GenProject";
+		private const string BuildFailMessage 	   = "External assembly build failure";
 
 		private static readonly string DotNetAssemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
 
 		private static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
-		private static readonly MetadataReference CodeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
+		private static readonly MetadataReference CodeAnalysisReference  = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
 
-		private static readonly MetadataReference PXDataReference = MetadataReference.CreateFromFile(typeof(PXGraph).Assembly.Location);
-		private static readonly MetadataReference FluentBqlReference = MetadataReference.CreateFromFile(typeof(FbqlCommand).Assembly.Location);
-		private static readonly MetadataReference PXCommonReference = MetadataReference.CreateFromFile(typeof(PX.Common.PXContext).Assembly.Location);
+		private static readonly MetadataReference PXDataReference 	   = MetadataReference.CreateFromFile(typeof(PXGraph).Assembly.Location);
+		private static readonly MetadataReference FluentBqlReference   = MetadataReference.CreateFromFile(typeof(FbqlCommand).Assembly.Location);
+		private static readonly MetadataReference PXCommonReference    = MetadataReference.CreateFromFile(typeof(PX.Common.PXContext).Assembly.Location);
 		private static readonly MetadataReference PXCommonStdReference = MetadataReference.CreateFromFile(typeof(PX.Common.PXInternalUseOnlyAttribute).Assembly.Location);
-		private static readonly MetadataReference PXObjectsReference =
+		private static readonly MetadataReference PXObjectsReference   =
 			MetadataReference.CreateFromFile(typeof(PX.Objects.GL.PeriodIDAttribute).Assembly.Location);
 
 		private static readonly MetadataReference[] DotNetReferences;
@@ -51,7 +50,7 @@ namespace Acuminator.Tests.Verification
 		private static readonly MetadataReference ExternalDependencyReference = 
 			MetadataReference.CreateFromFile(typeof(ExternalDependency.NoBqlFieldForDacFieldProperty.BaseDacWithoutBqlField).Assembly.Location);
 
-		static VerificationHelper()
+		static SolutionBuilder()
 		{
 			List<MetadataReference> dotNetReferences = new(capacity: 5);
 

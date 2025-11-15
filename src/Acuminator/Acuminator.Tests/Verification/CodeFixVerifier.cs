@@ -17,7 +17,7 @@ using Microsoft.CodeAnalysis.Formatting;
 
 using Xunit;
 
-using static Acuminator.Tests.Verification.VerificationHelper;
+using static Acuminator.Tests.Verification.SolutionBuilder;
 
 namespace Acuminator.Tests.Verification
 {
