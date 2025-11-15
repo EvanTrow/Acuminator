@@ -1,9 +1,9 @@
-using System;
 using System.Threading.Tasks;
 using PX.Data;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.IncorrectTaskUsageInAsyncCode.Sources
 {
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2012:Use ValueTasks correctly", Justification = "<Pending>")]
 	public class MyGraph : PXGraph<MyGraph>
 	{
 		// Should report diagnostic - method returns Task but return type is object

@@ -25,11 +25,17 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 		public Task Storing_TaskInstance_InLocalVariable(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable.CreateFor(9, 20),
+				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_NotAwaitedTaskReturningExpression.CreateFor(9, 39),
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable.CreateFor(10, 20),
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable.CreateFor(15, 4),
+				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_NotAwaitedTaskReturningExpression.CreateFor(15, 16),
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable.CreateFor(19, 4),
+				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_NotAwaitedTaskReturningExpression.CreateFor(19, 31),
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable.CreateFor(23, 4),
+				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_NotAwaitedTaskReturningExpression.CreateFor(23, 26),
+				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_NotAwaitedTaskReturningExpression.CreateFor(23, 64),
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable.CreateFor(27, 4),
+				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_NotAwaitedTaskReturningExpression.CreateFor(27, 44),
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable.CreateFor(30, 4));
 
 		[Theory]
@@ -38,7 +44,6 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable.CreateFor(7, 25),
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable.CreateFor(9, 59),
-				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable.CreateFor(11, 25),
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable.CreateFor(13, 19),
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable.CreateFor(15, 20),
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable.CreateFor(19, 39),

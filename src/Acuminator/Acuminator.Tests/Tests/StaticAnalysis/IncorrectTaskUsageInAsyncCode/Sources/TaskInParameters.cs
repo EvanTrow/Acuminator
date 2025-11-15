@@ -8,7 +8,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.IncorrectTaskUsageInAsyncCode.So
 
 	public readonly record struct MyRecordStruct(int Number, ValueTask<int> Task, int LineNumber);
 
-	public class MyService(Task task)
+	public class MyService
 	{
 		public int this[Task task] => 0;
 
