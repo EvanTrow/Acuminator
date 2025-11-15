@@ -478,7 +478,7 @@
     <value>NonTerminalBaseGraphExtension</value>
   </data>
   <data name="PX1120_StoreTaskInVariable" xml:space="preserve">
-    <value>StoreTaskInVariable</value>
+    <value>StoreTaskInVariableOrParameter</value>
   </data>
   <data name="PX1120_MethodReturnTypeIsNotTask" xml:space="preserve">
     <value>MethodReturnTypeIsNotTask</value>

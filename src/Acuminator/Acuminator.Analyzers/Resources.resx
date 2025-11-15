@@ -897,7 +897,7 @@ Reason: {2}</value>
     <value>Incorrect work with Task types in the Acumatica asynchronous code. Task-typed expressions should be awaited.</value>
   </data>
   <data name="PX1120Title_StoreTaskInVariable" xml:space="preserve">
-    <value>Incorrect work with Task types in the Acumatica asynchronous code. You should not store Task instance in a local variable.</value>
+    <value>Incorrect work with Task types in the Acumatica asynchronous code. You should not store Task instance in a local variable or parameter.</value>
   </data>
   <data name="SuppressDiagnosticGroupCodeActionTitle" xml:space="preserve">
     <value>Suppress the {0} diagnostic with Acuminator</value>

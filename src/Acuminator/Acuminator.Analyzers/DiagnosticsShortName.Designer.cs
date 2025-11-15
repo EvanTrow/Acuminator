@@ -1159,7 +1159,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to StoreTaskInVariable.
+        ///   Looks up a localized string similar to StoreTaskInVariableOrParameter.
         /// </summary>
         public static string PX1120_StoreTaskInVariable {
             get {

@@ -2376,7 +2376,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Incorrect work with Task types in the Acumatica asynchronous code. You should not store Task instance in a local variable..
+        ///   Looks up a localized string similar to Incorrect work with Task types in the Acumatica asynchronous code. You should not store Task instance in a local variable or parameter..
         /// </summary>
         public static string PX1120Title_StoreTaskInVariable {
             get {
