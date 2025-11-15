@@ -21,6 +21,7 @@ using PX.Data;
 using Acuminator.Utilities.Common;
 
 using FbqlCommand = PX.Data.BQL.Fluent.FbqlCommand;
+using ValueTask   = System.Threading.Tasks.ValueTask;
 
 namespace Acuminator.Tests.Verification
 {
@@ -36,6 +37,7 @@ namespace Acuminator.Tests.Verification
 
 		private static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
 		private static readonly MetadataReference CodeAnalysisReference  = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
+		private static readonly MetadataReference System_Threading_Tasks_Extensions = MetadataReference.CreateFromFile(typeof(ValueTask).Assembly.Location);
 
 		private static readonly MetadataReference PXDataReference 	   = MetadataReference.CreateFromFile(typeof(PXGraph).Assembly.Location);
 		private static readonly MetadataReference FluentBqlReference   = MetadataReference.CreateFromFile(typeof(FbqlCommand).Assembly.Location);
@@ -65,6 +67,7 @@ namespace Acuminator.Tests.Verification
 			[
 				CSharpSymbolsReference,
 				CodeAnalysisReference,
+				System_Threading_Tasks_Extensions,
 				PXDataReference,
 				PXCommonReference,
 				PXCommonStdReference,
@@ -110,7 +113,7 @@ namespace Acuminator.Tests.Verification
 
 			if (sources.Length != documents.Length)
 			{
-				throw new SystemException("Amount of sources did not match amount of Documents created");
+				throw new InvalidOperationException("Amount of sources did not match amount of Documents created");
 			}
 
 			return documents;
@@ -189,7 +192,7 @@ namespace Acuminator.Tests.Verification
 			return solution.GetProject(projectId).CheckIfNull();
 		}
 
-		private static ParseOptions CreateParseOptions(Project project)
+		private static CSharpParseOptions CreateParseOptions(Project project)
 		{
 			var customFeatures = new[] { KeyValuePair.Create("IOperation", "true") };
 			var projectFeatures = project.ParseOptions?.Features.Union(customFeatures) ?? [];
