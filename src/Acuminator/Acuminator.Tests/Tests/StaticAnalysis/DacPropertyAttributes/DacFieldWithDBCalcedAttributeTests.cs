@@ -27,6 +27,11 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacPropertyAttributes
 			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
+		[EmbeddedFileData("DacWithPXDBCalcedAndUnboundEntityAttributes.cs")]
+		public Task DacField_WithPXDBCalced_And_NonDB_EntityAttribute_NoDiagnostic(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
+
+		[Theory]
 		[EmbeddedFileData("DacWithPXDBCalcedAndWithoutUnboundTypeAttributes.cs")]
 		public Task DacField_WithPXDBCalced_And_WithoutNonDBAttribute_ReportsDiagnostic(string source) =>
 			VerifyCSharpDiagnosticAsync(source, 
