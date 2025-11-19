@@ -226,22 +226,22 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		/// <param name="pxContext">The Acumatica context.</param>
 		/// <param name="includeBaseTypes">True to include, false to exclude the base Acumatica types.</param>
 		/// <returns/>
-		public static ImmutableHashSet<AttributeWithApplication> GetThisAndAllAggregatedAttributesWithApplications(this AttributeData? attributeApplication,
+		public static ImmutableHashSet<AttributeWithApplicationAndAggregator> GetThisAndAllAggregatedAttributesWithApplications(this AttributeData? attributeApplication,
 																												   PXContext pxContext, bool includeBaseTypes)
 		{
 			var eventSubscriberAttribute = pxContext.CheckIfNull().AttributeTypes.PXEventSubscriberAttribute;
 
 			if (attributeApplication?.AttributeClass == null ||
 				attributeApplication.AttributeClass.Equals(eventSubscriberAttribute, SymbolEqualityComparer.Default))
-				return ImmutableHashSet<AttributeWithApplication>.Empty;
+				return ImmutableHashSet<AttributeWithApplicationAndAggregator>.Empty;
 
 			var attributeType = attributeApplication.AttributeClass;
 			var baseAcumaticaAttributeTypes = attributeType.GetBaseTypesAndThis().ToList();
 
 			if (!baseAcumaticaAttributeTypes.Contains(eventSubscriberAttribute, SymbolEqualityComparer.Default))
-				return ImmutableHashSet<AttributeWithApplication>.Empty;
+				return ImmutableHashSet<AttributeWithApplicationAndAggregator>.Empty;
 
-			var attributeWithApplication = new AttributeWithApplication(attributeApplication);
+			var attributeWithApplication = new AttributeWithApplicationAndAggregator(attributeApplication);
 
 			INamedTypeSymbol pxAggregateAttribute = pxContext.AttributeTypes.PXAggregateAttribute;
 			bool isAggregateAttribute = baseAcumaticaAttributeTypes.Contains(pxAggregateAttribute, SymbolEqualityComparer.Default);
@@ -251,7 +251,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 				// We can suppose that attribute types hierarchy shares the attribute application
 				return includeBaseTypes
 					? baseAcumaticaAttributeTypes.TakeWhile(type => !type.Equals(eventSubscriberAttribute, SymbolEqualityComparer.Default))
-												 .Select(type => new AttributeWithApplication(attributeApplication, type))
+												 .Select(type => new AttributeWithApplicationAndAggregator(attributeApplication, type))
 												 .ToImmutableHashSet()
 					: ImmutableHashSet.Create(attributeWithApplication);
 			}
@@ -259,9 +259,9 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			var results = includeBaseTypes
 				? baseAcumaticaAttributeTypes.TakeWhile(type => !type.Equals(eventSubscriberAttribute, SymbolEqualityComparer.Default) &&
 																!type.Equals(pxAggregateAttribute, SymbolEqualityComparer.Default))
-											 .Select(type => new AttributeWithApplication(attributeApplication, type))
+											 .Select(type => new AttributeWithApplicationAndAggregator(attributeApplication, type))
 											 .ToHashSet()
-				: new HashSet<AttributeWithApplication>() { attributeWithApplication };
+				: new HashSet<AttributeWithApplicationAndAggregator>() { attributeWithApplication };
 
 			var allDeclaredAcumaticaAttributesApplicationsOnClassHierarchy =
 				attributeType.GetAllAttributesApplicationsDefinedOnThisAndBaseTypes()
@@ -270,14 +270,14 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 			foreach (AttributeData aggregatedAttributeApplication in allDeclaredAcumaticaAttributesApplicationsOnClassHierarchy)
 			{
-				var aggregatedAttributeWithApplication = new AttributeWithApplication(aggregatedAttributeApplication);
+				var aggregatedAttributeWithApplication = new AttributeWithApplicationAndAggregator(aggregatedAttributeApplication);
 				CollectAggregatedAttributeWithApplications(aggregatedAttributeWithApplication, recursionDepth: 0);
 			}
 
 			return results.ToImmutableHashSet();
 
 			//--------------------------------------------------Local Function-----------------------------------------------------
-			void CollectAggregatedAttributeWithApplications(AttributeWithApplication aggregatedAttributeWithApplication, int recursionDepth)
+			void CollectAggregatedAttributeWithApplications(AttributeWithApplicationAndAggregator aggregatedAttributeWithApplication, int recursionDepth)
 			{
 				if (!results.Add(aggregatedAttributeWithApplication) || recursionDepth > MaxRecursionDepth)
 					return;
@@ -289,7 +289,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 					var aggregatedAttributeBaseAcumaticaAttributeTypesWithApplications =
 						aggregatedAttributeBaseTypes.TakeWhile(baseType => !baseType.Equals(eventSubscriberAttribute, SymbolEqualityComparer.Default) &&
 																		   !baseType.Equals(pxAggregateAttribute, SymbolEqualityComparer.Default))
-													.Select(baseType => new AttributeWithApplication(aggregatedAttributeWithApplication.Application, baseType));
+													.Select(baseType => new AttributeWithApplicationAndAggregator(aggregatedAttributeWithApplication.Application, baseType));
 
 					results.AddRange(aggregatedAttributeBaseAcumaticaAttributeTypesWithApplications);
 				}
@@ -305,7 +305,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 					foreach (AttributeData aggregatedOnAggregateAttributeApplication in allDeclaredAcumaticaAttributesApplicationsOnClassHierarchy)
 					{
-						var aggregatedOnAggregateAttributeWithApplication = new AttributeWithApplication(aggregatedOnAggregateAttributeApplication);
+						var aggregatedOnAggregateAttributeWithApplication = new AttributeWithApplicationAndAggregator(aggregatedOnAggregateAttributeApplication);
 						CollectAggregatedAttributeWithApplications(aggregatedOnAggregateAttributeWithApplication, recursionDepth + 1);
 					}
 				}

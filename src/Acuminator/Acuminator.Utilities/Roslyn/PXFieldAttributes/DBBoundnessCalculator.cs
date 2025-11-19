@@ -64,7 +64,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		/// The attribute application DB boundness type.
 		/// </returns>
 		internal DbBoundnessType GetAttributeApplicationDbBoundnessType(AttributeData attributeApplication, 
-																		ImmutableHashSet<AttributeWithApplication>? preparedFlattenedAttributesWithApplications,
+																		ImmutableHashSet<AttributeWithApplicationAndAggregator>? preparedFlattenedAttributesWithApplications,
 																		ISet<ITypeSymbol>? preparedFlattenedAttributesSet,
 																		IReadOnlyCollection<DataTypeAttributeInfo>? preparedAttributesMetadata)
 		{
@@ -111,7 +111,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			return DuckTypingCheckIfAttributeHasMixedDbBoundness(flattenedAttributesSet);
 		}
 
-		private DbBoundnessType GetDbBoundnessFromAttributesApplicationsAndMetadata(ImmutableHashSet<AttributeWithApplication> flattenedAttributesWithApplications,
+		private DbBoundnessType GetDbBoundnessFromAttributesApplicationsAndMetadata(ImmutableHashSet<AttributeWithApplicationAndAggregator> flattenedAttributesWithApplications,
 																					IReadOnlyCollection<DataTypeAttributeInfo> attributesMetadata)
 		{
 			if (attributesMetadata.Count == 0)
@@ -131,7 +131,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		}
 
 		private DbBoundnessType GetDbBoundnessFromMetadataAndApplications(DataTypeAttributeInfo attributeInfo, 
-																		  ILookup<ITypeSymbol, AttributeWithApplication> applicationsByAttribute)
+																		  ILookup<ITypeSymbol, AttributeWithApplicationAndAggregator> applicationsByAttribute)
 		{
 			// Even if the DB boundness is set explicitly at the application we have to calculate DB boundness from metadata
 			// Because it can be inconsistent in which case explicitly set boundness can't apply

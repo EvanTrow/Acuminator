@@ -28,7 +28,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Attribute
 
 			int? fieldSize = null;
 
-			foreach (AttributeWithApplication aggregatedAttr in dataTypeAttribute.FlattenedAcumaticaAttributes)
+			foreach (AttributeWithApplicationAndAggregator aggregatedAttr in dataTypeAttribute.FlattenedAcumaticaAttributes)
 			{
 				int? sizeFromAggregatedAttribute = GetSizeFromAggregatedAttribute(aggregatedAttr.Application, pxContext);
 

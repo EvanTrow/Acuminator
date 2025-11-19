@@ -10,27 +10,27 @@ using Microsoft.CodeAnalysis;
 namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 {
 	/// <summary>
-	/// Information about the attribute with attribute application.
+	/// Information about the attribute with attribute application and an optional aggregator attribute.
 	/// </summary>
-	public class AttributeWithApplication : IEquatable<AttributeWithApplication>
+	public class AttributeWithApplicationAndAggregator : IEquatable<AttributeWithApplicationAndAggregator>
 	{
 		public ITypeSymbol Type { get; }
 
 		public AttributeData Application { get; }
 
-		public AttributeWithApplication(AttributeData attributeApplication) : this(attributeApplication, attributeApplication?.AttributeClass!)
+		public AttributeWithApplicationAndAggregator(AttributeData attributeApplication) : this(attributeApplication, attributeApplication?.AttributeClass!)
 		{
 		}
 
-		public AttributeWithApplication(AttributeData attributeApplication, ITypeSymbol attributeType)
+		public AttributeWithApplicationAndAggregator(AttributeData attributeApplication, ITypeSymbol attributeType)
 		{
 			Application = attributeApplication.CheckIfNull();
 			Type = attributeType.CheckIfNull();
 		}
 
-		public override bool Equals(object obj) => obj is AttributeWithApplication other && Equals(other);
+		public override bool Equals(object obj) => obj is AttributeWithApplicationAndAggregator other && Equals(other);
 
-		public bool Equals(AttributeWithApplication other) =>
+		public bool Equals(AttributeWithApplicationAndAggregator other) =>
 			Type.Equals(other.Type, SymbolEqualityComparer.Default) && Application.Equals(other.Application);
 
 		public override int GetHashCode()
