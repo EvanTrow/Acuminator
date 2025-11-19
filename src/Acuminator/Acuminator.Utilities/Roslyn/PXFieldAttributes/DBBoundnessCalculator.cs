@@ -91,6 +91,18 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 				preparedAttributesMetadata ?? 
 				AttributesMetadataProvider.GetDacFieldTypeAttributeInfos_NoWellKnownNonDataTypeAttributesCheck(attributeApplication.AttributeClass,
 																											   flattenedAttributesSet);
+			bool checkForExplicitlySetDbBoundnessOnDirectAttributeApplication =
+				attributesMetadata.Count > 0 &&
+				attributesMetadata.Any(attributeInfo => attributeInfo.Kind == FieldTypeAttributeKind.MixedDbBoundnessTypeAttribute);
+
+			if (checkForExplicitlySetDbBoundnessOnDirectAttributeApplication)
+			{
+				var dbBoundnessOnApplication = GetDbBoundnessSetExplicitlyByAttributeApplication(attributeApplication);
+
+				if (dbBoundnessOnApplication != DbBoundnessType.NotDefined)
+					return dbBoundnessOnApplication;
+			}
+
 			DbBoundnessType combinedDbBoundness = GetDbBoundnessFromAttributesApplicationsAndMetadata(flattenedAttributesWithApplications, attributesMetadata);
 
 			if (combinedDbBoundness != DbBoundnessType.NotDefined)
