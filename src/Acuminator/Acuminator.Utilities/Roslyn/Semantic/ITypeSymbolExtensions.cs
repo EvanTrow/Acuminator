@@ -396,6 +396,50 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 							 .SelectMany(t => t.GetAttributes());
 		}
 
+		/// <summary>
+		/// Gets all attributes applications defined on this and base types using the already known list of base types.
+		/// </summary>
+		/// <param name="typeSymbol">The type symbol to act on.</param>
+		/// <param name="precalcedBaseTypes">List the pre-calculated base types.</param>
+		/// <returns>
+		/// All attributes' applications defined on this and base types.
+		/// </returns>
+		/// <remarks>
+		/// This is unsafe method used for optimization.
+		/// It does not calculate base types itself, instead it relies on the list of base types provided by the caller (which can be incorrect).<br/>
+		/// In addition, the method does not check the <paramref name="typeSymbol"/> and <paramref name="precalcedBaseTypes"/> parameters for nulls and 
+		/// does not perfrom boxing of <see cref="ImmutableArray{T}"/> collections of attributes.
+		/// </remarks>
+		internal static IReadOnlyCollection<AttributeData> GetAllAttributesApplicationsDefinedOnThisAndBaseTypesUnsafe(this ITypeSymbol typeSymbol,
+																										IReadOnlyList<ITypeSymbol> precalcedBaseTypes)
+		{
+			var attributesOnHierarchy = new List<AttributeData>(capacity: 8);
+			var typeAttributes = typeSymbol.GetAttributes();
+
+			if (!typeAttributes.IsDefaultOrEmpty)
+			{
+				for (int i = 0; i < typeAttributes.Length; i++)
+					attributesOnHierarchy.Add(typeAttributes[i]);
+			}
+
+			if (precalcedBaseTypes.Count == 0)
+				return attributesOnHierarchy;
+
+			for (int i = 0; i < precalcedBaseTypes.Count; i++)
+			{
+				var baseType		   = precalcedBaseTypes[i];
+				var baseTypeAttributes = baseType.GetAttributes();
+
+				if (baseTypeAttributes.IsDefaultOrEmpty)
+					continue;
+
+				for (int j = 0; j < baseTypeAttributes.Length; j++)
+					attributesOnHierarchy.Add(baseTypeAttributes[j]);
+			}
+
+			return attributesOnHierarchy;
+		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ITypeSymbol? GetUnderlyingTypeFromNullable(this ITypeSymbol? typeSymbol, PXContext pxContext)
 		{

@@ -149,7 +149,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			if (attributeType == null || attributeType.Equals(eventSubscriberAttribute, SymbolEqualityComparer.Default))
 				return ImmutableHashSet<ITypeSymbol>.Empty;
 
-			var baseAcumaticaAttributeTypes = attributeType.GetBaseTypesAndThis().ToList();
+			var baseAcumaticaAttributeTypes = attributeType.GetBaseTypesAndThis().ToList(capacity: 4);
 
 			if (!baseAcumaticaAttributeTypes.Contains(eventSubscriberAttribute))
 				return ImmutableHashSet<ITypeSymbol>.Empty;
@@ -171,8 +171,8 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 											 .ToHashSet<ITypeSymbol>(SymbolEqualityComparer.Default)
 				: new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default) { attributeType };
 
-			var allDeclaredAcumaticaAttributesOnClassHierarchy = GetAllDeclaredAcumaticaAttributesOnClassHierarchy(attributeType, pxContext);
-
+			var allDeclaredAcumaticaAttributesOnClassHierarchy = GetAllDeclaredAcumaticaAttributesOnClassHierarchy(attributeType, pxContext, 
+																												baseAcumaticaAttributeTypes);
 			foreach (var aggregatedAttribute in allDeclaredAcumaticaAttributesOnClassHierarchy)
 			{
 				CollectAggregatedAttributes(aggregatedAttribute, recursionDepth: 0);
@@ -186,7 +186,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 				if (!results.Add(aggregatedAttribute) || recursionDepth > MaxRecursionDepth)
 					return;
 
-				var aggregatedAttributeBaseTypes = aggregatedAttribute.GetBaseTypes().ToList();
+				var aggregatedAttributeBaseTypes = aggregatedAttribute.GetBaseTypes().ToList(capacity: 4);
 
 				if (includeBaseTypes)
 				{
@@ -201,8 +201,8 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 				if (isAggregateOnAggregateAttribute)
 				{
-					var allDeclaredAcumaticaAttributesOnClassHierarchy = GetAllDeclaredAcumaticaAttributesOnClassHierarchy(aggregatedAttribute, pxContext);
-
+					var allDeclaredAcumaticaAttributesOnClassHierarchy = GetAllDeclaredAcumaticaAttributesOnClassHierarchy(aggregatedAttribute, pxContext, 
+																														   aggregatedAttributeBaseTypes);
 					foreach (var attribute in allDeclaredAcumaticaAttributesOnClassHierarchy)
 					{
 						CollectAggregatedAttributes(attribute, recursionDepth + 1);
@@ -237,7 +237,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 				return ImmutableHashSet<AttributeWithApplicationAndAggregator>.Empty;
 
 			var attributeType = attributeApplication.AttributeClass;
-			var baseAcumaticaAttributeTypes = attributeType.GetBaseTypesAndThis().ToList();
+			var baseAcumaticaAttributeTypes = attributeType.GetBaseTypesAndThis().ToList(capacity: 4);
 
 			if (!baseAcumaticaAttributeTypes.Contains(eventSubscriberAttribute, SymbolEqualityComparer.Default))
 				return ImmutableHashSet<AttributeWithApplicationAndAggregator>.Empty;
@@ -265,7 +265,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 				: new HashSet<AttributeWithApplicationAndAggregator>() { attributeWithApplication };
 
 			var allDeclaredAcumaticaAttributesApplicationsOnClassHierarchy =
-				attributeType.GetAllAttributesApplicationsDefinedOnThisAndBaseTypes()
+				attributeType.GetAllAttributesApplicationsDefinedOnThisAndBaseTypesUnsafe(precalcedBaseTypes: baseAcumaticaAttributeTypes)
 							 .Where(application => application.AttributeClass != null &&
 												   application.AttributeClass.InheritsFrom(eventSubscriberAttribute));
 
@@ -311,9 +311,10 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 					return;
 
 				var allDeclaredAcumaticaAttributesApplicationsOnClassHierarchy =
-						aggregatedAttributeWithApplication.Type.GetAllAttributesApplicationsDefinedOnThisAndBaseTypes()
-															   .Where(application => application.AttributeClass != null &&
-																					 application.AttributeClass.InheritsFrom(eventSubscriberAttribute));
+						aggregatedAttributeWithApplication.Type
+														  .GetAllAttributesApplicationsDefinedOnThisAndBaseTypesUnsafe(precalcedBaseTypes: aggregatedAttributeBaseTypes)
+														  .Where(application => application.AttributeClass != null &&
+																				application.AttributeClass.InheritsFrom(eventSubscriberAttribute));
 
 				foreach (AttributeData aggregatedOnAggregateAttributeApplication in allDeclaredAcumaticaAttributesApplicationsOnClassHierarchy)
 				{
@@ -373,5 +374,12 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		private static IEnumerable<ITypeSymbol> GetAllDeclaredAcumaticaAttributesOnClassHierarchy(ITypeSymbol type, PXContext pxContext) =>
 			type.GetAllAttributesDefinedOnThisAndBaseTypes()
 				.Where(attribute => attribute.IsDerivedFromPXEventSubscriberAttribute(pxContext));
+
+		private static IEnumerable<ITypeSymbol> GetAllDeclaredAcumaticaAttributesOnClassHierarchy(ITypeSymbol type, PXContext pxContext,
+																								  IReadOnlyList<ITypeSymbol> precalcedBaseTypes) =>
+			type.GetAllAttributesApplicationsDefinedOnThisAndBaseTypesUnsafe(precalcedBaseTypes)
+				.Where(attributeData => attributeData.AttributeClass != null && 
+										attributeData.AttributeClass.IsDerivedFromPXEventSubscriberAttribute(pxContext))
+				.Select(attributeData => attributeData.AttributeClass!);
 	}
 }
