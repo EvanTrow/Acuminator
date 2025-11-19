@@ -1,7 +1,6 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 using Acuminator.Utilities.Common;
 
@@ -18,20 +17,44 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 		public AttributeData Application { get; }
 
-		public AttributeWithApplicationAndAggregator(AttributeData attributeApplication) : this(attributeApplication, attributeApplication?.AttributeClass!)
+		[MemberNotNullWhen(true, nameof(Aggregator), nameof(AggregatorType), nameof(AggregatorApplication))]
+		public bool HasAggregator => Aggregator != null;
+
+		public AttributeWithApplicationAndAggregator? Aggregator { get; }
+
+		public ITypeSymbol? AggregatorType => Aggregator?.Type;
+
+		public AttributeData? AggregatorApplication => Aggregator?.Application;
+
+		public AttributeWithApplicationAndAggregator(AttributeData attributeApplication, 
+													 AttributeWithApplicationAndAggregator? aggregator) : 
+												this(attributeApplication, attributeApplication?.AttributeClass!, aggregator)
 		{
 		}
 
-		public AttributeWithApplicationAndAggregator(AttributeData attributeApplication, ITypeSymbol attributeType)
+		public AttributeWithApplicationAndAggregator(AttributeData attributeApplication, ITypeSymbol attributeType, 
+													 AttributeWithApplicationAndAggregator? aggregator)
 		{
 			Application = attributeApplication.CheckIfNull();
-			Type = attributeType.CheckIfNull();
+			Type 		= attributeType.CheckIfNull();
+			Aggregator 	= aggregator;
 		}
 
-		public override bool Equals(object obj) => obj is AttributeWithApplicationAndAggregator other && Equals(other);
+		public override bool Equals(object obj) => Equals(obj as AttributeWithApplicationAndAggregator);
 
-		public bool Equals(AttributeWithApplicationAndAggregator other) =>
-			Type.Equals(other.Type, SymbolEqualityComparer.Default) && Application.Equals(other.Application);
+		public bool Equals(AttributeWithApplicationAndAggregator? other)
+		{
+			if (other == null || !Type.Equals(other.Type, SymbolEqualityComparer.Default) || !Application.Equals(other.Application))
+				return false;
+
+			if (HasAggregator)
+			{
+				return AggregatorType.Equals(other.AggregatorType, SymbolEqualityComparer.Default) &&
+					   AggregatorApplication.Equals(other.AggregatorApplication);
+			}
+			else
+				return !other.HasAggregator;
+		}
 
 		public override int GetHashCode()
 		{
@@ -41,6 +64,12 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			{
 				hash = 23 * hash + SymbolEqualityComparer.Default.GetHashCode(Type);
 				hash = 23 * hash + Application.GetHashCode();
+
+				if (HasAggregator)
+				{
+					hash = 23 * hash + SymbolEqualityComparer.Default.GetHashCode(AggregatorType);
+					hash = 23 * hash + AggregatorApplication.GetHashCode();
+				}
 			}
 
 			return hash;
@@ -52,6 +81,17 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			attributeApplication = Application;
 		}
 
-		public override string ToString() => $"{Type}: {Application}";
+		public void Deconstruct(out ITypeSymbol attributeType, out AttributeData attributeApplication, 
+								out AttributeWithApplicationAndAggregator? aggregator)
+		{
+			attributeType 		 = Type;
+			attributeApplication = Application;
+			aggregator 			 = Aggregator;
+		}
+
+		public override string ToString() =>
+			HasAggregator
+				? $"{Type}: {Application}, Aggregator -> {AggregatorType}: {AggregatorApplication}"
+				: $"{Type}: {Application}";
 	}
 }
