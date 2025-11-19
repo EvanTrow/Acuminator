@@ -226,8 +226,9 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		/// <param name="pxContext">The Acumatica context.</param>
 		/// <param name="includeBaseTypes">True to include, false to exclude the base Acumatica types.</param>
 		/// <returns/>
-		public static ImmutableHashSet<AttributeWithApplicationAndAggregator> GetThisAndAllAggregatedAttributesWithApplications(this AttributeData? attributeApplication,
-																												   PXContext pxContext, bool includeBaseTypes)
+		public static ImmutableHashSet<AttributeWithApplicationAndAggregator> GetThisAndAllAggregatedAttributesWithApplications(
+																								this AttributeData? attributeApplication,
+																								PXContext pxContext, bool includeBaseTypes)
 		{
 			var eventSubscriberAttribute = pxContext.CheckIfNull().AttributeTypes.PXEventSubscriberAttribute;
 
@@ -241,7 +242,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			if (!baseAcumaticaAttributeTypes.Contains(eventSubscriberAttribute, SymbolEqualityComparer.Default))
 				return ImmutableHashSet<AttributeWithApplicationAndAggregator>.Empty;
 
-			var attributeWithApplication = new AttributeWithApplicationAndAggregator(attributeApplication);
+			var attributeWithApplication = new AttributeWithApplicationAndAggregator(attributeApplication, aggregator: null);
 
 			INamedTypeSymbol pxAggregateAttribute = pxContext.AttributeTypes.PXAggregateAttribute;
 			bool isAggregateAttribute = baseAcumaticaAttributeTypes.Contains(pxAggregateAttribute, SymbolEqualityComparer.Default);
@@ -251,7 +252,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 				// We can suppose that attribute types hierarchy shares the attribute application
 				return includeBaseTypes
 					? baseAcumaticaAttributeTypes.TakeWhile(type => !type.Equals(eventSubscriberAttribute, SymbolEqualityComparer.Default))
-												 .Select(type => new AttributeWithApplicationAndAggregator(attributeApplication, type))
+												 .Select(type => new AttributeWithApplicationAndAggregator(attributeApplication, type, aggregator: null))
 												 .ToImmutableHashSet()
 					: ImmutableHashSet.Create(attributeWithApplication);
 			}
@@ -259,7 +260,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			var results = includeBaseTypes
 				? baseAcumaticaAttributeTypes.TakeWhile(type => !type.Equals(eventSubscriberAttribute, SymbolEqualityComparer.Default) &&
 																!type.Equals(pxAggregateAttribute, SymbolEqualityComparer.Default))
-											 .Select(type => new AttributeWithApplicationAndAggregator(attributeApplication, type))
+											 .Select(type => new AttributeWithApplicationAndAggregator(attributeApplication, type, aggregator: null))
 											 .ToHashSet()
 				: new HashSet<AttributeWithApplicationAndAggregator>() { attributeWithApplication };
 
@@ -270,7 +271,17 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 			foreach (AttributeData aggregatedAttributeApplication in allDeclaredAcumaticaAttributesApplicationsOnClassHierarchy)
 			{
-				var aggregatedAttributeWithApplication = new AttributeWithApplicationAndAggregator(aggregatedAttributeApplication);
+				// Here we collect attributes declared on the aggregate attribute and its base attribute types.
+				// However, even if attribute is aggregated on a base aggregator attribute type, we still consider 
+				// the derived aggregator attribute as the aggregator since it is the instance of that attribute that is applied to a DAC field.
+				// 
+				// This is done to simplify the DB boundness analysis, since it is the derived aggregator attribute that:
+				// 1. Applies the complete set of aggregated attributes to the DAC field.
+				// 2. For attributes with mixed DB Boundness, configures the DB boundness of itself and aggregated attributes 
+				//    by setting the IsDBField flag at the attribute's application site.
+				var aggregatedAttributeWithApplication = new AttributeWithApplicationAndAggregator(aggregatedAttributeApplication,
+																// The derived attribute is the aggregator even if the aggregated attribute is declared on the base type
+																								   aggregator: attributeWithApplication); 
 				CollectAggregatedAttributeWithApplications(aggregatedAttributeWithApplication, recursionDepth: 0);
 			}
 
@@ -282,32 +293,42 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 				if (!results.Add(aggregatedAttributeWithApplication) || recursionDepth > MaxRecursionDepth)
 					return;
 
-				var aggregatedAttributeBaseTypes = aggregatedAttributeWithApplication.Type.GetBaseTypes().ToList();
+				var aggregatedAttributeBaseTypes = aggregatedAttributeWithApplication.Type.GetBaseTypes().ToList(capacity: 4);
 
 				if (includeBaseTypes)
 				{
 					var aggregatedAttributeBaseAcumaticaAttributeTypesWithApplications =
 						aggregatedAttributeBaseTypes.TakeWhile(baseType => !baseType.Equals(eventSubscriberAttribute, SymbolEqualityComparer.Default) &&
 																		   !baseType.Equals(pxAggregateAttribute, SymbolEqualityComparer.Default))
-													.Select(baseType => new AttributeWithApplicationAndAggregator(aggregatedAttributeWithApplication.Application, baseType));
-
+													.Select(baseType => new AttributeWithApplicationAndAggregator(aggregatedAttributeWithApplication.Application, baseType,
+																												  aggregatedAttributeWithApplication.Aggregator));
 					results.AddRange(aggregatedAttributeBaseAcumaticaAttributeTypesWithApplications);
 				}
 
 				bool isAggregateOnAggregateAttribute = aggregatedAttributeBaseTypes.Contains(pxAggregateAttribute, SymbolEqualityComparer.Default);
 
-				if (isAggregateOnAggregateAttribute)
-				{
-					var allDeclaredAcumaticaAttributesApplicationsOnClassHierarchy =
+				if (!isAggregateOnAggregateAttribute)
+					return;
+
+				var allDeclaredAcumaticaAttributesApplicationsOnClassHierarchy =
 						aggregatedAttributeWithApplication.Type.GetAllAttributesApplicationsDefinedOnThisAndBaseTypes()
 															   .Where(application => application.AttributeClass != null &&
 																					 application.AttributeClass.InheritsFrom(eventSubscriberAttribute));
 
-					foreach (AttributeData aggregatedOnAggregateAttributeApplication in allDeclaredAcumaticaAttributesApplicationsOnClassHierarchy)
-					{
-						var aggregatedOnAggregateAttributeWithApplication = new AttributeWithApplicationAndAggregator(aggregatedOnAggregateAttributeApplication);
-						CollectAggregatedAttributeWithApplications(aggregatedOnAggregateAttributeWithApplication, recursionDepth + 1);
-					}
+				foreach (AttributeData aggregatedOnAggregateAttributeApplication in allDeclaredAcumaticaAttributesApplicationsOnClassHierarchy)
+				{
+					// Here we collect attributes declared on the aggregate attribute and its base attribute types.
+					// However, even if attribute is aggregated on a base aggregator attribute type, we still consider 
+					// the derived aggregator attribute as the aggregator since it is the instance of that attribute that is applied to a DAC field.
+					// 
+					// This is done to simplify the DB boundness analysis, since it is the derived aggregator attribute that:
+					// 1. Applies the complete set of aggregated attributes to the DAC field.
+					// 2. For attributes with mixed DB Boundness, configures the DB boundness of itself and aggregated attributes 
+					//    by setting the IsDBField flag at the attribute's application site.
+					var aggregatedOnAggregateAttributeWithApplication = new AttributeWithApplicationAndAggregator(aggregatedOnAggregateAttributeApplication,
+																				// The derived attribute is the aggregator even if the aggregated attribute is declared on the base type
+																												  aggregator: aggregatedAttributeWithApplication);
+					CollectAggregatedAttributeWithApplications(aggregatedOnAggregateAttributeWithApplication, recursionDepth + 1);
 				}
 			}
 		}
