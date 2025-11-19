@@ -200,14 +200,14 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			}
 
 			if (isDbFieldCounter > 1 || isNonDbCounter > 1)
-				return DbBoundnessType.Unknown;     //Strange case when there are multiple different "IsDBField"/"NonDB" properties set in attribute constructor (with different letters register case)
+				return DbBoundnessType.Unknown;					//Strange case when there are multiple different "IsDBField"/"NonDB" properties set in attribute constructor (with different letters register case)
 
 			bool isDbFieldPresent = isDbFieldCounter == 1;
 			bool isNonDbPresent = isNonDbCounter == 1;
 
 			if (!isDbFieldPresent && !isNonDbPresent)
 				return DbBoundnessType.NotDefined;
-			else if (isDbFieldPresent && isNonDbPresent)    //Strange case when there are both IsDBField and NonDB properties
+			else if (isDbFieldPresent && isNonDbPresent)		//Strange case when there are both IsDBField and NonDB properties
 			{
 				DbBoundnessType isDbFieldBoundness = GetIsDbFieldBoundness(isDbFieldValue);
 				DbBoundnessType nonDbBoundness = GetNonDbBoundness(isNonDbValue);
@@ -228,7 +228,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 			static DbBoundnessType GetNonDbBoundness(bool? isNonDbValue) =>
 				!isNonDbValue.HasValue
-					? DbBoundnessType.Unknown          //Strange rare case when IsDBField property is set explicitly with value of type other than bool. In this case we don't know if attribute is bound
+					? DbBoundnessType.Unknown          //Strange rare case when NonDB property is set explicitly with value of type other than bool. In this case we don't know if attribute is bound
 					: isNonDbValue.Value
 						? DbBoundnessType.Unbound
 						: DbBoundnessType.DbBound;

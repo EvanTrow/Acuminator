@@ -177,13 +177,13 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		private bool DacFieldTypeAttributeCapturedByMixedBoundnessAttributesTypeHierarchy(ITypeSymbol originalAttribute, ITypeSymbol dacFieldTypeAttribute, 
 																						  List<MixedDbBoundnessAttributeInfo> mixedDbBoundnessAttributeInfos)
 		{
-			bool presentInMixedAttribuesHierarchy =
+			bool presentInMixedAttributesHierarchy =
 				mixedDbBoundnessAttributeInfos.Any(info => info.AcumaticaAttributesHierarchy.Contains(dacFieldTypeAttribute, 
 																									  SymbolEqualityComparer.Default));
 
 			// If data type attribute is present in the hierarchy of one of mixed boundness metadata attributes
 			// then we need to check if dacFieldTypeAttribute is also directly aggregated on originalAttribute
-			return presentInMixedAttribuesHierarchy
+			return presentInMixedAttributesHierarchy
 				? !originalAttribute.EqualsOrAggregatesAttributeDirectly(dacFieldTypeAttribute, _pxContext)
 				: false;
 		}
