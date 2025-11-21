@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
-using Acuminator.Utilities;
 using Acuminator.Utilities.Roslyn.Semantic;
-using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
 using FluentAssertions;
 
@@ -49,6 +47,36 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels
 					symbol!.MethodKind.Should().Be(MethodKind.LocalFunction);
 					bool isStatic = symbol.Name.StartsWith("Static", StringComparison.OrdinalIgnoreCase);
 
+					symbol.IsStatic.Should().Be(isStatic);
+				}
+			}
+		}
+
+		[Theory]
+		[EmbeddedFileData("StaticLambda.cs")]
+		public async Task Static_Lambdas_Have_StaticSymbols(string text)
+		{
+			var (document, semanticModel, root) = await PrepareTestSolutionAsync(text).ConfigureAwait(false);
+			var classDeclaration = root.DescendantNodes()
+									   .OfType<ClassDeclarationSyntax>()
+									   .FirstOrDefault();
+			classDeclaration.Should().NotBeNull();
+
+			var methods = classDeclaration.Members.OfType<MethodDeclarationSyntax>().ToList();
+
+			foreach (MethodDeclarationSyntax methodNode in methods)
+			{
+				string methodName = methodNode.Identifier.ValueText;
+				bool isStatic 	  = methodName.StartsWith("Static", StringComparison.OrdinalIgnoreCase);
+				var lambdas 	  = methodNode.DescendantNodes()
+											  .OfType<AnonymousFunctionExpressionSyntax>();
+
+				foreach (var lambda in lambdas)
+				{
+					var symbol = semanticModel.GetSymbolOrFirstCandidate(lambda, default) as IMethodSymbol;
+					symbol.Should().NotBeNull();
+
+					symbol!.MethodKind.Should().Be(MethodKind.LambdaMethod);
 					symbol.IsStatic.Should().Be(isStatic);
 				}
 			}
