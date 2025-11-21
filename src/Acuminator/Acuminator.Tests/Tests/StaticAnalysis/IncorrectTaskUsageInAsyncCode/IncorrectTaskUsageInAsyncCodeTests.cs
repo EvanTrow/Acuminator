@@ -90,6 +90,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 		public Task CorrectTaskUsage_NoDiagnostic(string source) => VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
+		[EmbeddedFileData(@"CorrectTaskUsageInLongOperationAPIs.cs")]
+		public Task CorrectTaskUsage_InLongOperationAPIs_NoDiagnostic(string source) => VerifyCSharpDiagnosticAsync(source);
+
+		[Theory]
 		[EmbeddedFileData(@"NonAsyncCode.cs")]
 		public Task NonAsyncCode_NoDiagnostic(string source) => VerifyCSharpDiagnosticAsync(source);
 	}
