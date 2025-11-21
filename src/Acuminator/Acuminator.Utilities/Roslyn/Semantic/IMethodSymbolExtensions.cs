@@ -167,51 +167,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 			return false;
 		}
 
-
-		/// <summary>
-		/// Check if <paramref name="method"/> definitely static.
-		/// </summary>
-		/// <remarks>
-		/// There is a bug in older versions of Roslyn that local functions are always static: https://github.com/dotnet/roslyn/issues/27719 This code attempts to workaround it. <br/>
-		/// TODO: we need to remove this method after migration to more modern version of Roslyn.
-		/// </remarks>
-		/// <param name="method">The method to act on.</param>
-		/// <param name="cancellation">A token that allows processing to be cancelled.</param>
-		/// <returns>
-		/// True if <paramref name="method"/> is definitely static, false if not.
-		/// </returns>
-		public static bool IsDefinitelyStatic(this IMethodSymbol method, CancellationToken cancellation)
-		{
-			if (method.MethodKind != MethodKind.LocalFunction)
-				return method.IsStatic;
-
-			var methodDeclaration = method.GetSyntax(cancellation);
-			return methodDeclaration?.IsStatic() ?? method.IsStatic;
-		}
-
-		/// <summary>
-		/// Check if <paramref name="method"/> definitely static.
-		/// </summary>
-		/// <remarks>
-		/// There is a bug in older versions of Roslyn that local functions are always static: https://github.com/dotnet/roslyn/issues/27719 This code attempts to workaround it. <br/>
-		/// TODO: we need to remove this method after migration to more modern version of Roslyn.
-		/// </remarks>
-		/// <param name="method">The method to act on.</param>
-		/// <param name="methodDeclaration">The method declaration node.</param>
-		/// <returns>
-		/// True if <paramref name="method"/> is definitely static, false if not.
-		/// </returns>
-		public static bool IsDefinitelyStatic(this IMethodSymbol method, SyntaxNode methodDeclaration)
-		{
-			method.ThrowOnNull();
-			methodDeclaration.ThrowOnNull();
-
-			if (method.MethodKind != MethodKind.LocalFunction)
-				return method.IsStatic;
-
-			return methodDeclaration.IsStatic();
-		}
-
 		/// <summary>
 		/// Check if <paramref name="method"/> has either virtual, override or abstract signature.
 		/// </summary>
