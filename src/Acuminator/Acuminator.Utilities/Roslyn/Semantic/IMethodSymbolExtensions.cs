@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
@@ -14,6 +15,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 {
 	public static class IMethodSymbolExtensions
 	{
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsInstanceConstructor(this IMethodSymbol methodSymbol)
 		{
 			methodSymbol.ThrowOnNull();
@@ -22,51 +24,64 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		}
 
 		/// <summary>
+		/// Check if the <paramref name="methodSymbol"/> is nested method ().
+		/// </summary>
+		/// <param name="methodSymbol">The method to act on.</param>
+		/// <returns>
+		/// True if method is local function or lambda, false if not.
+		/// </returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsNestedMethod([NotNullWhen(returnValue: true)] this IMethodSymbol? methodSymbol) =>
+			methodSymbol?.MethodKind is MethodKind.LocalFunction or MethodKind.LambdaMethod;
+
+		/// <summary>
 		/// Gets the topmost non-local method containing the local function declaration. In case of a non-local method returns itself.
 		/// </summary>
 		/// <param name="localFunction">The method that can be local function.</param>
 		/// <returns>
 		/// The non-local method containing the local function.
 		/// </returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IMethodSymbol? GetContainingNonLocalMethod(this IMethodSymbol localFunction) =>
-			GetStaticOrNonLocalContainingMethod(localFunction, stopOnStaticMethod: false, CancellationToken.None);
+			GetStaticOrNonLocalContainingMethod(localFunction, stopOnStaticMethod: false);
 
 		/// <summary>
 		/// Gets the topmost static or non-local method containing the <paramref name="localFunction"/>. In case of a non-local method returns itself.
 		/// </summary>
 		/// <param name="localFunction">The method that can be local function.</param>
-		/// <param name="cancellation">A token that allows processing to be cancelled.</param>
 		/// <returns>
 		/// the topmost static or non-local method containing the <paramref name="localFunction"/>.
 		/// </returns>
-		public static IMethodSymbol? GetStaticOrNonLocalContainingMethod(this IMethodSymbol localFunction, CancellationToken cancellation) =>
-			GetStaticOrNonLocalContainingMethod(localFunction, stopOnStaticMethod: true, cancellation);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IMethodSymbol? GetStaticOrNonLocalContainingMethod(this IMethodSymbol localFunction) =>
+			GetStaticOrNonLocalContainingMethod(localFunction, stopOnStaticMethod: true);
 
-		private static IMethodSymbol? GetStaticOrNonLocalContainingMethod(IMethodSymbol localFunction, bool stopOnStaticMethod,
-																		  CancellationToken cancellation)
+		private static IMethodSymbol? GetStaticOrNonLocalContainingMethod(IMethodSymbol localFunctionOrLambda, bool stopOnStaticMethod)
 		{
-			localFunction.ThrowOnNull();
+			localFunctionOrLambda.ThrowOnNull();
 
-			if (localFunction.MethodKind != MethodKind.LocalFunction)
-				return localFunction;
+			if (!localFunctionOrLambda.IsNestedMethod())
+				return localFunctionOrLambda;
 
-			IMethodSymbol? current = localFunction;
+			IMethodSymbol? current = localFunctionOrLambda;
 
-			while (current != null && current.MethodKind == MethodKind.LocalFunction && (!stopOnStaticMethod || !localFunction.IsDefinitelyStatic(cancellation)))
+			while (current.IsNestedMethod() && (!stopOnStaticMethod || !localFunctionOrLambda.IsStatic))
 				current = current.ContainingSymbol as IMethodSymbol;
 
 			return current;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<IMethodSymbol> GetContainingMethodsAndThis(this IMethodSymbol localFunction) =>
-			localFunction.CheckIfNull().MethodKind == MethodKind.LocalFunction
+			localFunction.CheckIfNull().IsNestedMethod()
 				? localFunction.GetContainingMethods(includeThis: true)
-				: new[] { localFunction };
+				: [localFunction];
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<IMethodSymbol> GetContainingMethods(this IMethodSymbol localFunction) =>
-			localFunction.CheckIfNull().MethodKind == MethodKind.LocalFunction
+			localFunction.CheckIfNull().IsNestedMethod()
 				? localFunction.GetContainingMethods(includeThis: false)
-				: Enumerable.Empty<IMethodSymbol>();
+				: [];
 
 		private static IEnumerable<IMethodSymbol> GetContainingMethods(this IMethodSymbol localFunction, bool includeThis)
 		{
@@ -82,39 +97,41 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		}
 
 		/// <summary>
-		/// Gets all parameters available for local function including parameters from containing methods.
+		/// Gets all parameters available for local function or lambda including parameters from containing methods.
 		/// </summary>
-		/// <param name="localFunction">The method that can be a local function.</param>
-		/// <param name="includeOwnParameters">True to include, false to exclude <paramref name="localFunction"/>'s own parameters.</param>
+		/// <param name="localFunctionOrLambda">The method that can be a local function or lambda.</param>
+		/// <param name="includeOwnParameters">True to include, false to exclude <paramref name="localFunctionOrLambda"/>'s own parameters.</param>
+		/// <param name="cancellation">Cancellation token.</param>
 		/// <returns>
-		/// All parameters available for the local function including parameters from containing methods.
+		/// All parameters available for the local function or lambda including parameters from containing methods.
 		/// </returns>
-		public static ImmutableArray<IParameterSymbol> GetAllParametersAvailableForLocalFunction(this IMethodSymbol localFunction, bool includeOwnParameters,
-																								 CancellationToken cancellation)
+		public static ImmutableArray<IParameterSymbol> GetAllParametersAvailableForLocalFunctionOrLambda(this IMethodSymbol localFunctionOrLambda, 
+																										 bool includeOwnParameters, 
+																										 CancellationToken cancellation)
 		{
-			if (localFunction.CheckIfNull().MethodKind != MethodKind.LocalFunction)
-				return localFunction.Parameters;
+			if (!localFunctionOrLambda.CheckIfNull().IsNestedMethod())
+				return localFunctionOrLambda.Parameters;
 
 			ImmutableArray<IParameterSymbol>.Builder parametersBuilder;
 
-			if (localFunction.Parameters.IsDefaultOrEmpty || !includeOwnParameters)
+			if (localFunctionOrLambda.Parameters.IsDefaultOrEmpty || !includeOwnParameters)
 				parametersBuilder = ImmutableArray.CreateBuilder<IParameterSymbol>();
 			else
 			{
-				parametersBuilder = ImmutableArray.CreateBuilder<IParameterSymbol>(initialCapacity: localFunction.Parameters.Length);
-				parametersBuilder.AddRange(localFunction.Parameters);
+				parametersBuilder = ImmutableArray.CreateBuilder<IParameterSymbol>(initialCapacity: localFunctionOrLambda.Parameters.Length);
+				parametersBuilder.AddRange(localFunctionOrLambda.Parameters);
 			}
 
-			if (localFunction.IsStatic)
+			if (localFunctionOrLambda.IsStatic)
 				return parametersBuilder.ToImmutable();
 
-			IMethodSymbol? current = localFunction;
+			IMethodSymbol? current = localFunctionOrLambda;
 
 			do
 			{
 				cancellation.ThrowIfCancellationRequested();
 
-				var containingMethod = current.ContainingSymbol as IMethodSymbol;
+				var containingMethod = current!.ContainingSymbol as IMethodSymbol;
 
 				// For a non static nested local function we can add parameters from its containing local function even if it is static
 				// But we must stop after that and won't take parameters from the methods containing static local function
@@ -123,15 +140,16 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 					// If we do not include parameters from the local function then check if the outer parameters are redefined by the local function parameters.
 					// Redefined parameters won't be available to the local function
 					var notReassignedParameters = from parameter in containingMethod.Parameters
-												  where !parametersBuilder.Contains(parameter) && 												
-														(includeOwnParameters || !localFunction.Parameters.Any(localParameter => localParameter.Name == parameter.Name))
+												  where !parametersBuilder.Contains(parameter) &&
+														(includeOwnParameters || 
+														 !localFunctionOrLambda.Parameters.Any(localParameter => localParameter.Name == parameter.Name))
 												  select parameter;
 					parametersBuilder.AddRange(notReassignedParameters);
 				}
 
 				current = containingMethod;
 			}
-			while (current?.MethodKind == MethodKind.LocalFunction && !current.IsDefinitelyStatic(cancellation));	
+			while (current.IsNestedMethod() && !current.IsStatic);
 
 			return parametersBuilder.ToImmutable();
 		}
@@ -139,24 +157,24 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// <summary>
 		/// Check if  the parameter <paramref name="parameterName"/> from the non local method is redefined.
 		/// </summary>
-		/// <param name="localMethod">The method that can be local function.</param>
+		/// <param name="localMethodOrLambda">The method that can be local function or lambda.</param>
 		/// <param name="parameterName">Name of the parameter.</param>
 		/// <returns>
-		/// True if non local method parameter is redefined in a local method, false if not.
+		/// True if non local method parameter is redefined in a local method or lambda, false if not.
 		/// </returns>
-		public static bool IsNonLocalMethodParameterRedefined(this IMethodSymbol localMethod, string parameterName, CancellationToken cancellation)
+		public static bool IsNonLocalMethodParameterRedefined(this IMethodSymbol localMethodOrLambda, string parameterName)
 		{
-			localMethod.ThrowOnNull();
+			localMethodOrLambda.ThrowOnNull();
 
-			if (parameterName.IsNullOrWhiteSpace() || localMethod.MethodKind != MethodKind.LocalFunction)
+			if (parameterName.IsNullOrWhiteSpace() || !localMethodOrLambda.IsNestedMethod())
 				return false;
 
-			IMethodSymbol? current = localMethod;
+			IMethodSymbol? current = localMethodOrLambda;
 
-			while (current?.MethodKind == MethodKind.LocalFunction)
+			while (current.IsNestedMethod())
 			{
 				if ((!current.Parameters.IsDefaultOrEmpty && current.Parameters.Any(p => p.Name == parameterName)) ||
-					current.IsDefinitelyStatic(cancellation))
+					current.IsStatic)
 				{
 					return true;
 				}

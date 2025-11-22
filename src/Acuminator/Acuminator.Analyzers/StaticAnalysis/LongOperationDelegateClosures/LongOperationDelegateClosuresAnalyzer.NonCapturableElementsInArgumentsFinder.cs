@@ -116,7 +116,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 
 			private bool CallerIsStatic() =>
 				_callingTypeMember is IMethodSymbol methodSymbol
-					? methodSymbol.IsDefinitelyStatic(_cancellation)
+					? methodSymbol.IsStatic
 					: _callingTypeMember!.IsStatic;
 
 			public override void VisitInitializerExpression(InitializerExpressionSyntax initializer)
