@@ -260,5 +260,14 @@
 			public const string IGraphLongOperationManager 	  = "PX.Async.IGraphLongOperationManager";
 			public const string IGraphLongOperationManagerOld = "PX.Concurrency.IGraphLongOperationManager";
 		}
+
+		public static class DotNetTypes
+		{
+			public const string Task = "System.Threading.Tasks.Task";
+			public const string Task_Generic = "System.Threading.Tasks.Task`1";
+
+			public const string ValueTask = "System.Threading.Tasks.ValueTask";
+			public const string ValueTask_Generic = "System.Threading.Tasks.ValueTask`1";
+		}
 	}
 }

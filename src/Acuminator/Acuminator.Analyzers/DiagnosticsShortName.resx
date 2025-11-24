@@ -477,4 +477,13 @@
   <data name="PX1115GraphExtension" xml:space="preserve">
     <value>NonTerminalBaseGraphExtension</value>
   </data>
+  <data name="PX1120_StoreTaskInVariable" xml:space="preserve">
+    <value>StoreTaskInVariableOrParameter</value>
+  </data>
+  <data name="PX1120_MethodReturnTypeIsNotTask" xml:space="preserve">
+    <value>MethodReturnTypeIsNotTask</value>
+  </data>
+  <data name="PX1120_NotAwaitedTaskReturningExpression" xml:space="preserve">
+    <value>NotAwaitedTaskReturningExpression</value>
+  </data>
 </root>

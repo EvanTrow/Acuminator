@@ -20,7 +20,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Xunit;
 
-using static Acuminator.Tests.Verification.VerificationHelper;
+using static Acuminator.Tests.Verification.SolutionBuilder;
 
 namespace Acuminator.Tests.Tests.Utilities.AttributeSymbolHelpersTests
 {

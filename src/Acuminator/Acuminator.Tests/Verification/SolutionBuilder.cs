@@ -1,5 +1,4 @@
-﻿
-#nullable enable
+﻿#nullable enable
 
 using System;
 using System.Collections.Generic;
@@ -22,27 +21,29 @@ using PX.Data;
 using Acuminator.Utilities.Common;
 
 using FbqlCommand = PX.Data.BQL.Fluent.FbqlCommand;
+using ValueTask   = System.Threading.Tasks.ValueTask;
 
 namespace Acuminator.Tests.Verification
 {
-	public static class VerificationHelper
+	public static class SolutionBuilder
 	{
 		private const string GeneratedFileNameSeed = "Test";
-		private const string CSharpDefaultFileExt = "cs";
+		private const string CSharpDefaultFileExt  = "cs";
 		private const string VisualBasicDefaultExt = "vb";
-		private const string GeneratedProjectName = "GenProject";
-		private const string BuildFailMessage = "External assembly build failure";
+		private const string GeneratedProjectName  = "GenProject";
+		private const string BuildFailMessage 	   = "External assembly build failure";
 
 		private static readonly string DotNetAssemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
 
 		private static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
-		private static readonly MetadataReference CodeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
+		private static readonly MetadataReference CodeAnalysisReference  = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
+		private static readonly MetadataReference System_Threading_Tasks_Extensions = MetadataReference.CreateFromFile(typeof(ValueTask).Assembly.Location);
 
-		private static readonly MetadataReference PXDataReference = MetadataReference.CreateFromFile(typeof(PXGraph).Assembly.Location);
-		private static readonly MetadataReference FluentBqlReference = MetadataReference.CreateFromFile(typeof(FbqlCommand).Assembly.Location);
-		private static readonly MetadataReference PXCommonReference = MetadataReference.CreateFromFile(typeof(PX.Common.PXContext).Assembly.Location);
+		private static readonly MetadataReference PXDataReference 	   = MetadataReference.CreateFromFile(typeof(PXGraph).Assembly.Location);
+		private static readonly MetadataReference FluentBqlReference   = MetadataReference.CreateFromFile(typeof(FbqlCommand).Assembly.Location);
+		private static readonly MetadataReference PXCommonReference    = MetadataReference.CreateFromFile(typeof(PX.Common.PXContext).Assembly.Location);
 		private static readonly MetadataReference PXCommonStdReference = MetadataReference.CreateFromFile(typeof(PX.Common.PXInternalUseOnlyAttribute).Assembly.Location);
-		private static readonly MetadataReference PXObjectsReference =
+		private static readonly MetadataReference PXObjectsReference   =
 			MetadataReference.CreateFromFile(typeof(PX.Objects.GL.PeriodIDAttribute).Assembly.Location);
 
 		private static readonly MetadataReference[] DotNetReferences;
@@ -51,7 +52,7 @@ namespace Acuminator.Tests.Verification
 		private static readonly MetadataReference ExternalDependencyReference = 
 			MetadataReference.CreateFromFile(typeof(ExternalDependency.NoBqlFieldForDacFieldProperty.BaseDacWithoutBqlField).Assembly.Location);
 
-		static VerificationHelper()
+		static SolutionBuilder()
 		{
 			List<MetadataReference> dotNetReferences = new(capacity: 5);
 
@@ -66,6 +67,7 @@ namespace Acuminator.Tests.Verification
 			[
 				CSharpSymbolsReference,
 				CodeAnalysisReference,
+				System_Threading_Tasks_Extensions,
 				PXDataReference,
 				PXCommonReference,
 				PXCommonStdReference,
@@ -111,7 +113,7 @@ namespace Acuminator.Tests.Verification
 
 			if (sources.Length != documents.Length)
 			{
-				throw new SystemException("Amount of sources did not match amount of Documents created");
+				throw new InvalidOperationException("Amount of sources did not match amount of Documents created");
 			}
 
 			return documents;
@@ -190,7 +192,7 @@ namespace Acuminator.Tests.Verification
 			return solution.GetProject(projectId).CheckIfNull();
 		}
 
-		private static ParseOptions CreateParseOptions(Project project)
+		private static CSharpParseOptions CreateParseOptions(Project project)
 		{
 			var customFeatures = new[] { KeyValuePair.Create("IOperation", "true") };
 			var projectFeatures = project.ParseOptions?.Features.Union(customFeatures) ?? [];

@@ -890,6 +890,15 @@ Reason: {2}</value>
   <data name="PX1115TitleGraphExtension" xml:space="preserve">
     <value>Only terminal graph extensions can be used as base graph extensions</value>
   </data>
+  <data name="PX1120Title_MethodReturnTypeIsNotTask" xml:space="preserve">
+    <value>Incorrect work with the Task types in the Acumatica asynchronous code. Method returning a Task-typed expression should have the Task type as its return type.</value>
+  </data>
+  <data name="PX1120Title_NotAwaitedTaskReturningExpression" xml:space="preserve">
+    <value>Incorrect work with the Task types in the Acumatica asynchronous code. Task-typed expressions should be awaited.</value>
+  </data>
+  <data name="PX1120Title_StoreTaskInVariable" xml:space="preserve">
+    <value>Incorrect work with the Task types in the Acumatica asynchronous code. You should not store the Task instance in a local variable or parameter.</value>
+  </data>
   <data name="SuppressDiagnosticGroupCodeActionTitle" xml:space="preserve">
     <value>Suppress the {0} diagnostic with Acuminator</value>
   </data>

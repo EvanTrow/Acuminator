@@ -255,7 +255,9 @@ namespace Acuminator.Tests.Verification
 							expected.Severity, actual.Severity, FormatDiagnostics(analyzer, actual)));
 				}
 
-				if (actual.GetMessage() != expected.Message)
+				string actualMessage = actual.GetMessage();
+
+				if (actualMessage != expected.Message)
 				{
 					Assert.True(false,
 						string.Format("Expected diagnostic message to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
@@ -444,7 +446,7 @@ namespace Acuminator.Tests.Verification
 		protected static Task<Diagnostic[]> GetSortedDiagnosticsAsync(string[] sources, string language, 
 																	  DiagnosticAnalyzer analyzer, bool checkOnlyFirstDocument)
 		{
-			return GetSortedDiagnosticsFromDocumentsAsync(analyzer, VerificationHelper.GetDocuments(sources, language), checkOnlyFirstDocument);
+			return GetSortedDiagnosticsFromDocumentsAsync(analyzer, SolutionBuilder.GetDocuments(sources, language), checkOnlyFirstDocument);
 		}
 
 		/// <summary>
