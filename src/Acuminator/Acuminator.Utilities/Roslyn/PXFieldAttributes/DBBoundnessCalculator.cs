@@ -215,7 +215,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 		/// <summary>
 		/// Duck typing check if attribute Has mixed database boundness. 
-		/// The check will look for a presence of IsDBField properties on the flattened Acumatica attributes set of the checked attribute.<br/>
+		/// The check will look for a presence of IsDBField and NonDB properties on the flattened Acumatica attributes set of the checked attribute.<br/>
 		/// If there is a suitable property - return <see cref="DbBoundnessType.Unknown"/> since we can only spot the known pattern but can't deduce
 		/// attribute's DB boundness. 
 		/// </summary>
@@ -227,7 +227,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		/// </returns>
 		private DbBoundnessType DuckTypingCheckIfAttributeHasMixedDbBoundness(IEnumerable<ITypeSymbol> flattenedAttributesSet)
 		{
-			//only IsDBField properties are considered in analysis for attributes that can be applied to both bound and unbound fields
+			//only IsDBField and NonDB properties are considered in analysis for attributes that can be applied to both bound and unbound fields
 			foreach (var attributeType in flattenedAttributesSet)
 			{
 				var members = attributeType.GetMembers();
@@ -235,11 +235,12 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 				if (members.IsDefaultOrEmpty)
 					continue;
 
-				var hasIsDbFieldProperties = members.OfType<IPropertySymbol>()
+				var hasIsDbFieldOrNonDbProperties = members.OfType<IPropertySymbol>()
 													.Any(property => !property.IsStatic && property.IsExplicitlyDeclared() && 
 																	  property.IsDeclaredInType(attributeType) &&
-																	  IsDBField.Equals(property.Name, StringComparison.OrdinalIgnoreCase));
-				if (hasIsDbFieldProperties)
+																			(Constants.IsDBField.Equals(property.Name, StringComparison.OrdinalIgnoreCase) ||
+																			 Constants.NonDB.Equals(property.Name, StringComparison.OrdinalIgnoreCase)));
+				if (hasIsDbFieldOrNonDbProperties)
 					return DbBoundnessType.Unknown;
 			}
 
