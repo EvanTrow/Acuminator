@@ -31,8 +31,6 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.IncorrectTaskUsageInAsyncCode.So
 				var graph = PXGraph.CreateInstance<MyGraph>();
 				return graph.AuthorizeWithTerminalAsync();
 			});
-
-			PXLongOperation.StartOperation(this, () => ProcessMobilePaymentAsync());
 		}
 
 		
