@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="PX1000Fix" xml:space="preserve">
-    <value>Fix action delegate return type and parameters</value>
+    <value>Fix the return type and the parameters of the action delegate</value>
   </data>
   <data name="PX1000Title" xml:space="preserve">
     <value>The action delegate has incompatible return type and parameters</value>
@@ -517,7 +517,7 @@ public virtual int? SomeDacField{ get; set; }</value>
     <value>Strings concatenation is not allowed as a parameter for localization methods and PXException constructors. You should use localization format methods instead.</value>
   </data>
   <data name="PX1054Title" xml:space="preserve">
-    <value>PXGraph and PXGraphExtension instances should not start long-running operations during the initialization phase</value>
+    <value>PXGraph and PXGraphExtension instances should not start a long-running operation during the initialization phase</value>
   </data>
   <data name="PX1055FixEditIdentityAttribute" xml:space="preserve">
     <value>Make the field bound to the identity column be a non-key field and leave all other key fields untouched</value>
