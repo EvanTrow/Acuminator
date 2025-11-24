@@ -110,11 +110,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 																					IReadOnlyCollection<DataTypeAttributeInfo> attributesMetadata)
 		{
 			if (attributesMetadata.Count == 0)
-			{
-				return flattenedAttributesWithApplications
-							.Select(attrWithApplication => GetDbBoundnessSetExplicitlyByAttributeApplication(attrWithApplication.Application))
-							.Combine();
-			}
+				return GetDbBoundnessSetExplicitlyByAttributeApplications(flattenedAttributesWithApplications);
 
 			var applicationsByAttribute = flattenedAttributesWithApplications
 											.ToLookup(attrAppl => attrAppl.Type,
@@ -123,6 +119,21 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 				attributesMetadata.Select(attributeInfo => GetDbBoundnessFromMetadataAndApplications(attributeInfo, applicationsByAttribute))
 								  .Combine();
 			return combinedBoundness;
+		}
+
+		private DbBoundnessType GetDbBoundnessSetExplicitlyByAttributeApplications(
+														ImmutableHashSet<AttributeWithApplicationAndAggregator> flattenedAttributesWithApplications)
+		{
+			if (flattenedAttributesWithApplications.All(attrApplication => !attrApplication.HasAggregator))
+			{
+				return flattenedAttributesWithApplications
+							.Select(attrWithApplication => ExplicitlySetAttributeDbBoundnessCalculator.GetDbBoundnessSetExplicitlyByAttributeApplication(
+																															attrWithApplication.Application))
+							.Combine();
+			}
+
+			var combinedDbBoundness = DbBoundnessInfoFromFlattenedAttributesSetCollector.GetCombinedDbBoundness(flattenedAttributesWithApplications);
+			return combinedDbBoundness;
 		}
 
 		private DbBoundnessType GetDbBoundnessFromMetadataAndApplications(DataTypeAttributeInfo attributeInfo, 
