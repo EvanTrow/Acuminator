@@ -129,21 +129,21 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		}
 
 		/// <summary>
-		/// A <see cref="SyntaxNode"/> extension method that gets containing type member or local function node for syntax <paramref name="node"/> inside the type member.<br/>
+		/// A <see cref="SyntaxNode"/> extension method that gets containing type member, local function node, or lambda for syntax <paramref name="node"/> inside the type member.<br/>
 		/// For <paramref name="node"/> outside any type members returns <c>null</c>.
 		/// </summary>
 		/// <param name="node">The syntax node.</param>
 		/// <returns>
-		/// Declaration of the containing type member or local function.
+		/// Declaration of the containing type member, local function, or lambda.
 		/// </returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static SyntaxNode? GetContainingMemberOrLocalFunction(this SyntaxNode? node)
+		public static SyntaxNode? GetContainingMemberOrLocalFunctionOrLambda(this SyntaxNode? node)
 		{
 			SyntaxNode? curNode = node?.Parent;
 
 			while (curNode != null)
 			{
-				if (curNode is (MemberDeclarationSyntax or LocalFunctionStatementSyntax))
+				if (curNode is (MemberDeclarationSyntax or LocalFunctionStatementSyntax or AnonymousFunctionExpressionSyntax))
 					return curNode;
 
 				curNode = curNode.Parent;
