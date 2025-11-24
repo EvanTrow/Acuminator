@@ -42,6 +42,20 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.IncorrectTaskUsageInAsyncCode.So
 			object LocalFunction2() => GetValueAsync();
 		}
 
+		public Task UseFuncDelegate()
+		{
+			// Should report diagnostic - local function returns Task but return type is object
+			ProcessFunction(() => DelayAsync());
+
+			// Should report diagnostic - local function returns Task but return type is object
+			ProcessFunction(delegate() { return DelayAsync(); });
+
+			// Should report diagnostic - local function returns Task but return type is object
+			System.Func<int, object> func = i => DelayAsync();
+
+			return Task.CompletedTask;
+		}
+
 		private Task DelayAsync() => Task.Delay(100);
 
 		private Task<int> GetValueAsync() => Task.FromResult(42);
@@ -49,5 +63,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.IncorrectTaskUsageInAsyncCode.So
 		private ValueTask ProcessValueTaskAsync() => new ValueTask();
 
 		private ValueTask<string> GetStringAsync() => new ValueTask<string>("test");
+
+		private void ProcessFunction(System.Func<object> func)
+		{
+			var result = func();
+		}
 	}
 }
