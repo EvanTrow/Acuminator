@@ -81,7 +81,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 				Cancellation.ThrowIfCancellationRequested();
 
 				// Do a cheaper check for awaited or immediately returned invocations first to avoid extra queries to the semantic model
-				if (invocationExpression.Parent is AwaitExpressionSyntax or ReturnStatementSyntax or ArrowExpressionClauseSyntax)
+				if (invocationExpression.Parent is AwaitExpressionSyntax or ReturnStatementSyntax or ArrowExpressionClauseSyntax or
+												   AnonymousFunctionExpressionSyntax)
 				{
 					base.VisitInvocationExpression(invocationExpression);
 					return;
@@ -116,6 +117,22 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 				base.VisitArrowExpressionClause(arrowExpressionMethodBody);
 			}
 
+			// No need to check anonymous methods in addition to lambdas - they are covered by visiting return expressions
+
+			public override void VisitParenthesizedLambdaExpression(ParenthesizedLambdaExpressionSyntax parenthesizedLambdaExpression)
+			{
+				Cancellation.ThrowIfCancellationRequested();
+				CheckTypeMemberReturningTaskHasTaskReturnType(parenthesizedLambdaExpression.ExpressionBody);
+				base.VisitParenthesizedLambdaExpression(parenthesizedLambdaExpression);
+			}
+
+			public override void VisitSimpleLambdaExpression(SimpleLambdaExpressionSyntax simpleLambdaExpression)
+			{
+				Cancellation.ThrowIfCancellationRequested();
+				CheckTypeMemberReturningTaskHasTaskReturnType(simpleLambdaExpression.ExpressionBody);
+				base.VisitSimpleLambdaExpression(simpleLambdaExpression);
+			}
+
 			private void CheckTypeMemberReturningTaskHasTaskReturnType(ExpressionSyntax? returnExpression)
 			{
 				if (returnExpression == null)
@@ -126,7 +143,26 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 				if (returnExpressionType == null || !IsTaskType(returnExpressionType))
 					return;
 
-				var containingMethodOrLocalFunction = returnExpression.GetContainingMemberOrLocalFunction();
+				var containingMethodOrLocalFunction = returnExpression.GetContainingMemberOrLocalFunctionOrLambda();
+				var returnTypeSymbol = GetContainingMethodReturnType(containingMethodOrLocalFunction);
+
+				if (returnTypeSymbol == null || IsTaskType(returnTypeSymbol))
+					return;
+
+				var location   = returnExpression.GetLocation();
+				var diagnostic = Diagnostic.Create(Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_MethodReturnTypeIsNotTask, location);
+
+				_syntaxContext.ReportDiagnosticWithSuppressionCheck(diagnostic, _pxContext.CodeAnalysisSettings);
+			}
+
+			private ITypeSymbol? GetContainingMethodReturnType(SyntaxNode? containingMethodOrLocalFunction)
+			{
+				if (containingMethodOrLocalFunction is AnonymousFunctionExpressionSyntax lambdaDeclaration)
+				{
+					var lambdaSymbol = SemanticModel.GetSymbolOrFirstCandidate(lambdaDeclaration, Cancellation) as IMethodSymbol;
+					return lambdaSymbol?.ReturnType;
+				}
+
 				var returnTypeNode = containingMethodOrLocalFunction switch
 				{
 					MethodDeclarationSyntax methodDeclaration	  => methodDeclaration.ReturnType,
@@ -136,17 +172,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 				};
 
 				if (returnTypeNode == null)
-					return;
+					return null;
 
 				var returnTypeSymbol = SemanticModel.GetSymbolOrFirstCandidate(returnTypeNode, Cancellation) as ITypeSymbol;
-
-				if (returnTypeSymbol == null || IsTaskType(returnTypeSymbol))
-					return;
-
-				var location   = returnExpression.GetLocation();
-				var diagnostic = Diagnostic.Create(Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_MethodReturnTypeIsNotTask, location);
-
-				_syntaxContext.ReportDiagnosticWithSuppressionCheck(diagnostic, _pxContext.CodeAnalysisSettings);
+				return returnTypeSymbol;
 			}
 
 			private bool IsTaskType(ITypeSymbol typeSymbol) =>

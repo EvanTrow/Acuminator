@@ -83,11 +83,18 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_MethodReturnTypeIsNotTask.CreateFor(25, 43),
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_MethodReturnTypeIsNotTask.CreateFor(28, 38),
 				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_MethodReturnTypeIsNotTask.CreateFor(39, 12),
-				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_MethodReturnTypeIsNotTask.CreateFor(42, 31));
+				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_MethodReturnTypeIsNotTask.CreateFor(42, 31),
+				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_MethodReturnTypeIsNotTask.CreateFor(48, 26),
+				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_MethodReturnTypeIsNotTask.CreateFor(51, 40),
+				Descriptors.PX1120_IncorrectTaskUsageInAsyncCode_MethodReturnTypeIsNotTask.CreateFor(54, 41));
 
 		[Theory]
 		[EmbeddedFileData(@"CorrectTaskUsage.cs")]
 		public Task CorrectTaskUsage_NoDiagnostic(string source) => VerifyCSharpDiagnosticAsync(source);
+
+		[Theory]
+		[EmbeddedFileData(@"CorrectTaskUsageInLongOperationAPIs.cs")]
+		public Task CorrectTaskUsage_InLongOperationAPIs_NoDiagnostic(string source) => VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
 		[EmbeddedFileData(@"NonAsyncCode.cs")]
