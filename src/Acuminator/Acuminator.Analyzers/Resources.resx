@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="PX1000Fix" xml:space="preserve">
-    <value>Fix PXAction handler signature</value>
+    <value>Fix the return type and the parameters of the action delegate</value>
   </data>
   <data name="PX1000Title" xml:space="preserve">
-    <value>Invalid PXAction handler signature</value>
+    <value>The action delegate has incompatible return type and parameters</value>
   </data>
   <data name="PX1001Fix" xml:space="preserve">
     <value>Create a graph instance by using the factory method</value>
@@ -228,10 +228,10 @@ public virtual int? SomeDacField{ get; set; }</value>
     <value>The type parameter of the {0} action is not the primary DAC. You should specify the {1} DAC as the type parameter to make the action available on the toolbar.</value>
   </data>
   <data name="PX1013Fix" xml:space="preserve">
-    <value>Change the return type to IEnumerable</value>
+    <value>Change the return type of the action delegate to IEnumerable</value>
   </data>
   <data name="PX1013Title" xml:space="preserve">
-    <value>The action handler that initiates a background operation or is executed by a background operation must return IEnumerable</value>
+    <value>The return type of the action delegate that initiates a long-running operation must be "IEnumerable"</value>
   </data>
   <data name="PX1014Fix" xml:space="preserve">
     <value>Make the type nullable</value>
@@ -457,7 +457,7 @@ public virtual int? SomeDacField{ get; set; }</value>
     <value>Convert the graph event handler to a strongly typed generic signature. Please, be careful because the event handler can be overwritten somewhere else.</value>
   </data>
   <data name="PX1041Title" xml:space="preserve">
-    <value>The graph event handler has a weekly typed signature that relies on a naming convention. Consider converting it to a strongly typed generic signature for a better type safety enforced by the C# compiler.</value>
+    <value>The graph event handler has a weakly typed signature that relies on a naming convention. Consider converting it to a strongly typed generic signature for a better type safety enforced by the C# compiler.</value>
   </data>
   <data name="PX1042Fix" xml:space="preserve">
     <value>Surround the BQL statement or database query execution with a connection scope</value>
@@ -517,7 +517,7 @@ public virtual int? SomeDacField{ get; set; }</value>
     <value>Strings concatenation is not allowed as a parameter for localization methods and PXException constructors. You should use localization format methods instead.</value>
   </data>
   <data name="PX1054Title" xml:space="preserve">
-    <value>A PXGraph instance should not start PXLongOperation during the initialization phase</value>
+    <value>PXGraph and PXGraphExtension instances should not start a long-running operation during the initialization phase</value>
   </data>
   <data name="PX1055FixEditIdentityAttribute" xml:space="preserve">
     <value>Make the field bound to the identity column be a non-key field and leave all other key fields untouched</value>
@@ -748,7 +748,7 @@ public virtual int? SomeDacField{ get; set; }</value>
     <value>BQL statements and other database queries should not be executed during the PXGraph initialization</value>
   </data>
   <data name="PX1086Title" xml:space="preserve">
-    <value>PXSetupNotEnteredException cannot be thrown in long-running operations</value>
+    <value>PXSetupNotEnteredException cannot be thrown in long-running operations and processing delegates</value>
   </data>
   <data name="PX1087Title" xml:space="preserve">
     <value>This invocation of the base data view delegate can cause a StackOverflowException</value>
@@ -889,6 +889,15 @@ Reason: {2}</value>
   </data>
   <data name="PX1115TitleGraphExtension" xml:space="preserve">
     <value>Only terminal graph extensions can be used as base graph extensions</value>
+  </data>
+  <data name="PX1120Title_MethodReturnTypeIsNotTask" xml:space="preserve">
+    <value>Incorrect work with the Task types in the Acumatica asynchronous code. Method returning a Task-typed expression should have the Task type as its return type.</value>
+  </data>
+  <data name="PX1120Title_NotAwaitedTaskReturningExpression" xml:space="preserve">
+    <value>Incorrect work with the Task types in the Acumatica asynchronous code. Task-typed expressions should be awaited.</value>
+  </data>
+  <data name="PX1120Title_StoreTaskInVariable" xml:space="preserve">
+    <value>Incorrect work with the Task types in the Acumatica asynchronous code. You should not store the Task instance in a local variable or parameter.</value>
   </data>
   <data name="SuppressDiagnosticGroupCodeActionTitle" xml:space="preserve">
     <value>Suppress the {0} diagnostic with Acuminator</value>

@@ -110,7 +110,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MethodsUsageInDac
 						Diagnostic.Create(Descriptors.PX1032_DacPropertyCannotContainMethodInvocations, invocation.GetLocation()),
 						pxContext.CodeAnalysisSettings);
 				}
-				else if (node is ObjectCreationExpressionSyntax)
+				else if (node is BaseObjectCreationExpressionSyntax)
 				{
 					context.ReportDiagnosticWithSuppressionCheck(
 						Diagnostic.Create(Descriptors.PX1032_DacPropertyCannotContainMethodInvocations, node.GetLocation()),

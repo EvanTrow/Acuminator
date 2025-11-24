@@ -1,6 +1,8 @@
-﻿
+﻿using System.Runtime.CompilerServices;
+
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -15,6 +17,29 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 		public WalkerForGraphAnalyzer(SymbolAnalysisContext context, PXContext pxContext, DiagnosticDescriptor descriptor) : base(context, pxContext)
 		{
 			_descriptor = descriptor.CheckIfNull();
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void VisitProcessingDelegate(ProcessingDelegateInfo? processingDelegateInfo) =>
+			VisitDelegateNode(processingDelegateInfo?.Node, processingDelegateInfo?.Symbol);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void VisitLongRunDelegate(SyntaxNode? delegateNode, ISymbol? delegateSymbol) =>
+			VisitDelegateNode(delegateNode, delegateSymbol);
+
+		private void VisitDelegateNode(SyntaxNode? delegateNode, ISymbol? delegateSymbol)
+		{
+			if (delegateNode == null || delegateSymbol == null)
+				return;
+
+			if (delegateNode is NameSyntax methodIdentifier && delegateSymbol is IMethodSymbol method)
+			{
+				VisitCalledMethod(method, methodIdentifier);
+			}
+			else
+			{
+				Visit(delegateNode);
+			}
 		}
 
 		public override void VisitThrowExpression(ThrowExpressionSyntax throwExpression)

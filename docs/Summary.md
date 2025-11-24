@@ -9,9 +9,9 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 
 **Note:** In the following table, the types of the diagnostics are specified for the ISV solution certification&#8212;that is, if the **Enable additional diagnostics for ISV Solution Certification** option (in **Tools > Options > Acuminator > Code Analysis**) is set to `True`. The type of the diagnostic can be different if this option is set to `False`. For details about the type of the diagnostic, see the description of the diagnostic.
 
-| Code   | Short Description                                       | Type  | Code Fix  |
-| ------ | ------------------------------------------------------- | ----- | --------- |
-| [PX1000](diagnostics/PX1000.md) | An invalid signature of the `PXAction` handler is used. | Error | Available |
+| Code   | Short Description                                                                         | Type  | Code Fix  |
+| ------ | ----------------------------------------------------------------------------------------- | ----- | --------- |
+| [PX1000](diagnostics/PX1000.md) | The action delegate has incompatible return type and parameters. | Error | Available |
 | [PX1001](diagnostics/PX1001.md) | A `PXGraph` instance must be created with the `PXGraph.CreateInstance()` factory method. | Error | Available |
 | [PX1002](diagnostics/PX1002.md) | The field must have a type attribute that corresponds to the list attribute. | Error | Available |
 | [PX1003](diagnostics/PX1003.md) | Consider using a specific implementation of `PXGraph`. | Warning (ISV Level 2: Production Quality) | Unavailable |
@@ -24,7 +24,7 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1010](diagnostics/PX1010.md) | If a delegate applies paging in an inner select, `StartRow` must be reset. (If `StartRow` is not reset, paging will be applied twice.) | Warning (ISV Level 1: Significant) | Available |
 | [PX1011](diagnostics/PX1011.md) | Because multiple levels of inheritance are not supported for `PXCacheExtension`, the derived type can be marked as sealed. | Warning (ISV Level 3: Informational) | Available |
 | [PX1012](diagnostics/PX1012.md) | `PXAction` is declared on a non-primary view. | Warning (ISV Level 2: Production Quality) | Available |
-| [PX1013](diagnostics/PX1013.md) | The action handler that initiates a background operation or is executed by a background operation must return `IEnumerable`. | Error | Available   | 
+| [PX1013](diagnostics/PX1013.md) | In a graph action, the return type of the action delegate that initiates a long-running operation must be `IEnumerable`. | Error | Available |
 | [PX1014](diagnostics/PX1014.md) | A DAC field must have a nullable type. | Error   | Available |
 | [PX1015](diagnostics/PX1015.md) | For a BQL statement that contains parameters, the number of arguments of a `Select` method is different from the number of parameters. | Warning (ISV Level 1: Significant) | Unavailable |
 | [PX1016](diagnostics/PX1016.md) | A DAC or graph extension should include the public static `IsActive` method with no parameters and the `bool` return type. Extensions that are constantly active reduce performance. Suppress the error if you need the DAC extension to be constantly active. | Warning | Unavailable | 
@@ -62,7 +62,7 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1051](diagnostics/PX1051.md) | The strings defined in a class without the `PXLocalizable` attribute cannot be used as parameters for localization methods, `PXException` and `PXExceptionInfo` constructors. | Error | Unavailable |
 | [PX1052](diagnostics/PX1052.md) | Plain text strings cannot be used in the methods of the `LocalizeFormat` family. | Error | Unavailable |
 | [PX1053](diagnostics/PX1053.md) | Concatenated strings cannot be used as parameters for localization methods, `PXException` and `PXExceptionInfo` constructors. | Error | Unavailable |
-| [PX1054](diagnostics/PX1054.md) | A `PXGraph` instance cannot start a long-running operation during the `PXGraph` initialization. | Error | Unavailable |
+| [PX1054](diagnostics/PX1054.md) | Long-running operations cannot be started during the `PXGraph` and `PXGraphExtension` initialization. | Error | Unavailable |
 | [PX1055](diagnostics/PX1055.md) | An invalid primary key of the DAC is used. | Error | Available |
 | [PX1056](diagnostics/PX1056.md) | A PXGraph instance cannot be initialized inside the `IsActive` or `IsActiveForGraph<TGraph>` method. | Error | Unavailable |
 | [PX1057](diagnostics/PX1057.md) | A `PXGraph` instance cannot be initialized while another `PXGraph` instance is being initialized. | Error | Unavailable |
@@ -116,3 +116,4 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1113](diagnostics/PX1113.md) | Graphs and graph extensions should not be `sealed` types. | Warning | Available |
 | [PX1114](diagnostics/PX1114.md) | A graph extension should not inherit from a terminal graph extension. | Warning | Unavailable |
 | [PX1115](diagnostics/PX1115.md) | Only a terminal graph extension and a non-abstract DAC extension can be used as a base extension. | Error | Unavailable |
+| [PX1120](diagnostics/PX1120.md) | Incorrect work with the `Task` types in the Acumatica asynchronous code. You should not store the `Task` instance in a local variable or parameter. The `Task`-typed expressions should be awaited, and a method returning a `Task`-typed expression should have the `Task` type as its return type. | Warning | Unavailable |

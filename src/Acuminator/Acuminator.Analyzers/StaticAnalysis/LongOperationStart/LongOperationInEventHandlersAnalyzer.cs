@@ -21,7 +21,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			var methodSymbol = (IMethodSymbol)context.Symbol;
+			var methodSymbol = context.Symbol as IMethodSymbol;
+
+			if (methodSymbol == null)
+				return;
+
 			var methodSyntax = methodSymbol.GetSyntax(context.CancellationToken) as CSharpSyntaxNode;
 			var walker = new StartLongOperationWalker(context, pxContext, Descriptors.PX1046_LongOperationInEventHandlers);
 

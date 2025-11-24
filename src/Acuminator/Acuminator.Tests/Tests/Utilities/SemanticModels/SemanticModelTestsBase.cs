@@ -18,7 +18,7 @@ using FluentAssertions;
 namespace Acuminator.Tests.Tests.Utilities.SemanticModels
 {
 	/// <summary>
-	/// A vase class for semantic model tests with some shared logic.
+	/// A base class for semantic model tests with some shared logic.
 	/// </summary>
 	public abstract class SemanticModelTestsBase<TSemanticModel>
 	where TSemanticModel : ISemanticModel
@@ -38,7 +38,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels
 		{
 			code.Should().NotBeNullOrWhiteSpace();
 
-			Document document = VerificationHelper.CreateDocument(code);
+			Document document = SolutionBuilder.CreateDocument(code);
 
 			var compilationTask   = document.Project.GetCompilationAsync(cancellation);
 			var rootTask 		  = document.GetSyntaxRootAsync(cancellation);

@@ -36,7 +36,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 									base(pxContext, context.CancellationToken)
 			{
 				_context = context;
-				_nonCapturableElementsInArgumentsFinder = new NonCapturableElementsInArgumentsFinder(CancellationToken, PxContext);
+				_nonCapturableElementsInArgumentsFinder = new NonCapturableElementsInArgumentsFinder(PxContext, CancellationToken);
 			}
 
 			public void CheckForCapturedGraphReferencesInDelegateClosures(TypeDeclarationSyntax typeDeclarationNode)
@@ -104,8 +104,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 					return;
 				}
 
-				var longOperationDelegateType = LongOperationDelegateTypeClassifier.GetLongOperationDelegateType(invocationExpression,
-																												 semanticModel, PxContext, CancellationToken);
+				var longOperationDelegateInfo = LongOperationDelegateTypeClassifier.GetLongOperationDelegateInfo(invocationExpression,
+																							semanticModel, PxContext, CancellationToken);
+				if (longOperationDelegateInfo == null)
+				{
+					base.VisitInvocationExpression(invocationExpression);
+					return;
+				}
+
+				var (longOperationDelegateType, longOperationDelegateSymbol) = longOperationDelegateInfo.Value;
+
 				switch (longOperationDelegateType)
 				{
 					case LongOperationDelegateType.ProcessingDelegate:
@@ -113,7 +121,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 						return;
 
 					case LongOperationDelegateType.LongRunDelegate:
-						AnalyzeStartOperationDelegateMethod(semanticModel, invocationExpression);
+						AnalyzeStartOperationDelegateMethod(semanticModel, invocationExpression, longOperationDelegateSymbol);
 						return;
 
 					default:
@@ -139,14 +147,44 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 				}
 			}
 
-			private void AnalyzeStartOperationDelegateMethod(SemanticModel semanticModel, InvocationExpressionSyntax startOperationInvocation)
+			private void AnalyzeStartOperationDelegateMethod(SemanticModel semanticModel, InvocationExpressionSyntax startOperationInvocation,
+															 IMethodSymbol longOperationDelegateSymbol)
 			{
-				if (startOperationInvocation.ArgumentList.Arguments.Count < 2)
+				var longRunDelegateArgument = GetLongRunDelegateArgument(longOperationDelegateSymbol, startOperationInvocation);
+
+				if (longRunDelegateArgument == null)
 					return;
 
-				ExpressionSyntax longRunDelegateParameter = startOperationInvocation.ArgumentList.Arguments[1].Expression;
-				CheckDataFlowForDelegateMethod(semanticModel, startOperationInvocation, longRunDelegateParameter,
+				CheckDataFlowForDelegateMethod(semanticModel, startOperationInvocation, longRunDelegateArgument,
 											   LongOperationDelegateType.LongRunDelegate);
+			}
+
+			private ExpressionSyntax? GetLongRunDelegateArgument(IMethodSymbol methodSymbol, InvocationExpressionSyntax methodNode)
+			{
+				var arguments = methodNode.ArgumentList.Arguments;
+
+				switch (arguments.Count)
+				{
+					case 0:
+						return null;
+
+					case 1:
+						if (methodSymbol.Name == DelegateNames.Async.Await ||
+							methodSymbol.IsDeclaredInType(PxContext.AsyncOperations.IGraphLongOperationManager))
+						{
+							return arguments[0].Expression;
+						}
+						else
+							return null;
+
+					default:
+					{
+						var firstArgument = methodSymbol.Name == DelegateNames.Async.Await
+												? arguments[0].Expression
+												: arguments[1].Expression;
+						return firstArgument;
+					}
+				}
 			}
 
 			private bool CheckDataFlowForDelegateMethod(SemanticModel semanticModel, InvocationExpressionSyntax longOperationSetupMethodInvocationNode,
@@ -181,7 +219,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 			}
 
 			private PassedParametersToNotBeCaptured? GetNonCapturableParametersForDelegateMethodWithReassignmentCheck(SemanticModel semanticModel,
-																							InvocationExpressionSyntax longOperationSetupMethodInvocationNode)
+																							InvocationExpressionSyntax longOperationStartMethodInvocationNode)
 			{			
 				if (IsInsideRecursiveCall)     // if we inside the call stack then we need to check captured elements for reassignment
 				{
@@ -190,7 +228,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 					if (nonCapturableParametersOfMethodContainingCallSite == null)
 						return null;
 
-					var callingNode = GetDeclarationContainingCallSite(longOperationSetupMethodInvocationNode);
+					var callingNode = longOperationStartMethodInvocationNode.GetContainingMemberOrLocalFunctionOrLambda();
 
 					if (callingNode == null)
 						return null;
@@ -207,7 +245,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 				}
 				else                           // if we are at the top of call stack then we need to look for adapter parameter in case we are in action handler
 				{
-					var callingMethodNode = GetDeclarationContainingCallSite(longOperationSetupMethodInvocationNode);
+					var callingMethodNode = longOperationStartMethodInvocationNode.GetContainingMemberOrLocalFunctionOrLambda();
 
 					if (callingMethodNode == null)
 						return null;
@@ -235,7 +273,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 
 				//---------------------------------------Local Function-----------------------------------------------------------------------
 				HashSet<string>? GetReassignedParametersNames(SyntaxNode callingNode, IReadOnlyCollection<string> parametersNames) =>
-					_parametersReassignedFinder.GetParametersReassignedBeforeCallsite(callingNode, longOperationSetupMethodInvocationNode,
+					_parametersReassignedFinder.GetParametersReassignedBeforeCallsite(callingNode, longOperationStartMethodInvocationNode,
 																					  parametersNames, semanticModel, CancellationToken);
 			} 
 			#endregion
@@ -262,7 +300,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 					return false;
 
 				// Otherwise, we need to step only into non-static methods of graphs/graph extensions since they can capture "this" reference
-				return calledMethod.IsDefinitelyStatic(calledMethodNode) || calledMethod.ContainingType == null || !calledMethod.ContainingType.IsPXGraphOrExtension(PxContext);
+				return calledMethod.IsStatic || calledMethod.ContainingType == null || !calledMethod.ContainingType.IsPXGraphOrExtension(PxContext);
 			}
 
 			protected override void AfterRecursiveVisit(IMethodSymbol calledMethod, CSharpSyntaxNode calledMethodNode, ExpressionSyntax callSite, bool wasVisited)
@@ -280,21 +318,21 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 
 				var argumentsList = callSite.GetArgumentsList();
 
-				if (argumentsList == null || (argumentsList.Arguments.Count == 0 && calledMethod.MethodKind != MethodKind.LocalFunction))
+				if (argumentsList == null || (argumentsList.Arguments.Count == 0 && !calledMethod.IsNestedMethod()))
 					return null;
 
-				var callingTypeMemberOrLocalFunctionNode = GetDeclarationContainingCallSite(callSite);
+				var callingTypeMemberOrLambdaOrLocalFunctionNode = callSite.GetContainingMemberOrLocalFunctionOrLambda();
 
-				if (callingTypeMemberOrLocalFunctionNode == null)
+				if (callingTypeMemberOrLambdaOrLocalFunctionNode == null)
 					return null;
 
 				SemanticModel? semanticModel = GetSemanticModel(callSite.SyntaxTree);
-				ISymbol? callingTypeMember = semanticModel?.GetDeclaredSymbol(callingTypeMemberOrLocalFunctionNode, CancellationToken);
+				ISymbol? callingTypeMember = semanticModel?.GetDeclaredSymbol(callingTypeMemberOrLambdaOrLocalFunctionNode, CancellationToken);
 
 				if (callingTypeMember?.ContainingType == null)
 					return null;
 
-				var nonCapturableParameters = GetNonCapturableParameters(callingTypeMember, callingTypeMemberOrLocalFunctionNode, argumentsList, 
+				var nonCapturableParameters = GetNonCapturableParameters(callingTypeMember, callingTypeMemberOrLambdaOrLocalFunctionNode, argumentsList, 
 																		 callSite, semanticModel!, calledMethod, calledMethodNode);
 				if (nonCapturableParameters.IsNullOrEmpty())
 					return null;
@@ -309,7 +347,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 					return true;
 
 				// If the method doesn't have parameters it can capture this reference unless it is a static method
-				if (calledMethod.IsDefinitelyStatic(calledMethodNode))
+				if (calledMethod.IsStatic)
 					return false;
 
 				bool isInsideGraph = calledMethod.ContainingType?.IsPXGraphOrExtension(PxContext) ?? false;
@@ -318,8 +356,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 				if (isInsideGraph)
 					return true;
 
-				// If the method is a non static local function it can also capture parameters from the outer method
-				if (calledMethod.MethodKind == MethodKind.LocalFunction && calledMethod.ContainingSymbol is IMethodSymbol containingMethod)
+				// If the method is a non static local function or lambda it can also capture parameters from the outer method
+				if (calledMethod.IsNestedMethod() && calledMethod.ContainingSymbol is IMethodSymbol containingMethod)
 					return !containingMethod.Parameters.IsDefaultOrEmpty;
 				
 				return false;
@@ -407,14 +445,14 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 				if (callingMethod?.ContainingType == null)
 					return null;
 
-				var actionHandlerMethod = callingMethod.MethodKind != MethodKind.LocalFunction
+				var actionHandlerMethod = !callingMethod.IsNestedMethod()
 					? callingMethod
-					: callingMethod.GetStaticOrNonLocalContainingMethod(CancellationToken);
+					: callingMethod.GetStaticOrNonLocalContainingMethod();
 
-				// When we check local function declared we try to get the non local containing method OR first containing static local function
+				// When we check local function declared we try to get the non local containing method OR first containing static local function or lambda
 				// If we obtain the former than our local function can potentially use adapter parameter from the action handler.
-				// Otherwise, in case of a static local function it will be unavailable and we can return
-				if (actionHandlerMethod == null || actionHandlerMethod.MethodKind == MethodKind.LocalFunction)
+				// Otherwise, in case of a static local function or lambda it will be unavailable and we can return
+				if (actionHandlerMethod == null || actionHandlerMethod.IsNestedMethod())
 					return null;
 
 				if (actionHandlerMethod.Parameters.IsDefaultOrEmpty)
@@ -427,8 +465,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 					return null;
 
 				// Check if parameter is redefined by local functions
-				if (callingMethod.MethodKind == MethodKind.LocalFunction &&
-					callingMethod.IsNonLocalMethodParameterRedefined(adapterParameter.Name, CancellationToken))
+				if (callingMethod.IsNestedMethod() &&
+					callingMethod.IsNonLocalMethodParameterRedefined(adapterParameter.Name))
 				{
 					return null;
 				}
@@ -491,9 +529,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 				if (parametersPassedBefore == null || parametersPassedBefore.Count == 0)
 					return default;
 
-				// For called non static local functions we need to assume that all parameters passed before can be used inside the function
+				// For called non static local functions and lambdas we need to assume that all parameters passed before can be used inside the function
 				NonCapturableElementsInfo? nonCapturableElementsInfo = 
-					calledMethod.MethodKind == MethodKind.LocalFunction && !calledMethod.IsDefinitelyStatic(calledMethodNode)
+					calledMethod.IsNestedMethod() && !calledMethod.IsStatic
 						? new NonCapturableElementsInfo(nonCapturableContainingMethodsParameters: parametersPassedBefore)
 						: null;
 
@@ -555,13 +593,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 
 				var parametersPassedToCallingMethod = PeekPassedParametersFromStack();
 
-				if (callingMethod.MethodKind != MethodKind.LocalFunction)
+				if (!callingMethod.IsNestedMethod())
 					return parametersPassedToCallingMethod;
 
-				// Local functions can capture parameters from their containing methods (unless the parameter is redefined or the containing method is a static local function)
-				// We need to combile all parameters from outer methods that have non-capturable elements. 
+				// Local functions and lambdas can capture parameters from their containing methods (unless the parameter is redefined or the containing method is a static local function or lambda)
+				// We need to combine all parameters from outer methods that have non-capturable elements. 
 				// We could have retrieved them from the NonCapturablePassedParameters stack and combine but that would require some complex combining logic 
-				// for eacn of the nested local functions (of course, it's a rare case to have local functions and its even more rare to have a local function nested in local function).
+				// for each of the nested local functions (of course, it's a rare case to have local functions and its even more rare to have a local function nested in local function).
 				// 
 				// Instead we'll take a dynamic programming approach. 
 				// We will assume that for a call located in a nested local function the NonCapturablePassedParameters stack already contains all possible combined non-capturable parameters
@@ -571,8 +609,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 				// - For a call in local function we combine non-capturable parameters passed to it with non-capturable parameters passed to the containing non-local method
 				// - For a call to a nested local function we combine non-capturable parameters passed to it with non-capturable parameters passed to its containing local function
 				// - And so on.
-				if (callingMethod.IsDefinitelyStatic(callingMethodNode))
-					return parametersPassedToCallingMethod;     // no extra parameters from outer methods can be used by the static local function
+				if (callingMethod.IsStatic)
+					return parametersPassedToCallingMethod;		// no extra parameters from outer methods can be used by the static local function
 
 				if (callingMethod.ContainingSymbol is not IMethodSymbol methodContainingCallToCallingMethod)
 					return parametersPassedToCallingMethod;
@@ -660,21 +698,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 			private PassedParametersToNotBeCaptured? PeekPassedParametersFromStack() => NonCapturablePassedParameters.Count > 0
 					? NonCapturablePassedParameters.Peek()
 					: null;
-
-			private SyntaxNode? GetDeclarationContainingCallSite(SyntaxNode callSiteNode)
-			{
-				SyntaxNode? curNode = callSiteNode.Parent;
-
-				while (curNode != null)
-				{
-					if (curNode is (MemberDeclarationSyntax or LocalFunctionStatementSyntax))
-						return curNode;
-
-					curNode = curNode.Parent;
-				}
-
-				return null;
-			}
 		}
 	}
 }

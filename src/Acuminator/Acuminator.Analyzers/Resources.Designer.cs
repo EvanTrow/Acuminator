@@ -61,7 +61,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fix PXAction handler signature.
+        ///   Looks up a localized string similar to Fix the return type and the parameters of the action delegate.
         /// </summary>
         public static string PX1000Fix {
             get {
@@ -70,7 +70,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid PXAction handler signature.
+        ///   Looks up a localized string similar to The action delegate has incompatible return type and parameters.
         /// </summary>
         public static string PX1000Title {
             get {
@@ -381,7 +381,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Change the return type to IEnumerable.
+        ///   Looks up a localized string similar to Change the return type of the action delegate to IEnumerable.
         /// </summary>
         public static string PX1013Fix {
             get {
@@ -390,7 +390,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The action handler that initiates a background operation or is executed by a background operation must return IEnumerable.
+        ///   Looks up a localized string similar to The return type of the action delegate that initiates a long-running operation must be &quot;IEnumerable&quot;.
         /// </summary>
         public static string PX1013Title {
             get {
@@ -1060,7 +1060,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The graph event handler has a weekly typed signature that relies on a naming convention. Consider converting it to a strongly typed generic signature for a better type safety enforced by the C# compiler..
+        ///   Looks up a localized string similar to The graph event handler has a weakly typed signature that relies on a naming convention. Consider converting it to a strongly typed generic signature for a better type safety enforced by the C# compiler..
         /// </summary>
         public static string PX1041Title {
             get {
@@ -1240,7 +1240,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A PXGraph instance should not start PXLongOperation during the initialization phase.
+        ///   Looks up a localized string similar to PXGraph and PXGraphExtension instances should not start a long-running operation during the initialization phase.
         /// </summary>
         public static string PX1054Title {
             get {
@@ -1933,7 +1933,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to PXSetupNotEnteredException cannot be thrown in long-running operations.
+        ///   Looks up a localized string similar to PXSetupNotEnteredException cannot be thrown in long-running operations and processing delegates.
         /// </summary>
         public static string PX1086Title {
             get {
@@ -2331,7 +2331,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Graph extension should not inherit from non-terminal graph extensions.
+        ///   Looks up a localized string similar to A graph extension should not inherit from a non-terminal graph extension.
         /// </summary>
         public static string PX1114Title {
             get {
@@ -2354,6 +2354,33 @@ namespace Acuminator.Analyzers {
         public static string PX1115TitleGraphExtension {
             get {
                 return ResourceManager.GetString("PX1115TitleGraphExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect work with the Task types in the Acumatica asynchronous code. Method returning a Task-typed expression should have the Task type as its return type..
+        /// </summary>
+        public static string PX1120Title_MethodReturnTypeIsNotTask {
+            get {
+                return ResourceManager.GetString("PX1120Title_MethodReturnTypeIsNotTask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect work with the Task types in the Acumatica asynchronous code. Task-typed expressions should be awaited..
+        /// </summary>
+        public static string PX1120Title_NotAwaitedTaskReturningExpression {
+            get {
+                return ResourceManager.GetString("PX1120Title_NotAwaitedTaskReturningExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect work with the Task types in the Acumatica asynchronous code. You should not store the Task instance in a local variable or parameter..
+        /// </summary>
+        public static string PX1120Title_StoreTaskInVariable {
+            get {
+                return ResourceManager.GetString("PX1120Title_StoreTaskInVariable", resourceCulture);
             }
         }
         

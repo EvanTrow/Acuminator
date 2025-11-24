@@ -28,8 +28,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreationForBqlQueries
 			private readonly PXContext _pxContext;
 			private readonly CancellationToken _cancellation;
 
-			private readonly List<ExpressionSyntax> _graphArguments = new List<ExpressionSyntax>();
-			public ImmutableArray<ExpressionSyntax> GraphArguments => _graphArguments.ToImmutableArray();
+			public List<ExpressionSyntax> GraphArguments { get; } = [];
 
 			public BqlGraphArgWalker(SemanticModel semanticModel, PXContext pxContext, CancellationToken cancellation)
 			{				
@@ -55,7 +54,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreationForBqlQueries
 					var bqlCallGraphArg = node.ArgumentList.Arguments[0].Expression;
 
 					if (!ArgumentIsPropertyOrField(bqlCallGraphArg))
-						_graphArguments.Add(bqlCallGraphArg);
+						GraphArguments.Add(bqlCallGraphArg);
 				}
 
 				base.VisitInvocationExpression(node);
@@ -68,7 +67,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreationForBqlQueries
 				var declaringType = methodSymbol?.ContainingType?.OriginalDefinition;
 
 				return declaringType != null && declaringType.IsBqlCommand(_pxContext) &&
-					   !methodSymbol!.Parameters.IsEmpty && methodSymbol.Parameters[0].Type.IsPXGraph(_pxContext) &&
+					   !methodSymbol!.Parameters.IsDefaultOrEmpty && methodSymbol.Parameters[0].Type.IsPXGraph(_pxContext) &&
 						(methodSymbol.Name.StartsWith(SelectMethodName, StringComparison.Ordinal) ||
 						 methodSymbol.Name.StartsWith(SearchMethodName, StringComparison.Ordinal));
 			}

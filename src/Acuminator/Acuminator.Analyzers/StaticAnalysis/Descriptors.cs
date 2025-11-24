@@ -555,5 +555,17 @@ namespace Acuminator.Analyzers.StaticAnalysis
 		public static DiagnosticDescriptor PX1115_NonTerminalBaseDacExtension { get; } =
 			Rule("PX1115", nameof(Resources.PX1115TitleDacExtension).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, 
 				DiagnosticsShortName.PX1115DacExtension);
+
+		public static DiagnosticDescriptor PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable { get; } =
+			Rule("PX1120", nameof(Resources.PX1120Title_StoreTaskInVariable).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, 
+				DiagnosticsShortName.PX1120_StoreTaskInVariable);
+
+		public static DiagnosticDescriptor PX1120_IncorrectTaskUsageInAsyncCode_MethodReturnTypeIsNotTask { get; } =
+			Rule("PX1120", nameof(Resources.PX1120Title_MethodReturnTypeIsNotTask).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning,
+				DiagnosticsShortName.PX1120_MethodReturnTypeIsNotTask);
+
+		public static DiagnosticDescriptor PX1120_IncorrectTaskUsageInAsyncCode_NotAwaitedTaskReturningExpression { get; } =
+			Rule("PX1120", nameof(Resources.PX1120Title_NotAwaitedTaskReturningExpression).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning,
+				DiagnosticsShortName.PX1120_NotAwaitedTaskReturningExpression);
 	}
 }
