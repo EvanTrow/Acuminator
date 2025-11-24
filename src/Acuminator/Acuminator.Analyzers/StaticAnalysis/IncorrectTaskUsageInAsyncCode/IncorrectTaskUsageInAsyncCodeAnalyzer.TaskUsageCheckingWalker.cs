@@ -116,6 +116,22 @@ namespace Acuminator.Analyzers.StaticAnalysis.IncorrectTaskUsageInAsyncCode
 				base.VisitArrowExpressionClause(arrowExpressionMethodBody);
 			}
 
+			// No need to check anonymous methods in addition to lambdas - they are covered by visiting return expressions
+
+			public override void VisitParenthesizedLambdaExpression(ParenthesizedLambdaExpressionSyntax parenthesizedLambdaExpression)
+			{
+				Cancellation.ThrowIfCancellationRequested();
+				CheckTypeMemberReturningTaskHasTaskReturnType(parenthesizedLambdaExpression.ExpressionBody);
+				base.VisitParenthesizedLambdaExpression(parenthesizedLambdaExpression);
+			}
+
+			public override void VisitSimpleLambdaExpression(SimpleLambdaExpressionSyntax simpleLambdaExpression)
+			{
+				Cancellation.ThrowIfCancellationRequested();
+				CheckTypeMemberReturningTaskHasTaskReturnType(simpleLambdaExpression.ExpressionBody);
+				base.VisitSimpleLambdaExpression(simpleLambdaExpression);
+			}
+
 			private void CheckTypeMemberReturningTaskHasTaskReturnType(ExpressionSyntax? returnExpression)
 			{
 				if (returnExpression == null)
