@@ -24,7 +24,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		}
 
 		/// <summary>
-		/// Check if the <paramref name="methodSymbol"/> is nested method ().
+		/// Check if the <paramref name="methodSymbol"/> is a nested method (local function or lambda).
 		/// </summary>
 		/// <param name="methodSymbol">The method to act on.</param>
 		/// <returns>
