@@ -7,8 +7,6 @@ using System.Linq;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
-using Acuminator.Utilities.Roslyn.Semantic.Attribute;
-using Acuminator.Utilities.Roslyn.Semantic.Symbols;
 
 using Microsoft.CodeAnalysis;
 
@@ -22,9 +20,6 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 	/// </remarks>
 	public class DbBoundnessCalculator
 	{
-		private const string IsDBField = "IsDBField";
-		private const string NonDB = "NonDB";
-
 		public PXContext Context { get; }
 
 		public FieldTypeAttributesMetadataProvider AttributesMetadataProvider { get; }
@@ -81,7 +76,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 													  attributeApplication.GetThisAndAllAggregatedAttributesWithApplications(Context, includeBaseTypes: true);
 
 			if (flattenedAttributesWithApplications.Count == 0)
-				return GetDbBoundnessSetExplicitlyByAttributeApplication(attributeApplication);
+				return ExplicitlySetAttributeDbBoundnessCalculator.GetDbBoundnessSetExplicitlyByAttributeApplication(attributeApplication);
 
 			// Check combined information from attribute applications and metadata
 			var flattenedAttributesSet = preparedFlattenedAttributesSet ?? 
@@ -97,7 +92,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 			if (checkForExplicitlySetDbBoundnessOnDirectAttributeApplication)
 			{
-				var dbBoundnessOnApplication = GetDbBoundnessSetExplicitlyByAttributeApplication(attributeApplication);
+				var dbBoundnessOnApplication = ExplicitlySetAttributeDbBoundnessCalculator.GetDbBoundnessSetExplicitlyByAttributeApplication(attributeApplication);
 
 				if (dbBoundnessOnApplication != DbBoundnessType.NotDefined)
 					return dbBoundnessOnApplication;
@@ -149,7 +144,9 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 			var attributeApplications = applicationsByAttribute[mixedDbBoundnessAttributeInfo.AttributeType];
 			var explicitDbBoundnessFromApplications = 
-				attributeApplications.Select(attrWithAppl => GetDbBoundnessSetExplicitlyByAttributeApplication(attrWithAppl.Application)).Combine();
+				attributeApplications.Select(attrWithAppl => ExplicitlySetAttributeDbBoundnessCalculator.GetDbBoundnessSetExplicitlyByAttributeApplication(
+																attrWithAppl.Application))
+									 .Combine();
 
 			var combinedBoundness = CombineExplictlySetAndMetadataBoundnesses(explicitDbBoundnessFromApplications, dbBoundnessFromMetadata);
 			return combinedBoundness;
@@ -181,69 +178,6 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 				default:
 					return DbBoundnessType.NotDefined;
 			}
-		}
-
-		private DbBoundnessType GetDbBoundnessSetExplicitlyByAttributeApplication(AttributeData attributeApplication)
-		{
-			if (attributeApplication.NamedArguments.IsDefaultOrEmpty)
-				return DbBoundnessType.NotDefined;
-
-			int isDbFieldCounter = 0, isNonDbCounter = 0;
-			bool? isDbFieldValue = null, isNonDbValue = null;
-
-			foreach (var (argumentName, argumentValue) in attributeApplication.NamedArguments)
-			{
-				if (string.Equals(argumentName, IsDBField, StringComparison.OrdinalIgnoreCase))
-				{
-					isDbFieldCounter++;
-
-					if (argumentValue.Value is bool boolIsDbFieldValue)
-						isDbFieldValue = boolIsDbFieldValue;
-				}
-
-				if (string.Equals(argumentName, NonDB, StringComparison.OrdinalIgnoreCase))
-				{
-					isNonDbCounter++;
-
-					if (argumentValue.Value is bool boolNonDbValue)
-						isNonDbValue = boolNonDbValue;
-				}
-
-			}
-
-			if (isDbFieldCounter > 1 || isNonDbCounter > 1)
-				return DbBoundnessType.Unknown;					//Strange case when there are multiple different "IsDBField"/"NonDB" properties set in attribute constructor (with different letters register case)
-
-			bool isDbFieldPresent = isDbFieldCounter == 1;
-			bool isNonDbPresent = isNonDbCounter == 1;
-
-			if (!isDbFieldPresent && !isNonDbPresent)
-				return DbBoundnessType.NotDefined;
-			else if (isDbFieldPresent && isNonDbPresent)		//Strange case when there are both IsDBField and NonDB properties
-			{
-				DbBoundnessType isDbFieldBoundness = GetIsDbFieldBoundness(isDbFieldValue);
-				DbBoundnessType nonDbBoundness = GetNonDbBoundness(isNonDbValue);
-				return isDbFieldBoundness.Combine(nonDbBoundness);
-			}
-			else if (isDbFieldPresent)
-				return GetIsDbFieldBoundness(isDbFieldValue);
-			else
-				return GetNonDbBoundness(isNonDbValue);
-
-			//------------------------------------Local function--------------------------------------------------------------------
-			static DbBoundnessType GetIsDbFieldBoundness(bool? isDbFieldValue) =>
-				!isDbFieldValue.HasValue
-					? DbBoundnessType.Unknown           //Strange rare case when IsDBField property is set explicitly with value of type other than bool. In this case we don't know if attribute is bound
-					: isDbFieldValue.Value
-						? DbBoundnessType.DbBound
-						: DbBoundnessType.Unbound;
-
-			static DbBoundnessType GetNonDbBoundness(bool? isNonDbValue) =>
-				!isNonDbValue.HasValue
-					? DbBoundnessType.Unknown          //Strange rare case when NonDB property is set explicitly with value of type other than bool. In this case we don't know if attribute is bound
-					: isNonDbValue.Value
-						? DbBoundnessType.Unbound
-						: DbBoundnessType.DbBound;
 		}
 
 		private DbBoundnessType CombineExplictlySetAndMetadataBoundnesses(DbBoundnessType explicitDbBoundnessFromApplications, 
