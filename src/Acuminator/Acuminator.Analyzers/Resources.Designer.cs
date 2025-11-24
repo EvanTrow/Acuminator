@@ -61,7 +61,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fix action delegate return type and parameters.
+        ///   Looks up a localized string similar to Fix the return type and the parameters of the action delegate.
         /// </summary>
         public static string PX1000Fix {
             get {
@@ -1240,7 +1240,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to PXGraph and PXGraphExtension instances should not start long-running operations during the initialization phase.
+        ///   Looks up a localized string similar to PXGraph and PXGraphExtension instances should not start a long-running operation during the initialization phase.
         /// </summary>
         public static string PX1054Title {
             get {
@@ -2358,7 +2358,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Incorrect work with Task types in the Acumatica asynchronous code. Method returning a Task-typed expression should have Task type as its return type..
+        ///   Looks up a localized string similar to Incorrect work with the Task types in the Acumatica asynchronous code. Method returning a Task-typed expression should have the Task type as its return type..
         /// </summary>
         public static string PX1120Title_MethodReturnTypeIsNotTask {
             get {
@@ -2367,7 +2367,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Incorrect work with Task types in the Acumatica asynchronous code. Task-typed expressions should be awaited..
+        ///   Looks up a localized string similar to Incorrect work with the Task types in the Acumatica asynchronous code. Task-typed expressions should be awaited..
         /// </summary>
         public static string PX1120Title_NotAwaitedTaskReturningExpression {
             get {
@@ -2376,7 +2376,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Incorrect work with Task types in the Acumatica asynchronous code. You should not store Task instance in a local variable or parameter..
+        ///   Looks up a localized string similar to Incorrect work with the Task types in the Acumatica asynchronous code. You should not store the Task instance in a local variable or parameter..
         /// </summary>
         public static string PX1120Title_StoreTaskInVariable {
             get {
