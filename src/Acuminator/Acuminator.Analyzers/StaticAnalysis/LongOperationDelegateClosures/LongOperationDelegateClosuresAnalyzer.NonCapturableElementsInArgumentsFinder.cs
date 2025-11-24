@@ -26,10 +26,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 			private List<PassedParameter>? _callingMethodParametersUsedInArgument;
 			private bool _captureLocalGraphInstance;
 
-			public NonCapturableElementsInArgumentsFinder(CancellationToken cancellation, PXContext pxContext)
+			public NonCapturableElementsInArgumentsFinder(PXContext pxContext, CancellationToken cancellation)
 			{
-				_cancellation = cancellation;
 				_pxContext = pxContext;
+				_cancellation = cancellation;
 			}
 
 			public (bool CaptureLocalGraphInstance, List<PassedParameter>? ParametersUsedInArgument) GetElementsUsedInArgumentExpression(
@@ -68,7 +68,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 
 				foreach (SyntaxNode childNode in expression.ChildNodes())
 				{
-					if (childNode is ExpressionSyntax childExpression)			
+					if (childNode is ExpressionSyntax childExpression)
 					{
 						childExpression.Accept(this);
 						continue;

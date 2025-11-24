@@ -83,7 +83,6 @@
 		internal const string PXGraphExtension = "PX.Data.PXGraphExtension";
 		internal const string PXCacheExtension = "PX.Data.PXCacheExtension";
 		internal const string PXMappedCacheExtension = "PX.Data.PXMappedCacheExtension";
-		internal const string PXLongOperation = "PX.Data.PXLongOperation";
 		internal const string PXActionCollection = "PX.Data.PXActionCollection";
 		internal const string PXAdapter = "PX.Data.PXAdapter";
 
@@ -249,6 +248,17 @@
 		internal static class Workflow
 		{
 			public const string PXScreenConfiguration = "PX.Data.WorkflowAPI.PXScreenConfiguration";
+		}
+
+		public static class Async
+		{
+			public const string PXLongOperation = "PX.Data.PXLongOperation";
+
+			public const string ILongOperationManager 	 = "PX.Async.ILongOperationManager";
+			public const string ILongOperationManagerOld = "PX.Concurrency.ILongOperationManager";
+
+			public const string IGraphLongOperationManager 	  = "PX.Async.IGraphLongOperationManager";
+			public const string IGraphLongOperationManagerOld = "PX.Concurrency.IGraphLongOperationManager";
 		}
 	}
 }

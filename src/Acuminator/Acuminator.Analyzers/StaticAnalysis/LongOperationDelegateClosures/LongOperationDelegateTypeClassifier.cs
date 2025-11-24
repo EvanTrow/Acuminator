@@ -49,19 +49,23 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 		{
 			switch (methodName)
 			{
-				case DelegateNames.SetProcessDelegate:
-					var setDelegateSymbol = semanticModel.GetSymbolInfo(methodAccessNode, cancellationToken).Symbol as IMethodSymbol;
+				case DelegateNames.Processing.SetProcessDelegate:
+				case DelegateNames.Processing.SetAsyncProcessDelegate:
+					var setDelegateSymbol = semanticModel.GetSymbolOrFirstCandidate(methodAccessNode, cancellationToken) as IMethodSymbol;
 
 					if (setDelegateSymbol != null && setDelegateSymbol.ContainingType.ConstructedFrom.InheritsFromOrEquals(pxContext.PXProcessingBase.Type))
 						return LongOperationDelegateType.ProcessingDelegate;
 
 					return null;
 
-				case DelegateNames.StartOperation:
-					var longRunDelegate = semanticModel.GetSymbolInfo(methodAccessNode, cancellationToken).Symbol as IMethodSymbol;
+				case DelegateNames.Async.StartOperation:
+					var longRunDelegate = semanticModel.GetSymbolOrFirstCandidate(methodAccessNode, cancellationToken) as IMethodSymbol;
 
-					if (longRunDelegate != null && longRunDelegate.IsStatic && longRunDelegate.DeclaredAccessibility == Accessibility.Public &&
-						pxContext.PXLongOperation.Equals(longRunDelegate.ContainingType, SymbolEqualityComparer.Default))
+					if (longRunDelegate == null)
+						return null;
+
+					if (longRunDelegate.IsStatic && longRunDelegate.DeclaredAccessibility == Accessibility.Public &&
+						pxContext.AsyncOperations.PXLongOperation.Equals(longRunDelegate.ContainingType, SymbolEqualityComparer.Default))
 					{
 						return LongOperationDelegateType.LongRunDelegate;
 					}

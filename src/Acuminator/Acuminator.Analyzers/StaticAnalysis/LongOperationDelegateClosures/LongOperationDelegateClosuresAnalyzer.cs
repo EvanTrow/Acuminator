@@ -29,7 +29,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 		protected override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, PXContext pxContext)
 		{
 			compilationStartContext.RegisterSyntaxNodeAction(c => AnalyzeLongOperationDelegates(c, pxContext), 
-															 SyntaxKind.ClassDeclaration, SyntaxKind.StructDeclaration, SyntaxKind.InterfaceDeclaration);
+															 SyntaxKind.ClassDeclaration, SyntaxKind.StructDeclaration, SyntaxKind.InterfaceDeclaration,
+															 SyntaxKind.RecordDeclaration, SyntaxKind.RecordStructDeclaration);
 		}
 
 		private static void AnalyzeLongOperationDelegates(SyntaxNodeAnalysisContext syntaxContext, PXContext pxContext)

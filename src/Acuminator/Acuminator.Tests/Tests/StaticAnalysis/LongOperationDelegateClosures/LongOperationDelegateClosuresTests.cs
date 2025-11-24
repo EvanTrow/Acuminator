@@ -24,8 +24,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationDelegateClosures
 		[EmbeddedFileData("ClosuresInNonGraph.cs")]
 		public Task SetProcessDelegate_ReportOnlyCapturedPassedParameters_NonGraphHelper(string actual)
 		{
-			string[] formatArgsGraph = new[] { AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg };
-			string[] formatArgsAdapter = new[] { AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg };
+			string[] formatArgsGraph   = [AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg];
+			string[] formatArgsAdapter = [AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg];
 			return VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 24, column: 4, formatArgsGraph),
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 25, column: 4, formatArgsAdapter));
@@ -36,11 +36,11 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationDelegateClosures
 		public Task RecursiveAnalysis_CallsTo_NonGraphHelper_FromOtherFile(string actual, string helper)
 		{
 			string[] formatArgsGraphAndProcDelegate = 
-				new[] { AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg };
+				[AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg];
 			string[] formatArgsGraphAndLongRunDelegate =
-				new[] { AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg };
+				[AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg];
 			string[] formatArgsAdapterAndProcDelegate =
-				new[] { AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg };
+				[AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg];
 			return VerifyCSharpDiagnosticAsync(actual, helper,
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 19, column: 4, formatArgsGraphAndProcDelegate),
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 20, column: 4, formatArgsAdapterAndProcDelegate),
@@ -52,7 +52,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationDelegateClosures
 		[EmbeddedFileData("SetProcessDelegateClosures.cs")]
 		public Task SetProcessDelegates_GraphCapturedInClosures(string actual)
 		{
-			string[] formatArgs = new[] { AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg };
+			string[] formatArgs = [AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_ProcessingDelegateFormatArg];
 			return VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 25, column: 4, formatArgs),
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 36, column: 4, formatArgs),
@@ -60,15 +60,18 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationDelegateClosures
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 46, column: 4, formatArgs),
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 47, column: 4, formatArgs),
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 51, column: 4, formatArgs),
-				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 52, column: 4, formatArgs));
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 52, column: 4, formatArgs),
+				// SetAsyncProcessDelegate tests
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 56, column: 4, formatArgs),
+				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 57, column: 4, formatArgs));
 		}
 
 		[Theory]
 		[EmbeddedFileData("LongRunDelegateClosures_NormalCases.cs")]
 		public Task LongRunDelegates_GraphAndAdapterCaptured_NormalCases(string actual)
 		{
-			string[] formatArgsGraph = new[] { AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg };
-			string[] formatArgsAdapter = new[] { AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg };
+			string[] formatArgsGraph = [AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg];
+			string[] formatArgsAdapter = [AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg];
 			return VerifyCSharpDiagnosticAsync(actual,
 
 				// graph capture
@@ -106,7 +109,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationDelegateClosures
 		[EmbeddedFileData("LongRunDelegateClosures_ComplexMapping.cs")]
 		public Task LongRunDelegates_GraphCaptured_ComplexMappingOfArgumentsToParameters(string actual)
 		{
-			string[] formatArgs = new[] { AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg };
+			string[] formatArgs = [AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg];
 			return VerifyCSharpDiagnosticAsync(actual,
 				//Params check
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 27, column: 4, formatArgs),
@@ -135,8 +138,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationDelegateClosures
 		[EmbeddedFileData("CustomView.cs")]
 		public Task CustomView_LongRunCapture_GraphAndAdapter(string actual)
 		{
-			string[] formatArgsGraph = new[] { AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg };
-			string[] formatArgsAdapter = new[] { AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg };
+			string[] formatArgsGraph = [AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg];
+			string[] formatArgsAdapter = [AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg];
 			return VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 42, column: 4, formatArgsGraph),
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 43, column: 4, formatArgsGraph),
@@ -149,7 +152,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationDelegateClosures
 		[EmbeddedFileData("CustomAttribute.cs")]
 		public Task CustomAttribute_LongRunCapture_Adapter(string actual)
 		{
-			string[] formatArgsAdapter = new[] { AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg };
+			string[] formatArgsAdapter = [AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg];
 			return VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 33, column: 4, formatArgsAdapter),
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 35, column: 4, formatArgsAdapter));
@@ -159,7 +162,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationDelegateClosures
 		[EmbeddedFileData("LongRunDelegateClosures_Reassign.cs")]
 		public Task Adapter_Reassigned_InLongRun(string actual)
 		{
-			string[] formatArgs = new[] { AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg };
+			string[] formatArgs = [AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg];
 			return VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 39, column: 4, formatArgs),
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 40, column: 4, formatArgs),
@@ -175,7 +178,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationDelegateClosures
 		[EmbeddedFileData("LongRunDelegateClosures_Local.cs")]
 		public Task AdapterCaptured_InLocalFunctions_InLongRun(string actual)
 		{
-			string[] formatArgs = new[] { AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg };
+			string[] formatArgs = [AnalyzerResources.PX1008Title_CapturedPXAdapterFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg];
 			return VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 25, column: 4, formatArgs),
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 26, column: 4, formatArgs),
@@ -188,7 +191,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationDelegateClosures
 		[EmbeddedFileData("LongRunDelegateClosures_Delegates.cs")]
 		public Task GraphDelegateCaptured_InLocalFunctions_InLongRun(string actual)
 		{
-			string[] formatArgs = new[] { AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg };
+			string[] formatArgs = [AnalyzerResources.PX1008Title_CapturedGraphFormatArg, AnalyzerResources.PX1008Title_LongRunDelegateFormatArg];
 			return VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 26, column: 4, formatArgs),
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 28, column: 4, formatArgs),

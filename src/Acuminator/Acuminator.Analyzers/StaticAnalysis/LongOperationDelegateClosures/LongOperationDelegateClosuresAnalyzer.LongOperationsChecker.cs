@@ -36,7 +36,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 									base(pxContext, context.CancellationToken)
 			{
 				_context = context;
-				_nonCapturableElementsInArgumentsFinder = new NonCapturableElementsInArgumentsFinder(CancellationToken, PxContext);
+				_nonCapturableElementsInArgumentsFinder = new NonCapturableElementsInArgumentsFinder(PxContext, CancellationToken);
 			}
 
 			public void CheckForCapturedGraphReferencesInDelegateClosures(TypeDeclarationSyntax typeDeclarationNode)
