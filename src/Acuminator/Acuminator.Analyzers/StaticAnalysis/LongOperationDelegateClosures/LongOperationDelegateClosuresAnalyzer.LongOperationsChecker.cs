@@ -318,7 +318,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 
 				var argumentsList = callSite.GetArgumentsList();
 
-				if (argumentsList == null || (argumentsList.Arguments.Count == 0 && calledMethod.MethodKind != MethodKind.LocalFunction))
+				if (argumentsList == null || (argumentsList.Arguments.Count == 0 && !calledMethod.IsNestedMethod()))
 					return null;
 
 				var callingTypeMemberOrLambdaOrLocalFunctionNode = callSite.GetContainingMemberOrLocalFunctionOrLambda();
