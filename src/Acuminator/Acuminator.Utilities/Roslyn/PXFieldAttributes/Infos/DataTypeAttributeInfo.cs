@@ -28,6 +28,34 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			Kind = attributeKind;
 		}
 
+		public DbBoundnessType GetDbBoundness()
+		{
+			switch (Kind)
+			{
+				case FieldTypeAttributeKind.BoundTypeAttribute:
+					return DbBoundnessType.DbBound;
+				case FieldTypeAttributeKind.UnboundTypeAttribute:
+					return DbBoundnessType.Unbound;
+				case FieldTypeAttributeKind.MixedDbBoundnessTypeAttribute:
+					if (this is not MixedDbBoundnessAttributeInfo mixedDbBoundnessAttributeInfo ||
+						!mixedDbBoundnessAttributeInfo.IsDbBoundByDefault.HasValue)
+					{
+						return DbBoundnessType.Unknown;
+					}
+
+					return mixedDbBoundnessAttributeInfo.IsDbBoundByDefault.Value
+						? DbBoundnessType.DbBound
+						: DbBoundnessType.Unbound;
+
+				case FieldTypeAttributeKind.PXDBScalarAttribute:
+					return DbBoundnessType.PXDBScalar;
+				case FieldTypeAttributeKind.PXDBCalcedAttribute:
+					return DbBoundnessType.PXDBCalced;
+				default:
+					return DbBoundnessType.NotDefined;
+			}
+		}
+
 		public override bool Equals(object obj) => Equals(obj as DataTypeAttributeInfo);
 
 		public virtual bool Equals(DataTypeAttributeInfo? other)
