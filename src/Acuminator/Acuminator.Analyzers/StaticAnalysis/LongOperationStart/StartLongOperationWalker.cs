@@ -46,11 +46,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 
 		private bool DoesMethodStartLongRunOperation(IMethodSymbol methodSymbol)
 		{
-			if (PxContext.AsyncOperations.AllMethodsStartingLongRun.Contains(methodSymbol))
+			if (PxContext.AsyncOperations.AllMethodsStartingLongRun.Contains(methodSymbol.OriginalDefinition))
 				return true;
 
-			return !methodSymbol.IsDefinition && methodSymbol.OriginalDefinition != null &&
-					PxContext.AsyncOperations.AllMethodsStartingLongRun.Contains(methodSymbol.OriginalDefinition);
+			return !methodSymbol.IsDefinition && PxContext.AsyncOperations.AllMethodsStartingLongRun.Contains(methodSymbol);
 		}
 	}
 }

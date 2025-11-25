@@ -66,7 +66,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 					if (longRunDelegate == null)
 						return null;
 
-					return pxContext.AsyncOperations.AllMethodsStartingLongRun.Contains(longRunDelegate)
+					return pxContext.AsyncOperations.AllMethodsStartingLongRun.Contains(longRunDelegate.OriginalDefinition)
 						? (LongOperationDelegateType.LongRunDelegate, longRunDelegate)
 						: null;
 

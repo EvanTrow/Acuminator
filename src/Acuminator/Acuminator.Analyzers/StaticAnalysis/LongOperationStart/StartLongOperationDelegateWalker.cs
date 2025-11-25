@@ -33,7 +33,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 			IMethodSymbol? methodSymbol = GetSymbol<IMethodSymbol>(node);
 
 			if (methodSymbol == null || node.ArgumentList?.Arguments.Count is null or 0 ||
-				!PxContext.AsyncOperations.AllMethodsStartingLongRun.Contains<IMethodSymbol>(methodSymbol, SymbolEqualityComparer.Default))
+				!PxContext.AsyncOperations.AllMethodsStartingLongRun.Contains(methodSymbol.OriginalDefinition))
 			{
 				base.VisitInvocationExpression(node);
 				return;
