@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -18,11 +16,6 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 	/// </summary>
 	public class MixedDbBoundnessAttributeInfo : DataTypeAttributeInfo, IEquatable<MixedDbBoundnessAttributeInfo>
 	{
-		/// <summary>
-		/// The type of the attribute.
-		/// </summary>
-		public INamedTypeSymbol AttributeType { get; }
-
 		public IReadOnlyCollection<ITypeSymbol> AcumaticaAttributesHierarchy { get; }
 
 		/// <summary>
@@ -37,12 +30,11 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		/// <param name="fieldType">Type of the field.</param>
 		/// <param name="isDbBoundByDefault">The value indicating whether the field type attribute is database bound by default. If null then the attribute does not have a default DB boundness.</param>
 		internal MixedDbBoundnessAttributeInfo(INamedTypeSymbol attributeType, ITypeSymbol? fieldType, bool? isDbBoundByDefault) : 
-										  base(FieldTypeAttributeKind.MixedDbBoundnessTypeAttribute, fieldType)
+										  base(FieldTypeAttributeKind.MixedDbBoundnessTypeAttribute, attributeType, fieldType)
 		{
 			AcumaticaAttributesHierarchy = attributeType.GetBaseTypesAndThis()
 														.TakeWhile(baseAttributeType => baseAttributeType.ToString() != TypeFullNames.PXEventSubscriberAttribute)
 														.ToImmutableArray();
-			AttributeType	   = attributeType;
 			IsDbBoundByDefault = isDbBoundByDefault;
 		}
 
@@ -51,13 +43,27 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 				? new MixedDbBoundnessAttributeInfo(attributeType, fieldType, isDbBoundByDefault)
 				: null;
 
+		public override DbBoundnessType GetDbBoundness()
+		{
+			if (Kind == FieldTypeAttributeKind.MixedDbBoundnessTypeAttribute)
+			{
+				return IsDbBoundByDefault switch
+				{
+					true  => DbBoundnessType.DbBound,
+					false => DbBoundnessType.Unbound,
+					_ 	  => DbBoundnessType.Unknown
+				};
+			}
+			else
+				return base.GetDbBoundness();
+		}
+
 		public override bool Equals(object obj) => Equals(obj as MixedDbBoundnessAttributeInfo);
 
 		public override bool Equals(DataTypeAttributeInfo? other) => Equals(other as MixedDbBoundnessAttributeInfo);
 
 		public bool Equals(MixedDbBoundnessAttributeInfo? other) =>
-			base.Equals(other) && IsDbBoundByDefault == other.IsDbBoundByDefault && 
-			AttributeType.Equals(other.AttributeType, SymbolEqualityComparer.Default);
+			base.Equals(other) && IsDbBoundByDefault == other.IsDbBoundByDefault;
 
 		public override int GetHashCode()
 		{
@@ -66,14 +72,13 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			unchecked
 			{
 				hash = 23 * hash + IsDbBoundByDefault.GetValueOrDefault().GetHashCode();
-				hash = 23 * hash + SymbolEqualityComparer.Default.GetHashCode(AttributeType);
 			}
 
 			return hash;
 		}
 
 		public override string ToString() => IsDbBoundByDefault.HasValue
-			? $"{base.ToString()} {AttributeType} {IsDbBoundByDefault.Value}"
-			: $"{base.ToString()} {AttributeType}";
+			? $"{base.ToString()}, Default IsDbBound Value: {IsDbBoundByDefault.Value}"
+			: base.ToString();
 	}
 }

@@ -25,7 +25,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Attribute
 		/// aggregated attributes in case of an aggregate attribute, 
 		/// aggregates on aggregates and so on.
 		/// </summary>
-		public ImmutableHashSet<AttributeWithApplication> FlattenedAcumaticaAttributes { get; }
+		public ImmutableHashSet<AttributeWithApplicationAndAggregator> FlattenedAcumaticaAttributes { get; }
 
 		/// <summary>
 		/// The aggregated attribute metadata collection which is information from the flattened attributes set. 
@@ -45,13 +45,13 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Attribute
 
 		public bool IsAcumaticaAttribute { get; }
 
-		protected DacFieldAttributeInfo(PXContext pxContext, AttributeData attributeData, IEnumerable<AttributeWithApplication> flattenedAttributeApplications,
+		protected DacFieldAttributeInfo(PXContext pxContext, AttributeData attributeData, IEnumerable<AttributeWithApplicationAndAggregator> flattenedAttributeApplications,
 										ISet<ITypeSymbol> flattenedAttributeTypes, IEnumerable<DataTypeAttributeInfo> attributeInfos,
 										DbBoundnessType dbBoundness, int declarationOrder) :
 								   base(attributeData, declarationOrder)
 		{
 			_flattenedAttributeTypes 	 = flattenedAttributeTypes.CheckIfNull();
-			FlattenedAcumaticaAttributes = (flattenedAttributeApplications as ImmutableHashSet<AttributeWithApplication>) ??
+			FlattenedAcumaticaAttributes = (flattenedAttributeApplications as ImmutableHashSet<AttributeWithApplicationAndAggregator>) ??
 											flattenedAttributeApplications.ToImmutableHashSet();
 			AggregatedAttributeMetadata  = attributeInfos.ToImmutableArray();
 			DbBoundness 				 = dbBoundness;
