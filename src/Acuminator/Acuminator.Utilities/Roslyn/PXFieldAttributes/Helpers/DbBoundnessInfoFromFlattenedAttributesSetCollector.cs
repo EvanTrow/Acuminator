@@ -48,9 +48,10 @@ internal static class DbBoundnessInfoFromFlattenedAttributesSetCollector
 		// If aggregated attribute does not define any DB boundness then there is no need to consider how it combines with aggregator's DB boundness.
 		// It is not a data type attribute.
 		// 
-		// On the other hand, if the attribute has error or unknown DB boundness, then we can't combine it with aggregator's DB boundness
-		// In fact, this means that the DB boundness of the entire aggregator attribute is unknown or error
-		if (attributeDbBoundness is DbBoundnessType.NotDefined or DbBoundnessType.Error or DbBoundnessType.Unknown)
+		// On the other hand, if the attribute has error DB boundness, then we don't need to combine it with aggregator's DB boundness
+		// In fact, this means that the DB boundness of the entire original attribute placed on DAC field is error.
+		// Note, that if attribute's DB boundness is unknown, we still need to consider aggregator's DB boundness because it can be error boundness. 
+		if (attributeDbBoundness is DbBoundnessType.NotDefined or DbBoundnessType.Error)
 		{
 			calcedBoundnessByAttributeApplication[attributeApplication] = attributeDbBoundness;
 			return attributeDbBoundness;
