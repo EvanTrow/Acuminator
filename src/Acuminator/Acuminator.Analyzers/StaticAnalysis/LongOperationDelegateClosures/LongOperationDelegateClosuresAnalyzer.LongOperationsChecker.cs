@@ -1,10 +1,7 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Xml.Linq;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn;
@@ -43,7 +40,18 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 			{
 				ThrowIfCancellationRequested();
 
-				typeDeclarationNode.Accept(this);
+				try
+				{
+					typeDeclarationNode.Accept(this);
+				}
+				finally
+				{
+					// Clear state
+					if (NonCapturablePassedParameters == null)
+						NonCapturablePassedParameters = new();
+					else if (NonCapturablePassedParameters.Count > 0)
+						NonCapturablePassedParameters.Clear();
+				}
 			}
 
 			#region Visitor Optimization - do not visit some subtrees
