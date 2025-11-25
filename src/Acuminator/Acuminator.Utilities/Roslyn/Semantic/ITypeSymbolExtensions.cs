@@ -408,7 +408,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// This is unsafe method used for optimization.
 		/// It does not calculate base types itself, instead it relies on the list of base types provided by the caller (which can be incorrect).<br/>
 		/// In addition, the method does not check the <paramref name="typeSymbol"/> and <paramref name="precalcedBaseTypes"/> parameters for nulls and 
-		/// does not perfrom boxing of <see cref="ImmutableArray{T}"/> collections of attributes.
+		/// does not perform boxing of <see cref="ImmutableArray{T}"/> collections of attributes.
 		/// </remarks>
 		internal static IReadOnlyCollection<AttributeData> GetAllAttributesApplicationsDefinedOnThisAndBaseTypesUnsafe(this ITypeSymbol typeSymbol,
 																										IReadOnlyList<ITypeSymbol> precalcedBaseTypes)
