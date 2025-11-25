@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Acuminator.Utilities.Common;
+
 using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
@@ -10,6 +12,11 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 	/// </summary>
 	public class DataTypeAttributeInfo : IEquatable<DataTypeAttributeInfo>
 	{
+		/// <summary>
+		/// The type of the attribute.
+		/// </summary>
+		public INamedTypeSymbol AttributeType { get; }
+
 		public ITypeSymbol? DataType { get; }
 
 		public FieldTypeAttributeKind Kind { get; }
@@ -22,10 +29,11 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			Kind == FieldTypeAttributeKind.UnboundTypeAttribute || 
 			Kind == FieldTypeAttributeKind.MixedDbBoundnessTypeAttribute;
 
-		public DataTypeAttributeInfo(FieldTypeAttributeKind attributeKind, ITypeSymbol? fieldType)
+		public DataTypeAttributeInfo(FieldTypeAttributeKind attributeKind, INamedTypeSymbol attributeType, ITypeSymbol? fieldType)
 		{
-			DataType = fieldType;
-			Kind = attributeKind;
+			AttributeType = attributeType.CheckIfNull();
+			DataType 	  = fieldType;
+			Kind 		  = attributeKind;
 		}
 
 		public DbBoundnessType GetDbBoundness()
@@ -62,9 +70,12 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		{
 			if (ReferenceEquals(this, other))
 				return true;
+			else if (other == null)
+				return false;
 
-			return Kind == other?.Kind && SymbolEqualityComparer.Default.Equals(DataType, other.DataType) &&
-				   GetType() == other.GetType();
+			return Kind == other.Kind && GetType() == other.GetType() &&
+				   SymbolEqualityComparer.Default.Equals(DataType, other.DataType) &&
+				   SymbolEqualityComparer.Default.Equals(AttributeType, other.AttributeType);
 		}
 
 		public override int GetHashCode()
@@ -75,11 +86,12 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			{
 				hash = 23 * hash + Kind.GetHashCode();
 				hash = 23 * hash + SymbolEqualityComparer.Default.GetHashCode(DataType);
+				hash = 23 * hash + SymbolEqualityComparer.Default.GetHashCode(AttributeType);
 			}
 
 			return hash;
 		}
 
-		public override string ToString() => Kind.ToString();
+		public override string ToString() => $"{Kind.ToString()} {AttributeType}";
 	}
 }

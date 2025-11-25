@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -111,7 +109,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			if (dacFieldTypeAttributesInFlattenedSet.Count == 0)
 				return typeAttributeInfos as IReadOnlyCollection<DataTypeAttributeInfo> ?? [];
 
-			foreach (ITypeSymbol dacFieldTypeAttribute in dacFieldTypeAttributesInFlattenedSet)
+			foreach (INamedTypeSymbol dacFieldTypeAttribute in dacFieldTypeAttributesInFlattenedSet.OfType<INamedTypeSymbol>())
 			{
 				DataTypeAttributeInfo? attributeInfo = GetDacFieldTypeAttributeInfo(dacFieldTypeAttribute);
 
@@ -190,19 +188,19 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 		private DataTypeAttributeInfo? GetPXDbFieldAttributeInfoIfItIsUsedDirectly(ITypeSymbol attributeSymbol) =>
 			attributeSymbol.EqualsOrAggregatesAttributeDirectly(_pxDBFieldAttribute, _pxContext)
-				? new DataTypeAttributeInfo(FieldTypeAttributeKind.BoundTypeAttribute, fieldType: null)
+				? new DataTypeAttributeInfo(FieldTypeAttributeKind.BoundTypeAttribute, _pxDBFieldAttribute, fieldType: null)
 				: null;
 
-		private DataTypeAttributeInfo? GetDacFieldTypeAttributeInfo(ITypeSymbol dacFieldTypeAttribute)
+		private DataTypeAttributeInfo? GetDacFieldTypeAttributeInfo(INamedTypeSymbol dacFieldTypeAttribute)
 		{
 			if (dacFieldTypeAttribute.Equals(_pxDBScalarAttribute, SymbolEqualityComparer.Default))
-				return new DataTypeAttributeInfo(FieldTypeAttributeKind.PXDBScalarAttribute, fieldType: null);
+				return new DataTypeAttributeInfo(FieldTypeAttributeKind.PXDBScalarAttribute, _pxDBScalarAttribute, fieldType: null);
 			else if (dacFieldTypeAttribute.Equals(_pxDBCalcedAttribute, SymbolEqualityComparer.Default))
-				return new DataTypeAttributeInfo(FieldTypeAttributeKind.PXDBCalcedAttribute, fieldType: null);
+				return new DataTypeAttributeInfo(FieldTypeAttributeKind.PXDBCalcedAttribute, _pxDBCalcedAttribute, fieldType: null);
 			else if (BoundDacFieldTypeAttributesWithFieldType.TryGetValue(dacFieldTypeAttribute, out var boundFieldType))
-				return new DataTypeAttributeInfo(FieldTypeAttributeKind.BoundTypeAttribute, boundFieldType);
+				return new DataTypeAttributeInfo(FieldTypeAttributeKind.BoundTypeAttribute, dacFieldTypeAttribute, boundFieldType);
 			else if (UnboundDacFieldTypeAttributesWithFieldType.TryGetValue(dacFieldTypeAttribute, out var unboundFieldType))
-				return new DataTypeAttributeInfo(FieldTypeAttributeKind.UnboundTypeAttribute, unboundFieldType);
+				return new DataTypeAttributeInfo(FieldTypeAttributeKind.UnboundTypeAttribute, dacFieldTypeAttribute, unboundFieldType);
 
 			// TODO - some way of logging for Roslyn analyzers should be created with the support of out of process analysis
 			return null;
