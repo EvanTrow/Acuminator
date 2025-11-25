@@ -91,8 +91,8 @@ internal static class DbBoundnessInfoFromFlattenedAttributesSetAndMetadataCollec
 		// Get explicitly set DB boundness by this attribute application
 		var explicitDbBoundnessFromApplication =
 			ExplicitlySetAttributeDbBoundnessCalculator.GetDbBoundnessSetExplicitlyByAttributeApplication(attributeApplication.Application);
-		var combinedExplicitAndMetadataBoundness = CombineExplictlySetAndMetadataBoundnesses(explicitDbBoundnessFromApplication, 
-																							 dbBoundnessFromMetadata);
+		var combinedExplicitAndMetadataBoundness = CombineExplicitlySetAndMetadataBoundness(explicitDbBoundnessFromApplication, 
+																							dbBoundnessFromMetadata);
 
 		// If aggregated attribute does not define any DB boundness both explicitly and in metadata, 
 		// then there is no need to consider how it combines with aggregator's DB boundness. It is not a data type attribute.
@@ -126,8 +126,8 @@ internal static class DbBoundnessInfoFromFlattenedAttributesSetAndMetadataCollec
 		return combinedBoundnessFromApplicationAndMetadataAndAggregator;
 	}
 
-	private static DbBoundnessType CombineExplictlySetAndMetadataBoundnesses(DbBoundnessType explicitDbBoundnessFromApplication,
-																			 DbBoundnessType dbBoundnessFromMetadata)
+	private static DbBoundnessType CombineExplicitlySetAndMetadataBoundness(DbBoundnessType explicitDbBoundnessFromApplication,
+																			DbBoundnessType dbBoundnessFromMetadata)
 	{
 		if (dbBoundnessFromMetadata == DbBoundnessType.NotDefined)  // shortcut for undefined metadata boundness
 			return explicitDbBoundnessFromApplication;
