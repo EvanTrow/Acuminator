@@ -83,8 +83,8 @@ namespace Acuminator.Vsix.DiagnosticSuppression
 			}
 
 			if (!suppressionFileExists || 
-				!SuppressionManager.SuppressDiagnostic(semanticModel, diagnostic.Id, diagnostic.DataLocation.SourceSpan.Value,
-													   diagnostic.DefaultSeverity, Package.DisposalToken))
+				!SuppressionManager.SuppressDiagnosticInSuppressionFile(semanticModel, diagnostic.Id, diagnostic.DataLocation.SourceSpan.Value,
+																		diagnostic.DefaultSeverity, Package.DisposalToken))
 			{
 				ShowErrorMessage(suppressionFileRoslynDoc, project);
 			}

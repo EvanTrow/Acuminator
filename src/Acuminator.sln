@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Acuminator.Runner.NetFramework", "Acuminator\Acuminator.Runner.NetFramework\Acuminator.Runner.NetFramework.csproj", "{084CE6B0-BC72-461E-8D79-6B04C369BBCE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,13 +40,15 @@ Global
 		{B902103C-831B-4BBF-A88B-3DAE6F601CF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B902103C-831B-4BBF-A88B-3DAE6F601CF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B902103C-831B-4BBF-A88B-3DAE6F601CF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{084CE6B0-BC72-461E-8D79-6B04C369BBCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{084CE6B0-BC72-461E-8D79-6B04C369BBCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{084CE6B0-BC72-461E-8D79-6B04C369BBCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{084CE6B0-BC72-461E-8D79-6B04C369BBCE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		RESX_ResXSortingComparison = Ordinal
-		RESX_SortFileContentOnSave = True
 		SolutionGuid = {CA9909CB-EB85-43E3-8C21-0EFA82420B30}
 	EndGlobalSection
 EndGlobal

@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class APSetup : IBqlTable
+	public class APSetup : PXBqlTable, IBqlTable
 	{
 		#region RequireControlTotal
 		public abstract class requireControlTotal : PX.Data.IBqlField

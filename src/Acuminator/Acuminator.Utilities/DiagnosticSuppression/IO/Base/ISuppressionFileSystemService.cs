@@ -12,7 +12,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression.IO
 
 		bool Save(XDocument document, string path);
 
-		ISuppressionFileWatcherService CreateWatcher(string path);
+		ISuppressionFileWatcherService? CreateWatcher(string path);
 
 		string GetFileName(string path);
 

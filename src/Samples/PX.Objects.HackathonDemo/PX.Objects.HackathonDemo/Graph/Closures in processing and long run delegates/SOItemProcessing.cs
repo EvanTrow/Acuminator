@@ -10,7 +10,7 @@ namespace PX.Objects.HackathonDemo
 	{
 		private static readonly Guid ID = Guid.NewGuid();
 
-		public class SomeDAC : IBqlTable
+		public class SomeDAC : PXBqlTable, IBqlTable
 		{
 		}
 

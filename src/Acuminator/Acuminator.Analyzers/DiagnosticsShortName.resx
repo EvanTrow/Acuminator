@@ -345,6 +345,9 @@
   <data name="PX1068" xml:space="preserve">
     <value>PropertyAndBqlFieldTypesMismatch</value>
   </data>
+  <data name="PX1069" xml:space="preserve">
+    <value>MissingMandatoryDacFields</value>
+  </data>
   <data name="PX1070" xml:space="preserve">
     <value>UiPresentationLogicInEventHandlers</value>
   </data>
@@ -377,6 +380,9 @@
   </data>
   <data name="PX1078_DifferentTypeSize" xml:space="preserve">
     <value>TypesOfDacFieldAndReferencedFieldHaveDifferentSize</value>
+  </data>
+  <data name="PX1079" xml:space="preserve">
+    <value>PXOverrideWithoutDelegateParameter</value>
   </data>
   <data name="PX1080" xml:space="preserve">
     <value>LongRunOperationInDataViewDelegate</value>
@@ -432,7 +438,52 @@
   <data name="PX1096" xml:space="preserve">
     <value>PXOverrideSignatureMismatch</value>
   </data>
+  <data name="PX1097" xml:space="preserve">
+    <value>PXOverrideMethodMustBePublicNonVirtual</value>
+  </data>
+  <data name="PX1098" xml:space="preserve">
+    <value>PXOverrideMethodWithoutXmlDocComment</value>
+  </data>
   <data name="PX1099" xml:space="preserve">
     <value>UsageOfForbiddenApi</value>
+  </data>
+  <data name="PX1100" xml:space="preserve">
+    <value>ExtensionOfObsoleteElement</value>
+  </data>
+  <data name="PX1101" xml:space="preserve">
+    <value>PXOverrideWithInvalidDelegateParameter</value>
+  </data>
+  <data name="PX1102" xml:space="preserve">
+    <value>PXOverrideInvalidNameOfDelegateParameter</value>
+  </data>
+  <data name="PX1110" xml:space="preserve">
+    <value>MissingNoteIdFieldInDacWithLocalizableFieldValues</value>
+  </data>
+  <data name="PX1111" xml:space="preserve">
+    <value>MainDacOfProcessingViewMustContainNoteIdField</value>
+  </data>
+  <data name="PX1112" xml:space="preserve">
+    <value>GenericNonAbstractGraphOrGraphExtension</value>
+  </data>
+  <data name="PX1113" xml:space="preserve">
+    <value>SealedGraphOrGraphExtension</value>
+  </data>
+  <data name="PX1114" xml:space="preserve">
+    <value>GraphExtensionInheritFromNonAbstractGraphExtension</value>
+  </data>
+  <data name="PX1115DacExtension" xml:space="preserve">
+    <value>NonAbstractBaseDacExtension</value>
+  </data>
+  <data name="PX1115GraphExtension" xml:space="preserve">
+    <value>NonTerminalBaseGraphExtension</value>
+  </data>
+  <data name="PX1120_StoreTaskInVariable" xml:space="preserve">
+    <value>StoreTaskInVariableOrParameter</value>
+  </data>
+  <data name="PX1120_MethodReturnTypeIsNotTask" xml:space="preserve">
+    <value>MethodReturnTypeIsNotTask</value>
+  </data>
+  <data name="PX1120_NotAwaitedTaskReturningExpression" xml:space="preserve">
+    <value>NotAwaitedTaskReturningExpression</value>
   </data>
 </root>

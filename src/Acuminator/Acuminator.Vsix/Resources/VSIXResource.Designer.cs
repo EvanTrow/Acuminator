@@ -250,6 +250,15 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Node Expansion.
+        /// </summary>
+        public static string Category_NodeExpansion {
+            get {
+                return ResourceManager.GetString("Category_NodeExpansion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to BQL Outlining.
         /// </summary>
         public static string Category_Outlining {
@@ -264,6 +273,69 @@ namespace Acuminator.Vsix {
         public static string CodeMap_ConstructorNodeName {
             get {
                 return ResourceManager.GetString("CodeMap_ConstructorNodeName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All Fields.
+        /// </summary>
+        public static string CodeMap_DAC_MemberCategories_AllFields {
+            get {
+                return ResourceManager.GetString("CodeMap_DAC_MemberCategories_AllFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Audit Fields.
+        /// </summary>
+        public static string CodeMap_DAC_MemberCategories_AuditFields {
+            get {
+                return ResourceManager.GetString("CodeMap_DAC_MemberCategories_AuditFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Base Types.
+        /// </summary>
+        public static string CodeMap_DAC_MemberCategories_BaseTypes {
+            get {
+                return ResourceManager.GetString("CodeMap_DAC_MemberCategories_BaseTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Initialization &amp; Activation.
+        /// </summary>
+        public static string CodeMap_DAC_MemberCategories_InitializationAndActivation {
+            get {
+                return ResourceManager.GetString("CodeMap_DAC_MemberCategories_InitializationAndActivation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keys.
+        /// </summary>
+        public static string CodeMap_DAC_MemberCategories_Keys {
+            get {
+                return ResourceManager.GetString("CodeMap_DAC_MemberCategories_Keys", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Non-BQL Properties.
+        /// </summary>
+        public static string CodeMap_DAC_MemberCategories_NonBQLProperties {
+            get {
+                return ResourceManager.GetString("CodeMap_DAC_MemberCategories_NonBQLProperties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to System Non-Audit Fields.
+        /// </summary>
+        public static string CodeMap_DAC_MemberCategories_SystemNonAuditFields {
+            get {
+                return ResourceManager.GetString("CodeMap_DAC_MemberCategories_SystemNonAuditFields", resourceCulture);
             }
         }
         
@@ -340,11 +412,47 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An audit DAC field.
+        /// </summary>
+        public static string CodeMap_ExtraInfo_DacAuditFieldIconTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_ExtraInfo_DacAuditFieldIconTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A list of audit fields.
+        /// </summary>
+        public static string CodeMap_ExtraInfo_DacAuditFieldsCategoryIconTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_ExtraInfo_DacAuditFieldsCategoryIconTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Is part of a primary key.
         /// </summary>
         public static string CodeMap_ExtraInfo_DacKeyIconTooltip {
             get {
                 return ResourceManager.GetString("CodeMap_ExtraInfo_DacKeyIconTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A system non-audit DAC field.
+        /// </summary>
+        public static string CodeMap_ExtraInfo_DacSystemNonAuditFieldIconTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_ExtraInfo_DacSystemNonAuditFieldIconTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A list of system non-audit DAC fields.
+        /// </summary>
+        public static string CodeMap_ExtraInfo_DacSystemNonAuditFieldsCategoryIconTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_ExtraInfo_DacSystemNonAuditFieldsCategoryIconTooltip", resourceCulture);
             }
         }
         
@@ -439,6 +547,15 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This DAC has a PXAccumulator attribute or an attribute derived from the PXAccumulator attribute.
+        /// </summary>
+        public static string CodeMap_ExtraInfo_PXAccumulatorDacIndicatorTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_ExtraInfo_PXAccumulatorDacIndicatorTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This view is PXFilter or it is derived from it.
         /// </summary>
         public static string CodeMap_ExtraInfo_PXFilterViewIconTooltip {
@@ -493,11 +610,20 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is a projection attribute.
+        ///   Looks up a localized string similar to This is the projection attribute.
         /// </summary>
         public static string CodeMap_Icon_ProjectionAttributeTooltip {
             get {
                 return ResourceManager.GetString("CodeMap_Icon_ProjectionAttributeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the PXAccumulator attribute.
+        /// </summary>
+        public static string CodeMap_Icon_PXAccumulatorAttributeTooltip {
+            get {
+                return ResourceManager.GetString("CodeMap_Icon_PXAccumulatorAttributeTooltip", resourceCulture);
             }
         }
         
@@ -809,7 +935,7 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enables Acuminator diagnostics suppression with suppression comments and Acuminator suppression files. If this setting is set to false, Acuminator will ignore suppression comments in the source code and Acuminator suppression files and display all found diagnostics..
+        ///   Looks up a localized string similar to Enables Acuminator diagnostic suppression by using suppression comments and Acuminator suppression files. If this setting is set to false, Acuminator will ignore suppression comments in the source code and Acuminator suppression files and display detected errors and warnings for all diagnostics..
         /// </summary>
         public static string Setting_CodeAnalysis_SuppressionMechanismEnabled_Description {
             get {
@@ -818,11 +944,65 @@ namespace Acuminator.Vsix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable Acuminator diagnostics suppression.
+        ///   Looks up a localized string similar to Enable Acuminator diagnostic suppression.
         /// </summary>
         public static string Setting_CodeAnalysis_SuppressionMechanismEnabled_Title {
             get {
                 return ResourceManager.GetString("Setting_CodeAnalysis_SuppressionMechanismEnabled_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand Code Map attribute nodes on opening..
+        /// </summary>
+        public static string Setting_CodeMap_ExpandAttributeNodes_Description {
+            get {
+                return ResourceManager.GetString("Setting_CodeMap_ExpandAttributeNodes_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand Attribute Nodes.
+        /// </summary>
+        public static string Setting_CodeMap_ExpandAttributeNodes_Title {
+            get {
+                return ResourceManager.GetString("Setting_CodeMap_ExpandAttributeNodes_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand Code Map regular non-attribute nodes on opening..
+        /// </summary>
+        public static string Setting_CodeMap_ExpandRegularNodes_Description {
+            get {
+                return ResourceManager.GetString("Setting_CodeMap_ExpandRegularNodes_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand Regular Nodes .
+        /// </summary>
+        public static string Setting_CodeMap_ExpandRegularNodes_Title {
+            get {
+                return ResourceManager.GetString("Setting_CodeMap_ExpandRegularNodes_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand Code Map root nodes on opening..
+        /// </summary>
+        public static string Setting_CodeMap_ExpandRootNodes_Description {
+            get {
+                return ResourceManager.GetString("Setting_CodeMap_ExpandRootNodes_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand Root Nodes.
+        /// </summary>
+        public static string Setting_CodeMap_ExpandRootNodes_Title {
+            get {
+                return ResourceManager.GetString("Setting_CodeMap_ExpandRootNodes_Title", resourceCulture);
             }
         }
         

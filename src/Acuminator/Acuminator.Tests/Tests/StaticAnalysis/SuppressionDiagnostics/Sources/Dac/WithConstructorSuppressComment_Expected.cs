@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class SOOrder : IBqlTable
+	public class SOOrder : PXBqlTable, IBqlTable
 	{
 		#region Cons
 		// Acuminator disable once PX1028 ConstructorInDacDeclaration [Justification]
@@ -100,6 +100,7 @@ namespace PX.Objects.HackathonDemo
 		#region Hold
 		public abstract class hold : IBqlField { }
 		[PXDBBool]
+		// Acuminator disable once PX1030 PXDefaultIncorrectUse [Justification]
 		[PXDefault(true)]
 		[PXUIField(DisplayName = "Hold")]
 		public bool? Hold { get; set; }

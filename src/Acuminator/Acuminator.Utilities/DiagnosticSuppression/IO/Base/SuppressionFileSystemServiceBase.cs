@@ -76,7 +76,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression.IO
 		public virtual string GetFileDirectory(string path) =>
 			Path.GetDirectoryName(path.CheckIfNullOrWhiteSpace());
 
-		public abstract ISuppressionFileWatcherService CreateWatcher(string path);
+		public abstract ISuppressionFileWatcherService? CreateWatcher(string path);
 
 		private bool FilterException(Exception exception)
 		{

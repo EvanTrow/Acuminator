@@ -14,19 +14,26 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	{
 		public override Icon NodeIcon => AttributeInfo.IsPXProjection
 			? Icon.ProjectionAttribute
-			: Icon.Attribute;
+			: AttributeInfo.IsPXAccumulatorAttribute
+				? Icon.PXAccumulatorAttribute
+				: Icon.Attribute;
 
-		public override bool IconDependsOnCurrentTheme => !AttributeInfo.IsPXProjection;
+		public override bool IconDependsOnCurrentTheme => !AttributeInfo.IsPXProjection && !AttributeInfo.IsPXAccumulatorAttribute;
 
 		public override ExtendedObservableCollection<ExtraInfoViewModel>? ExtraInfos { get; }
 
-		public DacAttributeNodeViewModel(TreeNodeViewModel parent, DacAttributeInfo attributeInfo, bool isExpanded = false) :
-									base(parent, attributeInfo, isExpanded)
+		public DacAttributeNodeViewModel(TreeNodeViewModel parent, DacAttributeInfo attributeInfo, Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+									base(parent, attributeInfo, isExpandedCalculator)
 		{
-			ExtraInfos = new ExtendedObservableCollection<ExtraInfoViewModel>(GetDacExtraInfos());
+			var dacFriendlyNameInfo = GetDacFriendlyNameForPXCacheNameAttribute();
+
+			if (dacFriendlyNameInfo != null)
+			{
+				ExtraInfos = new ExtendedObservableCollection<ExtraInfoViewModel>(dacFriendlyNameInfo);
+			}
 		}
 
-		private IEnumerable<ExtraInfoViewModel> GetDacExtraInfos()
+		private ExtraInfoViewModel? GetDacFriendlyNameForPXCacheNameAttribute()
 		{
 			if (AttributeInfo.IsPXCacheName)
 			{
@@ -36,9 +43,11 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				{
 					dacFriendlyName = $"\"{dacFriendlyName}\"";
 					Color color = Color.FromRgb(38, 155, 199);
-					yield return new TextViewModel(this, dacFriendlyName, darkThemeForeground: color, lightThemeForeground: color);
+					return new TextViewModel(this, dacFriendlyName, darkThemeForeground: color, lightThemeForeground: color);
 				}
 			}
+
+			return null;
 		}
 
 		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => 

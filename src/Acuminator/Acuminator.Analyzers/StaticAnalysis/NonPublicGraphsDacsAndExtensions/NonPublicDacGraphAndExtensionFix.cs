@@ -132,7 +132,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NonPublicGraphsDacsAndExtensions
 				SyntaxFactory.TokenList(
 					SyntaxFactory.Token(SyntaxKind.PublicKeyword));
 
-			var modifiersToTransfer = nonPublicTypeNode.Modifiers.Where(token => !SyntaxFacts.IsAccessibilityModifier(token.Kind()));
+			var modifiersToTransfer = nonPublicTypeNode.Modifiers.Where((in SyntaxToken token) => !SyntaxFacts.IsAccessibilityModifier(token.Kind()));
 			modifiersWithPublicAccesibility = modifiersWithPublicAccesibility.AddRange(modifiersToTransfer);
 			return nonPublicTypeNode.WithModifiers(modifiersWithPublicAccesibility);
 		}

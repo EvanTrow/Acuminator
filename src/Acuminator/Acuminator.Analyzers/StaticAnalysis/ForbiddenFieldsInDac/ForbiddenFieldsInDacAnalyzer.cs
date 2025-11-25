@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -22,8 +21,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.ForbiddenFieldsInDac
 	/// </summary>
 	public class ForbiddenFieldsInDacAnalyzer : DacAggregatedAnalyzerBase
 	{
-		private const string CompanyPrefix = "Company";
-
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create
 			(
@@ -35,55 +32,36 @@ namespace Acuminator.Analyzers.StaticAnalysis.ForbiddenFieldsInDac
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacOrDacExtension)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
-
-			var forbiddenNames = DacFieldNames.Restricted.All;
-			CheckDacPropertiesForForbiddenNames(dacOrDacExtension, pxContext, context, forbiddenNames);
-
-			var allNestedTypes = dacOrDacExtension.GetMemberNodes<ClassDeclarationSyntax>()
-												  .ToLookup(node => node.Identifier.ValueText, StringComparer.OrdinalIgnoreCase);
+			CheckDacFieldsForForbiddenNames(dacOrDacExtension, pxContext, context);
 
 			context.CancellationToken.ThrowIfCancellationRequested();
-			CheckDacBqlFieldsForForbiddenNames(pxContext, context, forbiddenNames, allNestedTypes);
-
-			context.CancellationToken.ThrowIfCancellationRequested();
-			CheckDacPropertiesForCompanyPrefix(dacOrDacExtension, forbiddenNames, pxContext, context);
-
-			context.CancellationToken.ThrowIfCancellationRequested();
-			CheckDacBqlFieldsForCompanyPrefix(allNestedTypes, pxContext, forbiddenNames, context);
+			CheckDacFieldsForCompanyPrefix(dacOrDacExtension, pxContext, context);
 		}
 		
-		private void CheckDacPropertiesForForbiddenNames(DacSemanticModel dacOrDacExtension, PXContext pxContext, SymbolAnalysisContext context,
-														 in ImmutableArray<string> forbiddenNames)
+		private void CheckDacFieldsForForbiddenNames(DacSemanticModel dacOrDacExtension, PXContext pxContext, in SymbolAnalysisContext context)
 		{
-			var invalidProperties = from forbiddenFieldName in forbiddenNames
-									where dacOrDacExtension.PropertiesByNames.ContainsKey(forbiddenFieldName)
-									select dacOrDacExtension.PropertiesByNames[forbiddenFieldName];
+			var forbiddenNames = DacFieldNames.Restricted.All;
 
-			foreach (DacPropertyInfo property in invalidProperties.Where(p => dacOrDacExtension.Symbol.Equals(p.Symbol.ContainingSymbol, 
-																											  SymbolEqualityComparer.Default)))
+			foreach (string forbiddenFieldName in forbiddenNames)
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
 
-				// Node not null here because aggregated DAC analysers by default run only on DACs in source 
-				// and these properties are declared in the DAC type itself
-				RegisterForbiddenFieldDiagnosticForIdentifier(property.Node!.Identifier, pxContext, context);
+				if (!dacOrDacExtension.DacFieldsByNames.TryGetValue(forbiddenFieldName, out var forbiddenDacField))
+					continue;
+
+				if (forbiddenDacField.PropertyInfo?.Node != null && forbiddenDacField.PropertyInfo.Symbol.IsDeclaredInType(dacOrDacExtension.Symbol))
+				{
+					RegisterForbiddenFieldDiagnosticForIdentifier(forbiddenDacField.PropertyInfo.Node.Identifier, pxContext, context);
+				}
+
+				if (forbiddenDacField.BqlFieldInfo?.Node != null && forbiddenDacField.BqlFieldInfo.Symbol.IsDeclaredInType(dacOrDacExtension.Symbol))
+				{
+					RegisterForbiddenFieldDiagnosticForIdentifier(forbiddenDacField.BqlFieldInfo.Node.Identifier, pxContext, context);
+				}
 			}
 		}
 
-		private void CheckDacBqlFieldsForForbiddenNames(PXContext pxContext, SymbolAnalysisContext context, in ImmutableArray<string> forbiddenNames,
-														ILookup<string, ClassDeclarationSyntax> allNestedTypes)
-		{
-			var allInvalidFields = forbiddenNames.Where(forbiddenClassName		=> allNestedTypes.Contains(forbiddenClassName))
-												 .SelectMany(forbiddenClassName => allNestedTypes[forbiddenClassName]);
-
-			foreach (ClassDeclarationSyntax fieldNode in allInvalidFields)
-			{
-				context.CancellationToken.ThrowIfCancellationRequested();
-				RegisterForbiddenFieldDiagnosticForIdentifier(fieldNode.Identifier, pxContext, context);
-			}
-		}
-
-		private void RegisterForbiddenFieldDiagnosticForIdentifier(SyntaxToken identifier, PXContext pxContext, SymbolAnalysisContext context)
+		private void RegisterForbiddenFieldDiagnosticForIdentifier(SyntaxToken identifier, PXContext pxContext, in SymbolAnalysisContext context)
 		{
 			bool isDeletedDatabaseRecord = DacFieldNames.Restricted.DeletedDatabaseRecord.Equals(identifier.ValueText, StringComparison.OrdinalIgnoreCase);
 			DiagnosticDescriptor descriptorToShow = 
@@ -96,36 +74,26 @@ namespace Acuminator.Analyzers.StaticAnalysis.ForbiddenFieldsInDac
 				pxContext.CodeAnalysisSettings);
 		}
 
-		private void CheckDacPropertiesForCompanyPrefix(DacSemanticModel dacOrDacExtension, ImmutableArray<string> forbiddenNames, 
-														PXContext pxContext, SymbolAnalysisContext context)
+		private void CheckDacFieldsForCompanyPrefix(DacSemanticModel dacOrDacExtension, PXContext pxContext, in SymbolAnalysisContext context)
 		{
-			var propertiesWithInvalidPrefix = 
-				dacOrDacExtension.DeclaredDacFieldPropertiesWithBqlFields
-								 .Where(property => property.Name.StartsWith(CompanyPrefix, StringComparison.OrdinalIgnoreCase) &&
-													forbiddenNames.All(field => !field.Equals(property.Name, StringComparison.OrdinalIgnoreCase)));
+			var dacFieldsWithCompanyPrefix = dacOrDacExtension.DeclaredDacFields
+															  .Where(field => field.FieldCategory == DacFieldCategory.CompanyPrefix);
 
-			foreach (DacPropertyInfo property in propertiesWithInvalidPrefix)
+			foreach (DacFieldInfo companyPrefixedField in dacFieldsWithCompanyPrefix)
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
 
-				// Node not null here because aggregated DAC analysers by default run only on DACs in source 
-				// and these properties are declared in the DAC type itself
-				RegisterCompanyPrefixDiagnosticForIdentifier(property.Node!.Identifier, pxContext, context);
-			}
-		}
+				if (companyPrefixedField.PropertyInfo?.Node != null && 
+					companyPrefixedField.PropertyInfo.Symbol.IsDeclaredInType(dacOrDacExtension.Symbol))
+				{
+					RegisterCompanyPrefixDiagnosticForIdentifier(companyPrefixedField.PropertyInfo.Node.Identifier, pxContext, context);
+				}
 
-		private void CheckDacBqlFieldsForCompanyPrefix(ILookup<string, ClassDeclarationSyntax> allNestedTypes, PXContext pxContext,
-													   ImmutableArray<string> forbiddenNames, SymbolAnalysisContext context)
-		{
-			var fieldsWithInvalidPrefix = 
-				allNestedTypes.Where(groupedByName => groupedByName.Key.StartsWith(CompanyPrefix, StringComparison.OrdinalIgnoreCase) &&
-													  forbiddenNames.All(field => !field.Equals(groupedByName.Key, StringComparison.OrdinalIgnoreCase)))
-							  .SelectMany(groupedByName => groupedByName);
-
-			foreach (ClassDeclarationSyntax fieldNode in fieldsWithInvalidPrefix)
-			{
-				context.CancellationToken.ThrowIfCancellationRequested();
-				RegisterCompanyPrefixDiagnosticForIdentifier(fieldNode.Identifier, pxContext, context);
+				if (companyPrefixedField.BqlFieldInfo?.Node != null && 
+					companyPrefixedField.BqlFieldInfo.Symbol.IsDeclaredInType(dacOrDacExtension.Symbol))
+				{
+					RegisterCompanyPrefixDiagnosticForIdentifier(companyPrefixedField.BqlFieldInfo.Node.Identifier, pxContext, context);
+				}
 			}
 		}
 

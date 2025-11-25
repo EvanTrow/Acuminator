@@ -745,6 +745,15 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to MissingMandatoryDacFields.
+        /// </summary>
+        public static string PX1069 {
+            get {
+                return ResourceManager.GetString("PX1069", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to UiPresentationLogicInEventHandlers.
         /// </summary>
         public static string PX1070 {
@@ -840,6 +849,15 @@ namespace Acuminator.Analyzers {
         public static string PX1078_DifferentTypeSize {
             get {
                 return ResourceManager.GetString("PX1078_DifferentTypeSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PXOverrideWithoutDelegateParameter.
+        /// </summary>
+        public static string PX1079 {
+            get {
+                return ResourceManager.GetString("PX1079", resourceCulture);
             }
         }
         
@@ -1006,11 +1024,146 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to PXOverrideMethodMustBePublicNonVirtual.
+        /// </summary>
+        public static string PX1097 {
+            get {
+                return ResourceManager.GetString("PX1097", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PXOverrideMethodWithoutXmlDocComment.
+        /// </summary>
+        public static string PX1098 {
+            get {
+                return ResourceManager.GetString("PX1098", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to UsageOfForbiddenApi.
         /// </summary>
         public static string PX1099 {
             get {
                 return ResourceManager.GetString("PX1099", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ExtensionOfObsoleteElement.
+        /// </summary>
+        public static string PX1100 {
+            get {
+                return ResourceManager.GetString("PX1100", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PXOverrideWithInvalidDelegateParameter.
+        /// </summary>
+        public static string PX1101 {
+            get {
+                return ResourceManager.GetString("PX1101", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PXOverrideInvalidNameOfDelegateParameter.
+        /// </summary>
+        public static string PX1102 {
+            get {
+                return ResourceManager.GetString("PX1102", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MissingNoteIdFieldInDacWithLocalizableFieldValues.
+        /// </summary>
+        public static string PX1110 {
+            get {
+                return ResourceManager.GetString("PX1110", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MainDacOfProcessingViewMustContainNoteIdField.
+        /// </summary>
+        public static string PX1111 {
+            get {
+                return ResourceManager.GetString("PX1111", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GenericNonAbstractGraphOrGraphExtension.
+        /// </summary>
+        public static string PX1112 {
+            get {
+                return ResourceManager.GetString("PX1112", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SealedGraphOrGraphExtension.
+        /// </summary>
+        public static string PX1113 {
+            get {
+                return ResourceManager.GetString("PX1113", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GraphExtensionInheritFromNonAbstractGraphExtension.
+        /// </summary>
+        public static string PX1114 {
+            get {
+                return ResourceManager.GetString("PX1114", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NonAbstractBaseDacExtension.
+        /// </summary>
+        public static string PX1115DacExtension {
+            get {
+                return ResourceManager.GetString("PX1115DacExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NonTerminalBaseGraphExtension.
+        /// </summary>
+        public static string PX1115GraphExtension {
+            get {
+                return ResourceManager.GetString("PX1115GraphExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MethodReturnTypeIsNotTask.
+        /// </summary>
+        public static string PX1120_MethodReturnTypeIsNotTask {
+            get {
+                return ResourceManager.GetString("PX1120_MethodReturnTypeIsNotTask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NotAwaitedTaskReturningExpression.
+        /// </summary>
+        public static string PX1120_NotAwaitedTaskReturningExpression {
+            get {
+                return ResourceManager.GetString("PX1120_NotAwaitedTaskReturningExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to StoreTaskInVariableOrParameter.
+        /// </summary>
+        public static string PX1120_StoreTaskInVariable {
+            get {
+                return ResourceManager.GetString("PX1120_StoreTaskInVariable", resourceCulture);
             }
         }
     }

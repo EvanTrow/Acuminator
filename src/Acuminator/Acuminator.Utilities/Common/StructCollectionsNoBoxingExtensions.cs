@@ -1,16 +1,67 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
+
 using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Common
 {
 	public static class StructCollectionsNoBoxingExtensions
 	{
+		public delegate bool PredicateWithInputByReadOnlyRef<TItem>(in TItem item);
+		public delegate TResult FuncWithInputByReadOnlyRef<TItem, TResult>(in TItem item);
+		public delegate void ActionWithInputByReadOnlyRef<TItem>(in TItem item);
+
+		/// <summary>
+		/// Prepends struct collection <paramref name="source"/> with an <paramref name="itemToAdd"/>.<br/>
+		/// This methods prevents additional boxing on convertation of a <typeparamref name="TStructCollection"/> collection to <see cref="IEnumerable{T}"/>.
+		/// </summary>
+		/// <typeparam name="TStructCollection">Type of the structure collection.</typeparam>
+		/// <typeparam name="TItem">Type of the item.</typeparam>
+		/// <param name="source">The struct collection to act on.</param>
+		/// <param name="itemToAdd">The item to add.</param>
+		/// <returns>
+		/// An <see cref="IEnumerable{TItem}"/> that contains the <paramref name="itemToAdd"/> followed by the items in <paramref name="source"/>.
+		/// </returns>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<TItem> PrependItem<TStructCollection, TItem>(this TStructCollection source, TItem itemToAdd)
+		where TStructCollection : struct, IEnumerable<TItem> =>
+			source.PrependOrAppend(itemToAdd, isAppending: false);
+
+		/// <summary>
+		/// Appends struct collection <paramref name="source"/> with an <paramref name="item"/>.<br/>
+		/// This methods prevents additional boxing on convertation of a <typeparamref name="TStructCollection"/> collection to <see cref="IEnumerable{T}"/>.
+		/// </summary>
+		/// <typeparam name="TItem">Type of the item.</typeparam>
+		/// <param name="source">The struct collection to act on.</param>
+		/// <param name="itemToAdd">The item to add.</param>
+		/// <returns>
+		/// An <see cref="IEnumerable{TItem}"/> that contains the items in <paramref name="source"/> followed by the <paramref name="itemToAdd"/>.
+		/// </returns>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<TItem> AppendItem<TStructCollection, TItem>(this TStructCollection source, TItem itemToAdd)
+		where TStructCollection : struct, IReadOnlyCollection<TItem> =>
+			source.PrependOrAppend(itemToAdd, isAppending: true);
+
+		[DebuggerStepThrough]
+		private static IEnumerable<TItem> PrependOrAppend<TStructCollection, TItem>(this TStructCollection source, TItem itemToAdd, bool isAppending)
+		where TStructCollection : struct, IEnumerable<TItem>
+		{
+			if (!isAppending)
+				yield return itemToAdd;
+
+			foreach (var item in source)
+				yield return item;
+
+			if (isAppending)
+				yield return itemToAdd;
+		}
+
 		/// <summary>
 		/// Concatenate structure list to this collection. This is an optimization method which allows to avoid boxing for collections implemented as structs.
 		/// </summary>
@@ -68,12 +119,13 @@ namespace Acuminator.Utilities.Common
 		/// <returns/>
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<SyntaxToken> Where(this SyntaxTokenList source, Func<SyntaxToken, bool> predicate)
+		public static IEnumerable<SyntaxToken> Where(this in SyntaxTokenList source, PredicateWithInputByReadOnlyRef<SyntaxToken> predicate)
 		{
 			predicate.ThrowOnNull();
-			return WhereForSyntaxTokenListImplementation();
+			return WhereForSyntaxTokenListImplementation(source, predicate);
 
-			IEnumerable<SyntaxToken> WhereForSyntaxTokenListImplementation()
+			static IEnumerable<SyntaxToken> WhereForSyntaxTokenListImplementation(SyntaxTokenList source, 
+																				  PredicateWithInputByReadOnlyRef<SyntaxToken> predicate)
 			{
 				for (int i = 0; i < source.Count; i++)
 				{
@@ -95,7 +147,7 @@ namespace Acuminator.Utilities.Common
 		/// <returns/>
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static SyntaxToken FirstOrDefault(this SyntaxTokenList source, Func<SyntaxToken, bool> predicate)
+		public static SyntaxToken FirstOrDefault(this in SyntaxTokenList source, PredicateWithInputByReadOnlyRef<SyntaxToken> predicate)
 		{
 			predicate.ThrowOnNull();
 
@@ -140,26 +192,290 @@ namespace Acuminator.Utilities.Common
 		}
 
 		/// <summary>
+		/// Any method for <see cref="SyntaxList{TNode}"/>. This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <typeparam name="TNode">Type of the syntax node.</typeparam>
+		/// <param name="source">The source to act on.</param>
+		/// <param name="predicate">The predicate.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		public static bool Any<TNode>(this SyntaxList<TNode> source, Func<TNode, bool> predicate)
+		where TNode : SyntaxNode
+		{
+			predicate.ThrowOnNull();
+
+			for (int i = 0; i < source.Count; i++)
+			{
+				if (predicate(source[i]))
+					return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Select method for <see cref="SyntaxTriviaList"/>. This is an optimization method which allows to avoid boxing.
 		/// </summary>
 		/// <typeparam name="TResult">Type of the result.</typeparam>
-		/// <param name="triviaList">The triviaList to act on.</param>
+		/// <param name="triviaList">The trivia list to act on.</param>
 		/// <param name="selector">The selector.</param>
 		/// <returns/>
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<TResult> Select<TResult>(this SyntaxTriviaList triviaList, Func<SyntaxTrivia, TResult> selector)
+		public static IEnumerable<TResult> Select<TResult>(this in SyntaxTriviaList triviaList, 
+														  FuncWithInputByReadOnlyRef<SyntaxTrivia, TResult> selector)
 		{
 			selector.ThrowOnNull();
-			return SelectForStructListImplementation();
+			return SelectForStructListImplementation(triviaList, selector);
 
-			IEnumerable<TResult> SelectForStructListImplementation()
+			static IEnumerable<TResult> SelectForStructListImplementation(SyntaxTriviaList triviaList, 
+																		  FuncWithInputByReadOnlyRef<SyntaxTrivia, TResult> selector)
 			{
 				for (int i = 0; i < triviaList.Count; i++)
 				{
 					yield return selector(triviaList[i]);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Where method for <see cref="SyntaxTriviaList"/>. 
+		/// This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="triviaList">The trivia list to act on.</param>
+		/// <param name="predicate">The selector.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<SyntaxTrivia> Where(this in SyntaxTriviaList triviaList,
+													  PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate) =>
+			WhereImplementation(triviaList, predicate.CheckIfNull());
+
+		/// <summary>
+		/// Where method for <see cref="SyntaxTriviaList.Reversed"/>.
+		/// This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="reversedTrivia">The reversedTrivia to act on.</param>
+		/// <param name="predicate">The selector.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<SyntaxTrivia> Where(this in SyntaxTriviaList.Reversed reversedTrivia,
+													  PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate) =>
+			WhereImplementation(reversedTrivia, predicate.CheckIfNull());
+
+		private static IEnumerable<SyntaxTrivia> WhereImplementation<TStructCollection>(TStructCollection source,
+																						PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate)
+		where TStructCollection : struct, IEnumerable<SyntaxTrivia>
+		{
+			foreach (SyntaxTrivia item in source)
+			{
+				if (predicate(item))
+					yield return item;
+			}
+		}
+
+		/// <summary>
+		/// Take method for <see cref="SyntaxTriviaList"/>. This is an optimization method which allows to avoid boxing and allocations in some cases.
+		/// </summary>
+		/// <param name="triviaList">The trivia list to act on.</param>
+		/// <param name="countToTake">The count of elements to take.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static SyntaxTriviaList Take(this in SyntaxTriviaList triviaList, int countToTake)
+		{
+			if (countToTake >= triviaList.Count)
+				return triviaList;
+
+			switch (countToTake)
+			{
+				case <= 0:
+					return SyntaxTriviaList.Empty;
+				case 1:
+					return new SyntaxTriviaList(triviaList[0]);     // Hot path to avoid some allocations
+				default:
+					var slice = new SyntaxTrivia[countToTake];
+
+					for (int i = 0; i < countToTake; i++)
+						slice[i] = triviaList[i];
+
+					return new SyntaxTriviaList(slice);
+			}
+		}
+
+		/// <summary>
+		/// Skip method for <see cref="SyntaxTriviaList"/>. This is an optimization method which allows to avoid boxing and allocations in many cases.
+		/// </summary>
+		/// <param name="triviaList">The trivia list to act on.</param>
+		/// <param name="countToSkip">The count of elements to skip.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static SyntaxTriviaList Skip(this in SyntaxTriviaList triviaList, int countToSkip)
+		{
+			if (countToSkip >= triviaList.Count)
+				return SyntaxTriviaList.Empty;
+			else if (countToSkip <= 0)
+				return triviaList;
+			else if (countToSkip == triviaList.Count - 1)		// Hot path to avoid some allocations
+				return new SyntaxTriviaList(triviaList[^1]);
+			else
+			{
+				int countOfElementsToTake = triviaList.Count - countToSkip;
+				var slice = new SyntaxTrivia[countOfElementsToTake];
+
+				for (int i = 0; i < slice.Length; i++)
+					slice[i] = triviaList[i + countToSkip];
+
+				return new SyntaxTriviaList(slice);
+			}
+		}
+
+		/// <summary>
+		/// TakeWhile method for <see cref="SyntaxTriviaList"/>. This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="triviaList">The trivia list to act on.</param>
+		/// <param name="predicate">The selector.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<SyntaxTrivia> TakeWhile(this in SyntaxTriviaList triviaList,
+														  PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate)
+		{
+			predicate.ThrowOnNull();
+			return TakeWhileImplementation(triviaList, predicate);
+		}
+
+		/// <summary>
+		/// TakeWhile method for <see cref="SyntaxTriviaList.Reversed"/>. This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="reversedTrivia">The reversedTrivia to act on.</param>
+		/// <param name="predicate">The selector.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<SyntaxTrivia> TakeWhile(this in SyntaxTriviaList.Reversed reversedTrivia,
+														  PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate)
+		{
+			predicate.ThrowOnNull();
+			return TakeWhileImplementation(reversedTrivia, predicate);			
+		}
+
+		private static IEnumerable<SyntaxTrivia> TakeWhileImplementation<TStructCollection>(TStructCollection source,
+																							PredicateWithInputByReadOnlyRef<SyntaxTrivia> predicate)
+		where TStructCollection : struct, IEnumerable<SyntaxTrivia>
+		{
+			foreach (SyntaxTrivia item in source)
+			{
+				if (predicate(item))
+					yield return item;
+				else
+					yield break;
+			}
+		}
+
+		/// <summary>
+		/// Concat method that appends <see cref="SyntaxTriviaList"/> collection without boxing.<br/>
+		/// This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="source">The source collection to act on.</param>
+		/// <param name="triviasToAdd">The <see cref="SyntaxTriviaList"/> trivias to add.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		public static IEnumerable<SyntaxTrivia> Concat(this IEnumerable<SyntaxTrivia>? source, in SyntaxTriviaList triviasToAdd)
+		{
+			if (source == null)
+				return triviasToAdd;
+			else if (triviasToAdd.Count == 0)
+				return source;
+
+			return ConcatImpl(source, triviasToAdd);
+
+			//------------------------------------Local Function-----------------------------------------
+			static IEnumerable<SyntaxTrivia> ConcatImpl(IEnumerable<SyntaxTrivia> source, SyntaxTriviaList triviasToAdd)
+			{
+				foreach (SyntaxTrivia trivia in source)
+					yield return trivia;
+
+				for (int i = 0; i < triviasToAdd.Count; i++)
+					yield return triviasToAdd[i];
+			}
+		}
+
+		/// <summary>
+		/// Concat method that appends trivias collection to <see cref="SyntaxTriviaList"/> without boxing.<br/>
+		/// This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="triviaList">The trivia list to act on.</param>
+		/// <param name="triviasToAdd">The collection of trivias to add.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		public static IEnumerable<SyntaxTrivia> Concat(this in SyntaxTriviaList triviaList, IEnumerable<SyntaxTrivia>? triviasToAdd)
+		{
+			if (triviaList.Count == 0)
+				return triviasToAdd ?? [];
+			else if (triviasToAdd == null)
+				return triviaList;
+
+			return ConcatImpl(triviaList, triviasToAdd);
+
+			//------------------------------------Local Function-----------------------------------------
+			static IEnumerable<SyntaxTrivia> ConcatImpl(SyntaxTriviaList triviaList, IEnumerable<SyntaxTrivia> triviasToAdd)
+			{
+				for (int i = 0; i < triviaList.Count; i++)
+					yield return triviaList[i];
+
+				foreach (SyntaxTrivia trivia in triviasToAdd)
+					yield return trivia;
+			}
+		}
+
+		/// <summary>
+		/// Concat method that appends <see cref="SyntaxTriviaList"/> collection without boxing.<br/>
+		/// This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="triviaList">The trivia list to act on.</param>
+		/// <param name="triviasToAdd">The <see cref="SyntaxTriviaList"/> trivias to add.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		public static SyntaxTriviaList Concat(this in SyntaxTriviaList triviaList, in SyntaxTriviaList triviasToAdd)
+		{
+			if (triviaList.Count == 0)
+				return triviasToAdd;
+			else if (triviasToAdd.Count == 0)
+				return triviaList;
+
+			var unitedTrivia = new SyntaxTrivia[triviaList.Count + triviasToAdd.Count];
+
+			for (int i = 0; i < triviaList.Count; i++)
+				unitedTrivia[i] = triviaList[i];
+
+			for (int i = 0; i < triviasToAdd.Count; i++)
+				unitedTrivia[triviaList.Count + i] = triviasToAdd[i];
+
+			return new SyntaxTriviaList(unitedTrivia);
+		}
+
+		/// <summary>
+		/// Any method for <see cref="SyntaxTriviaList"/> collection without boxing.<br/>
+		/// This is an optimization method which allows to avoid boxing.
+		/// </summary>
+		/// <param name="triviaList">The trivia list to act on.</param>
+		/// <param name="predicate">The predicate.</param>
+		/// <returns/>
+		[DebuggerStepThrough]
+		public static bool Any(this in SyntaxTriviaList triviaList, Func<SyntaxTrivia, bool> predicate)
+		{
+			predicate.ThrowOnNull();
+
+			for (int i = 0; i < triviaList.Count; i++)
+			{
+				if (predicate(triviaList[i]))
+					return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -242,9 +558,38 @@ namespace Acuminator.Utilities.Common
 			return -1;
 		}
 
+		/// <summary>
+		/// Contains method implementation for <see cref="ImmutableArray{TSymbol}"/> without boxing.
+		/// </summary>
+		/// <typeparam name="TSymbol">Generic type parameter representing symbol.</typeparam>
+		/// <param name="source">The source to act on.</param>
+		/// <param name="item">The item.</param>
+		/// <param name="customComparer">(Optional) The custom comparer.</param>
+		/// <returns>
+		/// True if the object is in this collection, false if not.
+		/// </returns>
+		[DebuggerStepThrough]
+		public static bool Contains<TSymbol>(this ImmutableArray<TSymbol> source, TSymbol item, 
+											IEqualityComparer<TSymbol>? customComparer = null)
+		where TSymbol : ISymbol
+		{
+			if (source.IsDefaultOrEmpty)
+				return false;
+
+			IEqualityComparer<TSymbol> comparer = customComparer ?? (SymbolEqualityComparer.Default as IEqualityComparer<TSymbol>)!;
+
+			for (int i = 0; i < source.Length; i++)
+			{
+				if (comparer.Equals(source[i], item))
+					return true;
+			}
+
+			return false;
+		}
+
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static int FindIndex<TNode>(this SeparatedSyntaxList<TNode> source, Func<TNode, bool> condition)
+		public static int FindIndex<TNode>(this in SeparatedSyntaxList<TNode> source, Func<TNode, bool> condition)
 		where TNode : SyntaxNode
 		{
 			return FindIndex(source, startInclusive: 0, endExclusive: source.Count, condition);
@@ -252,14 +597,15 @@ namespace Acuminator.Utilities.Common
 
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static int FindIndex<TNode>(this SeparatedSyntaxList<TNode> source, int startInclusive, Func<TNode, bool> condition)
+		public static int FindIndex<TNode>(this in SeparatedSyntaxList<TNode> source, int startInclusive, Func<TNode, bool> condition)
 		where TNode : SyntaxNode
 		{
 			return FindIndex(source, startInclusive, endExclusive: source.Count, condition);
 		}
 
 		[DebuggerStepThrough]
-		public static int FindIndex<TNode>(this SeparatedSyntaxList<TNode> source, int startInclusive, int endExclusive, Func<TNode, bool> condition)
+		public static int FindIndex<TNode>(this in SeparatedSyntaxList<TNode> source, int startInclusive, int endExclusive, 
+										   Func<TNode, bool> condition)
 		where TNode : SyntaxNode
 		{
 			condition.ThrowOnNull();
@@ -279,7 +625,7 @@ namespace Acuminator.Utilities.Common
 		}
 
 		[DebuggerStepThrough]
-		public static bool All<TNode>(this SeparatedSyntaxList<TNode> source, Func<TNode, bool> condition)
+		public static bool All<TNode>(this in SeparatedSyntaxList<TNode> source, Func<TNode, bool> condition)
 		where TNode : SyntaxNode
 		{
 			condition.ThrowOnNull();
@@ -294,7 +640,7 @@ namespace Acuminator.Utilities.Common
 		}
 
 		[DebuggerStepThrough]
-		public static bool Any<TNode>(this SeparatedSyntaxList<TNode> source, Func<TNode, bool> condition)
+		public static bool Any<TNode>(this in SeparatedSyntaxList<TNode> source, Func<TNode, bool> condition)
 		where TNode : SyntaxNode
 		{
 			condition.ThrowOnNull();
@@ -309,7 +655,7 @@ namespace Acuminator.Utilities.Common
 		}
 
 		[DebuggerStepThrough]
-		public static bool Contains<TNode>(this SyntaxList<TNode> source, TNode node)
+		public static bool Contains<TNode>(this in SyntaxList<TNode> source, TNode node)
 		where TNode : SyntaxNode
 		{
 			for (int i = 0; i < source.Count; i++)

@@ -33,7 +33,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		/// <summary>
 		/// The icon depends on the current IDE theme.
 		/// </summary>
-		public virtual bool IconDependsOnCurrentTheme { get; }
+		public virtual bool IconDependsOnCurrentTheme => false;
 
 		public virtual ExtendedObservableCollection<ExtraInfoViewModel>? ExtraInfos => null;
 
@@ -163,11 +163,11 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public virtual bool AreDetailsVisible => ShouldShowDetails();
 
-		protected TreeNodeViewModel(TreeViewModel tree, TreeNodeViewModel? parent, bool isExpanded)
+		protected TreeNodeViewModel(TreeViewModel tree, TreeNodeViewModel? parent, Func<TreeNodeViewModel, bool> isExpandedCalculator)
 		{
 			Tree 		= tree.CheckIfNull();
 			Parent 		= parent;
-			_isExpanded = isExpanded;
+			_isExpanded = isExpandedCalculator?.Invoke(this) ?? false;
 
 			AllChildren.CollectionChanged += AllChildren_CollectionChanged;
 			DisplayedChildren = new ReadOnlyObservableCollection<TreeNodeViewModel>(_mutableDisplayedChildren);

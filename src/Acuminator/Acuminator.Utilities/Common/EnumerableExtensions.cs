@@ -145,6 +145,13 @@ namespace Acuminator.Utilities.Common
 		public static bool IsNullOrEmpty<T>([NotNullWhen(returnValue: false)] this T[]? array) => 
 			array?.Length is null or 0;
 
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IReadOnlyCollection<T>? NullIfEmpty<T>(this IReadOnlyCollection<T>? source) =>
+			source?.Count > 0
+				? source
+				: null;
+
 		/// <summary>
 		/// An <see cref="IReadOnlyCollection{T}"/> extension method that converts a source to an immutable array a bit more optimally.
 		/// </summary>
@@ -218,6 +225,29 @@ namespace Acuminator.Utilities.Common
 			}
 
 			return false;
+		}
+
+		/// <summary>
+		/// Finds the index of the first item matching the <paramref name="predicate"/>.
+		/// </summary>
+		/// <typeparam name="T">Generic type parameter.</typeparam>
+		/// <param name="source">The source to act on.</param>
+		/// <param name="predicate">The predicate.</param>
+		/// <returns>
+		/// The found index.
+		/// </returns>
+		public static int FindIndex<T>(this IReadOnlyList<T> source, Func<T, bool> predicate)
+		{
+			source.ThrowOnNull();
+			predicate.ThrowOnNull();
+
+			for (int i = 0; i < source.Count; i++)
+			{
+				if (predicate(source[i]))
+					return i;
+			}
+
+			return -1;
 		}
 	}
 }

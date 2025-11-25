@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public partial class SOOrder : IBqlTable
+	public partial class SOOrder : PXBqlTable, IBqlTable
 	{
 
 
@@ -18,7 +18,7 @@ namespace PX.Objects.HackathonDemo
 		[PXUIField(DisplayName = "Order Nbr")]
 		public int? OrderNbr { get; set; }
 		#endregion
-
+		public abstract class deletedDatabaseRecord { }     // Not a BQL field => shouldn't report
 
 		#region OrderCD
 		public abstract class orderCD : IBqlField { }

@@ -1,16 +1,16 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
-
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
 
 using Acuminator.Utilities;
 using Acuminator.Utilities.Roslyn.Semantic;
-using System.Runtime.ExceptionServices;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 {
@@ -70,17 +70,19 @@ namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 					aggregatedAnalyserAction(0);
 					return;
 				default:
-				{
-#if DEBUG
-					for (int analyzerIndex = 0; analyzerIndex < effectiveAnalyzers.Count; analyzerIndex++)
+					if (Debugger.IsAttached)
 					{
-						aggregatedAnalyserAction(analyzerIndex);
+						for (int analyzerIndex = 0; analyzerIndex < effectiveAnalyzers.Count; analyzerIndex++)
+						{
+							aggregatedAnalyserAction(analyzerIndex);
+						}
 					}
-#else
-					RunInParallel(effectiveAnalyzers, context, aggregatedAnalyserAction, parallelOptions);
-#endif
+					else
+					{
+						RunInParallel(effectiveAnalyzers, context, aggregatedAnalyserAction, parallelOptions);
+					}
+
 					return;
-				}
 			}
 		}
 

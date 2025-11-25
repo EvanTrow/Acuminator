@@ -19,10 +19,14 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		DacFieldProperty,
 		DacBqlField,
 		DacNonBqlProperty,
+		DacAuditField,
+		DacSystemNonAuditField,
 
 		AllDacFieldsCategory,
 		DacKeysCategory,
 		DacNonBqlPropertiesCategory,
+		DacAuditFieldsCategory,
+		DacSystemNonAuditFieldsCategory,
 
 		Category,
 		BaseTypesCategory,
@@ -63,9 +67,11 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		IsActiveMethodDac,
 
 		ProjectionDac,
+		PXAccumulatorDac,
 
 		Attribute,
 		AttributesGroup,
-		ProjectionAttribute
+		ProjectionAttribute,
+		PXAccumulatorAttribute
 	}
 }

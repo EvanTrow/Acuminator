@@ -84,7 +84,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public ImmutableDictionary<string, ActionHandlerInfo> ActionHandlersByNames { get; }
 		public IEnumerable<ActionHandlerInfo> ActionHandlers => ActionHandlersByNames.Values;
 
-		public ImmutableArray<PXOverrideInfo> PXOverrides { get; }
+		public ImmutableArray<PXOverrideInfo> DeclaredPXOverrides { get; }
 
 		/// <summary>
 		/// Actions which are declared in the graph or the graph extension that is represented by this instance of the semantic model.
@@ -200,12 +200,18 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			IsActiveMethodInfo 		   = GetIsActiveMethodInfo();
 			IsActiveForGraphMethodInfo = GetIsActiveForGraphMethodInfo();
 			
-			PXOverrides = GetDeclaredPXOverrideInfos();
+			DeclaredPXOverrides = GetDeclaredPXOverrideInfos();
 			HasPXProtectedAccess = IsPXProtectedAccessAttributeDeclared();
 		}
 
 		protected void InitProcessingDelegatesInfo()
 		{
+			if (ViewsByNames.Count == 0)
+			{
+				IsProcessing = false;
+				return;
+			}
+
 			if (!ModelCreationOptions.HasFlag(GraphSemanticModelCreationOptions.CollectProcessingDelegates))
 			{
 				IsProcessing = Views.Any(v => v.IsProcessing);
@@ -214,13 +220,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 			var processingViewSymbols = Views.Where(v => v.IsProcessing)
 											 .Select(v => v.Symbol)
-											 .ToImmutableHashSet(SymbolEqualityComparer.Default);
+											 .ToHashSet(SymbolEqualityComparer.Default);
 			IsProcessing = processingViewSymbols.Count > 0;
 
 			if (!IsProcessing)
-			{
 				return;
-			}
 
 			_cancellation.ThrowIfCancellationRequested();
 			var declaringNodes = Symbol.DeclaringSyntaxReferences
@@ -408,7 +412,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 		protected ImmutableArray<PXOverrideInfo> GetDeclaredPXOverrideInfos()
 		{
-			var pxOverrides = PXOverrideInfo.GetPXOverrides(Symbol, PXContext, _cancellation);
+			var pxOverrides = PXOverrideInfo.GetDeclaredPXOverrides(GraphOrGraphExtInfo, PXContext, _cancellation);
 			return pxOverrides.ToImmutableArray();
 		}
 

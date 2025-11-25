@@ -7,7 +7,7 @@ using PX.Data;
 namespace PX.Objects.HackathonDemo
 {
 	// Acuminator disable once PX1016 ExtensionDoesNotDeclareIsActiveMethod extension should be constantly active
-	public class SOOrderBalancedExt : PXGraphExtension<PX.Objects.SO.SOInvoiceEntry>
+	public class SOInvoiceBalancedExt : PXGraphExtension<PX.Objects.SO.SOInvoiceEntry>
 	{
 		public override void Initialize()
 		{

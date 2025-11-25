@@ -3,6 +3,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Acuminator.Tests.Sources
 {
@@ -11,9 +13,7 @@ namespace Acuminator.Tests.Sources
 		private static readonly Guid ID = Guid.NewGuid();
 
 		[PXHidden]
-		public class SomeDAC : IBqlTable
-		{
-		}
+		public class SomeDAC : PXBqlTable, IBqlTable { }
 
 		private readonly Processor processor = new Processor();
 
@@ -89,6 +89,21 @@ namespace Acuminator.Tests.Sources
 			AnotherProcessor.RunDelegate(this);									//Should be diagnostic
 			AnotherProcessor.RunDelegate(localGraph);							//No diagnostic
 
+			LongOperationManager.Await(cToken => MemberFunc(cToken));							//Should be diagnostic
+			LongOperationManager.Await(cToken => MemberFunc(cToken), CancellationToken.None);	//Should be diagnostic
+			LongOperationManager.Await(cToken => StaticFunc(cToken));							//No diagnostic
+
+			LongOperationManager.StartAsyncOperation(MemberFunc);								 //Should be diagnostic
+			LongOperationManager.StartAsyncOperation(this, MemberFunc);							 //Should be diagnostic
+			LongOperationManager.StartAsyncOperation(async cToken => await MemberFunc(cToken));  //Should be diagnostic
+			LongOperationManager.StartAsyncOperation(StaticFunc);								 //No diagnostic
+
+			LongOperationManager.StartOperation(cToken => MemberFunc());						 //Should be diagnostic
+			LongOperationManager.StartOperation(this, cToken => MemberFunc());					 //Should be diagnostic
+			
+			// Acuminator disable once PX1038 AsyncVoidMethodsAndLambdas [Justification]
+			LongOperationManager.StartOperation(this, async cToken => await StaticFunc(cToken)); //No diagnostic
+
 			return adapter.Get();
 		}
 
@@ -103,11 +118,18 @@ namespace Acuminator.Tests.Sources
 		public static void StaticFunc(List<SomeDAC> list)
 		{ }
 
+		public static Task StaticFunc(CancellationToken cancellation) => Task.CompletedTask;
+
 		public void MemberFunc(List<SomeDAC> list)
 		{ }
 
 		public void MemberFunc()
 		{ }
+
+		public Task MemberFunc(CancellationToken cancellation)
+		{
+			return Task.CompletedTask;
+		}
 
 		public static void StaticFuncWithNoInput()
 		{
@@ -136,6 +158,14 @@ namespace Acuminator.Tests.Sources
 			{
 				typeof(PXAdapter).Name.ToString();
 			});
+
+			LongOperationManager.StartAsyncOperation(cToken =>                                      //Should be diagnostic
+			{ 
+				UseAdapter(adapter);
+				return Task.CompletedTask;
+			});
+
+			LongOperationManager.StartOperation(cToken => UseAdapter(adapter));						//Should be diagnostic
 
 			//Test recursive analyis
 			RunLongRunWithAdapter(adapter);                                                         //Should be diagnostic

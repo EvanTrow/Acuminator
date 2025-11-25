@@ -8,7 +8,7 @@ using PX.Data;
 namespace Acuminator.Tests.Tests.StaticAnalysis.NoIsActiveMethodForExtension.Sources
 {
 	public sealed class Ext<TDac> : PXCacheExtension<TDac>
-	where TDac : IBqlTable, new()
+	where TDac : PXBqlTable, IBqlTable, new()
 	{
 
 	}

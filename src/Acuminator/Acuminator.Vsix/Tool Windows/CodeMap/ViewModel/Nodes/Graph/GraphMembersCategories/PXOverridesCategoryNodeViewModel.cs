@@ -12,12 +12,13 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	{
 		protected override bool AllowNavigation => true;
 
-		public PXOverridesCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent, bool isExpanded) : 
-										   base(graphViewModel, parent, GraphMemberCategory.PXOverride, isExpanded)
+		public PXOverridesCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent,
+												Func<TreeNodeViewModel, bool> isExpandedCalculator) : 
+										   base(graphViewModel, parent, GraphMemberCategory.PXOverride, isExpandedCalculator)
 		{		
 		}
 
-		public override IEnumerable<SymbolItem> GetCategoryGraphNodeSymbols() => CodeMapGraphModel.GraphModel.PXOverrides;
+		public override IEnumerable<SymbolItem> GetCategoryGraphNodeSymbols() => CodeMapGraphModel.GraphModel.DeclaredPXOverrides;
 
 		public override TResult AcceptVisitor<TInput, TResult>(CodeMapTreeVisitor<TInput, TResult> treeVisitor, TInput input) => treeVisitor.VisitNode(this, input);
 

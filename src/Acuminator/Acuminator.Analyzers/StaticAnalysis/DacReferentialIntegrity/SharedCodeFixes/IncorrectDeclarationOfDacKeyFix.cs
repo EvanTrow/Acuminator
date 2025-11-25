@@ -312,9 +312,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 				return keyNode;
 
 			var nonStructuredLeadingTrivia = keyNode.GetLeadingTrivia()
-													.Where(trivia => !trivia.HasStructure);
+													.Where((in SyntaxTrivia trivia) => !trivia.HasStructure);
 			var nonStructuredTrailingTrivia = keyNode.GetTrailingTrivia()
-													 .Where(trivia => !trivia.HasStructure);
+													 .Where((in SyntaxTrivia trivia) => !trivia.HasStructure);
 
 			return keyNode.WithLeadingTrivia(nonStructuredLeadingTrivia)
 						  .WithTrailingTrivia(nonStructuredTrailingTrivia);

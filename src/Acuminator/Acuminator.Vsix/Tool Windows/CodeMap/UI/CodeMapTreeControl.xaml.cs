@@ -6,8 +6,11 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 using Microsoft.VisualStudio.Shell;
+
+using Acuminator.Vsix.Utilities;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
@@ -127,7 +130,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 			if (filterVM.HasFilterText)
 			{
-				int selectionIndex = textBox.Text.IndexOf(filterVM.FilterText, StringComparison.OrdinalIgnoreCase);
+				string filterTextTrimmed = filterVM.FilterText.Trim();
+				int selectionIndex = textBox.Text.IndexOf(filterTextTrimmed, StringComparison.OrdinalIgnoreCase);
 
 				if (selectionIndex < 0)
 				{
@@ -135,7 +139,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 					return;
 				}
 
-				textBox.Select(selectionIndex, filterVM.FilterText.Length);
+				textBox.Select(selectionIndex, filterTextTrimmed.Length);
 			}
 			else
 			{
@@ -143,5 +147,17 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				return;
 			}
 		}
+
+		private void CodeMapIcon_DpiChanged(object sender, DpiChangedEventArgs e)
+		{
+			if (sender is Image iconImage &&
+				(e.OldDpi.DpiScaleX != e.NewDpi.DpiScaleX || e.OldDpi.DpiScaleY != e.NewDpi.DpiScaleY))
+			{
+				DpiUtils.SetReverseDpiTransformationForImage(iconImage);
+			}
+		}
+
+		private void CodeMapIcon_Initialized(object sender, EventArgs e) =>
+			DpiUtils.SetReverseDpiTransformationForImage(sender as Image);
 	}
 }

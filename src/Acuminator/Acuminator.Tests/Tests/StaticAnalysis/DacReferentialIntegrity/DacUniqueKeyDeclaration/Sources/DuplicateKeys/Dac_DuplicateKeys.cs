@@ -4,7 +4,7 @@ using PX.Data.ReferentialIntegrity.Attributes;
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.Sources
 {
 	[PXCacheName("SO Order")]
-	public class SOOrder : IBqlTable
+	public class SOOrder : PXBqlTable, IBqlTable
 	{
 		public class PK : PrimaryKeyOf<SOOrder>.By<orderType, orderNbr>
 		{
@@ -21,6 +21,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacReferentialIntegrity.Sources
 			public static SOOrder Find(PXGraph graph, string orderType, string orderNbr) => FindBy(graph, orderType, orderNbr);
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Acuminator", "PX1036:The single unique key in the DAC should be named \"UK\"", Justification = "<Pending>")]
 		public class UK3 : PrimaryKeyOf<SOOrder>.By<orderType>
 		{
 			public static SOOrder Find(PXGraph graph, string orderType) => FindBy(graph, orderType);

@@ -21,7 +21,7 @@ namespace Acuminator.Tests.Tests.Utilities.CodeAnalysisSettingsSerialization
 	{
 		private const string EmptyStringPlaceHolder = "#";
 		
-		private const string ExternalExecutorFilePath = @".\..\..\ExternalRunner\App\ExternalRunner.exe";
+		private const string ExternalExecutorFilePath = @".\..\..\..\ExternalRunner\App\ExternalRunner.exe";
 		private const int Timeout_ThreeMinutes = 3 * 60_000;
 
 		[Theory]

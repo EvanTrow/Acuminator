@@ -10,7 +10,7 @@ using PX.Objects.GL;
 namespace PX.Objects.HackathonDemo
 {
 	[PXCacheName("Schedule")]
-	public partial class Schedule : IBqlTable
+	public partial class Schedule : PXBqlTable, IBqlTable
 	{
 		#region ScheduleID
 		public abstract class scheduleID : PX.Data.BQL.BqlString.Field<scheduleID> { }

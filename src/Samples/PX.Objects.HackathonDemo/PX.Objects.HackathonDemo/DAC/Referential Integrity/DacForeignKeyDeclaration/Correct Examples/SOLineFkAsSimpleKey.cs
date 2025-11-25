@@ -7,7 +7,7 @@ using PX.Objects.SO;
 namespace PX.Objects.HackathonDemo.ReferentialIntegrity.ForeignKeyExamples
 {
 	[PXCacheName("SO Line")]
-	public partial class SOLineFkAsSimpleKey : IBqlTable
+	public partial class SOLineFkAsSimpleKey : PXBqlTable, IBqlTable
 	{
 		public class PK : PrimaryKeyOf<SOLineFkAsSimpleKey>.By<orderType, orderNbr, lineNbr>
 		{

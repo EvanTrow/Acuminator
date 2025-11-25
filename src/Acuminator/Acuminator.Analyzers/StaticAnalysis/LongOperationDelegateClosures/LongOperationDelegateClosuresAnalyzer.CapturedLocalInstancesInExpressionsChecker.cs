@@ -1,11 +1,10 @@
-﻿
-using System;
+﻿using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
+using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -160,7 +159,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 				ISymbol? identifierSymbol = _semanticModel.GetSymbolInfo(identifierName, _cancellation).Symbol;
 
 				if (identifierSymbol == null || (identifierSymbol.Kind != SymbolKind.Method && identifierSymbol.IsStatic) ||
-					(identifierSymbol is IMethodSymbol methodSymbol && methodSymbol.IsDefinitelyStatic(_cancellation)))
+					(identifierSymbol is IMethodSymbol methodSymbol && methodSymbol.IsStatic))
 				{
 					return CapturedInstancesTypes.None;
 				}
@@ -168,12 +167,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 				switch (identifierSymbol.Kind)
 				{
 					case SymbolKind.Local:
-						if (!(identifierSymbol is ILocalSymbol))
+						if (identifierSymbol is not ILocalSymbol)
 							return CapturedInstancesTypes.None;
 
-						var localVariableDeclarator = identifierSymbol.DeclaringSyntaxReferences
-																	  .FirstOrDefault()
-																	 ?.GetSyntax(_cancellation) as VariableDeclaratorSyntax;
+						var localVariableDeclarator = identifierSymbol.GetSyntax(_cancellation) as VariableDeclaratorSyntax;
 
 						// Check variable declaration to investigated assigned values.
 						// We do not check for assignments to the variable done after the declaration since this case is both difficult to analyze and very rare.
@@ -186,7 +183,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 						// Instance methods, properties, fields and events hold closure
 						return TypeMemberAccessCapturesGraph(identifierSymbol.ContainingType)
 							? CapturedInstancesTypes.PXGraph
-							: CapturedInstancesTypes.None;      
+							: CapturedInstancesTypes.None;
 
 					case SymbolKind.Parameter:
 						var nonCapturableParameter = FindNonCapturableParameterPassedToMethod(identifierSymbol.Name);

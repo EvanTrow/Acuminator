@@ -24,8 +24,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override DacOrDacExtInfoBase DacOrDacExtInfo => DacModel.DacOrDacExtInfo;
 
-		public DacNodeViewModel(DacSemanticModelForCodeMap dacModel, TreeViewModel tree, TreeNodeViewModel? parent, bool isExpanded) : 
-						   base(tree, parent, isExpanded)
+		public DacNodeViewModel(DacSemanticModelForCodeMap dacModel, TreeViewModel tree, TreeNodeViewModel? parent,
+								Func<TreeNodeViewModel, bool> isExpandedCalculator) : 
+						   base(tree, parent, isExpandedCalculator)
 		{
 			DacModelForCodeMap = dacModel.CheckIfNull();
 			ExtraInfos		   = new ExtendedObservableCollection<ExtraInfoViewModel>(GetDacExtraInfos());
@@ -36,6 +37,11 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			if (DacModelForCodeMap.IsProjectionDac)
 			{
 				yield return new IconViewModel(this, Icon.ProjectionDac);
+			}
+
+			if (DacModel.HasAccumulatorAttribute)
+			{
+				yield return new IconViewModel(this, Icon.PXAccumulatorDac);
 			}
 
 			yield return CreateDacTypeInfo();

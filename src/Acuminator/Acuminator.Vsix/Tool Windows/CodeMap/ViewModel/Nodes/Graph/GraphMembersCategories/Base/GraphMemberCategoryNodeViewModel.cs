@@ -47,8 +47,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		IList<TreeNodeViewModel> IGroupNodeWithCyclingNavigation.DisplayedChildren => DisplayedChildren;
 
 		protected GraphMemberCategoryNodeViewModel(GraphNodeViewModel graphViewModel, TreeNodeViewModel parent,
-												   GraphMemberCategory graphMemberType, bool isExpanded) : 
-											  base(graphViewModel?.Tree!, parent, isExpanded)
+												   GraphMemberCategory graphMemberType, Func<TreeNodeViewModel, bool> isExpandedCalculator) : 
+											  base(graphViewModel?.Tree!, parent, isExpandedCalculator)
 		{
 			GraphViewModel = graphViewModel!;
 			CategoryType = graphMemberType;

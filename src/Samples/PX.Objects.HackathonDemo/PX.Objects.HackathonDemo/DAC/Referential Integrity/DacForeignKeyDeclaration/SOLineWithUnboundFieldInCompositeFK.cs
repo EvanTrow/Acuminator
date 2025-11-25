@@ -5,7 +5,7 @@ using PX.Objects.IN;
 namespace PX.Objects.HackathonDemo.ReferentialIntegrity.ForeignKeyExamples
 {
 	[PXCacheName("SO Line")]
-	public partial class SOLineWithUnboundFieldInCompositeFK : IBqlTable
+	public partial class SOLineWithUnboundFieldInCompositeFK : PXBqlTable, IBqlTable
 	{
 		public class PK : PrimaryKeyOf<SOLineWithUnboundFieldInCompositeFK>.By<orderType, orderNbr, lineNbr>
 		{

@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
@@ -16,7 +15,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 	{
 		protected virtual DacNodeViewModel CreateDacNode(DacSemanticModelForCodeMap dacSemanticModel, TreeNodeViewModel? parent, 
 														 TreeViewModel tree) =>
-			new DacNodeViewModel(dacSemanticModel, tree, parent, ExpandCreatedNodes);
+			new DacNodeViewModel(dacSemanticModel, tree, parent, ExpandCreatedNodesCalculator);
 
 		public override IEnumerable<TreeNodeViewModel>? VisitNode(DacNodeViewModel dac)
 		{
@@ -38,7 +37,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		}
 
 		protected virtual DacAttributesGroupNodeViewModel GetDacAttributesGroupNode(DacNodeViewModel dac) =>
-			new DacAttributesGroupNodeViewModel(dac.DacModelForCodeMap.DacModel, dac, ExpandCreatedNodes);
+			new DacAttributesGroupNodeViewModel(dac.DacModelForCodeMap.DacModel, dac, ExpandCreatedNodesCalculator);
 
 		protected virtual IEnumerable<DacMemberCategory> GetDacMemberCategoriesInOrder()
 		{
@@ -46,23 +45,27 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			yield return DacMemberCategory.InitializationAndActivation;
 			yield return DacMemberCategory.Keys;
 			yield return DacMemberCategory.AllDacFields;
+			yield return DacMemberCategory.AuditDacFields;
+			yield return DacMemberCategory.SystemNonAuditDacFields;
 			yield return DacMemberCategory.NonBqlProperties;
 		}
 
 		protected virtual DacMemberCategoryNodeViewModel? CreateCategory(DacNodeViewModel dac, DacMemberCategory dacMemberCategory) =>
 			dacMemberCategory switch
 			{
-				DacMemberCategory.BaseTypes					  => new DacBaseTypesCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
-				DacMemberCategory.InitializationAndActivation => new DacInitializationAndActivationCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
-				DacMemberCategory.Keys 						  => new KeyDacFieldsCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
-				DacMemberCategory.AllDacFields 				  => new AllDacFieldsDacCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
-				DacMemberCategory.NonBqlProperties			  => new NonBqlDacPropertiesCategoryNodeViewModel(dac, dac, ExpandCreatedNodes),
+				DacMemberCategory.BaseTypes					  => new DacBaseTypesCategoryNodeViewModel(dac, dac, ExpandCreatedNodesCalculator),
+				DacMemberCategory.InitializationAndActivation => new DacInitializationAndActivationCategoryNodeViewModel(dac, dac, ExpandCreatedNodesCalculator),
+				DacMemberCategory.Keys 						  => new KeyDacFieldsCategoryNodeViewModel(dac, dac, ExpandCreatedNodesCalculator),
+				DacMemberCategory.AuditDacFields 			  => new AuditDacFieldsCategoryNodeViewModel(dac, dac, ExpandCreatedNodesCalculator),
+				DacMemberCategory.SystemNonAuditDacFields 	  => new SystemNonAuditDacFieldsCategoryNodeViewModel(dac, dac, ExpandCreatedNodesCalculator),
+				DacMemberCategory.AllDacFields 				  => new AllDacFieldsDacCategoryNodeViewModel(dac, dac, ExpandCreatedNodesCalculator),
+				DacMemberCategory.NonBqlProperties			  => new NonBqlDacPropertiesCategoryNodeViewModel(dac, dac, ExpandCreatedNodesCalculator),
 				_ 											  => null,
 			};
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(DacAttributesGroupNodeViewModel attributeGroupNode) =>
 			attributeGroupNode.AttributeInfos()
-							  .Select(attrInfo => new DacAttributeNodeViewModel(attributeGroupNode, attrInfo, ExpandCreatedNodes));
+							  .Select(attrInfo => new DacAttributeNodeViewModel(attributeGroupNode, attrInfo, ExpandCreatedNodesCalculator));
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(DacBaseTypesCategoryNodeViewModel dacBaseTypesCategory)
 		{
@@ -71,17 +74,17 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			if (dacBaseTypesCategory.BaseDacInfo != null)
 			{
 				yield return new BaseDacPlaceholderNodeViewModel(dacBaseTypesCategory.BaseDacInfo, dacBaseTypesCategory.DacViewModel,
-													  dacBaseTypesCategory, ExpandCreatedNodes);
+													  dacBaseTypesCategory, ExpandCreatedNodesCalculator);
 			}
 
 			if (dacBaseTypesCategory.BaseDacExtensionInfo != null)
 			{
 				yield return new BaseDacPlaceholderNodeViewModel(dacBaseTypesCategory.BaseDacExtensionInfo, dacBaseTypesCategory.DacViewModel, 
-													  dacBaseTypesCategory, ExpandCreatedNodes);
+													  dacBaseTypesCategory, ExpandCreatedNodesCalculator);
 			}
 		}
 
-		public override IEnumerable<TreeNodeViewModel>? VisitNode(DacInitializationAndActivationCategoryNodeViewModel dacInitializationAndActivationCategory)
+		public override IEnumerable<TreeNodeViewModel> VisitNode(DacInitializationAndActivationCategoryNodeViewModel dacInitializationAndActivationCategory)
 		{
 			Cancellation.ThrowIfCancellationRequested();
 
@@ -89,20 +92,32 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			{
 				var isActiveNode = new IsActiveDacMethodNodeViewModel(dacInitializationAndActivationCategory,
 																	  dacInitializationAndActivationCategory.DacModel.IsActiveMethodInfo, 
-																	  ExpandCreatedNodes);
+																	  ExpandCreatedNodesCalculator);
 				return [isActiveNode];
 			}
 			else
 				return [];
 		}
 
-		public override IEnumerable<TreeNodeViewModel>? VisitNode(KeyDacFieldsCategoryNodeViewModel dacKeyFieldsCategory) =>
-			CreateDacFieldsCategoryChildren(dacKeyFieldsCategory);
+		public override IEnumerable<TreeNodeViewModel> VisitNode(KeyDacFieldsCategoryNodeViewModel dacKeyFieldsCategory) =>
+			CreateDacFieldsCategoryChildren(dacKeyFieldsCategory,
+				fieldInfo => new KeyDacFieldNodeViewModel(dacKeyFieldsCategory, parent: dacKeyFieldsCategory, fieldInfo, ExpandCreatedNodesCalculator));
 
-		public override IEnumerable<TreeNodeViewModel>? VisitNode(AllDacFieldsDacCategoryNodeViewModel allDacFieldsCategory) =>
-			CreateDacFieldsCategoryChildren(allDacFieldsCategory);
+		public override IEnumerable<TreeNodeViewModel> VisitNode(AuditDacFieldsCategoryNodeViewModel auditDacFieldsCategory) =>
+			CreateDacFieldsCategoryChildren(auditDacFieldsCategory,
+				fieldInfo => new AuditDacFieldNodeViewModel(auditDacFieldsCategory, parent: auditDacFieldsCategory, fieldInfo, ExpandCreatedNodesCalculator));
 
-		protected virtual IEnumerable<TreeNodeViewModel> CreateDacFieldsCategoryChildren(DacFieldCategoryNodeViewModel dacFieldCategory)
+		public override IEnumerable<TreeNodeViewModel> VisitNode(SystemNonAuditDacFieldsCategoryNodeViewModel systemNonAuditDacFieldsCategory) =>
+			CreateDacFieldsCategoryChildren(systemNonAuditDacFieldsCategory,
+				fieldInfo => new SystemNonAuditDacFieldNodeViewModel(systemNonAuditDacFieldsCategory, parent: systemNonAuditDacFieldsCategory, 
+																	fieldInfo, ExpandCreatedNodesCalculator));
+
+		public override IEnumerable<TreeNodeViewModel> VisitNode(AllDacFieldsDacCategoryNodeViewModel allDacFieldsCategory) =>
+			CreateDacFieldsCategoryChildren(allDacFieldsCategory,
+				fieldInfo => CreateDacFieldNodeViewModel(allDacFieldsCategory, fieldInfo));
+
+		protected virtual IEnumerable<TreeNodeViewModel> CreateDacFieldsCategoryChildren(DacFieldCategoryNodeViewModel dacFieldCategory,
+															Func<DacFieldInfo, DacFieldNodeViewModelBase> fieldVmConstructor)
 		{
 			var dacFields = dacFieldCategory?.GetCategoryDacFields();
 
@@ -112,10 +127,24 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			foreach (DacFieldInfo fieldInfo in dacFields)
 			{
 				Cancellation.ThrowIfCancellationRequested();
-				
-				var dacFieldNode = new DacFieldNodeViewModel(dacFieldCategory!, parent: dacFieldCategory!, fieldInfo, ExpandCreatedNodes);
-				yield return dacFieldNode;
+				DacFieldNodeViewModelBase dacFieldNode = fieldVmConstructor(fieldInfo);
+	
+				yield return dacFieldNode;	
 			}
+		}
+
+		protected virtual DacFieldNodeViewModelBase CreateDacFieldNodeViewModel(DacFieldCategoryNodeViewModel dacFieldCategory, DacFieldInfo fieldInfo)
+		{
+			if (fieldInfo.IsKey)
+				return new KeyDacFieldNodeViewModel(dacFieldCategory, parent: dacFieldCategory, fieldInfo, ExpandCreatedNodesCalculator);
+			else if (fieldInfo.FieldCategory.IsSystemField())
+			{
+				return fieldInfo.FieldCategory.IsAuditField()
+					? new AuditDacFieldNodeViewModel(dacFieldCategory, parent: dacFieldCategory, fieldInfo, ExpandCreatedNodesCalculator)
+					: new SystemNonAuditDacFieldNodeViewModel(dacFieldCategory, parent: dacFieldCategory, fieldInfo, ExpandCreatedNodesCalculator);
+			}
+			else
+				return new RegularDacFieldNodeViewModel(dacFieldCategory, parent: dacFieldCategory, fieldInfo, ExpandCreatedNodesCalculator);
 		}
 
 		public override IEnumerable<TreeNodeViewModel> VisitNode(NonBqlDacPropertiesCategoryNodeViewModel nonBqlDacPropertiesCategory)
@@ -132,24 +161,36 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 				if (nonBqlDacFieldInfo.HasFieldPropertyDeclared)
 				{
 					var nonBqlDacFieldNode = new NonBqlDacPropertyNodeViewModel(nonBqlDacPropertiesCategory!, parent: nonBqlDacPropertiesCategory!,
-																				nonBqlDacFieldInfo.PropertyInfo, ExpandCreatedNodes);
+																				nonBqlDacFieldInfo.PropertyInfo, ExpandCreatedNodesCalculator);
 					yield return nonBqlDacFieldNode;
 				}
 			}
 		}
 
-		public override IEnumerable<TreeNodeViewModel>? VisitNode(DacFieldNodeViewModel dacField)
+		public override IEnumerable<TreeNodeViewModel> VisitNode(RegularDacFieldNodeViewModel dacField) =>
+			CreateDacFieldPropertyAndBqlField(dacField);
+
+		public override IEnumerable<TreeNodeViewModel> VisitNode(KeyDacFieldNodeViewModel dacField) => 
+			CreateDacFieldPropertyAndBqlField(dacField);
+
+		public override IEnumerable<TreeNodeViewModel> VisitNode(AuditDacFieldNodeViewModel auditDacField) =>
+			CreateDacFieldPropertyAndBqlField(auditDacField);
+
+		public override IEnumerable<TreeNodeViewModel> VisitNode(SystemNonAuditDacFieldNodeViewModel systemNonAuditDacField) =>
+			CreateDacFieldPropertyAndBqlField(systemNonAuditDacField);
+
+		protected virtual IEnumerable<TreeNodeViewModel> CreateDacFieldPropertyAndBqlField(DacFieldNodeViewModelBase dacFieldVmBase)
 		{
-			if (dacField.FieldInfo.PropertyInfo != null)
+			if (dacFieldVmBase.FieldInfo.PropertyInfo != null)
 			{
-				yield return new DacFieldPropertyNodeViewModel(dacField.MemberCategory, parent: dacField, 
-															   dacField.FieldInfo.PropertyInfo, ExpandCreatedNodes);
+				yield return new DacFieldPropertyNodeViewModel(dacFieldVmBase.MemberCategory, parent: dacFieldVmBase,
+															   dacFieldVmBase.FieldInfo.PropertyInfo, ExpandCreatedNodesCalculator);
 			}
 
-			if (dacField.FieldInfo.BqlFieldInfo != null)
+			if (dacFieldVmBase.FieldInfo.BqlFieldInfo != null)
 			{
-				yield return new DacBqlFieldNodeViewModel(dacField.MemberCategory, parent: dacField, 
-														   dacField.FieldInfo.BqlFieldInfo, ExpandCreatedNodes);
+				yield return new DacBqlFieldNodeViewModel(dacFieldVmBase.MemberCategory, parent: dacFieldVmBase,
+														  dacFieldVmBase.FieldInfo.BqlFieldInfo, ExpandCreatedNodesCalculator);
 			}
 		}
 
@@ -166,7 +207,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 			var attributes = dacPropertyInfo.Attributes;
 			return !attributes.IsDefaultOrEmpty
-				? attributes.Select(attrInfo => new DacFieldAttributeNodeViewModel(parent, attrInfo, ExpandCreatedNodes))
+				? attributes.Select(attrInfo => new DacFieldAttributeNodeViewModel(parent, attrInfo, ExpandCreatedNodesCalculator))
 				: [];
 		}
 	}

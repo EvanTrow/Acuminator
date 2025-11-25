@@ -396,6 +396,50 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 							 .SelectMany(t => t.GetAttributes());
 		}
 
+		/// <summary>
+		/// Gets all attributes applications defined on this and base types using the already known list of base types.
+		/// </summary>
+		/// <param name="typeSymbol">The type symbol to act on.</param>
+		/// <param name="precalcedBaseTypes">List the pre-calculated base types.</param>
+		/// <returns>
+		/// All attributes' applications defined on this and base types.
+		/// </returns>
+		/// <remarks>
+		/// This is unsafe method used for optimization.
+		/// It does not calculate base types itself, instead it relies on the list of base types provided by the caller (which can be incorrect).<br/>
+		/// In addition, the method does not check the <paramref name="typeSymbol"/> and <paramref name="precalcedBaseTypes"/> parameters for nulls and 
+		/// does not perform boxing of <see cref="ImmutableArray{T}"/> collections of attributes.
+		/// </remarks>
+		internal static IReadOnlyCollection<AttributeData> GetAllAttributesApplicationsDefinedOnThisAndBaseTypesUnsafe(this ITypeSymbol typeSymbol,
+																										IReadOnlyList<ITypeSymbol> precalcedBaseTypes)
+		{
+			var attributesOnHierarchy = new List<AttributeData>(capacity: 8);
+			var typeAttributes = typeSymbol.GetAttributes();
+
+			if (!typeAttributes.IsDefaultOrEmpty)
+			{
+				for (int i = 0; i < typeAttributes.Length; i++)
+					attributesOnHierarchy.Add(typeAttributes[i]);
+			}
+
+			if (precalcedBaseTypes.Count == 0)
+				return attributesOnHierarchy;
+
+			for (int i = 0; i < precalcedBaseTypes.Count; i++)
+			{
+				var baseType		   = precalcedBaseTypes[i];
+				var baseTypeAttributes = baseType.GetAttributes();
+
+				if (baseTypeAttributes.IsDefaultOrEmpty)
+					continue;
+
+				for (int j = 0; j < baseTypeAttributes.Length; j++)
+					attributesOnHierarchy.Add(baseTypeAttributes[j]);
+			}
+
+			return attributesOnHierarchy;
+		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ITypeSymbol? GetUnderlyingTypeFromNullable(this ITypeSymbol? typeSymbol, PXContext pxContext)
 		{
@@ -619,17 +663,40 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 		/// <summary>
 		/// Gets a simplified name for type if it is a primitive type.
+		/// For nullable ref types returns the name without the "?" annotation.
 		/// </summary>
 		/// <param name="type">The type to act on.</param>
 		/// <returns/>
 		public static string GetSimplifiedName(this ITypeSymbol type)
 		{
-			type.ThrowOnNull();
-
-			switch (type.SpecialType)
+			switch (type.CheckIfNull().SpecialType)
 			{
-				case SpecialType.None when type.TypeKind == TypeKind.Array:
 				case SpecialType.System_Object:
+				case SpecialType.System_String:
+				case SpecialType.None when type.TypeKind == TypeKind.Dynamic:
+				{
+					string simpleTypeName = type.ToString();
+					return simpleTypeName[^1] == '?'
+						? simpleTypeName[..^1]
+						: simpleTypeName;
+				}
+
+				case SpecialType.None when type.TypeKind == TypeKind.Array:
+				case SpecialType.System_Array:
+				{
+					string simpleTypeName = type.ToString();
+
+					if (type is IArrayTypeSymbol arrayType && arrayType.ElementNullableAnnotation == NullableAnnotation.Annotated &&
+						(arrayType.ElementType.SpecialType == SpecialType.System_Nullable_T || arrayType.ElementType.IsValueType))
+					{
+						return simpleTypeName.Replace("?", string.Empty);
+					}
+						
+					return simpleTypeName[^1] == '?'
+						? simpleTypeName[..^1]
+						: simpleTypeName;
+				}
+
 				case SpecialType.System_Void:
 				case SpecialType.System_Boolean:
 				case SpecialType.System_Char:
@@ -644,8 +711,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				case SpecialType.System_Decimal:
 				case SpecialType.System_Single:
 				case SpecialType.System_Double:
-				case SpecialType.System_String:
-				case SpecialType.System_Array:
 				case SpecialType.System_Nullable_T:
 					return type.ToString();
 				default:

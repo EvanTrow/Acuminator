@@ -61,7 +61,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fix PXAction handler signature.
+        ///   Looks up a localized string similar to Fix the return type and the parameters of the action delegate.
         /// </summary>
         public static string PX1000Fix {
             get {
@@ -70,7 +70,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid PXAction handler signature.
+        ///   Looks up a localized string similar to The action delegate has incompatible return type and parameters.
         /// </summary>
         public static string PX1000Title {
             get {
@@ -381,7 +381,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Change the return type to IEnumerable.
+        ///   Looks up a localized string similar to Change the return type of the action delegate to IEnumerable.
         /// </summary>
         public static string PX1013Fix {
             get {
@@ -390,7 +390,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The action handler that initiates a background operation or is executed by a background operation must return IEnumerable.
+        ///   Looks up a localized string similar to The return type of the action delegate that initiates a long-running operation must be &quot;IEnumerable&quot;.
         /// </summary>
         public static string PX1013Title {
             get {
@@ -444,7 +444,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A DAC extension must include the public static IsActive method with the bool return type. Extensions which are constantly active reduce performance. Suppress the error if you need the DAC extension to be constantly active..
+        ///   Looks up a localized string similar to A DAC extension should include the public static IsActive method with the bool return type. Extensions which are constantly active reduce performance. Suppress the warning if you need the DAC extension to be constantly active..
         /// </summary>
         public static string PX1016DacExtensionTitle {
             get {
@@ -453,7 +453,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A graph extension must include a public static IsActive method with the bool return type. Extensions which are constantly active reduce performance. Suppress the error if you need the graph extension to be constantly active..
+        ///   Looks up a localized string similar to A graph extension should include a public static IsActive method with the bool return type. Extensions which are constantly active reduce performance. Suppress the warning if you need the graph extension to be constantly active..
         /// </summary>
         public static string PX1016GraphExtensionTitle {
             get {
@@ -732,7 +732,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Constructors in DACs are prohibited.
+        ///   Looks up a localized string similar to Constructors in DACs and DAC extensions are prohibited.
         /// </summary>
         public static string PX1028Title {
             get {
@@ -1015,7 +1015,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Async void lambdas and anonymous methods are forbidden in Acumatica.
+        ///   Looks up a localized string similar to Async void lambdas, and anonymous methods are forbidden in Acumatica Framework.
         /// </summary>
         public static string PX1038TitleLambdas {
             get {
@@ -1024,7 +1024,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Async void methods are forbidden in Acumatica.
+        ///   Looks up a localized string similar to Async void methods are forbidden in Acumatica Framework.
         /// </summary>
         public static string PX1038TitleMethods {
             get {
@@ -1060,7 +1060,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The graph event handler has a weekly typed signature that relies on a naming convention. Consider converting it to a strongly typed generic signature for a better type safety enforced by the C# compiler..
+        ///   Looks up a localized string similar to The graph event handler has a weakly typed signature that relies on a naming convention. Consider converting it to a strongly typed generic signature for a better type safety enforced by the C# compiler..
         /// </summary>
         public static string PX1041Title {
             get {
@@ -1240,7 +1240,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A PXGraph instance should not start PXLongOperation during the initialization phase.
+        ///   Looks up a localized string similar to PXGraph and PXGraphExtension instances should not start a long-running operation during the initialization phase.
         /// </summary>
         public static string PX1054Title {
             get {
@@ -1636,6 +1636,42 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add the missing mandatory DAC fields to the DAC.
+        /// </summary>
+        public static string PX1069Fix {
+            get {
+                return ResourceManager.GetString("PX1069Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DAC must declare mandatory audit and timestamp DAC fields.
+        /// </summary>
+        public static string PX1069Title {
+            get {
+                return ResourceManager.GetString("PX1069Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC must declare the mandatory {1} DAC fields.
+        /// </summary>
+        public static string PX1069TitleFormat_MultipleFields {
+            get {
+                return ResourceManager.GetString("PX1069TitleFormat_MultipleFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC must declare the mandatory {1} DAC field.
+        /// </summary>
+        public static string PX1069TitleFormat_SingleField {
+            get {
+                return ResourceManager.GetString("PX1069TitleFormat_SingleField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The state of fields and actions can be configured only in the RowSelected event handler.
         /// </summary>
         public static string PX1070Title {
@@ -1825,6 +1861,24 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add a delegate for calling a base method as the last parameter of the &quot;{0}&quot; method.
+        /// </summary>
+        public static string PX1079Fix {
+            get {
+                return ResourceManager.GetString("PX1079Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A method with the PXOverride attribute must declare a delegate for calling its base method as the last parameter.
+        /// </summary>
+        public static string PX1079Title {
+            get {
+                return ResourceManager.GetString("PX1079Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Data view delegates should not start long-running operations.
         /// </summary>
         public static string PX1080Title {
@@ -1879,7 +1933,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to PXSetupNotEnteredException cannot be thrown in long-running operations.
+        ///   Looks up a localized string similar to PXSetupNotEnteredException cannot be thrown in long-running operations and processing delegates.
         /// </summary>
         public static string PX1086Title {
             get {
@@ -2032,6 +2086,43 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Make the &quot;{0}&quot; method public and non-virtual.
+        /// </summary>
+        public static string PX1097Fix {
+            get {
+                return ResourceManager.GetString("PX1097Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A method with the PXOverride attribute must be public and non-virtual.
+        /// </summary>
+        public static string PX1097Title {
+            get {
+                return ResourceManager.GetString("PX1097Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add the XML documentation comment with the reference to the base method.
+        /// </summary>
+        public static string PX1098Fix {
+            get {
+                return ResourceManager.GetString("PX1098Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A method with the PXOverride attribute must declare an XML documentation comment with a reference to the base method. The format of the comment:
+        ////// Overrides &lt;seealso cref=&quot;{Base method}&quot;/&gt;.
+        /// </summary>
+        public static string PX1098Title {
+            get {
+                return ResourceManager.GetString("PX1098Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The forbidden API is used.
         /// </summary>
         public static string PX1099Title {
@@ -2110,6 +2201,186 @@ namespace Acuminator.Analyzers {
         public static string PX1099TitleFormatWithReason {
             get {
                 return ResourceManager.GetString("PX1099TitleFormatWithReason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A method with the PXOverride attribute overrides an obsolete method.
+        /// </summary>
+        public static string PX1100TitlePXOverride {
+            get {
+                return ResourceManager.GetString("PX1100TitlePXOverride", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fix the signature of the additional delegate parameter.
+        /// </summary>
+        public static string PX1101Fix {
+            get {
+                return ResourceManager.GetString("PX1101Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The additional delegate parameter for calling the base method of the PXOverride method has incorrect signature that does not match the base method.
+        /// </summary>
+        public static string PX1101Title {
+            get {
+                return ResourceManager.GetString("PX1101Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fix the name of the additional delegate parameter.
+        /// </summary>
+        public static string PX1102Fix {
+            get {
+                return ResourceManager.GetString("PX1102Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The name of the additional delegate parameter for calling the base method of the PXOverride method breaks Acumatica naming conventions .
+        /// </summary>
+        public static string PX1102Title {
+            get {
+                return ResourceManager.GetString("PX1102Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add the missing &quot;NoteID&quot; field to the DAC.
+        /// </summary>
+        public static string PX1110Fix {
+            get {
+                return ResourceManager.GetString("PX1110Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The DAC has a DAC field with the PXDBLocalizableString attribute. Therefore, this DAC must declare a NoteID DAC field..
+        /// </summary>
+        public static string PX1110Title {
+            get {
+                return ResourceManager.GetString("PX1110Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &quot;{0}&quot; DAC has a DAC field with the PXDBLocalizableString attribute. Therefore, this DAC must declare a NoteID DAC field..
+        /// </summary>
+        public static string PX1110TitleFormat {
+            get {
+                return ResourceManager.GetString("PX1110TitleFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The primary DAC of a processing view must contain the &quot;NoteID&quot; field.
+        /// </summary>
+        public static string PX1111Title {
+            get {
+                return ResourceManager.GetString("PX1111Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The primary DAC &quot;{0}&quot; of the processing view &quot;{1}&quot; must contain the &quot;NoteID&quot; field.
+        /// </summary>
+        public static string PX1111TitleFormat {
+            get {
+                return ResourceManager.GetString("PX1111TitleFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Make the type abstract.
+        /// </summary>
+        public static string PX1112Fix {
+            get {
+                return ResourceManager.GetString("PX1112Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Graphs and graph extensions with generic type parameters must be abstract.
+        /// </summary>
+        public static string PX1112Title {
+            get {
+                return ResourceManager.GetString("PX1112Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove &quot;sealed&quot; modifier from the type.
+        /// </summary>
+        public static string PX1113Fix {
+            get {
+                return ResourceManager.GetString("PX1113Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Graphs and graph extensions should not be sealed types.
+        /// </summary>
+        public static string PX1113Title {
+            get {
+                return ResourceManager.GetString("PX1113Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A graph extension should not inherit from a non-terminal graph extension.
+        /// </summary>
+        public static string PX1114Title {
+            get {
+                return ResourceManager.GetString("PX1114Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only non-abstract DAC extensions can be used as base DAC extensions.
+        /// </summary>
+        public static string PX1115TitleDacExtension {
+            get {
+                return ResourceManager.GetString("PX1115TitleDacExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only terminal graph extensions can be used as base graph extensions.
+        /// </summary>
+        public static string PX1115TitleGraphExtension {
+            get {
+                return ResourceManager.GetString("PX1115TitleGraphExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect work with the Task types in the Acumatica asynchronous code. Method returning a Task-typed expression should have the Task type as its return type..
+        /// </summary>
+        public static string PX1120Title_MethodReturnTypeIsNotTask {
+            get {
+                return ResourceManager.GetString("PX1120Title_MethodReturnTypeIsNotTask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect work with the Task types in the Acumatica asynchronous code. Task-typed expressions should be awaited..
+        /// </summary>
+        public static string PX1120Title_NotAwaitedTaskReturningExpression {
+            get {
+                return ResourceManager.GetString("PX1120Title_NotAwaitedTaskReturningExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect work with the Task types in the Acumatica asynchronous code. You should not store the Task instance in a local variable or parameter..
+        /// </summary>
+        public static string PX1120Title_StoreTaskInVariable {
+            get {
+                return ResourceManager.GetString("PX1120Title_StoreTaskInVariable", resourceCulture);
             }
         }
         

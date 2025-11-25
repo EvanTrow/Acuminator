@@ -14,7 +14,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.SuppressionDiagnostics
 	{
 		public override ImmutableArray<string> FixableDiagnosticIds => AllCollectedFixableDiagnosticIds;
 
-		public override FixAllProvider GetFixAllProvider() => null;
+		public override FixAllProvider GetFixAllProvider() => null!;
 
 		/// <summary>
 		/// Gets code action to register. OVerrides the default method that returns code action with nested code actions. 

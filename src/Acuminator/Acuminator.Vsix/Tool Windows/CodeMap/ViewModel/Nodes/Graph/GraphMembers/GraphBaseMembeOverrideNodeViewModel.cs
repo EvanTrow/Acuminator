@@ -20,6 +20,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override Icon NodeIcon { get; }
 
+		public override bool IconDependsOnCurrentTheme => 
+			OverrideKind is MemberOverrideKind.NormalPropertyOverride or MemberOverrideKind.NormalEventOverride;
+
 		public BaseMemberOverrideInfo BaseMemberOverrideInfo => (BaseMemberOverrideInfo)MemberInfo;
 
 		public override string Name
@@ -29,8 +32,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		}
 
 		public GraphBaseMembeOverrideNodeViewModel(GraphBaseMemberOverridesCategoryNodeViewModel graphBaseMemberOverridesCategoryVM, 
-												   BaseMemberOverrideInfo baseMemberOverrideInfo, bool isExpanded = false) :
-											  base(graphBaseMemberOverridesCategoryVM, graphBaseMemberOverridesCategoryVM, baseMemberOverrideInfo, isExpanded)
+												   BaseMemberOverrideInfo baseMemberOverrideInfo, Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+											  base(graphBaseMemberOverridesCategoryVM, graphBaseMemberOverridesCategoryVM, baseMemberOverrideInfo, 
+												   isExpandedCalculator)
 		{
 			NodeIcon = GetNodeIcon();
 

@@ -41,8 +41,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.PublicClassXmlComment
 		{
 			foreach (string attrName in attributeNames)
 			{
-				if (ObsoleteAttributeShortName.Equals(attrName) || PXInternalUseOnlyAttributeShortName.Equals(attrName) ||
-					(checkForPXHidden && PXHiddenAttributeShortName.Equals(attrName)))
+				if (ObsoleteAttributeShortName.Equals(attrName, StringComparison.Ordinal) ||
+					PXInternalUseOnlyAttributeShortName.Equals(attrName, StringComparison.Ordinal) ||
+					(checkForPXHidden && PXHiddenAttributeShortName.Equals(attrName, StringComparison.Ordinal)))
 				{
 					return true;
 				}
@@ -67,7 +68,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PublicClassXmlComment
 
 			// perfomance optimization to avoid checking the suffix of attribute names 
 			// which are definitely shorter than any of the attributes we search with "Attribute" suffix
-			if (attributeName.Length >= minLengthWithSuffix && attributeName.EndsWith(AttributeSuffix))
+			if (attributeName.Length >= minLengthWithSuffix && attributeName.EndsWith(AttributeSuffix, StringComparison.Ordinal))
 			{
 				const int suffixLength = 9;
 				return attributeName.Substring(0, attributeName.Length - suffixLength);

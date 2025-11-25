@@ -180,11 +180,35 @@
   <data name="Category_Coloring" xml:space="preserve">
     <value>BQL Coloring</value>
   </data>
+  <data name="Category_NodeExpansion" xml:space="preserve">
+    <value>Node Expansion</value>
+  </data>
   <data name="Category_Outlining" xml:space="preserve">
     <value>BQL Outlining</value>
   </data>
   <data name="CodeMap_ConstructorNodeName" xml:space="preserve">
     <value>Constructor</value>
+  </data>
+  <data name="CodeMap_DAC_MemberCategories_AllFields" xml:space="preserve">
+    <value>All Fields</value>
+  </data>
+  <data name="CodeMap_DAC_MemberCategories_AuditFields" xml:space="preserve">
+    <value>Audit Fields</value>
+  </data>
+  <data name="CodeMap_DAC_MemberCategories_BaseTypes" xml:space="preserve">
+    <value>Base Types</value>
+  </data>
+  <data name="CodeMap_DAC_MemberCategories_InitializationAndActivation" xml:space="preserve">
+    <value>Initialization &amp; Activation</value>
+  </data>
+  <data name="CodeMap_DAC_MemberCategories_Keys" xml:space="preserve">
+    <value>Keys</value>
+  </data>
+  <data name="CodeMap_DAC_MemberCategories_NonBQLProperties" xml:space="preserve">
+    <value>Non-BQL Properties</value>
+  </data>
+  <data name="CodeMap_DAC_MemberCategories_SystemNonAuditFields" xml:space="preserve">
+    <value>System Non-Audit Fields</value>
   </data>
   <data name="CodeMap_DbBoundnessIndicator_Bound" xml:space="preserve">
     <value>Bound</value>
@@ -210,8 +234,20 @@
   <data name="CodeMap_ExtraInfo_CustomViewTooltip" xml:space="preserve">
     <value>The view is a custom class derived from standard PXSelect-like classes</value>
   </data>
+  <data name="CodeMap_ExtraInfo_DacAuditFieldIconTooltip" xml:space="preserve">
+    <value>An audit DAC field</value>
+  </data>
+  <data name="CodeMap_ExtraInfo_DacAuditFieldsCategoryIconTooltip" xml:space="preserve">
+    <value>A list of audit fields</value>
+  </data>
   <data name="CodeMap_ExtraInfo_DacKeyIconTooltip" xml:space="preserve">
     <value>Is part of a primary key</value>
+  </data>
+  <data name="CodeMap_ExtraInfo_DacSystemNonAuditFieldIconTooltip" xml:space="preserve">
+    <value>A system non-audit DAC field</value>
+  </data>
+  <data name="CodeMap_ExtraInfo_DacSystemNonAuditFieldsCategoryIconTooltip" xml:space="preserve">
+    <value>A list of system non-audit DAC fields</value>
   </data>
   <data name="CodeMap_ExtraInfo_HasPXDBIdentityAttributeTooltip" xml:space="preserve">
     <value>The PXDBIdentity attribute is specified for this field.</value>
@@ -227,6 +263,9 @@
   </data>
   <data name="CodeMap_ExtraInfo_IsGraphExtension" xml:space="preserve">
     <value>Graph Extension</value>
+  </data>
+  <data name="CodeMap_ExtraInfo_PXAccumulatorDacIndicatorTooltip" xml:space="preserve">
+    <value>This DAC has a PXAccumulator attribute or an attribute derived from the PXAccumulator attribute</value>
   </data>
   <data name="CodeMap_ExtraInfo_PXFilterViewIconTooltip" xml:space="preserve">
     <value>This view is PXFilter or it is derived from it</value>
@@ -261,8 +300,11 @@
   <data name="CodeMap_FailedToUnsubscribeFromVsEvents_ErrorMessage" xml:space="preserve">
     <value>Code Map failed to unsubscribe from Visual Studio events</value>
   </data>
+  <data name="CodeMap_Icon_PXAccumulatorAttributeTooltip" xml:space="preserve">
+    <value>This is the PXAccumulator attribute</value>
+  </data>
   <data name="CodeMap_Icon_ProjectionAttributeTooltip" xml:space="preserve">
-    <value>This is a projection attribute</value>
+    <value>This is the projection attribute</value>
   </data>
   <data name="CodeMap_Node_DacAttributes" xml:space="preserve">
     <value>DAC Attributes</value>
@@ -372,6 +414,24 @@ This option should be used together with the "Banned API File" setting.</value>
   </data>
   <data name="Setting_CodeAnalysis_SuppressionMechanismEnabled_Title" xml:space="preserve">
     <value>Enable Acuminator diagnostic suppression</value>
+  </data>
+  <data name="Setting_CodeMap_ExpandAttributeNodes_Description" xml:space="preserve">
+    <value>Expand attribute nodes when the Code Map is opened.</value>
+  </data>
+  <data name="Setting_CodeMap_ExpandAttributeNodes_Title" xml:space="preserve">
+    <value>Expand Attribute Nodes</value>
+  </data>
+  <data name="Setting_CodeMap_ExpandRegularNodes_Description" xml:space="preserve">
+    <value>Expand regular non-attribute nodes when the Code Map is opened.</value>
+  </data>
+  <data name="Setting_CodeMap_ExpandRegularNodes_Title" xml:space="preserve">
+    <value>Expand Regular Nodes</value>
+  </data>
+  <data name="Setting_CodeMap_ExpandRootNodes_Description" xml:space="preserve">
+    <value>Expand root nodes when the Code Map is opened.</value>
+  </data>
+  <data name="Setting_CodeMap_ExpandRootNodes_Title" xml:space="preserve">
+    <value>Expand Root Nodes</value>
   </data>
   <data name="Setting_ColorOnlyInsideBQL_Description" xml:space="preserve">
     <value>Colorize code only inside BQL commands (only for Roslyn coloring).</value>

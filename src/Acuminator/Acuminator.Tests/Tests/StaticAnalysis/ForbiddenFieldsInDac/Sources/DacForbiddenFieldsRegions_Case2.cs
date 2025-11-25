@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public partial class SOOrder : IBqlTable
+	public partial class SOOrder : PXBqlTable, IBqlTable
 	{
 		#region OrderNbr
 		public abstract class orderNbr : IBqlField { }
@@ -17,7 +17,7 @@ namespace PX.Objects.HackathonDemo
 		public int? OrderNbr { get; set; }
 		#endregion
 		#region  DeletedDatabaseRecord
-		public abstract class deletedDatabaseRecord { }
+		public abstract class deletedDatabaseRecord : IBqlField { }
 		[PXDefault]
 		[PXUIField(DisplayName = "Deleted Flag")]
 		public string DeletedDatabaseRecord { get; set; }

@@ -58,6 +58,40 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 	public static class DbBoundnessTypeCombiner
 	{
+		internal static DbBoundnessType CombineBoundnessFromAggregatorAndAggregatedAttributes(DbBoundnessType aggregatedDbBoundness,
+																							  DbBoundnessType aggregatorDbBoundness)
+		{
+			switch (aggregatorDbBoundness)
+			{
+				// If aggregator attribute is unbound then it overrides the DB boundness of the aggregated attribute only if the aggregated attribute is DB bound.
+				// In that case the resulting DB boundness is unbound because the aggregator attribute won't subscribe the aggregated DB bound attribute
+				// To the DB related Acumatica events. This effectively makes the aggregated attribute unbound too.
+				case DbBoundnessType.Unbound:
+					return aggregatedDbBoundness == DbBoundnessType.DbBound
+						? DbBoundnessType.Unbound
+						: aggregatedDbBoundness;
+
+				// If aggregator's DB boundness is unknown or error, then the DB boundness of aggregated attributes
+				// is effectively unknown or error, since we don't know how aggregator uses them
+				case DbBoundnessType.Unknown:
+				case DbBoundnessType.Error:
+					return aggregatorDbBoundness;
+
+				// For DB bound aggregator the DB boundness of the aggregated attribute is not overridden by the aggregator attribute
+				case DbBoundnessType.DbBound:
+
+				// For DBScalar and DBCalced the aggregator won't override the DB boundness of the aggregated attribute
+				// Even if the combination of the DB boundnesses of the aggregator and aggregated attributes will produce an error later
+				case DbBoundnessType.PXDBCalced:
+				case DbBoundnessType.PXDBScalar:
+
+				// Aggregator does not affect DB boundness of the aggregated attribute
+				case DbBoundnessType.NotDefined:
+				default:
+					return aggregatedDbBoundness;
+			}
+		}
+
 		/// <summary>
 		/// Combines a collection of <see cref="DbBoundnessType"/> in a proper order.
 		/// </summary>

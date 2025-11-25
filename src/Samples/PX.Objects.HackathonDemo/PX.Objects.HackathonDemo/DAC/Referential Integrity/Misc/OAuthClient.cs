@@ -11,7 +11,7 @@ namespace PX.Owin.IdentityServerIntegration.DAC
 {
 	[Serializable]
 	[PXCacheName("OAuthClient")]
-	public class OAuthClient : IBqlTable
+	public class OAuthClient : PXBqlTable, IBqlTable
 	{
 		#region ClientID
 		public abstract class clientID : PX.Data.BQL.BqlGuid.Field<clientID> { }
@@ -110,7 +110,7 @@ namespace PX.Owin.IdentityServerIntegration.DAC
 
 	[Serializable]
 	[PXHidden]
-	public class OpenIdPlugin : IBqlTable
+	public class OpenIdPlugin : PXBqlTable, IBqlTable
 	{
 		#region Name
 

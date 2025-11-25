@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PX.Objects.HackathonDemo.ViewOrder
 {
-	public class ARInvoice : IBqlTable
+	public class ARInvoice : PXBqlTable, IBqlTable
 	{
 	}
 }

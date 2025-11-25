@@ -23,10 +23,10 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public override Icon NodeIcon => Icon.IsActiveMethodGraph;
 
 		protected IsActiveGraphMethodNodeViewModelBase(GraphInitializationAndActivationCategoryNodeViewModel graphInitializationAndActivationCategoryVM,
-													   NodeSymbolItem<MethodDeclarationSyntax, IMethodSymbol> isActiveMethodMemberInfo, 
-													   bool isExpanded = false) :
+													   NodeSymbolItem<MethodDeclarationSyntax, IMethodSymbol> isActiveMethodMemberInfo,
+													   Func<TreeNodeViewModel, bool> isExpandedCalculator) :
 												  base(graphInitializationAndActivationCategoryVM, graphInitializationAndActivationCategoryVM,
-													   isActiveMethodMemberInfo, isExpanded)
+													   isActiveMethodMemberInfo, isExpandedCalculator)
 		{
 		}
 

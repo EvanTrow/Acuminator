@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class TaxTran : IBqlTable
+	public class TaxTran : PXBqlTable, IBqlTable
 	{
 		#region TaxPeriodID
 		public abstract class taxPeriodID : IBqlField

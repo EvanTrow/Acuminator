@@ -32,7 +32,7 @@ namespace PX.Objects
 		}
 	}
 
-	public class SOInvoice : IBqlTable
+	public class SOInvoice : PXBqlTable, IBqlTable
 	{
 	}
 }

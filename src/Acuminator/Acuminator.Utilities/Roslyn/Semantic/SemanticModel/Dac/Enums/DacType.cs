@@ -1,8 +1,7 @@
-﻿namespace Acuminator.Utilities.Roslyn.Semantic.Dac
+﻿namespace Acuminator.Utilities.Roslyn.Semantic.Dac;
+
+public enum DacType : byte
 {
-	public enum DacType
-	{
-		Dac,
-		DacExtension
-	}
+	Dac,
+	DacExtension
 }

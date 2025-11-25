@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class DacExampleFieldAttributesTypeMismatch : IBqlTable
+	public class DacExampleFieldAttributesTypeMismatch : PXBqlTable, IBqlTable
 	{
 		#region OrderType
 		public abstract class orderType : IBqlField { }

@@ -1,8 +1,5 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
@@ -19,19 +16,24 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	internal class ProcessingDelegatesWalker : DelegatesWalkerBase
 	{
 		private int _currentDeclarationOrder;
-		private readonly ImmutableHashSet<ISymbol> _processingViewSymbols;
+		private readonly HashSet<ISymbol> _processingViewSymbols;
 
-		public Dictionary<string, List<ProcessingDelegateInfo>> ParametersDelegateListByView { get; } =
-			new Dictionary<string, List<ProcessingDelegateInfo>>();
-		public Dictionary<string, List<ProcessingDelegateInfo>> ProcessDelegateListByView { get; } =
-			new Dictionary<string, List<ProcessingDelegateInfo>>();
-		public Dictionary<string, List<ProcessingDelegateInfo>> FinallyProcessDelegateListByView { get; } =
-			new Dictionary<string, List<ProcessingDelegateInfo>>();
+		public Dictionary<string, List<ProcessingDelegateInfo>> ParametersDelegateListByView { get; } = new();
 
-		public ProcessingDelegatesWalker(PXContext pxContext, ImmutableHashSet<ISymbol> processingViewSymbols, CancellationToken cancellation)
-			: base(pxContext, cancellation)
+		public Dictionary<string, List<ProcessingDelegateInfo>> ProcessDelegateListByView { get; } = new();
+		
+		public Dictionary<string, List<ProcessingDelegateInfo>> FinallyProcessDelegateListByView { get; } = new();
+
+		public ProcessingDelegatesWalker(PXContext pxContext, HashSet<ISymbol> processingViewSymbols, CancellationToken cancellation) : 
+									base(pxContext, cancellation)
 		{
 			_processingViewSymbols = processingViewSymbols.CheckIfNull();
+		}
+
+		public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
+		{
+			ThrowIfCancellationRequested();
+			base.VisitMethodDeclaration(node);
 		}
 
 		public override void VisitInvocationExpression(InvocationExpressionSyntax node)
@@ -39,9 +41,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			ThrowIfCancellationRequested();
 
 			if (node.ArgumentList == null || node.Expression is not MemberAccessExpressionSyntax memberAccess)
-			{
 				return;
-			}
 
 			var viewSymbol = GetSymbol<ISymbol>(memberAccess.Expression);
 
@@ -51,97 +51,109 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			var isProcessingView = _processingViewSymbols.Contains(viewSymbol);
 
 			if (!isProcessingView)
-			{
 				return;
-			}
 
 			var viewName = viewSymbol.Name;
 			var methodSymbol = GetSymbol<IMethodSymbol>(memberAccess.Name);
 
 			if (methodSymbol == null)
+				return;
+
+			bool isSetProcessDelegate =
+					PxContext.PXProcessingBase.SetProcessDelegate.Contains<IMethodSymbol>(methodSymbol.OriginalDefinition, 
+																							SymbolEqualityComparer.Default);
+			bool isSetAsyncProcessDelegate =
+					PxContext.PXProcessingBase.SetAsyncProcessDelegate.Contains<IMethodSymbol>(methodSymbol.OriginalDefinition,
+																								SymbolEqualityComparer.Default);
+			if (isSetProcessDelegate || isSetAsyncProcessDelegate)
 			{
+				AnalyzeSetProcessDelegate(viewName, node.ArgumentList);
+				base.VisitInvocationExpression(node);
 				return;
 			}
 
-			var isSetParametersDelegate = 
-				PxContext.PXProcessingBase.SetParametersDelegate.Equals(methodSymbol.OriginalDefinition, SymbolEqualityComparer.Default);
+			bool isSetParametersDelegate =
+					PxContext.PXProcessingBase.SetParametersDelegate.Equals(methodSymbol.OriginalDefinition, SymbolEqualityComparer.Default);
 
 			if (isSetParametersDelegate)
 			{
 				AnalyzeSetParametersDelegate(viewName, node.ArgumentList);
-			}
-			else
-			{
-				var isSetProcessDelegate = 
-					PxContext.PXProcessingBase.SetProcessDelegate.Contains<IMethodSymbol>(methodSymbol.OriginalDefinition, SymbolEqualityComparer.Default);
-
-				if (isSetProcessDelegate)
-				{
-					AnalyzeSetProcessDelegate(viewName, node.ArgumentList);
-				}
+				base.VisitInvocationExpression(node);
+				return;
 			}
 
 			base.VisitInvocationExpression(node);
 		}
 
-		private void AnalyzeSetParametersDelegate(string viewName, ArgumentListSyntax? argumentList)
+		private void AnalyzeSetParametersDelegate(string viewName, ArgumentListSyntax argumentList)
 		{
 			ThrowIfCancellationRequested();
 
-			var handlerNode = argumentList?.Arguments.First()?.Expression;
+			var handlerNode = argumentList.Arguments.FirstOrDefault()?.Expression;
 			if (handlerNode == null)
 			{
 				return;
-			}
-
-			if (!ParametersDelegateListByView.ContainsKey(viewName))
-			{
-				ParametersDelegateListByView.Add(viewName, new List<ProcessingDelegateInfo>());
 			}
 
 			var parametersDelegateInfo = GetDelegateInfo(handlerNode);
 
-			if (parametersDelegateInfo != null)
-				ParametersDelegateListByView[viewName].Add(parametersDelegateInfo);
+			if (parametersDelegateInfo == null)
+				return;
+
+			if (ParametersDelegateListByView.TryGetValue(viewName, out List<ProcessingDelegateInfo> parameterDelegates))
+			{
+				parameterDelegates.Add(parametersDelegateInfo);
+			}
+			else
+			{
+				parameterDelegates = new List<ProcessingDelegateInfo>(capacity: 1) { parametersDelegateInfo };
+				ParametersDelegateListByView.Add(viewName, parameterDelegates);
+			}
 		}
 
-		private void AnalyzeSetProcessDelegate(string viewName, ArgumentListSyntax? argumentList)
+		private void AnalyzeSetProcessDelegate(string viewName, ArgumentListSyntax argumentList)
 		{
 			ThrowIfCancellationRequested();
 
-			ExpressionSyntax? handlerNode = argumentList?.Arguments.First()?.Expression;
+			ExpressionSyntax? handlerNode = argumentList.Arguments.FirstOrDefault()?.Expression;
 			if (handlerNode == null)
 			{
 				return;
-			}
-
-			if (!ProcessDelegateListByView.ContainsKey(viewName))
-			{
-				ProcessDelegateListByView.Add(viewName, new List<ProcessingDelegateInfo>());
 			}
 
 			var processDelegateInfo = GetDelegateInfo(handlerNode);
 
 			if (processDelegateInfo != null)
-				ProcessDelegateListByView[viewName].Add(processDelegateInfo);
+			{
+				if (ProcessDelegateListByView.TryGetValue(viewName, out List<ProcessingDelegateInfo> processingDelegates))
+					processingDelegates.Add(processDelegateInfo);
+				else
+				{
+					processingDelegates = new List<ProcessingDelegateInfo>(capacity: 1) { processDelegateInfo };
+					ProcessDelegateListByView.Add(viewName, processingDelegates);
+				}
+			}
 
-			if (argumentList!.Arguments.Count == 1)
+			if (argumentList!.Arguments.Count <= 1)
 				return;
 
-			var finallyHandlerNode = argumentList.Arguments[1]?.Expression;
+			var finallyHandlerNode = argumentList.Arguments[1].Expression;
 
 			if (finallyHandlerNode == null)
 				return;
 
-			if (!FinallyProcessDelegateListByView.ContainsKey(viewName))
-			{
-				FinallyProcessDelegateListByView.Add(viewName, new List<ProcessingDelegateInfo>());
-			}
-
 			var finallyHandlerInfo = GetDelegateInfo(finallyHandlerNode);
 
-			if (finallyHandlerInfo != null)
-				FinallyProcessDelegateListByView[viewName].Add(finallyHandlerInfo);
+			if (finallyHandlerInfo == null)
+				return;
+
+			if (FinallyProcessDelegateListByView.TryGetValue(viewName, out List<ProcessingDelegateInfo> finallyDelegates))
+				finallyDelegates.Add(finallyHandlerInfo);
+			else
+			{
+				finallyDelegates = new List<ProcessingDelegateInfo>(capacity: 1) { finallyHandlerInfo };
+				FinallyProcessDelegateListByView.Add(viewName, finallyDelegates);
+			}
 		}
 
 		private ProcessingDelegateInfo? GetDelegateInfo(ExpressionSyntax handlerNode)

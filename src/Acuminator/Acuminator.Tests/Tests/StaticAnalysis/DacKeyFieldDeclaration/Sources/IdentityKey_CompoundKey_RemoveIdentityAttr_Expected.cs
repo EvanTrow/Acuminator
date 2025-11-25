@@ -2,7 +2,7 @@
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.DacKeyFieldDeclaration.Sources
 {
-	public class KNSIConfigItemsStore : IBqlTable
+	public class KNSIConfigItemsStore : PXBqlTable, IBqlTable
 	{
 		#region StoreID
 		public abstract class storeID : IBqlField { }

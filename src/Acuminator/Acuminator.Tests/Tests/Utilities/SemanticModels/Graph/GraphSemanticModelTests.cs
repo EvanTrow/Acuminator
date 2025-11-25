@@ -126,7 +126,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			var allEventHandlersOverridesChains = graphExtensionModelWithEvents.AllEventHandlerOverridesChains;
 
 			graphExtensionModelWithEvents.Should().NotBeNull();
-			graphExtensionModelWithEvents.PXOverrides.Should().HaveCount(3);
+			graphExtensionModelWithEvents.DeclaredPXOverrides.Should().HaveCount(3);
 
 			#region Graph Hierarchy 
 			graphExtensionModelWithEvents.GraphOrGraphExtInfo.Base.Should().NotBeNull();

@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public partial class SOOrder : IBqlTable
+	public partial class SOOrder : PXBqlTable, IBqlTable
 	{
 		#region CompanyID
 		// Acuminator disable once PX1027 ForbiddenFieldsInDacDeclaration [Justification]
@@ -26,7 +26,6 @@ namespace PX.Objects.HackathonDemo
 		public int? OrderNbr { get; set; }
 		#endregion
 		#region  DeletedDatabaseRecord
-		// Acuminator disable once PX1027 ForbiddenFieldsInDacDeclaration [Justification]
 		public abstract class deletedDatabaseRecord { }
 		// Acuminator disable once PX1027 ForbiddenFieldsInDacDeclaration [Justification]
 		[PXDefault]

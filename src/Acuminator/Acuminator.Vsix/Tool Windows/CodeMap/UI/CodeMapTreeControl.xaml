@@ -563,7 +563,8 @@
 												  ItemsSource="{Binding Path=DisplayedChildren, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
 							<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" MinHeight="19" MaxHeight="19">
 								<Image Margin="0,0,5,0" UseLayoutRounding="True" SnapsToDevicePixels="True"
-									   ToolTip="{Binding Mode=OneWay, Converter={StaticResource iconTooltipConverter}}">
+									   ToolTip="{Binding Mode=OneWay, Converter={StaticResource iconTooltipConverter}}"
+									   DpiChanged="CodeMapIcon_DpiChanged" Initialized="CodeMapIcon_Initialized">
 									<Image.Source>
 										<MultiBinding Mode="OneWay" Converter="{StaticResource treeNodeToIconConverter}">
 											<!-- Pass the datacontext as the first parameter -->
@@ -669,7 +670,8 @@
 								<ItemsControl.Resources>
 									<DataTemplate DataType="{x:Type codeMap:IconViewModel}">
 										<Image Margin="0,0,5,0" UseLayoutRounding="True" MaxHeight="14" MinHeight="14" MaxWidth="14" MinWidth="14"
-											   SnapsToDevicePixels="True" ToolTip="{Binding Mode=OneWay, Converter={StaticResource iconTooltipConverter}}">
+											   SnapsToDevicePixels="True" ToolTip="{Binding Mode=OneWay, Converter={StaticResource iconTooltipConverter}}"
+											   DpiChanged="CodeMapIcon_DpiChanged" Initialized="CodeMapIcon_Initialized">
 											<Image.Source>
 												<MultiBinding Mode="OneWay" Converter="{StaticResource treeNodeToIconConverter}">
 													<!-- Pass the datacontext as the first parameter -->

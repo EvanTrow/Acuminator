@@ -40,6 +40,8 @@ namespace Acuminator.Utilities.Roslyn.Constants
 			public const string WithTablesOf_TypeName = "WithTablesOf";
 			public const string IsRelatedTo = "IsRelatedTo";
 			public const string Field = "Field";
+
+			public const string Dirty = "Dirty";
 		}
 
 		/// <summary>
@@ -105,7 +107,25 @@ namespace Acuminator.Utilities.Roslyn.Constants
 				StringComparer.OrdinalIgnoreCase);
 		}
 
+		public static class SystemFieldsAttributes
+		{
+			public static class ShortNames
+			{
+				public const string PXDBTimestamp = nameof(PXDBTimestamp);
+				public const string PXNote		  = nameof(PXNote);
+
+				public const string PXDBCreatedByID 	  = nameof(PXDBCreatedByID);
+				public const string PXDBCreatedByScreenID = nameof(PXDBCreatedByScreenID);
+				public const string PXDBCreatedDateTime   = nameof(PXDBCreatedDateTime);
+
+				public const string PXDBLastModifiedByID   	   = nameof(PXDBLastModifiedByID);
+				public const string PXDBLastModifiedByScreenID = nameof(PXDBLastModifiedByScreenID);
+				public const string PXDBLastModifiedDateTime   = nameof(PXDBLastModifiedDateTime);
+			}
+		}
+
 		public const string StringArray = "string[]";
+		public const string ByteArray = "byte[]";
 
 		public const string PXView = "PXView";
 

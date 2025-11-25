@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -141,17 +139,15 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		public static IEnumerable<SyntaxToken> GetIdentifiers(this MemberDeclarationSyntax? member) =>
 			member switch
 			{
+				BaseTypeDeclarationSyntax baseTypeDeclaration		=> baseTypeDeclaration.Identifier.ToEnumerable(),
 				PropertyDeclarationSyntax propertyDeclaration 		=> propertyDeclaration.Identifier.ToEnumerable(),
-				FieldDeclarationSyntax fieldDeclaration 			=> fieldDeclaration.Declaration.Variables.Select(variable => variable.Identifier),
 				MethodDeclarationSyntax methodDeclaration 			=> methodDeclaration.Identifier.ToEnumerable(),
-				EventDeclarationSyntax eventDeclaration 			=> eventDeclaration.Identifier.ToEnumerable(),                                           //for explicit event declaration with "add" and "remove"
-				EventFieldDeclarationSyntax eventFieldDeclaration 	=> eventFieldDeclaration.Declaration.Variables.Select(variable => variable.Identifier),  //for field event declaration
-				DelegateDeclarationSyntax delegateDeclaration 		=> delegateDeclaration.Identifier.ToEnumerable(),
-				ClassDeclarationSyntax nestedClassDeclaration 		=> nestedClassDeclaration.Identifier.ToEnumerable(),
-				EnumDeclarationSyntax enumDeclaration 				=> enumDeclaration.Identifier.ToEnumerable(),
-				StructDeclarationSyntax structDeclaration 			=> structDeclaration.Identifier.ToEnumerable(),
-				InterfaceDeclarationSyntax interfaceDeclaration 	=> interfaceDeclaration.Identifier.ToEnumerable(),
 				ConstructorDeclarationSyntax constructorDeclaration => constructorDeclaration.Identifier.ToEnumerable(),
+				BaseFieldDeclarationSyntax fieldOrEventDeclaration 	=> fieldOrEventDeclaration.Declaration.Variables.Select(variable => variable.Identifier),
+				DelegateDeclarationSyntax delegateDeclaration 		=> delegateDeclaration.Identifier.ToEnumerable(),
+				EnumMemberDeclarationSyntax enumMemberDeclaration 	=> enumMemberDeclaration.Identifier.ToEnumerable(),
+				EventDeclarationSyntax eventDeclaration 			=> eventDeclaration.Identifier.ToEnumerable(),                 //for explicit event declaration with "add" and "remove"
+				DestructorDeclarationSyntax destructorDeclaration  	=> destructorDeclaration.Identifier.ToEnumerable(),
 				_ 													=> []
 			};
 
@@ -232,14 +228,13 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		public static SyntaxTokenList GetModifiers(this SyntaxNode member) =>
 			member.CheckIfNull() switch
 			{
-				BasePropertyDeclarationSyntax basePropertyDeclaration => basePropertyDeclaration.Modifiers,
-				BaseMethodDeclarationSyntax baseMethodDeclaration 	  => baseMethodDeclaration.Modifiers,
-				BaseTypeDeclarationSyntax baseTypeDeclaration 		  => baseTypeDeclaration.Modifiers,
-				BaseFieldDeclarationSyntax baseFieldDeclaration 	  => baseFieldDeclaration.Modifiers,
-				DelegateDeclarationSyntax delegateDeclaration 		  => delegateDeclaration.Modifiers,
-				LocalFunctionStatementSyntax localFunctionStatement   => localFunctionStatement.Modifiers,
-				AnonymousFunctionExpressionSyntax anonymousFunction   => anonymousFunction.Modifiers,
-				_ 													  => SyntaxFactory.TokenList()
+				MemberDeclarationSyntax memberDeclaration 			=> memberDeclaration.Modifiers,
+				BaseParameterSyntax parameter 			  			=> parameter.Modifiers,
+				AnonymousFunctionExpressionSyntax anonymousFunction => anonymousFunction.Modifiers,
+				AccessorDeclarationSyntax accessor 		  			=> accessor.Modifiers,
+				LocalFunctionStatementSyntax localFunctionStatement => localFunctionStatement.Modifiers,
+				LocalDeclarationStatementSyntax localDeclaration	=> localDeclaration.Modifiers,
+				_ 										  			=> SyntaxFactory.TokenList()
 			};
 
 		/// <summary>
@@ -252,28 +247,28 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		public static CSharpSyntaxNode? GetBody(this SyntaxNode? node) =>
 			node switch
 			{
-				AccessorDeclarationSyntax accessorSyntax         => accessorSyntax.Body ?? 
-																	accessorSyntax.ExpressionBody?.Expression as CSharpSyntaxNode,
+				BaseMethodDeclarationSyntax methodSyntax			=> methodSyntax.Body ??
+																	   methodSyntax.ExpressionBody?.Expression as CSharpSyntaxNode,
 
-				MethodDeclarationSyntax methodSyntax             => methodSyntax.Body ?? 
-																	methodSyntax.ExpressionBody?.Expression as CSharpSyntaxNode,
+				AccessorDeclarationSyntax accessorSyntax			=> accessorSyntax.Body ?? 
+																	   accessorSyntax.ExpressionBody?.Expression as CSharpSyntaxNode,
 
-				ConstructorDeclarationSyntax constructorSyntax   => constructorSyntax.Body ?? 
-																	constructorSyntax.ExpressionBody?.Expression as CSharpSyntaxNode,
+				LocalFunctionStatementSyntax localFunctionSyntax 	=> localFunctionSyntax.Body ??
+																	   localFunctionSyntax.ExpressionBody?.Expression as CSharpSyntaxNode,
 
-				LocalFunctionStatementSyntax localFunctionSyntax => localFunctionSyntax.Body ??
-																	localFunctionSyntax.ExpressionBody?.Expression as CSharpSyntaxNode,
-				_ => null,
+				AnonymousFunctionExpressionSyntax anonymousFunction => anonymousFunction.Body,
+
+				_													=> null,
 			};
 
-		public static IEnumerable<AttributeSyntax> GetAttributes(this MemberDeclarationSyntax member)
+		public static IEnumerable<AttributeSyntax> GetAttributes(this SyntaxNode node)
 		{
-			member.ThrowOnNull();
+			node.ThrowOnNull();
 			return GetAttributesImpl();
 
 			IEnumerable<AttributeSyntax> GetAttributesImpl()
 			{
-				var attributeLists = member.GetAttributeLists();
+				var attributeLists = node.GetAttributeLists();
 
 				for (int i = 0; i < attributeLists.Count; i++)
 				{
@@ -288,90 +283,42 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static SyntaxList<AttributeListSyntax> GetAttributeLists(this MemberDeclarationSyntax? member) =>
-			member switch
+		public static SyntaxList<AttributeListSyntax> GetAttributeLists(this SyntaxNode? node) =>
+			node switch
 			{
-				PropertyDeclarationSyntax propertyDeclaration 		=> propertyDeclaration.AttributeLists,
-				FieldDeclarationSyntax fieldDeclaration 			=> fieldDeclaration.AttributeLists,
-				MethodDeclarationSyntax methodDeclaration 			=> methodDeclaration.AttributeLists,
-				EventDeclarationSyntax eventDeclaration 			=> eventDeclaration.AttributeLists,
-				EventFieldDeclarationSyntax eventFieldDeclaration 	=> eventFieldDeclaration.AttributeLists,
-				DelegateDeclarationSyntax delegateDeclaration 		=> delegateDeclaration.AttributeLists,
-				ClassDeclarationSyntax nestedClassDeclaration 		=> nestedClassDeclaration.AttributeLists,
-				EnumDeclarationSyntax enumDeclaration 				=> enumDeclaration.AttributeLists,
-				StructDeclarationSyntax structDeclaration 			=> structDeclaration.AttributeLists,
-				InterfaceDeclarationSyntax interfaceDeclaration 	=> interfaceDeclaration.AttributeLists,
-				ConstructorDeclarationSyntax constructorDeclaration => constructorDeclaration.AttributeLists,
-				_ 													=> new SyntaxList<AttributeListSyntax>()
+				MemberDeclarationSyntax memberDeclaration => memberDeclaration.AttributeLists,
+				BaseParameterSyntax parameter			  => parameter.AttributeLists,
+				LambdaExpressionSyntax lambda			  => lambda.AttributeLists,
+				AccessorDeclarationSyntax accessor		  => accessor.AttributeLists,
+				TypeParameterSyntax typeParameter 		  => typeParameter.AttributeLists,
+				CompilationUnitSyntax compilationUnit 	  => compilationUnit.AttributeLists,
+				StatementSyntax statement				  => statement.AttributeLists,
+				_ 										  => new SyntaxList<AttributeListSyntax>()
 			};
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static SyntaxTrivia ToSingleLineComment(this string? commentContent)
-		{
-			const string commentPrefix = "//";
-			string comment = commentContent.IsNullOrWhiteSpace()
-				? commentPrefix
-				: commentPrefix + " " + commentContent.Trim();
-
-			return SyntaxFactory.Comment(comment);
-		}
-
-		public static BaseArgumentListSyntax? GetArgumentsList(this SyntaxNode callSite) =>
+		public static BaseArgumentListSyntax? GetArgumentsList(this SyntaxNode? callSite) =>
 			callSite switch
 			{
-				InvocationExpressionSyntax invocation 		  => invocation.ArgumentList,
-				ElementAccessExpressionSyntax elementAccess   => elementAccess.ArgumentList,
-				ObjectCreationExpressionSyntax objectCreation => objectCreation.ArgumentList,
-				ElementBindingExpressionSyntax elementBinding => elementBinding.ArgumentList,
-				_ 											  => null
+				InvocationExpressionSyntax invocation 						=> invocation.ArgumentList,
+				BaseObjectCreationExpressionSyntax objectCreation 			=> objectCreation.ArgumentList,
+				ElementAccessExpressionSyntax elementAccess 				=> elementAccess.ArgumentList,
+				ElementBindingExpressionSyntax elementBinding 				=> elementBinding.ArgumentList,
+				ConstructorInitializerSyntax constructorInitializer 		=> constructorInitializer.ArgumentList,
+				ImplicitElementAccessSyntax implicitElementAccess 			=> implicitElementAccess.ArgumentList,
+				PrimaryConstructorBaseTypeSyntax primaryConstructorBaseType => primaryConstructorBaseType.ArgumentList,
+				VariableDeclaratorSyntax variableDeclaratorSyntax 			=> variableDeclaratorSyntax.ArgumentList,
+				_ 															=> null
 			};
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string? GetDocTagName(this XmlNodeSyntax docTagNode) => docTagNode switch
 		{
-			XmlElementSyntax docTagWithContent	 => docTagWithContent.StartTag?.Name?.ToString(),
-			XmlEmptyElementSyntax oneLinerDocTag => oneLinerDocTag.Name?.ToString(),
+			XmlElementSyntax docTagWithContent	 => docTagWithContent.StartTag?.Name?.LocalName.ToString(),
+			XmlEmptyElementSyntax oneLinerDocTag => oneLinerDocTag.Name?.LocalName.ToString(),
 			_									 => null
 		};
 
-		public static bool ContainsNewLine(this in SyntaxTriviaList trivias)
-		{
-			for (int i = 0; i < trivias.Count; i++)
-			{
-				SyntaxTrivia trivia = trivias[i];
-
-				if (trivia.Kind() is SyntaxKind.EndOfLineTrivia or SyntaxKind.XmlTextLiteralNewLineToken)
-					return true;
-			}
-
-			return false;
-		}
-
-		public static List<SyntaxTrivia> GetRegionDirectiveLinesFromTrivia(this in SyntaxTriviaList trivias)
-		{
-			if (trivias.Count == 0)
-				return [];
-
-			var regionTrivias = new List<SyntaxTrivia>(2);
-			SyntaxTrivia? previousTrivia = null;
-
-			for (int i = 0; i < trivias.Count; i++)
-			{
-				var trivia = trivias[i];
-
-				if (trivia.Kind() is SyntaxKind.RegionDirectiveTrivia or SyntaxKind.EndRegionDirectiveTrivia)
-				{
-					if (previousTrivia.HasValue && previousTrivia.Value.IsKind(SyntaxKind.WhitespaceTrivia))
-						regionTrivias.Add(previousTrivia.Value);
-
-					regionTrivias.Add(trivia);
-				}
-
-				previousTrivia = trivia;
-			}
-
-			return regionTrivias;
-		}
+		
 
 		public static IEnumerable<SingleVariableDesignationSyntax> GetAllVariableDesignations(this PatternSyntax? pattern)
 		{
@@ -486,5 +433,13 @@ namespace Acuminator.Utilities.Roslyn.Syntax
 				}
 			}
 		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool AreNullableAnnotationsEnabled(this NullableContext nullableContext) =>
+			nullableContext.IsFlagSet(NullableContext.AnnotationsEnabled);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsFlagSet(this NullableContext nullableContext, NullableContext flagToCheck) =>
+			(nullableContext & flagToCheck) == flagToCheck;
 	}
 }

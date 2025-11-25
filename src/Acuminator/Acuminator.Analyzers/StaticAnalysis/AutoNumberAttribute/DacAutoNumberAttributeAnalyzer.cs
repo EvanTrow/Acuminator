@@ -116,7 +116,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.AutoNumberAttribute
 
 			foreach (var arg in stringAttribute.AttributeData.ConstructorArguments)
 			{
-				if (arg.Kind == TypedConstantKind.Primitive  && arg.Value is int length)
+				if (arg.Kind == TypedConstantKind.Primitive && arg.Value is int length)
 				{
 					stringLength = length;
 					lengthArgsCandidatesCount++;

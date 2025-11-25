@@ -10,7 +10,7 @@ namespace Acuminator.Tests.Sources
     [Serializable]
     [PXPrimaryGraph(typeof(CFHistoryMaint))]
     [PXCacheName("My DAC Class")]
-    public class DacWithGraphUsageInAttribute : IBqlTable
+    public class DacWithGraphUsageInAttribute : PXBqlTable, IBqlTable
     {
         [PXUIField(DisplayName = "Reference Nbr.")]
         [PXDBInt]

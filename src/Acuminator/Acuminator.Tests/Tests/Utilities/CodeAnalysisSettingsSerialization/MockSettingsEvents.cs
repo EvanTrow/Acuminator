@@ -7,7 +7,7 @@ using Acuminator.Vsix.Settings;
 
 namespace Acuminator.Tests.Tests.Utilities.CodeAnalysisSettingsSerialization
 {
-	internal class MockSettingsEvents : ISettingsEvents
+	internal class MockSettingsEvents : IGeneralSettingsEvents
 	{
 		public event EventHandler<SettingChangedEventArgs>? ColoringSettingChanged
 		{

@@ -15,6 +15,7 @@
 		public const string PXObjectsWithDot   = "PX.Objects.";
 
 		public const string ReferentialIntegrityAttributes = "PX.Data.ReferentialIntegrity.Attributes";
+		public const string PXDataBql 					   = "PX.Data.BQL";
 		public const string PXDataBqlFluent 			   = "PX.Data.BQL.Fluent";
 
 		public const string System 		  = "System";

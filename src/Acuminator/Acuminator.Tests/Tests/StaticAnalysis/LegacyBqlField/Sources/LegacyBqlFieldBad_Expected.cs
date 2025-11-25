@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿#nullable disable
+using System;
+using System.Diagnostics.CodeAnalysis;
 using PX.Data;
 using PX.Objects.CR;
 
 namespace PX.Analyzers.Test.Sources
 {
-	public class BadDac : IBqlTable
+	[PXHidden]
+	[SuppressMessage("Acuminator", "PX1069:DAC must declare mandatory audit and timestamp DAC fields", Justification = "<Pending>")]
+	public class BadDac : PXBqlTable, IBqlTable
 	{
 		public abstract class legacyBoolField : PX.Data.BQL.BqlBool.Field<legacyBoolField> { }
 		[PXBool]
@@ -60,5 +61,21 @@ namespace PX.Analyzers.Test.Sources
 		public abstract class attributes : PX.Objects.CR.BqlAttributes.Field<attributes> { }
 		[CRAttributesField(typeof(CRQuote.opportunityClassID))]
 		public virtual string[] Attributes { get; set; }
+
+		#nullable enable
+
+		#region LegacyNullableStringField
+		public abstract class legacyNullableStringField : PX.Data.BQL.BqlString.Field<legacyNullableStringField> { }
+
+		[PXDBString(50)]
+		public string? LegacyNullableStringField { get; set; }
+		#endregion
+
+		#region LegacyNullableBinaryField
+		public abstract class legacyNullableBinaryField : PX.Data.BQL.BqlByteArray.Field<legacyNullableBinaryField> { }
+
+		[PXDBBinary]
+		public byte[]? LegacyNullableBinaryField { get; set; }
+		#endregion
 	}
 }

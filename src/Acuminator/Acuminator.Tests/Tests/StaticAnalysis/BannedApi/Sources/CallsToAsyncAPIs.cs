@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,6 +6,8 @@ namespace PX.Objects.HackathonDemo
 {
 	public class Service
 	{
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD103:Call async methods when in an async method", Justification = "<Pending>")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD105:Avoid method overloads that assume TaskScheduler.Current", Justification = "<Pending>")]
 		public static async Task<bool> RunParallelAsync()
 		{
 			var plinq = Enumerable.Range(1, 100).AsParallel().Sum();
@@ -28,6 +29,13 @@ namespace PX.Objects.HackathonDemo
 			coldTaskNonGeneric.Start(TaskScheduler.Current);
 
 			await coldTaskNonGeneric.ConfigureAwait(false);
+
+			var hotTaskGeneric2 = Task.Factory.StartNew(() => 100 * 100);
+
+			hotTaskNonGeneric.Wait(1000, CancellationToken.None);
+			var res = hotTaskGeneric2.Result;
+
+			res = hotTaskGeneric.GetAwaiter().GetResult();
 
 			return true;
 		}

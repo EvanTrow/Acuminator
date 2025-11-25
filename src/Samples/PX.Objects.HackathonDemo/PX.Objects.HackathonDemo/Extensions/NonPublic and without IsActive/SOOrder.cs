@@ -11,7 +11,7 @@ using PX.Objects.GL;
 namespace PX.Objects.HackathonDemo.Extensions.NonPublic
 {
 	[PXHidden]
-	public class SOOrder : IBqlTable
+	public class SOOrder : PXBqlTable, IBqlTable
 	{
 		#region OrderType
 		public abstract class orderType : IBqlField { }

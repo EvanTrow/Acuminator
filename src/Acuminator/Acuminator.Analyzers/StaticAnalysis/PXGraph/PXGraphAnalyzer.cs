@@ -1,26 +1,27 @@
-﻿
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis.ActionHandlerAttributes;
-using Acuminator.Analyzers.StaticAnalysis.ActionHandlerReturnType;
 using Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator;
 using Acuminator.Analyzers.StaticAnalysis.CallingBaseActionHandler;
 using Acuminator.Analyzers.StaticAnalysis.CallingBaseDataViewDelegate;
 using Acuminator.Analyzers.StaticAnalysis.ChangesInPXCache;
 using Acuminator.Analyzers.StaticAnalysis.ConstructorInGraphExtension;
 using Acuminator.Analyzers.StaticAnalysis.DatabaseQueries;
+using Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraph;
+using Acuminator.Analyzers.StaticAnalysis.ForbidPrivateEventHandlers;
 using Acuminator.Analyzers.StaticAnalysis.InvalidPXActionSignature;
 using Acuminator.Analyzers.StaticAnalysis.LongOperationStart;
+using Acuminator.Analyzers.StaticAnalysis.MainDacOfProcessingViewMustContainNoteIdField;
 using Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGraphExtensions;
 using Acuminator.Analyzers.StaticAnalysis.NoIsActiveMethodForExtension;
 using Acuminator.Analyzers.StaticAnalysis.NonPublicGraphsDacsAndExtensions;
 using Acuminator.Analyzers.StaticAnalysis.NoPrimaryViewForPrimaryDac;
-using Acuminator.Analyzers.StaticAnalysis.ForbidPrivateEventHandlers;
+using Acuminator.Analyzers.StaticAnalysis.ObsoleteElementsUsage;
 using Acuminator.Analyzers.StaticAnalysis.PXActionExecution;
 using Acuminator.Analyzers.StaticAnalysis.PXGraphCreationInGraphInWrongPlaces;
-using Acuminator.Analyzers.StaticAnalysis.PXOverrideMismatch;
+using Acuminator.Analyzers.StaticAnalysis.PXOverride;
 using Acuminator.Analyzers.StaticAnalysis.SavingChanges;
 using Acuminator.Analyzers.StaticAnalysis.StaticFieldOrPropertyInGraph;
 using Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions;
@@ -43,12 +44,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 		protected override SymbolKind SymbolKind => SymbolKind.NamedType;
 
 		public PXGraphAnalyzer() : this(null,
+			new GraphAndGraphExtensionDeclarationAnalyzer(),
 			new PXGraphCreationInGraphInWrongPlacesGraphAnalyzer(),
 			new ConstructorInGraphExtensionAnalyzer(),
 			new SavingChangesInGraphSemanticModelAnalyzer(),
 			new ChangesInPXCacheDuringPXGraphInitializationAnalyzer(),
-			new LongOperationInPXGraphDuringInitializationAnalyzer(),
-			new LongOperationInDataViewDelegateAnalyzer(),
+			new LongOperationInGraphAnalyzer(),
 			new PXActionExecutionInGraphSemanticModelAnalyzer(),
 			new DatabaseQueriesInPXGraphInitializationAnalyzer(),
 			new ThrowingExceptionsInLongRunningOperationAnalyzer(),
@@ -62,12 +63,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 			new ViewDeclarationOrderAnalyzer(),
 			new NoPrimaryViewForPrimaryDacAnalyzer(),
 			new ActionHandlerAttributesAnalyzer(),
-			new ActionHandlerReturnTypeAnalyzer(),
 			new NonPublicGraphAndDacAndExtensionsAnalyzer(),
 			new InvalidPXActionSignatureAnalyzer(),
 			new StaticFieldOrPropertyInGraphAnalyzer(),
 			new TypoInViewAndActionHandlerNameAnalyzer(),
-			new PXOverrideMismatchAnalyzer(),
+			new PXOverrideAnalyzer(),
+			new MainDacOfProcessingViewMustContainNoteIdFieldAnalyzer(),
+			new ObsoleteElementsUsageAnalyzer(),
 			new ForbidPrivateEventHandlersAnalyzer())
 		{
 		}

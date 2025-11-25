@@ -83,7 +83,6 @@
 		internal const string PXGraphExtension = "PX.Data.PXGraphExtension";
 		internal const string PXCacheExtension = "PX.Data.PXCacheExtension";
 		internal const string PXMappedCacheExtension = "PX.Data.PXMappedCacheExtension";
-		internal const string PXLongOperation = "PX.Data.PXLongOperation";
 		internal const string PXActionCollection = "PX.Data.PXActionCollection";
 		internal const string PXAdapter = "PX.Data.PXAdapter";
 
@@ -177,13 +176,15 @@
 
 		public const string PXStringListAttribute = "PX.Data.PXStringListAttribute";
 
-		public const string PXProtectedAccessAttribute = "PX.Data.PXProtectedAccessAttribute";
-		public const string PXProjectionAttribute = "PX.Data.PXProjectionAttribute";
-		public const string PXSelectorAttribute = "PX.Data.PXSelectorAttribute";
+		public const string PXProtectedAccessAttribute 	 = "PX.Data.PXProtectedAccessAttribute";
+		public const string PXProjectionAttribute 		 = "PX.Data.PXProjectionAttribute";
+		public const string PXSelectorAttribute 		 = "PX.Data.PXSelectorAttribute";
 		public const string PXDimensionSelectorAttribute = "PX.Data.PXDimensionSelectorAttribute";
-		public const string PXParentAttribute = "PX.Data.PXParentAttribute";
-		public const string PXForeignReferenceAttribute = "PX.Data.ReferentialIntegrity.Attributes.PXForeignReferenceAttribute";
-		public const string PXDBDefaultAttribute = "PX.Data.PXDBDefaultAttribute";
+		public const string PXParentAttribute 			 = "PX.Data.PXParentAttribute";
+		public const string PXForeignReferenceAttribute  = "PX.Data.ReferentialIntegrity.Attributes.PXForeignReferenceAttribute";
+		public const string PXDBDefaultAttribute 		 = "PX.Data.PXDBDefaultAttribute";
+		public const string PXAccumulatorAttribute 		 = "PX.Data.PXAccumulatorAttribute";
+		public const string PXNoteAttribute 			 = "PX.Data.PXNoteAttribute";
 
 		public const string PXView = "PX.Data.PXView";
 
@@ -247,6 +248,26 @@
 		internal static class Workflow
 		{
 			public const string PXScreenConfiguration = "PX.Data.WorkflowAPI.PXScreenConfiguration";
+		}
+
+		public static class Async
+		{
+			public const string PXLongOperation = "PX.Data.PXLongOperation";
+
+			public const string ILongOperationManager 	 = "PX.Async.ILongOperationManager";
+			public const string ILongOperationManagerOld = "PX.Concurrency.ILongOperationManager";
+
+			public const string IGraphLongOperationManager 	  = "PX.Async.IGraphLongOperationManager";
+			public const string IGraphLongOperationManagerOld = "PX.Concurrency.IGraphLongOperationManager";
+		}
+
+		public static class DotNetTypes
+		{
+			public const string Task = "System.Threading.Tasks.Task";
+			public const string Task_Generic = "System.Threading.Tasks.Task`1";
+
+			public const string ValueTask = "System.Threading.Tasks.ValueTask";
+			public const string ValueTask_Generic = "System.Threading.Tasks.ValueTask`1";
 		}
 	}
 }

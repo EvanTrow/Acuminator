@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class POLine : IBqlTable
+	public class POLine : PXBqlTable, IBqlTable
 	{
         #region Cons
         public POLine() : base()

@@ -18,9 +18,7 @@ public class FilterViewModel : ViewModelBase
 		get => _filterText;
 		set
 		{
-			string? newValue = value.IsNullOrEmpty() 
-				? null 
-				: value;
+			string? newValue = value.NullIfWhiteSpace();
 
 			if (_filterText != newValue)
 			{
@@ -51,7 +49,7 @@ public class FilterViewModel : ViewModelBase
 	}
 
 	[MemberNotNullWhen(returnValue: true, nameof(FilterText))]
-	public bool HasFilterText => !_filterText.IsNullOrEmpty();
+	public bool HasFilterText => !_filterText.IsNullOrWhiteSpace();
 
 	public Command ClearCommand { get; }
 

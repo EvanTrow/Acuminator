@@ -8,7 +8,9 @@ using PX.Objects.CR;
 
 namespace PX.Analyzers.Test.Sources
 {
-	public class GoodDac : IBqlTable
+	// Acuminator disable once PX1069 MissingMandatoryDacFields [Justification]
+	[PXHidden]
+	public class GoodDac : PXBqlTable, IBqlTable
 	{
 		public abstract class modernBoolField : PX.Data.BQL.BqlBool.Field<modernBoolField> { }
 		[PXBool]
@@ -46,7 +48,11 @@ namespace PX.Analyzers.Test.Sources
 		[PXString]
 		public String ModernStringField { get; set; }
 
-		public abstract class modernDateField : PX.Data.BQL.BqlDate.Field<modernDateField> { }
+		public abstract class modernStringField1 : PX.Data.BQL.BqlString.Field<modernStringField1> { }
+		[PXString]
+		public string? ModernStringField1 { get; set; }
+
+		public abstract class modernDateField : PX.Data.BQL.BqlDateTime.Field<modernDateField> { }
 		[PXDate]
 		public DateTime? ModernDateField { get; set; }
 

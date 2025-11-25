@@ -6,7 +6,7 @@ using PX.Data.BQL;
 namespace PX.Analyzers.Test.Sources
 {
 	[PXHidden]
-	public class DacWithPropertiesFirst : IBqlTable
+	public class DacWithPropertiesFirst : PXBqlTable, IBqlTable
 	{
 		#region NoteID
 		[PXUIField]

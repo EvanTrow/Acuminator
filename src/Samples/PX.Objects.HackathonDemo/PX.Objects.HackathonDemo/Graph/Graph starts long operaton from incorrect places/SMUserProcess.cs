@@ -1,37 +1,57 @@
 ﻿using PX.Data;
+using PX.Data.BQL;
+
 using System;
 using System.Collections;
 
-namespace PX.Objects.HackathonDemo
+namespace PX.Objects.HackathonDemo;
+
+public class SMUserProcess : PXGraph
 {
-    public class SMUserProcess : PXGraph
-    {
-        public PXSelect<PX.SM.Users> Users;
+	[PXHidden]
+	public class FilterDac : PXBqlTable, IBqlTable
+	{
+		#region SomeFlag
+		/// <inheritdoc cref="SomeFlag"/>
+		public abstract class someFlag : BqlBool.Field<someFlag> { }
 
-        public PXAction<PX.SM.Users> SyncMyUsers;
+		[PXBool]
+		[PXUIField(DisplayName = "Some Flag")]
+		public virtual bool? SomeFlag
+		{
+			get;
+			set;
+		}
+		#endregion
+	}
 
-        [PXButton]
-        [PXUIField]
-        public virtual void syncMyUsers()
-        {
-            SyncUsers();
-        }
+	public PXFilter<FilterDac> Filter;
 
-        public IEnumerable users()
-        {
-            SyncUsers();
+	public PXSelect<PX.SM.Users> Users;
 
-            return new PXSelect<PX.SM.Users>(this).Select();
-        }
+	public PXAction<PX.SM.Users> SyncMyUsers;
 
-        public SMUserProcess()
-        {
-            SyncUsers();
-        }
+	[PXButton]
+	[PXUIField]
+	public virtual void syncMyUsers()
+	{
+		SyncUsers();
+	}
 
-        private void SyncUsers()
-        {
-            PXLongOperation.StartOperation(this, () => Console.WriteLine("Synced"));
-        }
-    }
+	public IEnumerable users()
+	{
+		SyncUsers();
+
+		return new PXSelect<PX.SM.Users>(this).Select();
+	}
+
+	public SMUserProcess()
+	{
+		SyncUsers();
+	}
+
+	private void SyncUsers()
+	{
+		PXLongOperation.StartOperation(this, () => Console.WriteLine("Synced"));
+	}
 }

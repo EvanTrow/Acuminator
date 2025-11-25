@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo.Suppression.Comments
 {
-	public partial class POOrder : IBqlTable
+	public partial class POOrder : PXBqlTable, IBqlTable
 	{
 		#region CompanyMask
 		// Acuminator disable once PX1060 LegacyBqlField [Justification]

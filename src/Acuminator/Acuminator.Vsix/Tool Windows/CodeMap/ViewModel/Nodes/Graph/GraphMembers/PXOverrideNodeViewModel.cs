@@ -16,8 +16,8 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public PXOverrideInfo PXOverrideInfo => (MemberInfo as PXOverrideInfo)!;
 
 		public PXOverrideNodeViewModel(PXOverridesCategoryNodeViewModel pxOverridesCategoryVM, 
-									   PXOverrideInfo pxOverrideInfo, bool isExpanded = false) :
-								  base(pxOverridesCategoryVM, pxOverridesCategoryVM, pxOverrideInfo, isExpanded)
+									   PXOverrideInfo pxOverrideInfo, Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+								  base(pxOverridesCategoryVM, pxOverridesCategoryVM, pxOverrideInfo, isExpandedCalculator)
 		{		
 		}
 

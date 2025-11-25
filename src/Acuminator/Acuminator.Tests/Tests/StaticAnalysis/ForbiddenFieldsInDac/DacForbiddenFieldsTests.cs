@@ -27,7 +27,6 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ForbiddenFieldsInDac
 			VerifyCSharpDiagnostic(source,
 				Descriptors.PX1027_ForbiddenFieldsInDacDeclaration.CreateFor(13, 25, "companyId"),
 				Descriptors.PX1027_ForbiddenFieldsInDacDeclaration.CreateFor(17, 17, "CompanyID"),
-				Descriptors.PX1027_ForbiddenFieldsInDacDeclaration.CreateFor(27, 25, "deletedDatabaseRecord"),
 				Descriptors.PX1027_ForbiddenFieldsInDacDeclaration.CreateFor(30, 17, "DeletedDatabaseRecord"),
 				Descriptors.PX1027_ForbiddenFieldsInDacDeclaration.CreateFor(39, 25, "companyMask"),
 				Descriptors.PX1027_ForbiddenFieldsInDacDeclaration.CreateFor(42, 17, "CompanyMask"),

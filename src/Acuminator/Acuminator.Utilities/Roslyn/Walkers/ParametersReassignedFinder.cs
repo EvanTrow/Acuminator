@@ -255,28 +255,27 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 				if (invocationExpression.Expression is not IdentifierNameSyntax)
 					return;
 
-				var symbolInfo = _semanticModel.GetSymbolInfo(invocationExpression, _cancellation);
-				var localFunction = (symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault()) as IMethodSymbol;
+				var localFunctionOrLambda = _semanticModel?.GetSymbolOrFirstCandidate(invocationExpression, _cancellation) as IMethodSymbol;
 
 				// Analyse local functions since they can reassign parameters from containing methods
-				if (localFunction == null || localFunction.MethodKind != MethodKind.LocalFunction)
+				if (localFunctionOrLambda == null || !localFunctionOrLambda.IsNestedMethod())
 					return;
 
-				if (_checkedLocalFunctions?.Contains(localFunction) == true)
+				if (_checkedLocalFunctions?.Contains(localFunctionOrLambda) == true)
 					return;
 
-				AddToCheckedLocalFunctions(localFunction);
+				AddToCheckedLocalFunctions(localFunctionOrLambda);
 
 				// Local method may have parameters with the same name as outer method parameters which will hide the outer method parameters
-				var nonRedeclaredParameters = localFunction.Parameters.IsDefaultOrEmpty
+				var nonRedeclaredParameters = localFunctionOrLambda.Parameters.IsDefaultOrEmpty
 					? _parametersToCheck
-					: _parametersToCheck.Where(checkedParameterName => localFunction.Parameters.All(p => p.Name != checkedParameterName))
+					: _parametersToCheck.Where(checkedParameterName => localFunctionOrLambda.Parameters.All(p => p.Name != checkedParameterName))
 										.ToList(capacity: _parametersToCheck!.Count);
 
 				if (nonRedeclaredParameters!.Count == 0)
 					return;
 
-				List<ISymbol>? reassignedContainingMethodsParameters = GetReassignedContainingMethodsParameters(localFunction);
+				List<ISymbol>? reassignedContainingMethodsParameters = GetReassignedContainingMethodsParameters(localFunctionOrLambda);
 
 				if (reassignedContainingMethodsParameters.IsNullOrEmpty())
 					return;
@@ -317,14 +316,13 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 				var localFunctionBody = localFunctionDeclaration?.GetBody();
 
 				// Static local functions can't reassign parameters from containing methods
-				if (localFunctionBody == null || localFunction.IsDefinitelyStatic(localFunctionDeclaration!))
+				if (localFunctionBody == null || localFunction.IsStatic)
 					return null;
 
 				// If there are containing local functions we must check for the first containing static local function.
 				// Only its parameters and parameters of its local functions can be reassigned by this localFunction
 				var containingMethodsWithReassignableParameters = localFunction.GetContainingMethods()
-																			   .TakeWhile(function => function.MethodKind != MethodKind.LocalFunction ||
-																									  !function.IsDefinitelyStatic(_cancellation))
+																			   .TakeWhile(function => !function.IsNestedMethod() || !function.IsStatic)
 																			   .ToList(capacity: 1);
 				if (containingMethodsWithReassignableParameters.Count == 0)
 					return null;
@@ -363,7 +361,7 @@ namespace Acuminator.Utilities.Roslyn.Walkers
 			}
 
 			#region Skip visiting anonymous functions and lambdas
-			// Lambdas and amomymous functions can be declared in the middle of the code. 
+			// Lambdas and anonymous functions can be declared in the middle of the code. 
 			// We don't visit them from the normal tree walking since their declaration is not a running code that can reassign something
 			// Also, currently analysis of invocations of lambdas is not supported
 			public override void VisitAnonymousMethodExpression(AnonymousMethodExpressionSyntax anonymousMethodExpression)

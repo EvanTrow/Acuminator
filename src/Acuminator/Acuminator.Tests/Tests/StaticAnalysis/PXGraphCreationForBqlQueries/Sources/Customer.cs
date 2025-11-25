@@ -7,7 +7,7 @@ using PX.Data;
 
 namespace PX.Objects
 {
-	public class Customer : IBqlTable
+	public class Customer : PXBqlTable, IBqlTable
 	{
 		#region BAccountID
 		[PXDBIdentity]

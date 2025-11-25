@@ -6,7 +6,7 @@ namespace PX.Objects.HackathonDemo
 		public bool IsDBField { get; set; } = true;
 	}
 
-	public class IIGPOALCLandedCost : IBqlTable
+	public class IIGPOALCLandedCost : PXBqlTable, IBqlTable
 	{
 		#region AcctSubBound
 		public abstract class cost : PX.Data.IBqlField { }

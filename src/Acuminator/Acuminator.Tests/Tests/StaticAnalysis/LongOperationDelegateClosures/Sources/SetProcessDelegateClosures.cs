@@ -1,13 +1,13 @@
 ﻿using PX.Data;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Acuminator.Tests.Sources
 {
 	public class SomeGraph : PXGraph<SomeGraph>
 	{
-		public class SomeDAC : IBqlTable
-		{
-		}
+		public class SomeDAC : PXBqlTable, IBqlTable { }
 
 		private readonly Processor processor = new Processor();
 
@@ -47,9 +47,15 @@ namespace Acuminator.Tests.Sources
 			Processing.SetProcessDelegate(ProcessorProperty.MemberFunc);  //Should be diagnostic
 			Processing.SetProcessDelegate(processorStatic.MemberFunc);    //No diagnostic
 
-			Processing.SetProcessDelegate<SomeGraph>((graph, dac) => StaticFuncWithNoInput(), graph => graph.FinallyHandler());             //No diagnostic
-			Processing.SetProcessDelegate<SomeGraph>((graph, dac) => MainProcessingHandler(dac), graph => FinallyHandler());                //Should be diagnostic
-			Processing.SetProcessDelegate<SomeGraph>((graph, dac) => graph.MainProcessingHandler(dac), graph => FinallyHandler());          //Should be diagnostic
+			Processing.SetProcessDelegate<SomeGraph>((graph, dac) => StaticFuncWithNoInput(), graph => graph.FinallyHandler());             // No diagnostic
+			Processing.SetProcessDelegate<SomeGraph>((graph, dac) => MainProcessingHandler(dac), graph => FinallyHandler());                // Should be diagnostic
+			Processing.SetProcessDelegate<SomeGraph>((graph, dac) => graph.MainProcessingHandler(dac), graph => FinallyHandler());          // Should be diagnostic
+
+			Processing.SetAsyncProcessDelegate<SomeGraph>(async (graph, dac, cToken) => await StaticFuncWithNoInputAsync(cToken));          // No diagnostic
+			Processing.SetAsyncProcessDelegate<SomeGraph>(async (graph, dac, cToken) => await graph.InstanceFuncWithNoInputAsync(cToken));  // No diagnostic
+			Processing.SetAsyncProcessDelegate<SomeGraph>(async (graph, dac, cToken) => await InstanceFuncWithNoInputAsync(cToken));        // Should be diagnostic
+			Processing.SetAsyncProcessDelegate<SomeGraph>(async (graph, dac, cToken) => await StaticFuncWithNoInputAsync(cToken), 
+														  FinallyHandlerAsync);																// Should be diagnostic
 		}
 
 		public static void StaticFunc(object filter, List<SomeDAC> list, bool markOnly)
@@ -73,6 +79,18 @@ namespace Acuminator.Tests.Sources
 		public void FinallyHandler()
 		{
 		}
+
+		public static Task StaticFuncWithNoInputAsync(CancellationToken cancellation)
+		{
+			return Task.CompletedTask;
+		}
+
+		public Task InstanceFuncWithNoInputAsync(CancellationToken cancellation)
+		{
+			return Task.CompletedTask;
+		}
+
+		public Task FinallyHandlerAsync(PXGraph graph, CancellationToken cancellation) => Task.CompletedTask;
 
 		private class Processor
 		{

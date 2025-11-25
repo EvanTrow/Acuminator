@@ -52,8 +52,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		IList<TreeNodeViewModel> IGroupNodeWithCyclingNavigation.DisplayedChildren => DisplayedChildren;
 
-		protected DacGroupingNodeBaseViewModel(GraphEventHandlerCategoryNodeViewModel graphEventHandlersCategoryVM, string dacName, bool isExpanded) :
-										  base(graphEventHandlersCategoryVM?.Tree!, graphEventHandlersCategoryVM, isExpanded)
+		protected DacGroupingNodeBaseViewModel(GraphEventHandlerCategoryNodeViewModel graphEventHandlersCategoryVM, string dacName,
+											   Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+										  base(graphEventHandlersCategoryVM?.Tree!, graphEventHandlersCategoryVM, isExpandedCalculator)
 		{
 			dacName.ThrowOnNullOrWhiteSpace();
 

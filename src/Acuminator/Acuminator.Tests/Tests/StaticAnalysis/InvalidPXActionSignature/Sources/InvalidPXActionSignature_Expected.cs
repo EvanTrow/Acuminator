@@ -22,7 +22,7 @@ namespace PX.Objects.SO
 		}
 	}
 
-	public class SOOrder : IBqlTable
+	public class SOOrder : PXBqlTable, IBqlTable
 	{
 		public abstract class orderType { }
 		[PXDBString(IsKey = true, InputMask = "")]

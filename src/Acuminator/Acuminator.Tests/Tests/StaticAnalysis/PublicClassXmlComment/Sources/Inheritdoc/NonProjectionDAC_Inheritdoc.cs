@@ -5,7 +5,7 @@ namespace PX.Objects
 {
 	/// <inheritdoc/>
 	[PXCacheName("NonProjection DAC")]
-	public class NonProjectionDacInhertitdoc : IBqlTable
+	public class NonProjectionDacInhertitdoc : PXBqlTable, IBqlTable
 	{
 		#region OrderType
 		public abstract class orderType : IBqlField { }
@@ -41,7 +41,7 @@ namespace PX.Objects
 	}
 
 	[PXHidden]
-	public class POOrder : IBqlTable
+	public class POOrder : PXBqlTable, IBqlTable
 	{
 		#region OrderNbr
 		public abstract class orderNbr : IBqlField { }

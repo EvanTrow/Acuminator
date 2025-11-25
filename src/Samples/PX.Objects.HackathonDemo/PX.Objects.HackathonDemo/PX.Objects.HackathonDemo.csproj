@@ -15,6 +15,7 @@
     <AssemblyName>PX.Objects.HackathonDemo</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <LangVersion>12.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -72,6 +73,9 @@
     <Compile Include="DAC\DAC with inconsistent Property and BQL field types\DerivedDacWithInconsistentTypes.cs" />
     <Compile Include="DAC\Documentation in DAC\ProjectionDAC_MappingWithInheritance_NoInheritdoc_AddInheritdoc.cs" />
     <Compile Include="DAC\InconsistentTypesOfDeclaredFieldAndReferencedDacFields\DacWithPropertiesHavingForeignKeysAndTypeNotMatchingOneOfForeignProperty.cs" />
+    <Compile Include="DAC\MissingMandatoryFieldsInDac\AccumulatorDac.cs" />
+    <Compile Include="DAC\MissingMandatoryFieldsInDac\DacWithFieldsAddedToBeginning.cs" />
+    <Compile Include="DAC\MissingMandatoryFieldsInDac\DacWithoutAuditFieldsAndTimestamp.cs" />
     <Compile Include="DAC\Multiple field attributes, invalid aggregators and DAC field must be abstract\FeatureSet.cs" />
     <Compile Include="DAC\Multiple Levels of inheritance\DacWithBaseTypeNonDac.cs" />
     <Compile Include="DAC\Property and attribute types mismatch and nullable types\SOOrder.cs" />
@@ -136,6 +140,7 @@
     <Compile Include="CallsToInternalAPI\GraphUsingInternalApi.cs" />
     <Compile Include="Graph\Graph with workflow\SOInvoiceEntry_Workflow.cs" />
     <Compile Include="Graph\OverrideTest\GraphExtensionsWithOverrides.cs" />
+    <Compile Include="Graph\OverrideTest\PXOverridesExample.cs" />
     <Compile Include="Graph\Start row reset for paging\LEPMaint.cs" />
     <Compile Include="Graph\Static fields and properties in graph\POCustomOrderEntry.cs" />
     <Compile Include="Graph\View Order\DAC\ARTran.cs" />

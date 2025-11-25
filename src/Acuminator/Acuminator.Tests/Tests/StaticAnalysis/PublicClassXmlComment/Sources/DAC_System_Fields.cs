@@ -10,7 +10,7 @@ namespace PX.Objects
 	/// <summary>
 	/// A DAC with system fields. Description is present to avoid diagnostic alert.
 	/// </summary>
-	public class DacWithSystemFields : IBqlTable
+	public class DacWithSystemFields : PXBqlTable, IBqlTable
 	{
 		#region Selected
 		public abstract class selected : PX.Data.BQL.BqlBool.Field<selected> { }

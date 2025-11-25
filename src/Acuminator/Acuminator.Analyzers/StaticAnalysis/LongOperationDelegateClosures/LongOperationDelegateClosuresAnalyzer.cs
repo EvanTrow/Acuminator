@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -28,19 +27,31 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 
 		protected override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, PXContext pxContext)
 		{
-			compilationStartContext.RegisterSyntaxNodeAction(c => AnalyzeLongOperationDelegates(c, pxContext), 
-															 SyntaxKind.ClassDeclaration, SyntaxKind.StructDeclaration, SyntaxKind.InterfaceDeclaration);
+			compilationStartContext.RegisterSyntaxNodeAction(c => AnalyzeLongOperationDelegates(c, pxContext), SyntaxKind.CompilationUnit);
 		}
 
 		private static void AnalyzeLongOperationDelegates(SyntaxNodeAnalysisContext syntaxContext, PXContext pxContext)
 		{
 			syntaxContext.CancellationToken.ThrowIfCancellationRequested();
 
-			if (syntaxContext.Node is not TypeDeclarationSyntax typeDeclaration)
+			if (syntaxContext.Node is not CompilationUnitSyntax rootNode)
 				return;
 
 			var longOperationsChecker = new LongOperationsChecker(syntaxContext, pxContext);
-			longOperationsChecker.CheckForCapturedGraphReferencesInDelegateClosures(typeDeclaration);
+			var typeDeclarations = rootNode.DescendantNodes()
+										   .OfType<TypeDeclarationSyntax>();
+	
+			foreach (TypeDeclarationSyntax typeDeclaration in typeDeclarations)
+			{
+				syntaxContext.CancellationToken.ThrowIfCancellationRequested();
+
+				var typeMembers = typeDeclaration.Members;
+
+				if (typeMembers.Count > 0)
+				{
+					longOperationsChecker.CheckForCapturedGraphReferencesInDelegateClosures(typeDeclaration);
+				}
+			}
 		}
 	}
 }

@@ -80,7 +80,7 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			Rule("PX1008", nameof(Resources.PX1008Title).GetLocalized(), Category.Acuminator,
 				DiagnosticSeverity.Error, DiagnosticsShortName.PX1008);
 
-		public static DiagnosticDescriptor PX1009_InheritanceFromPXCacheExtension { get; } =
+		public static DiagnosticDescriptor PX1009_InheritanceFromDacExtension { get; } =
 			Rule("PX1009", nameof(Resources.PX1009Title).GetLocalized(), Category.Acuminator,
 				DiagnosticSeverity.Error, DiagnosticsShortName.PX1009);
 
@@ -88,7 +88,7 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			Rule("PX1010", nameof(Resources.PX1010Title).GetLocalized(), Category.Acuminator,
 				DiagnosticSeverity.Warning, DiagnosticsShortName.PX1010);
 
-		public static DiagnosticDescriptor PX1011_InheritanceFromPXCacheExtension { get; } =
+		public static DiagnosticDescriptor PX1011_NotSealedDacExtension { get; } =
 			Rule("PX1011", nameof(Resources.PX1011Title).GetLocalized(), Category.Acuminator,
 				DiagnosticSeverity.Warning, DiagnosticsShortName.PX1011);
 
@@ -115,11 +115,11 @@ namespace Acuminator.Analyzers.StaticAnalysis
 				nameof(Resources.PX1015MessageFormatWithRequiredAndOptionalParams).GetLocalized());
 
 		public static DiagnosticDescriptor PX1016_NoIsActiveMethodForDacExtension { get; } =
-			Rule("PX1016", nameof(Resources.PX1016DacExtensionTitle).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error,
+			Rule("PX1016", nameof(Resources.PX1016DacExtensionTitle).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning,
 				 DiagnosticsShortName.PX1016, diagnosticDefaultJustification: DiagnosticsDefaultJustification.PX1016);
 
 		public static DiagnosticDescriptor PX1016_NoIsActiveMethodForGraphExtension { get; } =
-			Rule("PX1016", nameof(Resources.PX1016GraphExtensionTitle).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error,
+			Rule("PX1016", nameof(Resources.PX1016GraphExtensionTitle).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning,
 				 DiagnosticsShortName.PX1016, diagnosticDefaultJustification: DiagnosticsDefaultJustification.PX1016);
 
 		public static DiagnosticDescriptor PX1018_NoPrimaryViewForPrimaryDac { get; } =
@@ -352,10 +352,10 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			Rule("PX1059", nameof(Resources.PX1059Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1059);
 
 		public static DiagnosticDescriptor PX1060_LegacyBqlField { get; } =
-			Rule("PX1060", nameof(Resources.PX1060Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Info, DiagnosticsShortName.PX1060);
+			Rule("PX1060", nameof(Resources.PX1060Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1060);
 
 		public static DiagnosticDescriptor PX1061_LegacyBqlConstant { get; } =
-			Rule("PX1061", nameof(Resources.PX1061Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Info, DiagnosticsShortName.PX1061);
+			Rule("PX1061", nameof(Resources.PX1061Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1061);
 
 		public static DiagnosticDescriptor PX1062_StaticFieldOrPropertyInGraph { get; } =
 			Rule("PX1062", nameof(Resources.PX1062MessageFormat).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1062);
@@ -386,6 +386,14 @@ namespace Acuminator.Analyzers.StaticAnalysis
 
 		public static DiagnosticDescriptor PX1068_PropertyAndBqlFieldTypesMismatch { get; } =
 			Rule("PX1068", nameof(Resources.PX1068Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1068);
+
+		public static DiagnosticDescriptor PX1069_MissingSingleMandatoryDacField { get; } =
+			Rule("PX1069", nameof(Resources.PX1069Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1069,
+				 messageFormat: nameof(Resources.PX1069TitleFormat_SingleField).GetLocalized());
+
+		public static DiagnosticDescriptor PX1069_MissingMultipleMandatoryDacFields { get; } =
+			Rule("PX1069", nameof(Resources.PX1069Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1069,
+				 messageFormat: nameof(Resources.PX1069TitleFormat_MultipleFields).GetLocalized());
 
 		public static DiagnosticDescriptor PX1070_UiPresentationLogicInEventHandlers { get; } =
 			Rule("PX1070", nameof(Resources.PX1070Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1070);
@@ -446,6 +454,9 @@ namespace Acuminator.Analyzers.StaticAnalysis
 				Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1078_DifferentTypeSize,
 				messageFormat: nameof(Resources.PX1078MessageFormat_TypesOfDacFieldAndReferencedFieldHaveDifferentSize).GetLocalized());
 
+		public static DiagnosticDescriptor PX1079_PXOverrideWithoutDelegateParameter { get; } =
+			Rule("PX1079", nameof(Resources.PX1079Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1079);
+
 		public static DiagnosticDescriptor PX1080_DataViewDelegateLongOperationStart { get; } =
 			Rule("PX1080", nameof(Resources.PX1080Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1080);
 
@@ -497,6 +508,12 @@ namespace Acuminator.Analyzers.StaticAnalysis
 		public static DiagnosticDescriptor PX1096_PXOverrideMustMatchSignature { get; } =
 			Rule("PX1096", nameof(Resources.PX1096Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1096);
 
+		public static DiagnosticDescriptor PX1097_PXOverrideMethodMustBePublicNonVirtual { get; } =
+			Rule("PX1097", nameof(Resources.PX1097Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1097);
+
+		public static DiagnosticDescriptor PX1098_PXOverrideMethodWithoutXmlDocComment { get; } =
+			Rule("PX1098", nameof(Resources.PX1098Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1098);
+
 		public static DiagnosticDescriptor PX1099_ForbiddenApiUsage_WithoutReason { get; } =
 			Rule("PX1099", nameof(Resources.PX1099Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1099,
 				 messageFormat: nameof(Resources.PX1099TitleFormat).GetLocalized());
@@ -504,5 +521,51 @@ namespace Acuminator.Analyzers.StaticAnalysis
 		public static DiagnosticDescriptor PX1099_ForbiddenApiUsage_WithReason { get; } =
 			Rule("PX1099", nameof(Resources.PX1099Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1099,
 				 messageFormat: nameof(Resources.PX1099TitleFormatWithReason).GetLocalized());
+
+		public static DiagnosticDescriptor PX1100_PXOverrideOverridesObsoleteMethod { get; } =
+			Rule("PX1100", nameof(Resources.PX1100TitlePXOverride).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1100);
+
+		public static DiagnosticDescriptor PX1101_PXOverrideWithInvalidDelegateParameter { get; } =
+			Rule("PX1101", nameof(Resources.PX1101Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1101);
+
+		public static DiagnosticDescriptor PX1102_PXOverrideInvalidNameOfDelegateParameter { get; } =
+			Rule("PX1102", nameof(Resources.PX1102Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1102);
+
+		public static DiagnosticDescriptor PX1110_MissingNoteIdFieldInDacWithLocalizableFieldValues { get; } =
+			Rule("PX1110", nameof(Resources.PX1110Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1110,
+				 messageFormat: nameof(Resources.PX1110TitleFormat).GetLocalized());
+
+		public static DiagnosticDescriptor PX1111_MainDacOfProcessingViewMustContainNoteIdField { get; } =
+			Rule("PX1111", nameof(Resources.PX1111Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1111, 
+				messageFormat: nameof(Resources.PX1111TitleFormat).GetLocalized());
+
+		public static DiagnosticDescriptor PX1112_GenericGraphsAndGraphExtensionsMustBeAbstract { get; } =
+			Rule("PX1112", nameof(Resources.PX1112Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1112);
+
+		public static DiagnosticDescriptor PX1113_SealedGraphsAndGraphExtensions { get; } =
+			Rule("PX1113", nameof(Resources.PX1113Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1113);
+
+		public static DiagnosticDescriptor PX1114_GraphExtensionInheritFromNonAbstractGraphExtension { get; } =
+			Rule("PX1114", nameof(Resources.PX1114Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1114);
+
+		public static DiagnosticDescriptor PX1115_NonTerminalBaseGraphExtension { get; } =
+			Rule("PX1115", nameof(Resources.PX1115TitleGraphExtension).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error,
+				 DiagnosticsShortName.PX1115GraphExtension);
+
+		public static DiagnosticDescriptor PX1115_NonTerminalBaseDacExtension { get; } =
+			Rule("PX1115", nameof(Resources.PX1115TitleDacExtension).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, 
+				DiagnosticsShortName.PX1115DacExtension);
+
+		public static DiagnosticDescriptor PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable { get; } =
+			Rule("PX1120", nameof(Resources.PX1120Title_StoreTaskInVariable).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, 
+				DiagnosticsShortName.PX1120_StoreTaskInVariable);
+
+		public static DiagnosticDescriptor PX1120_IncorrectTaskUsageInAsyncCode_MethodReturnTypeIsNotTask { get; } =
+			Rule("PX1120", nameof(Resources.PX1120Title_MethodReturnTypeIsNotTask).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning,
+				DiagnosticsShortName.PX1120_MethodReturnTypeIsNotTask);
+
+		public static DiagnosticDescriptor PX1120_IncorrectTaskUsageInAsyncCode_NotAwaitedTaskReturningExpression { get; } =
+			Rule("PX1120", nameof(Resources.PX1120Title_NotAwaitedTaskReturningExpression).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning,
+				DiagnosticsShortName.PX1120_NotAwaitedTaskReturningExpression);
 	}
 }

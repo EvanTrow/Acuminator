@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn;
 using Acuminator.Utilities.Roslyn.CodeGeneration;
+using Acuminator.Utilities.Roslyn.Constants;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
@@ -45,7 +46,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.LegacyBqlField
 
 			var propertyDataTypeName = new DataTypeName(propertyTypeName);
 			string bqlFieldName = bqlFieldNode.Identifier.Text;
-			SimpleBaseTypeSyntax? newBaseType = BqlFieldGeneration.BaseTypeForBqlField(propertyDataTypeName, bqlFieldName);
+			bool hasPxDataBqlNamespace = root is CompilationUnitSyntax compilationUnit &&
+										 compilationUnit.Usings.Any(u => u.Name?.ToString() == NamespaceNames.PXDataBql);
+			var baseTypeNamingStyle = hasPxDataBqlNamespace
+				? BqlFieldBaseTypeNamingStyle.OnlyTypeName
+				: BqlFieldBaseTypeNamingStyle.FullNameWithNamespace;
+			SimpleBaseTypeSyntax? newBaseType = BqlFieldGeneration.BaseTypeForBqlField(propertyDataTypeName, bqlFieldName, 
+																					   baseTypeNamingStyle);
 			if (newBaseType == null)
 				return;
 

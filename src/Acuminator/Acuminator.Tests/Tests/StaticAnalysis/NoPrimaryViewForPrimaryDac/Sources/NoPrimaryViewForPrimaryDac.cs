@@ -8,11 +8,11 @@ using PX.Data;
 
 namespace PX.Objects.HackathonDemo
 {
-	public class ARInvoice : IBqlTable { }
+	public class ARInvoice : PXBqlTable, IBqlTable { }
 
-	public class ARTran : IBqlTable { }
+	public class ARTran : PXBqlTable, IBqlTable { }
 
-	public class SOTran : IBqlTable { }
+	public class SOTran : PXBqlTable, IBqlTable { }
 
 	public class ARInvoiceEntry : PXGraph<ARInvoiceEntry, ARInvoice>
 	{

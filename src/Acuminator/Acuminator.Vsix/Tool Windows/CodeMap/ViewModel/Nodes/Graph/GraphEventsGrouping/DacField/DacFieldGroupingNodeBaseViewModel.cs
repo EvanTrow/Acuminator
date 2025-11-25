@@ -41,8 +41,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public ImmutableArray<GraphFieldEventHandlerInfo> FieldEventHandlers { get; }
 
 		protected DacFieldGroupingNodeBaseViewModel(DacGroupingNodeBaseViewModel dacVM, string dacFieldName,
-													IEnumerable<GraphFieldEventHandlerInfo> dacFieldEventHandlers, bool isExpanded) :
-												base(dacVM?.Tree!, dacVM, isExpanded)
+													IEnumerable<GraphFieldEventHandlerInfo> dacFieldEventHandlers, 
+													Func<TreeNodeViewModel, bool> isExpandedCalculator) :
+												base(dacVM?.Tree!, dacVM, isExpandedCalculator)
 		{
 			DacVM = dacVM!;
 			DacFieldName = dacFieldName.CheckIfNullOrWhiteSpace();

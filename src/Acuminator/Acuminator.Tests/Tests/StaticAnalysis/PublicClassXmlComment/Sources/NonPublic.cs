@@ -3,7 +3,7 @@
 namespace PX.Objects
 {
 	[PXCacheName("Non public DAC")]
-	internal class NonPublicDac : IBqlTable
+	internal class NonPublicDac : PXBqlTable, IBqlTable
 	{
 	}
 
@@ -11,7 +11,7 @@ namespace PX.Objects
 	/// A public DAC with non public prroperties.
 	/// </summary>
 	[PXCacheName("A public DAC with non public prroperties")]
-	public class PublicDacWithNonPublicPrroperties : IBqlTable
+	public class PublicDacWithNonPublicPrroperties : PXBqlTable, IBqlTable
 	{
 		#region OrderType
 		internal abstract class orderType : IBqlField { }

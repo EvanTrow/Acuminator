@@ -9,7 +9,7 @@ using PX.Data;
 namespace ExternalDependency.NoBqlFieldForDacFieldProperty
 {
 	[PXHidden]
-	public class BaseDacWithoutBqlField : IBqlTable
+	public class BaseDacWithoutBqlField : PXBqlTable, IBqlTable
     {
 		#region Status
 		public abstract class status : PX.Data.BQL.BqlString.Field<status> { }

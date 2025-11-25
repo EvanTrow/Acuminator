@@ -62,8 +62,8 @@ namespace Acuminator.Utilities.DiagnosticSuppression.CodeActions
 			{
 				// For some reason the changes in suppression file will immediately reflect in the code editor 
 				// only if we call suppress diagnostic in code action manually, not via code action operation
-				if (!SuppressionManager.SuppressDiagnostic(semanticModel, Diagnostic.Id, Diagnostic.Location.SourceSpan,
-														   Diagnostic.DefaultSeverity, cancellationToken))
+				if (!SuppressionManager.SuppressDiagnosticInSuppressionFile(semanticModel, Diagnostic.Id, Diagnostic.Location.SourceSpan,
+																			Diagnostic.DefaultSeverity, cancellationToken))
 				{
 					var errorMessage = new LocalizableResourceString(nameof(Resources.DiagnosticSuppression_FailedToAddToSuppressionFile),
 																	 Resources.ResourceManager, typeof(Resources), suppressionFile.Path);
