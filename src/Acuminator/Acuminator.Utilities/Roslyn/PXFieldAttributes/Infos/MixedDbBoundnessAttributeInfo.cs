@@ -43,6 +43,21 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 				? new MixedDbBoundnessAttributeInfo(attributeType, fieldType, isDbBoundByDefault)
 				: null;
 
+		public override DbBoundnessType GetDbBoundness()
+		{
+			if (Kind == FieldTypeAttributeKind.MixedDbBoundnessTypeAttribute)
+			{
+				return IsDbBoundByDefault switch
+				{
+					true  => DbBoundnessType.DbBound,
+					false => DbBoundnessType.Unbound,
+					_ 	  => DbBoundnessType.Unknown
+				};
+			}
+			else
+				return base.GetDbBoundness();
+		}
+
 		public override bool Equals(object obj) => Equals(obj as MixedDbBoundnessAttributeInfo);
 
 		public override bool Equals(DataTypeAttributeInfo? other) => Equals(other as MixedDbBoundnessAttributeInfo);
