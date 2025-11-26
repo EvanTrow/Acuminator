@@ -73,8 +73,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 				return;
 
 			context.CancellationToken.ThrowIfCancellationRequested();
-			var effectiveEventAnalyzers = _innerAnalyzers.Where(analyzer => analyzer.ShouldAnalyze(pxContext, eventHandlerLooseInfo))
-														 .ToList(capacity: _innerAnalyzers.Length);
+			var effectiveEventAnalyzers = InnerAnalyzers.Where(analyzer => analyzer.ShouldAnalyze(pxContext, eventHandlerLooseInfo))
+														.ToList(capacity: InnerAnalyzers.Length);
 
 			RunAggregatedAnalyzersInParallel(effectiveEventAnalyzers, context, analyzerIndex =>
 			{

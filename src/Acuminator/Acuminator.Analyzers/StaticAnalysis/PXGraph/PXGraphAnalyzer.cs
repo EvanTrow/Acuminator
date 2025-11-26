@@ -95,8 +95,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			var effectiveAnalyzers = _innerAnalyzers.Where(analyzer => analyzer.ShouldAnalyze(pxContext, graphOrGraphExtModel))
-													.ToList(capacity: _innerAnalyzers.Length);
+			var effectiveAnalyzers = InnerAnalyzers.Where(analyzer => analyzer.ShouldAnalyze(pxContext, graphOrGraphExtModel))
+												   .ToList(capacity: InnerAnalyzers.Length);
 
 			RunAggregatedAnalyzersInParallel(effectiveAnalyzers, context, aggregatedAnalyserAction: analyzerIndex =>
 			{

@@ -86,8 +86,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 				return;
 
 			context.CancellationToken.ThrowIfCancellationRequested();
-			var effectiveDacAnalyzers = _innerAnalyzers.Where(analyzer => analyzer.ShouldAnalyze(pxContext, inferredDacModel))
-													   .ToList(capacity: _innerAnalyzers.Length);
+			var effectiveDacAnalyzers = InnerAnalyzers.Where(analyzer => analyzer.ShouldAnalyze(pxContext, inferredDacModel))
+													  .ToList(capacity: InnerAnalyzers.Length);
 
 			RunAggregatedAnalyzersInParallel(effectiveDacAnalyzers, context, analyzerIndex =>
 			{
