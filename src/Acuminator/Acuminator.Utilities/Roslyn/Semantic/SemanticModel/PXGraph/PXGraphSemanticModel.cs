@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -169,16 +167,21 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </summary>
 		public ImmutableArray<GraphAttributeInfo> Attributes { get; }
 
-		protected PXGraphSemanticModel(PXContext pxContext, GraphType graphType, GraphOrGraphExtInfoBase graphOrGraphExtInfo, ClassDeclarationSyntax? node,
-										ITypeSymbol? graphSymbol, GraphSemanticModelCreationOptions modelCreationOptions, int declarationOrder,
-										CancellationToken cancellation = default)
+		protected PXGraphSemanticModel(PXContext pxContext, GraphOrGraphExtInfoBase graphOrGraphExtInfo, GraphSemanticModelCreationOptions modelCreationOptions,
+									   int declarationOrder, CancellationToken cancellation = default)
 		{
 			cancellation.ThrowIfCancellationRequested();
 
 			PXContext 			= pxContext.CheckIfNull();
-			GraphType 			= graphType;
 			GraphOrGraphExtInfo = graphOrGraphExtInfo.CheckIfNull();
-			GraphSymbol			= graphSymbol;
+
+			(GraphType, GraphSymbol) = graphOrGraphExtInfo switch
+			{
+				GraphInfo graphInfo 			=> (GraphType.PXGraph, graphInfo.Symbol),
+				GraphExtensionInfo graphExtInfo => (GraphType.PXGraphExtension, graphExtInfo.Graph?.Symbol),
+				_ 								=> throw new ArgumentOutOfRangeException(nameof(graphOrGraphExtInfo),
+														$"The \"{nameof(graphOrGraphExtInfo)}\" parameter must be either {nameof(GraphInfo)} or {nameof(GraphExtensionInfo)}.")
+			};
 
 			_cancellation 		 = cancellation;
 			ModelCreationOptions = modelCreationOptions;
@@ -341,62 +344,31 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		}
 
 		/// <summary>
-		/// Infer semantic model for a given <paramref name="graphOrGraphExtTypeSymbol"/>.
+		/// Infer semantic model for a given <paramref name="graphOrGraphExtTypeSymbol"/>. 
 		/// If <paramref name="graphOrGraphExtTypeSymbol"/> is not a graph or graph extension, returns <see langword="null"/>.
 		/// </summary>
 		/// <param name="pxContext">Acumatica context.</param>
-		/// <param name="graphOrGraphExtTypeSymbol">The graph or graph extension type symbol.</param>
+		/// <param name="graphOrGraphExtInferredInfo">The graph or graph extension inferred information obtained from resolving a hierarchy of chained graph extensions and base types.</param>
 		/// <param name="modelCreationOptions">Options for controlling the semantic model creation.</param>
-		/// <param name="declarationOrder">(Optional) The declaration order.</param>
+		/// <param name="customDeclarationOrder">(Optional) The declaration order.</param>
 		/// <param name="cancellation">(Optional) Cancellation token.</param>
 		/// <returns>
 		/// A semantic model for a given graph or graph extension <paramref name="graphOrGraphExtTypeSymbol"/>.<br/>
 		/// If <paramref name="graphOrGraphExtTypeSymbol"/> is not graph or graph extension, then returns <see langword="null"/>.
 		/// </returns>
-		public static PXGraphSemanticModel? InferModel(PXContext pxContext, INamedTypeSymbol graphOrGraphExtTypeSymbol,
+		public static PXGraphSemanticModel? InferModel(PXContext pxContext, GraphOrGraphExtInfoBase graphOrGraphExtInferredInfo,
 													   GraphSemanticModelCreationOptions modelCreationOptions,
 													   int? customDeclarationOrder = null, CancellationToken cancellation = default)
 		{
 			pxContext.ThrowOnNull();
-			graphOrGraphExtTypeSymbol.ThrowOnNull();
+			graphOrGraphExtInferredInfo.ThrowOnNull();
 			cancellation.ThrowIfCancellationRequested();
 
-			GraphType graphType;
-			ITypeSymbol? graphSymbol;
-
-			if (graphOrGraphExtTypeSymbol.IsPXGraph(pxContext))
-			{
-				graphType   = GraphType.PXGraph;
-				graphSymbol = graphOrGraphExtTypeSymbol;
-			}
-			else if (graphOrGraphExtTypeSymbol.IsPXGraphExtension(pxContext))
-			{
-				graphType   = GraphType.PXGraphExtension;
-				graphSymbol = graphOrGraphExtTypeSymbol.GetGraphFromGraphExtension(pxContext);
-			}
-			else
+			if (graphOrGraphExtInferredInfo is not (GraphInfo or GraphExtensionInfo))
 				return null;
 
 			int declarationOrder = customDeclarationOrder ?? 0;
-			var graphOrExtNode = graphOrGraphExtTypeSymbol.GetSyntax(cancellation) as ClassDeclarationSyntax;
-
-			GraphOrGraphExtInfoBase? graphOrGraphExtInfo;
-
-			if (graphType == GraphType.PXGraph)
-				graphOrGraphExtInfo = GraphInfo.Create(graphOrGraphExtTypeSymbol, graphOrExtNode, pxContext, declarationOrder, cancellation);
-			else
-			{
-				(graphOrGraphExtInfo, bool hasCircularReferences) = 
-					GraphExtensionInfo.Create(graphOrGraphExtTypeSymbol, graphOrExtNode, graphSymbol, pxContext, declarationOrder, cancellation);
-
-				if (hasCircularReferences)
-					return null;
-			}
-
-			if (graphOrGraphExtInfo == null)
-				return null;
-
-			return new PXGraphSemanticModel(pxContext, graphType, graphOrGraphExtInfo, graphOrExtNode, graphSymbol, modelCreationOptions, 
+			return new PXGraphSemanticModel(pxContext, graphOrGraphExtInferredInfo, modelCreationOptions, 
 											declarationOrder, cancellation);
 		}
 
