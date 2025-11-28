@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
-	public class GraphInfo : GraphOrGraphExtInfoBase, IOverridableItem<GraphInfo>, IInferredAcumaticaFrameworkTypeInfo<GraphInfo>
+	public class GraphInfo : GraphOrGraphExtInfoBase, IOverridableItem<GraphInfo>, IInferredAcumaticaFrameworkTypeInfo
 	{
 		public GraphInfo? Base { get; }
 
@@ -21,7 +21,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <br/>
 		/// Graph info can't have circular references because graphs can only inherit from other graphs.
 		/// </remarks>
-		bool IInferredAcumaticaFrameworkTypeInfo<GraphInfo>.HasCircularReferences => false;
+		bool IInferredAcumaticaFrameworkTypeInfo.HasCircularReferences => false;
 
 		/// <inheritdoc path="/summary"/>
 		/// <remarks>
@@ -29,9 +29,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <br/><br/>
 		/// Graph info can't have multiple root types.
 		/// </remarks>
-		bool IInferredAcumaticaFrameworkTypeInfo<GraphInfo>.HasMultipleRootTypes => false;
-
-		GraphInfo IInferredAcumaticaFrameworkTypeInfo<GraphInfo>.GetFrameworkTypeInfo() => this;
+		bool IInferredAcumaticaFrameworkTypeInfo.HasMultipleRootTypes => false;
 
 		protected GraphInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graph, int declarationOrder, GraphInfo baseGraphInfo) :
 					   base(node, graph, declarationOrder)

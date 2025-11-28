@@ -1,22 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
 
 /// <summary>
 /// Interface for inferred semantic information about Acumatica Framework type.
 /// </summary>
-public interface IInferredAcumaticaFrameworkTypeInfo<out TAcumaticaFrameworkType>
-where TAcumaticaFrameworkType : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>
+public interface IInferredAcumaticaFrameworkTypeInfo
 {
-	/// <summary>
-	/// Get the Acumatica Framework type information.
-	/// </summary>
-	TAcumaticaFrameworkType? GetFrameworkTypeInfo();
-
 	/// <summary>
 	/// <see langword="true"/> if this object has circular references in the type hierarchy; otherwise, <see langword="false"/>.
 	/// </summary>
