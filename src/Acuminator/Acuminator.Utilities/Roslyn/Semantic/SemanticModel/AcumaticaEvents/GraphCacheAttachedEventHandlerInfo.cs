@@ -29,7 +29,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 				throw new ArgumentOutOfRangeException(nameof(eventType), $"The {eventType} is not a cache attached event.");
 		}
 
-		protected override void CombineWithBaseInfo(GraphCacheAttachedEventHandlerInfo baseInfo)
+		protected override void CombineWithBaseInfo()
 		{
 			// TODO implement merge of attributes declared on cache attached event handlers
 		}
