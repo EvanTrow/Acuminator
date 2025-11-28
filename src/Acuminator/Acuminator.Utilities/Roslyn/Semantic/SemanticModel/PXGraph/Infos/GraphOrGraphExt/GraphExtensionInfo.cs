@@ -19,6 +19,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	{
 		public GraphInfo? BaseGraph { get; }
 
+		/// <summary>
+		/// The overridden base graph extensions if any.<br/>
+		/// Contains either direct base graph extension or chained graph extensions.
+		/// </summary>
+		ImmutableArray<GraphExtensionInfo> BaseGraphExtensions { get; }
+
+		public bool IsFirstLevelExtension => BaseGraphExtensions.IsDefaultOrEmpty;
+
 		GraphExtensionInfo IInferredAcumaticaFrameworkTypeInfo<GraphExtensionInfo>.GetFrameworkTypeInfo() => this;
 
 		/// <inheritdoc path="/summary"/>
@@ -38,26 +46,39 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		bool IInferredAcumaticaFrameworkTypeInfo<GraphExtensionInfo>.HasMultipleRootTypes => false;
 
 		protected GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
-									 int declarationOrder, GraphInfo baseGraph) :
-								base(node, graphExtension, declarationOrder, baseGraph)
+									 int declarationOrder) :
+								base(node, graphExtension, declarationOrder)
 		{
-			Graph = graph;
+			BaseGraph 			  = graph;
+			BaseGraphExtensions   = [];
+			CombineWithBaseGraphAndGraphExtensions();
 		}
 
 		protected GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
 									 int declarationOrder, GraphExtensionInfo baseGraphExtension) :
-								base(node, graphExtension, declarationOrder, baseGraphExtension)
-		{
-			Graph = graph;
-		}
-
-		protected GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph, int declarationOrder) :
 								base(node, graphExtension, declarationOrder)
 		{
-			Graph = graph;
+			BaseGraph = graph;
+			BaseGraphExtensions = [baseGraphExtension];
+			CombineWithBaseGraphAndGraphExtensions();
 		}
 
-		protected override void CombineWithBaseInfo(GraphOrGraphExtInfoBase baseGraphOrGraphExtensionInfo) { }
+		protected GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
+									 int declarationOrder, IEnumerable<GraphExtensionInfo> baseGraphExtensions) :
+								base(node, graphExtension, declarationOrder)
+		{
+			BaseGraph 			  = graph;
+			BaseGraphExtensions   = baseGraphExtensions?.ToImmutableArray() ?? [];
+			CombineWithBaseGraphAndGraphExtensions();
+		}
+
+		/// <summary>
+		/// Combine this info with info from base graph and graph extensions.
+		/// </summary>
+		private void CombineWithBaseGraphAndGraphExtensions()
+		{
+
+		}
 
 		public static (GraphExtensionInfo? Info, bool HasCircularReferences) Create(INamedTypeSymbol? graphExtension, 
 																				ClassDeclarationSyntax? graphExtensionNode, ITypeSymbol? graph,
@@ -96,7 +117,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				return (Info: null, HasCircularReferences: false);
 			
 			bool isInSource = graphExtensionNode != null;
-			var (extensionFromPreviousLevels, hasCircularReferences) = GetAggregatedExtensionFromPreviouslLevels(extensionBaseType, pxContext, 
+			var (extensionFromPreviousLevels, hasCircularReferences) = GetAggregatedExtensionFromPreviousLevels(extensionBaseType, pxContext, 
 																												 visitedExtensions, graphInfo, 
 																												 cancellation);
 			if (hasCircularReferences)
@@ -125,7 +146,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			return (graphExtensionInfo, HasCircularReferences: false);
 		}
 
-		private static (GraphExtensionInfo? Info, bool HasCircularReferences) GetAggregatedExtensionFromPreviouslLevels(
+		private static (GraphExtensionInfo? Info, bool HasCircularReferences) GetAggregatedExtensionFromPreviousLevels(
 																					INamedTypeSymbol extensionBaseType, PXContext pxContext,
 																					HashSet<INamedTypeSymbol> collectedExtensionsFromOtherLevels,
 																					GraphInfo? graphInfo, CancellationToken cancellation)
