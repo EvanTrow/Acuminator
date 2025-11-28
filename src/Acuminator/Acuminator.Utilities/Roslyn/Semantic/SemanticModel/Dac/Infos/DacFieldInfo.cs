@@ -35,7 +35,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 				_baseInfo = value;
 
 				if (value != null)
-					CombineWithBaseInfo(value);
+					CombineWithBaseInfo();
 			}
 		}
 
@@ -78,7 +78,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 		/// <value>
 		/// The non nullable type of the property. For reference types and non nullable value types it is the same as <see cref="PropertyType"/>. 
-		/// For nulable value types it is the underlying type extracted from nullable. It is <c>T</c> for <see cref="Nullable{T}"/>.
+		/// For nullable value types it is the underlying type extracted from nullable. It is <c>T</c> for <see cref="Nullable{T}"/>.
 		/// </value>
 		public ITypeSymbol? PropertyTypeUnwrappedNullable { get; private set; }
 
@@ -89,7 +89,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 		/// <summary>
 		/// The effective BQL field data type of this DAC field that is obtained through the combination of <see cref="BqlFieldDataTypeDeclared"/> 
-		/// from this and base infos.
+		/// from this and base info.
 		/// </summary>
 		public ITypeSymbol? BqlFieldDataTypeEffective {  get; private set; }
 
@@ -99,7 +99,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		public DbBoundnessType DeclaredDbBoundness { get; }
 
 		/// <summary>
-		/// The effective bound type for this DAC field obtained by the combination of <see cref="DeclaredDbBoundness"/>s of this propety's override chain. 
+		/// The effective bound type for this DAC field obtained by the combination of <see cref="DeclaredDbBoundness"/>s of this property's override chain. 
 		/// </summary>
 		public DbBoundnessType EffectiveDbBoundness { get; private set; }
 
@@ -115,7 +115,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// A flag indicating whether this info object represents a non-BQL property.
 		/// </summary>
 		/// <remarks>
-		/// A non-BQL propery is a C# property declared in a DAC or a DAC extension that does not have a corresponding BQL field and does not have Acumatica attributes declared on it.
+		/// A non-BQL property is a C# property declared in a DAC or a DAC extension that does not have a corresponding BQL field and does not have Acumatica attributes declared on it.
 		/// </remarks>
 		public bool IsNonBqlProperty => HasFieldPropertyDeclared && !HasBqlFieldEffective && !HasAcumaticaAttributes;
 
@@ -128,7 +128,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 					   this(dacPropertyInfo, dacBqlFieldInfo)
 		{
 			_baseInfo = baseInfo.CheckIfNull();
-			CombineWithBaseInfo(baseInfo);
+			CombineWithBaseInfo();
 		}
 
 		public DacFieldInfo(DacPropertyInfo? dacPropertyInfo, DacBqlFieldInfo? dacBqlFieldInfo)
@@ -190,24 +190,27 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		public bool IsDeclaredInType(ITypeSymbol? type) =>
 			 PropertyInfo?.Symbol.IsDeclaredInType(type) ?? BqlFieldInfo!.Symbol.IsDeclaredInType(type);
 
-		void IWriteableBaseItem<DacFieldInfo>.CombineWithBaseInfo(DacFieldInfo baseInfo) => CombineWithBaseInfo(baseInfo);
+		void IOverridableItem<DacFieldInfo>.CombineWithBaseInfo() => CombineWithBaseInfo();
 
-		private void CombineWithBaseInfo(DacFieldInfo baseInfo)
+		private void CombineWithBaseInfo()
 		{
-			HasAcumaticaAttributes 	  = HasAcumaticaAttributes 	  || baseInfo.HasAcumaticaAttributes;
-			HasBqlFieldEffective 	  = HasBqlFieldEffective 	  || baseInfo.HasBqlFieldEffective;
-			HasFieldPropertyEffective = HasFieldPropertyEffective || baseInfo.HasFieldPropertyEffective;
-			IsKey 					  = IsKey 					  || baseInfo.IsKey;
-			IsIdentity 				  = IsIdentity 				  || baseInfo.IsIdentity;
-			IsAutoNumbering 		  = IsAutoNumbering 		  || baseInfo.IsAutoNumbering;
-			HasAcumaticaAttributes 	  = HasAcumaticaAttributes 	  || baseInfo.HasAcumaticaAttributes;
+			if (_baseInfo == null)
+				return;
 
-			PropertyType				  ??= baseInfo.PropertyType;
-			PropertyTypeUnwrappedNullable ??= baseInfo.PropertyTypeUnwrappedNullable;
+			HasAcumaticaAttributes 	  = HasAcumaticaAttributes 	  || _baseInfo.HasAcumaticaAttributes;
+			HasBqlFieldEffective 	  = HasBqlFieldEffective 	  || _baseInfo.HasBqlFieldEffective;
+			HasFieldPropertyEffective = HasFieldPropertyEffective || _baseInfo.HasFieldPropertyEffective;
+			IsKey 					  = IsKey 					  || _baseInfo.IsKey;
+			IsIdentity 				  = IsIdentity 				  || _baseInfo.IsIdentity;
+			IsAutoNumbering 		  = IsAutoNumbering 		  || _baseInfo.IsAutoNumbering;
+			HasAcumaticaAttributes 	  = HasAcumaticaAttributes 	  || _baseInfo.HasAcumaticaAttributes;
 
-			BqlFieldDataTypeEffective ??= baseInfo.BqlFieldDataTypeEffective;
+			PropertyType				  ??= _baseInfo.PropertyType;
+			PropertyTypeUnwrappedNullable ??= _baseInfo.PropertyTypeUnwrappedNullable;
 
-			EffectiveDbBoundness = DeclaredDbBoundness.Combine(baseInfo.EffectiveDbBoundness);
+			BqlFieldDataTypeEffective ??= _baseInfo.BqlFieldDataTypeEffective;
+
+			EffectiveDbBoundness = DeclaredDbBoundness.Combine(_baseInfo.EffectiveDbBoundness);
 		}
 
 		public override string ToString() => Name;

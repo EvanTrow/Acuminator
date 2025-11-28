@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System;
+﻿using System;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -29,7 +28,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 							 this(node, bqlField, declarationOrder)
 		{
 			_baseInfo = baseInfo.CheckIfNull();
-			CombineWithBaseInfo(baseInfo);
+			CombineWithBaseInfo();
 		}
 
 		protected DacBqlFieldInfo(ClassDeclarationSyntax? node, INamedTypeSymbol bqlField, int declarationOrder) :
@@ -55,9 +54,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 				: new DacBqlFieldInfo(bqlFieldNode, bqlField, declarationOrder);
 		}
 
-		protected override void CombineWithBaseInfo(DacBqlFieldInfo baseInfo)
+		protected override void CombineWithBaseInfo()
 		{
-			BqlFieldDataTypeEffective ??= baseInfo.BqlFieldDataTypeEffective;
+			if (_baseInfo == null)
+				return;
+
+			BqlFieldDataTypeEffective ??= _baseInfo.BqlFieldDataTypeEffective;
 		}
 
 		public override bool Equals(object obj) => Equals(obj as DacBqlFieldInfo);

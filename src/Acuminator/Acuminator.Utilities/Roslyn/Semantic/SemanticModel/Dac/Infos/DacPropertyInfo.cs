@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -47,7 +45,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 		/// <value>
 		/// The effective type of the property. For reference types and non nullable value types it is the same as <see cref="PropertyType"/>. 
-		/// For nulable value types it is the underlying type extracted from nullable. It is <c>T</c> for <see cref="Nullable{T}"/>.
+		/// For nullable value types it is the underlying type extracted from nullable. It is <c>T</c> for <see cref="Nullable{T}"/>.
 		/// </value>
 		public ITypeSymbol PropertyTypeUnwrappedNullable { get; }
 
@@ -96,7 +94,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 							 this(node, symbol, propertyTypeUnwrappedNullable, declarationOrder, hasBqlField, attributeInfos)
 		{
 			_baseInfo = baseInfo.CheckIfNull();
-			CombineWithBaseInfo(baseInfo);
+			CombineWithBaseInfo();
 		}
 
 		protected DacPropertyInfo(PropertyDeclarationSyntax? node, IPropertySymbol symbol, ITypeSymbol propertyTypeUnwrappedNullable,
@@ -169,8 +167,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			}
 		}
 
-		protected override void CombineWithBaseInfo(DacPropertyInfo baseProperty)
+		protected override void CombineWithBaseInfo()
 		{
+			if (_baseInfo is not { } baseProperty)
+				return;
+			
 			// TODO - need to add support for PXMergeAttributesAttribute in the future
 			EffectiveDbBoundness 			= DeclaredDbBoundness.Combine(baseProperty.EffectiveDbBoundness);
 			HasBqlFieldEffective 			= HasBqlFieldDeclared || baseProperty.HasBqlFieldEffective;
