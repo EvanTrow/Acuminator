@@ -1,12 +1,11 @@
-﻿#nullable enable
-using Acuminator.Utilities.Common;
+﻿using Acuminator.Utilities.Common;
 
 using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Roslyn.Semantic
 {
 	/// <summary>
-	/// Generic class for overridable semantic infos from a graph or DAC with symbol.
+	/// Generic class for overridable semantic info from a graph or DAC with symbol.
 	/// </summary>
 	/// <typeparam name="TInfo">Type of the information symbol.</typeparam>
 	/// <typeparam name="S">Type of the declaration symbol of the item.</typeparam>
@@ -25,25 +24,25 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				_baseInfo = value;
 
 				if (value != null)
-					CombineWithBaseInfo(value);
+					CombineWithBaseInfo();
 			}
 		}
 
 		protected OverridableSymbolItem(S symbol, int declarationOrder, TInfo baseInfo) : this(symbol, declarationOrder)
 		{
 			_baseInfo = baseInfo.CheckIfNull();
-			CombineWithBaseInfo(_baseInfo);
+			CombineWithBaseInfo();
 		}
 
 		protected OverridableSymbolItem(S symbol, int declarationOrder) : base(symbol, declarationOrder)
 		{
 		}
 
-		void IWriteableBaseItem<TInfo>.CombineWithBaseInfo(TInfo baseInfo) => 
-			CombineWithBaseInfo(baseInfo);
+		void IOverridableItem<TInfo>.CombineWithBaseInfo() => 
+			CombineWithBaseInfo();
 
-		/// <inheritdoc cref="IWriteableBaseItem{T}.CombineWithBaseInfo(T)"/>
-		protected virtual void CombineWithBaseInfo(TInfo baseInfo)
+		/// <inheritdoc cref="IOverridableItem{T}.CombineWithBaseInfo()"/>
+		protected virtual void CombineWithBaseInfo()
 		{
 
 		}
