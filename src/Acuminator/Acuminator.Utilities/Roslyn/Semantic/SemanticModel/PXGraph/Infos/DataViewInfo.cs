@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
@@ -89,7 +87,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					 : this(symbol, type, pxContext, declarationOrder)
 		{
 			_baseInfo = baseInfo.CheckIfNull(nameof(baseInfo));
-			CombineWithBaseInfo(_baseInfo);
+			CombineWithBaseInfo();
 		}
 	}
 }

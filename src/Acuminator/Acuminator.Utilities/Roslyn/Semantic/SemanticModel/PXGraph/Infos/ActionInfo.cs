@@ -28,7 +28,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					 this(symbol, type, declarationOrder, isSystem)
 		{
 			_baseInfo = baseInfo.CheckIfNull();
-			CombineWithBaseInfo(_baseInfo);
+			CombineWithBaseInfo();
 		}
 
 		public ActionInfo(ISymbol symbol, INamedTypeSymbol type, int declarationOrder, bool isSystem) :
