@@ -15,14 +15,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			get => Base;
 			set 
 			{
-				if (this is IWriteableBaseItem<OverridableNodeSymbolItem<DacOrDacExtInfoBase, ClassDeclarationSyntax, INamedTypeSymbol>> baseInterface)
+				if (this is IWriteableBaseItem<DacOrDacExtInfoBase> baseInterface)
 					baseInterface.Base = value;
 				else
 				{
 					_baseInfo = value;
 
 					if (value != null)
-						CombineWithBaseInfo(value);
+						CombineWithBaseInfo();
 				}
 			}
 		}
@@ -37,23 +37,17 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		{
 		}
 
-		void IWriteableBaseItem<TInfo>.CombineWithBaseInfo(TInfo baseInfo) => CombineWithBaseInfo(baseInfo);
+		void IOverridableItem<TInfo>.CombineWithBaseInfo() => CombineWithBaseInfo();
 
-		protected sealed override void CombineWithBaseInfo(DacOrDacExtInfoBase baseInfo)
+		protected sealed override void CombineWithBaseInfo()
 		{
-			if (baseInfo is TInfo baseInfoTyped)
-				CombineWithBaseInfo(baseInfoTyped);
-			else
+			if (_baseInfo == null)
+				return;
+			else if (_baseInfo is not TInfo)
 			{
-				throw new ArgumentOutOfRangeException(nameof(baseInfo),
-								$"Type \"{baseInfo.GetType().FullName}\" is not \"{typeof(TInfo).FullName}\" or derived from it.");
+				throw new ArgumentOutOfRangeException(nameof(_baseInfo),
+								$"Type \"{_baseInfo.GetType().FullName}\" is not \"{typeof(TInfo).FullName}\" or derived from it.");
 			}
-		}
-
-		/// <inheritdoc cref="IWriteableBaseItem{T}.CombineWithBaseInfo(T)"/>
-		protected virtual void CombineWithBaseInfo(TInfo baseInfo)
-		{
-
 		}
 	}
 

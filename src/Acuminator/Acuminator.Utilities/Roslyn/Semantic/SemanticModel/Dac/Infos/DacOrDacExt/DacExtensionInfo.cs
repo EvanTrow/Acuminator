@@ -18,7 +18,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 							  this(node, dacExtension, dac, declarationOrder)
 		{
 			_baseInfo = baseInfo.CheckIfNull();
-			CombineWithBaseInfo(baseInfo);
+			CombineWithBaseInfo();
 		}
 
 		protected DacExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol dacExtension, DacInfo? dac, int declarationOrder) :
