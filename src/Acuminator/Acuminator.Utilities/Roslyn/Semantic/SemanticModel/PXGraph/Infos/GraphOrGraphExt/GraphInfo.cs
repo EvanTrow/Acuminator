@@ -13,7 +13,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
 	public class GraphInfo : GraphOrGraphExtInfoBase, IOverridableItem<GraphInfo>, IInferredAcumaticaFrameworkTypeInfo<GraphInfo>
 	{
-		public new GraphInfo? Base => base.Base as GraphInfo;
+		public GraphInfo? Base { get; }
 
 		/// <inheritdoc path="/summary"/>
 		/// <remarks>
@@ -33,23 +33,16 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 		GraphInfo IInferredAcumaticaFrameworkTypeInfo<GraphInfo>.GetFrameworkTypeInfo() => this;
 
-		protected GraphInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graph, int declarationOrder, GraphInfo baseInfo) :
-					   base(node, graph, declarationOrder, baseInfo)
-		{ }
+		protected GraphInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graph, int declarationOrder, GraphInfo baseGraphInfo) :
+					   base(node, graph, declarationOrder)
+		{
+			Base = baseGraphInfo.CheckIfNull();
+			CombineWithBaseInfo();
+		}
 
 		protected GraphInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graph, int declarationOrder) :
 					   base(node, graph, declarationOrder)
 		{ }
-
-		protected sealed override void CombineWithBaseInfo(GraphOrGraphExtInfoBase baseInfo) 
-		{
-			if (baseInfo is GraphInfo graphInfo)
-				CombineWithBaseInfo(graphInfo);
-		}
-
-		protected virtual void CombineWithBaseInfo(GraphInfo baseInfo)
-		{
-		}
 
 		public static GraphInfo? Create(INamedTypeSymbol? graph, ClassDeclarationSyntax? graphNode, PXContext pxContext,
 										int graphDeclarationOrder, CancellationToken cancellation)
@@ -91,6 +84,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				: new GraphInfo(graphNode, graph, graphDeclarationOrder);
 
 			return graphInfo;
+		}
+
+		void IOverridableItem<GraphInfo>.CombineWithBaseInfo() => CombineWithBaseInfo();
+
+		private void CombineWithBaseInfo()
+		{
 		}
 	}
 }
