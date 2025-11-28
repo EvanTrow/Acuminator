@@ -39,8 +39,8 @@ public class InitializeMethodInfo : OverridableNodeSymbolItem<InitializeMethodIn
 	/// <remarks>
 	/// We collect only Initialize method overrides from the class hierarchy because graph and graph extension overrides of Initialize method can be considered independent.<br/>
 	/// Therefore, for graph extension base graph's Initialize method overrides are not included into results.<br/>
-	/// Thus, only one <see cref="InitializeMethodInfo"/> will be created in the end. The created DTO will contain all Initialize method overrides as base infos.<br/>
-	/// The created <see cref="InitializeMethodInfo"/> DTO is not neccessary declared in the <paramref name="graphOrGraphExtension"/> symbol. <br/>
+	/// Thus, only one <see cref="InitializeMethodInfo"/> will be created in the end. The created DTO will contain all Initialize method overrides as base info.<br/>
+	/// The created <see cref="InitializeMethodInfo"/> DTO is not necessary declared in the <paramref name="graphOrGraphExtension"/> symbol. <br/>
 	/// It can be also declared in its base types.
 	/// </remarks>
 	/// <param name="graphOrGraphExtension">The graph or graph extension.</param>

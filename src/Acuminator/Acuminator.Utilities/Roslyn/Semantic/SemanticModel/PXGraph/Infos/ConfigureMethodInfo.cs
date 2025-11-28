@@ -42,8 +42,8 @@ public class ConfigureMethodInfo : OverridableNodeSymbolItem<ConfigureMethodInfo
 	/// they can't affect workflow configuration done by the base extension or graph.<br/>
 	/// - Graph and graph extension overrides of Configure method can be considered independently.<br/>  
 	/// Therefore, for graph extension base graph's Configure method overrides are not included into results.<br/>
-	/// Thus, only one <see cref="ConfigureMethodInfo"/> will be created in the end. The created DTO will contain all Configure method overrides as base infos.<br/>
-	/// The created <see cref="ConfigureMethodInfo"/> DTO is not neccessary declared in the <paramref name="graphOrGraphExtension"/> symbol. <br/>
+	/// Thus, only one <see cref="ConfigureMethodInfo"/> will be created in the end. The created DTO will contain all Configure method overrides as base info.<br/>
+	/// The created <see cref="ConfigureMethodInfo"/> DTO is not necessary declared in the <paramref name="graphOrGraphExtension"/> symbol. <br/>
 	/// It can be also declared in its base types.
 	/// </remarks>
 	/// <param name="graphOrGraphExtension">The graph or graph extension.</param>
