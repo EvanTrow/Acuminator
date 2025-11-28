@@ -13,16 +13,16 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 	{
 		public DacInfo? Dac { get; }
 
-		protected DacExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol dacExtension, DacInfo? dac, int declarationOrder, 
-								   DacExtensionInfo baseInfo) :
-							  this(node, dacExtension, dac, declarationOrder)
+		public DacExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol dacExtension, DacInfo? dac, int declarationOrder, 
+								DacExtensionInfo baseInfo) :
+						   this(node, dacExtension, dac, declarationOrder)
 		{
 			_baseInfo = baseInfo.CheckIfNull();
 			CombineWithBaseInfo();
 		}
 
-		protected DacExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol dacExtension, DacInfo? dac, int declarationOrder) :
-							  base(node, dacExtension, declarationOrder)
+		public DacExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol dacExtension, DacInfo? dac, int declarationOrder) :
+						   base(node, dacExtension, declarationOrder)
 		{
 			Dac = dac;
 		}
