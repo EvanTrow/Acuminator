@@ -9,8 +9,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer
 	public abstract class ExtensionCandidateInfo<TRootInfo, TExtensionInfo> : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>, 
 																			  IInferredAcumaticaFrameworkTypeInfo,
 																			  IHaveDeclarationOrder
-	where TRootInfo : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>
-	where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>
+	where TRootInfo : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>, IInferredAcumaticaFrameworkTypeInfo
+	where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>, IInferredAcumaticaFrameworkTypeInfo
 	{
 		protected internal List<TExtensionInfo> BaseExtensionsMutable { get; } =  new(capacity: 1);
 
