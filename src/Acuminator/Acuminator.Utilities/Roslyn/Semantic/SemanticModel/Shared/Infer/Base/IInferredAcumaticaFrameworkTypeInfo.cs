@@ -13,9 +13,9 @@ public interface IInferredAcumaticaFrameworkTypeInfo<out TAcumaticaFrameworkType
 where TAcumaticaFrameworkType : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>
 {
 	/// <summary>
-	/// The Acumatica Framework type information.
+	/// Get the Acumatica Framework type information.
 	/// </summary>
-	TAcumaticaFrameworkType TypeInfo { get; }
+	TAcumaticaFrameworkType? GetFrameworkTypeInfo();
 
 	/// <summary>
 	/// <see langword="true"/> if this object has circular references in the type hierarchy; otherwise, <see langword="false"/>.

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -10,9 +11,27 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
-	public class GraphInfo : GraphOrGraphExtInfoBase, IOverridableItem<GraphInfo>
+	public class GraphInfo : GraphOrGraphExtInfoBase, IOverridableItem<GraphInfo>, IInferredAcumaticaFrameworkTypeInfo<GraphInfo>
 	{
 		public new GraphInfo? Base => base.Base as GraphInfo;
+
+		/// <inheritdoc path="/summary"/>
+		/// <remarks>
+		/// <inheritdoc path="/remarks"/>
+		/// <br/>
+		/// Graph info can't have circular references because graphs can only inherit from other graphs.
+		/// </remarks>
+		bool IInferredAcumaticaFrameworkTypeInfo<GraphInfo>.HasCircularReferences => false;
+
+		/// <inheritdoc path="/summary"/>
+		/// <remarks>
+		/// <inheritdoc path="/remarks"/>
+		/// <br/><br/>
+		/// Graph info can't have multiple root types.
+		/// </remarks>
+		bool IInferredAcumaticaFrameworkTypeInfo<GraphInfo>.HasMultipleRootTypes => false;
+
+		GraphInfo IInferredAcumaticaFrameworkTypeInfo<GraphInfo>.GetFrameworkTypeInfo() => this;
 
 		protected GraphInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graph, int declarationOrder, GraphInfo baseInfo) :
 					   base(node, graph, declarationOrder, baseInfo)
@@ -35,11 +54,16 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public static GraphInfo? Create(INamedTypeSymbol? graph, ClassDeclarationSyntax? graphNode, PXContext pxContext,
 										int graphDeclarationOrder, CancellationToken cancellation)
 		{
-			if (graph == null)
+			if (graph == null || !graph.IsPXGraph(pxContext))
 				return null;
 
-			cancellation.ThrowIfCancellationRequested();
+			return CreateUnsafe(graph, graphNode, pxContext, graphDeclarationOrder, cancellation);
+		}
 
+		internal static GraphInfo CreateUnsafe(INamedTypeSymbol graph, ClassDeclarationSyntax? graphNode, PXContext pxContext,
+											   int graphDeclarationOrder, CancellationToken cancellation)
+		{
+			cancellation.ThrowIfCancellationRequested();
 			var graphBaseTypesFromBaseToDerived = graph.GetGraphBaseTypes()
 													   .OfType<INamedTypeSymbol>()
 													   .Reverse();

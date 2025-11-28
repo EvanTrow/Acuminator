@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -11,9 +12,30 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
-	public class GraphExtensionInfo : GraphOrGraphExtInfoBase
+	/// <summary>
+	/// Information about the correctly declared graph extension without issues in the type hierarchy.
+	/// </summary>
+	public class GraphExtensionInfo : GraphOrGraphExtInfoBase, IInferredAcumaticaFrameworkTypeInfo<GraphExtensionInfo>
 	{
 		public GraphInfo? Graph { get; }
+
+		GraphExtensionInfo IInferredAcumaticaFrameworkTypeInfo<GraphExtensionInfo>.GetFrameworkTypeInfo() => this;
+
+		/// <inheritdoc path="/summary"/>
+		/// <remarks>
+		/// <inheritdoc path="/remarks"/>
+		/// <br/>
+		/// The constructed correct graph extension info can't have circular references.
+		/// </remarks>
+		bool IInferredAcumaticaFrameworkTypeInfo<GraphExtensionInfo>.HasCircularReferences => false;
+
+		/// <inheritdoc path="/summary"/>
+		/// <remarks>
+		/// <inheritdoc path="/remarks"/>
+		/// <br/><br/>
+		/// The constructed correct graph extension info can't have multiple root types.
+		/// </remarks>
+		bool IInferredAcumaticaFrameworkTypeInfo<GraphExtensionInfo>.HasMultipleRootTypes => false;
 
 		protected GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
 									 int declarationOrder, GraphInfo baseGraph) :
