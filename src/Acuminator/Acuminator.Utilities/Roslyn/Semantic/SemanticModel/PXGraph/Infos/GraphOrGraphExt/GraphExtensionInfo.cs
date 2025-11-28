@@ -17,7 +17,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	/// </summary>
 	public class GraphExtensionInfo : GraphOrGraphExtInfoBase, IInferredAcumaticaFrameworkTypeInfo<GraphExtensionInfo>
 	{
-		public GraphInfo? Graph { get; }
+		public GraphInfo? BaseGraph { get; }
 
 		GraphExtensionInfo IInferredAcumaticaFrameworkTypeInfo<GraphExtensionInfo>.GetFrameworkTypeInfo() => this;
 

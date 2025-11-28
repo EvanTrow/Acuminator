@@ -45,7 +45,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap.Graph
 			else
 			{
 				GraphExtensionInfo = GraphModel.GraphOrGraphExtInfo as GraphExtensionInfo;
-				GraphInfo = GraphExtensionInfo?.Graph;
+				GraphInfo = GraphExtensionInfo?.BaseGraph;
 			}
 		}
 

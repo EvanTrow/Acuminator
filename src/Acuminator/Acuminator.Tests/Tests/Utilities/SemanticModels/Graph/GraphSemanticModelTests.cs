@@ -33,8 +33,8 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			var graphExtensionInfo = graphSemanticModel.GraphOrGraphExtInfo as GraphExtensionInfo;
 
 			graphExtensionInfo.Should().NotBeNull();
-			graphExtensionInfo!.Graph.Should().NotBeNull();
-			graphExtensionInfo!.Graph!.Name.Should().Be("MyGraph");
+			graphExtensionInfo!.BaseGraph.Should().NotBeNull();
+			graphExtensionInfo!.BaseGraph!.Name.Should().Be("MyGraph");
 			graphExtensionInfo.Base.Should().NotBeNull();
 			graphExtensionInfo.Base!.Name.Should().Be("SecondLevelGraphExtension");
 
@@ -42,9 +42,9 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 
 			extensionFromPreviousLevel.Should().NotBeNull();
 			extensionFromPreviousLevel!.Name.Should().Be("BaseExtension");
-			extensionFromPreviousLevel!.Graph.Should().NotBeNull();
+			extensionFromPreviousLevel!.BaseGraph.Should().NotBeNull();
 			extensionFromPreviousLevel.Base.Should().NotBeNull();
-			extensionFromPreviousLevel.Base.Should().Be(extensionFromPreviousLevel.Graph);
+			extensionFromPreviousLevel.Base.Should().Be(extensionFromPreviousLevel.BaseGraph);
 		}
 
 		[Theory]
@@ -109,7 +109,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			var graphExtInfo = graphSemanticModel.GraphOrGraphExtInfo as GraphExtensionInfo;
 
 			graphExtInfo.Should().NotBeNull();
-			graphExtInfo!.Graph.Should().NotBeNull();
+			graphExtInfo!.BaseGraph.Should().NotBeNull();
 			graphSemanticModel.GraphType.Should().Be(GraphType.PXGraphExtension);
 			graphSemanticModel.InitializeMethodInfo.Should().BeNull();
 		}
