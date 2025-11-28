@@ -45,30 +45,29 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </remarks>
 		bool IInferredAcumaticaFrameworkTypeInfo<GraphExtensionInfo>.HasMultipleRootTypes => false;
 
-		protected GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
-									 int declarationOrder) :
-								base(node, graphExtension, declarationOrder)
-		{
-			BaseGraph 			  = graph;
-			BaseGraphExtensions   = [];
-			CombineWithBaseGraphAndGraphExtensions();
-		}
+		public GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
+								  int declarationOrder) :
+							 this(node, graphExtension, graph, declarationOrder, baseGraphExtensions: [])
+		{ }
 
-		protected GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
-									 int declarationOrder, GraphExtensionInfo baseGraphExtension) :
-								base(node, graphExtension, declarationOrder)
+		public GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
+								  int declarationOrder, GraphExtensionInfo baseGraphExtension) :
+							 this(node, graphExtension, graph, declarationOrder,
+								  [baseGraphExtension.CheckIfNull()])
+		{ }
+
+		public GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
+								  int declarationOrder, IEnumerable<GraphExtensionInfo> baseGraphExtensions) :
+							 this(node, graphExtension, graph, declarationOrder, 
+								  baseGraphExtensions?.ToImmutableArray() ?? [])
+		{ }
+
+		public GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
+								  int declarationOrder, ImmutableArray<GraphExtensionInfo> baseGraphExtensions) :
+							 base(node, graphExtension, declarationOrder)
 		{
 			BaseGraph = graph;
-			BaseGraphExtensions = [baseGraphExtension];
-			CombineWithBaseGraphAndGraphExtensions();
-		}
-
-		protected GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
-									 int declarationOrder, IEnumerable<GraphExtensionInfo> baseGraphExtensions) :
-								base(node, graphExtension, declarationOrder)
-		{
-			BaseGraph 			  = graph;
-			BaseGraphExtensions   = baseGraphExtensions?.ToImmutableArray() ?? [];
+			BaseGraphExtensions = baseGraphExtensions;
 			CombineWithBaseGraphAndGraphExtensions();
 		}
 
