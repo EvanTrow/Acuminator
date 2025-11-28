@@ -10,7 +10,7 @@ where T : IOverridableItem<T>
 	string Name { get; }
 
 	/// <summary>
-	/// The overriden base info if any.
+	/// The overridden base info if any.
 	/// </summary>
 	T? Base { get; }
 }

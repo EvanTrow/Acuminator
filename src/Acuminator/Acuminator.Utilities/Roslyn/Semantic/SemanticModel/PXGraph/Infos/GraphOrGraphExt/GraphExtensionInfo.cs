@@ -74,17 +74,17 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				return (Info: null, HasCircularReferences: false);
 			
 			bool isInSource = graphExtensionNode != null;
-			var (extensionFromPreviousLevels, hasCurcularReferences) = GetAggregatedExtensionFromPreviouslLevels(extensionBaseType, pxContext, 
+			var (extensionFromPreviousLevels, hasCircularReferences) = GetAggregatedExtensionFromPreviouslLevels(extensionBaseType, pxContext, 
 																												 visitedExtensions, graphInfo, 
 																												 cancellation);
-			if (hasCurcularReferences)
+			if (hasCircularReferences)
 				return (Info: null, HasCircularReferences: true);
 
 			GraphExtensionInfo? aggregatedBaseGraphExtInfo = null;
 			
 			if (!SymbolEqualityComparer.Default.Equals(graphExtension.BaseType, extensionBaseType))
 			{
-				(aggregatedBaseGraphExtInfo, hasCurcularReferences) = 
+				(aggregatedBaseGraphExtInfo, hasCircularReferences) = 
 					GetAggregatedBaseExtensions(graphExtension, graphInfo, extensionFromPreviousLevels, visitedExtensions, isInSource, cancellation);
 			}
 
