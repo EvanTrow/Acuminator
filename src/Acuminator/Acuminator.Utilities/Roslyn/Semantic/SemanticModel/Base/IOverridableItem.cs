@@ -13,10 +13,15 @@ where T : IOverridableItem<T>
 	/// The overridden base info if any.
 	/// </summary>
 	T? Base { get; }
+
+	/// <summary>
+	/// Combine this info with info from base type.
+	/// </summary>
+	void CombineWithBaseInfo();
 }
 
 internal interface IWriteableBaseItem<T> : IOverridableItem<T>
-where T : IOverridableItem<T>
+where T : IWriteableBaseItem<T>
 {
 	/// <inheritdoc cref="IOverridableItem{T}.Base"/>
 	new T? Base
@@ -24,9 +29,4 @@ where T : IOverridableItem<T>
 		get;
 		set;
 	}
-
-	/// <summary>
-	/// Combine this info with info from base types.
-	/// </summary>
-	void CombineWithBaseInfo(T baseInfo);
 }
