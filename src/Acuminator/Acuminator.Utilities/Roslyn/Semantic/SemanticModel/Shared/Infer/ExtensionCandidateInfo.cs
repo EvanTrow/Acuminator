@@ -6,19 +6,19 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer
 {
-	public abstract class ExtensionCandidateInfo<TRootType, TExtensionInfo> : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>, 
+	public abstract class ExtensionCandidateInfo<TRootInfo, TExtensionInfo> : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>, 
 																			  IInferredAcumaticaFrameworkTypeInfo,
 																			  IHaveDeclarationOrder
-	where TRootType : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>
+	where TRootInfo : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>
 	where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>
 	{
 		protected internal List<TExtensionInfo> BaseExtensionsMutable { get; } =  new(capacity: 1);
 
 		public IReadOnlyCollection<TExtensionInfo> BaseExtensions => BaseExtensionsMutable;
 
-		protected internal List<TRootType> RootTypesMutable { get; } = new(capacity: 1);
+		protected internal List<TRootInfo> RootTypesMutable { get; } = new(capacity: 1);
 
-		public IReadOnlyCollection<TRootType> RootTypes => RootTypesMutable;
+		public IReadOnlyCollection<TRootInfo> RootTypes => RootTypesMutable;
 
 		public bool HasCircularReferences 
 		{ 
