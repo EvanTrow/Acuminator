@@ -43,24 +43,24 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </remarks>
 		bool IInferredAcumaticaFrameworkTypeInfo.HasMultipleRootTypes => false;
 
-		public GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
+		public GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
 								  int declarationOrder) :
 							 this(node, graphExtension, graph, declarationOrder, baseGraphExtensions: [])
 		{ }
 
-		public GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
+		public GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
 								  int declarationOrder, GraphExtensionInfo baseGraphExtension) :
 							 this(node, graphExtension, graph, declarationOrder,
 								  [baseGraphExtension.CheckIfNull()])
 		{ }
 
-		public GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
+		public GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
 								  int declarationOrder, IEnumerable<GraphExtensionInfo> baseGraphExtensions) :
 							 this(node, graphExtension, graph, declarationOrder, 
 								  baseGraphExtensions?.ToImmutableArray() ?? [])
 		{ }
 
-		public GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
+		public GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
 								  int declarationOrder, ImmutableArray<GraphExtensionInfo> baseGraphExtensions) :
 							 base(node, graphExtension, declarationOrder)
 		{
@@ -77,28 +77,28 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 		}
 
-		public static (GraphExtensionInfo? Info, bool HasCircularReferences) Create(INamedTypeSymbol? graphExtension, 
+		public static (GraphExtensionInfo? Info, bool HasCircularReferences) Create(ITypeSymbol? graphExtension, 
 																				ClassDeclarationSyntax? graphExtensionNode, ITypeSymbol? graph,
 																				PXContext pxContext, int graphExtDeclarationOrder, CancellationToken cancellation)
 		{
 			var graphNode = graph.GetSyntax(cancellation) as ClassDeclarationSyntax;
-			var graphInfo = GraphInfo.Create(graph as INamedTypeSymbol, graphNode, pxContext, graphDeclarationOrder: 0, cancellation);
+			var graphInfo = GraphInfo.Create(graph, graphNode, pxContext, graphDeclarationOrder: 0, cancellation);
 
 			return Create(graphExtension, graphExtensionNode, graphInfo, pxContext, graphExtDeclarationOrder, cancellation);
 		}
 
-		public static (GraphExtensionInfo? Info, bool HasCircularReferences) Create(INamedTypeSymbol? graphExtension, 
+		public static (GraphExtensionInfo? Info, bool HasCircularReferences) Create(ITypeSymbol? graphExtension, 
 																				ClassDeclarationSyntax? graphExtensionNode, GraphInfo? graphInfo,
 																				PXContext pxContext, int graphExtDeclarationOrder, CancellationToken cancellation)
 		{
-			var visitedExtensions = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+			var visitedExtensions = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
 			return Create(graphExtension, graphExtensionNode, graphInfo, pxContext, graphExtDeclarationOrder, visitedExtensions, cancellation);
 		}
 
-		private static (GraphExtensionInfo? Info, bool HasCircularReferences) Create(INamedTypeSymbol? graphExtension, 
+		private static (GraphExtensionInfo? Info, bool HasCircularReferences) Create(ITypeSymbol? graphExtension, 
 																				ClassDeclarationSyntax? graphExtensionNode, GraphInfo? graphInfo,
 																				PXContext pxContext, int graphExtDeclarationOrder, 
-																				HashSet<INamedTypeSymbol> visitedExtensions, 
+																				HashSet<ITypeSymbol> visitedExtensions, 
 																				CancellationToken cancellation)
 		{
 			cancellation.ThrowIfCancellationRequested();
@@ -108,8 +108,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			else if (!visitedExtensions.Add(graphExtension))
 				return (Info: null, HasCircularReferences: true);
 
-			INamedTypeSymbol? extensionBaseType = graphExtension.GetBaseTypesAndThis()
-																.FirstOrDefault(type => type.IsGraphExtensionBaseType()) as INamedTypeSymbol;
+			ITypeSymbol? extensionBaseType = graphExtension.GetBaseTypesAndThis()
+																.FirstOrDefault(type => type.IsGraphExtensionBaseType());
 			if (extensionBaseType == null)
 				return (Info: null, HasCircularReferences: false);
 			
@@ -144,8 +144,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		}
 
 		private static (GraphExtensionInfo? Info, bool HasCircularReferences) GetAggregatedExtensionFromPreviousLevels(
-																					INamedTypeSymbol extensionBaseType, PXContext pxContext,
-																					HashSet<INamedTypeSymbol> collectedExtensionsFromOtherLevels,
+																					ITypeSymbol extensionBaseType, PXContext pxContext,
+																					HashSet<ITypeSymbol> collectedExtensionsFromOtherLevels,
 																					GraphInfo? graphInfo, CancellationToken cancellation)
 		{
 			if (!extensionBaseType.IsGenericType)
@@ -169,19 +169,18 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			return aggregatedPrevLevelGraphExtensionInfo;
 		}
 
-		private static (GraphExtensionInfo? Info, bool HasCircularReferences) GetAggregatedBaseExtensions(INamedTypeSymbol graphExtension, 
+		private static (GraphExtensionInfo? Info, bool HasCircularReferences) GetAggregatedBaseExtensions(ITypeSymbol graphExtension, 
 																					GraphInfo? graphInfo, GraphExtensionInfo? aggregatedExtensionFromBaseLevels,
-																					HashSet<INamedTypeSymbol> collectedExtensionsFromOtherLevels, bool isInSource, 
+																					HashSet<ITypeSymbol> collectedExtensionsFromOtherLevels, bool isInSource, 
 																					CancellationToken cancellation)
 		{
 			var graphExtensionsBaseTypesFromBaseToDerived = graphExtension.GetGraphExtensionBaseTypes()
-																		  .OfType<INamedTypeSymbol>()
 																		  .Reverse();
 
 			GraphExtensionInfo? aggregatedBaseGraphExtensionInfo = null; 
 			GraphExtensionInfo? prevGraphExtensionInfo = aggregatedExtensionFromBaseLevels;
 
-			foreach (INamedTypeSymbol baseType in graphExtensionsBaseTypesFromBaseToDerived)
+			foreach (ITypeSymbol baseType in graphExtensionsBaseTypesFromBaseToDerived)
 			{
 				cancellation.ThrowIfCancellationRequested();
 

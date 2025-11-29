@@ -31,18 +31,18 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </remarks>
 		bool IInferredAcumaticaFrameworkTypeInfo.HasMultipleRootTypes => false;
 
-		protected GraphInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graph, int declarationOrder, GraphInfo baseGraphInfo) :
+		protected GraphInfo(ClassDeclarationSyntax? node, ITypeSymbol graph, int declarationOrder, GraphInfo baseGraphInfo) :
 					   base(node, graph, declarationOrder)
 		{
 			Base = baseGraphInfo.CheckIfNull();
 			CombineWithBaseInfo();
 		}
 
-		protected GraphInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graph, int declarationOrder) :
+		protected GraphInfo(ClassDeclarationSyntax? node, ITypeSymbol graph, int declarationOrder) :
 					   base(node, graph, declarationOrder)
 		{ }
 
-		public static GraphInfo? Create(INamedTypeSymbol? graph, ClassDeclarationSyntax? graphNode, PXContext pxContext,
+		public static GraphInfo? Create(ITypeSymbol? graph, ClassDeclarationSyntax? graphNode, PXContext pxContext,
 										int graphDeclarationOrder, CancellationToken cancellation)
 		{
 			if (graph == null || !graph.IsPXGraph(pxContext))
@@ -51,17 +51,16 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			return CreateUnsafe(graph, graphNode, pxContext, graphDeclarationOrder, cancellation);
 		}
 
-		internal static GraphInfo CreateUnsafe(INamedTypeSymbol graph, ClassDeclarationSyntax? graphNode, PXContext pxContext,
+		internal static GraphInfo CreateUnsafe(ITypeSymbol graph, ClassDeclarationSyntax? graphNode, PXContext pxContext,
 											   int graphDeclarationOrder, CancellationToken cancellation)
 		{
 			cancellation.ThrowIfCancellationRequested();
 			var graphBaseTypesFromBaseToDerived = graph.GetGraphBaseTypes()
-													   .OfType<INamedTypeSymbol>()
 													   .Reverse();
 			bool isInSource = graphNode != null;
 			GraphInfo? aggregatedBaseGraphInfo = null, prevGraphInfo = null;
 
-			foreach (INamedTypeSymbol baseType in graphBaseTypesFromBaseToDerived)
+			foreach (ITypeSymbol baseType in graphBaseTypesFromBaseToDerived)
 			{
 				cancellation.ThrowIfCancellationRequested();
 

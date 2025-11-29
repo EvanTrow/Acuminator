@@ -6,11 +6,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer
 {
-	public abstract class ExtensionCandidateInfo<TRootInfo, TExtensionInfo> : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>, 
+	public abstract class ExtensionCandidateInfo<TRootInfo, TExtensionInfo> : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>,
 																			  IInferredAcumaticaFrameworkTypeInfo,
 																			  IHaveDeclarationOrder
-	where TRootInfo : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>, IInferredAcumaticaFrameworkTypeInfo
-	where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, INamedTypeSymbol>, IInferredAcumaticaFrameworkTypeInfo
+	where TRootInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaFrameworkTypeInfo
+	where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaFrameworkTypeInfo
 	{
 		protected internal List<TExtensionInfo> BaseExtensionsMutable { get; } =  new(capacity: 1);
 
@@ -28,7 +28,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer
 
 		public bool HasMultipleRootTypes => RootTypes.Count > 1;
 
-		protected ExtensionCandidateInfo(ClassDeclarationSyntax? extensionNode, INamedTypeSymbol extensionSymbol, int declarationOrder) :
+		protected ExtensionCandidateInfo(ClassDeclarationSyntax? extensionNode, ITypeSymbol extensionSymbol, int declarationOrder) :
 									base(extensionNode, extensionSymbol, declarationOrder)
 		{
 		}
