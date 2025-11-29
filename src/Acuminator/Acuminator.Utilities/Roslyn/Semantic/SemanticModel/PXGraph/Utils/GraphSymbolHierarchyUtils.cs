@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -51,14 +52,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 						 .TakeWhile(type => !type.IsGraphExtensionBaseType());
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static bool IsGraphOrGraphExtensionBaseType(this ITypeSymbol? type) =>
+		internal static bool IsGraphOrGraphExtensionBaseType([NotNullWhen(returnValue: true)] this ITypeSymbol? type) =>
 			type != null && (type.Name == TypeNames.PXGraph || type.Name == TypeNames.PXGraphExtension);
 		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool IsGraphBaseType(this ITypeSymbol? type) => type?.Name == TypeNames.PXGraph;
+		public static bool IsGraphBaseType([NotNullWhen(returnValue: true)] this ITypeSymbol? type) => type?.Name == TypeNames.PXGraph;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool IsGraphExtensionBaseType(this ITypeSymbol? type) => 
+		public static bool IsGraphExtensionBaseType([NotNullWhen(returnValue: true)]this ITypeSymbol? type) => 
 			type?.Name == TypeNames.PXGraphExtension;
 
 		/// <summary>
