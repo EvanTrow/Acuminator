@@ -27,12 +27,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			}
 		}
 
-		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, INamedTypeSymbol dac, int declarationOrder, TInfo baseInfo) :
+		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder, TInfo baseInfo) :
 								 base(node, dac, declarationOrder, baseInfo)
 		{
 		}
 
-		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, INamedTypeSymbol dac, int declarationOrder) :
+		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder) :
 								 base(node, dac, declarationOrder)
 		{
 		}
@@ -52,14 +52,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 	}
 
 
-	public abstract class DacOrDacExtInfoBase : OverridableNodeSymbolItem<DacOrDacExtInfoBase, ClassDeclarationSyntax, INamedTypeSymbol>
+	public abstract class DacOrDacExtInfoBase : OverridableNodeSymbolItem<DacOrDacExtInfoBase, ClassDeclarationSyntax, ITypeSymbol>
 	{
-		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, INamedTypeSymbol dac, int declarationOrder, DacOrDacExtInfoBase baseInfo) :
+		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder, DacOrDacExtInfoBase baseInfo) :
 								 base(node, dac, declarationOrder, baseInfo)
 		{
 		}
 
-		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, INamedTypeSymbol dac, int declarationOrder) :
+		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder) :
 								 base(node, dac, declarationOrder)
 		{
 		}

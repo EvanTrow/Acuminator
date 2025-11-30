@@ -11,17 +11,17 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 {
 	public class DacInfo : DacOrDacExtInfoBase<DacInfo>
 	{
-		protected DacInfo(ClassDeclarationSyntax? node, INamedTypeSymbol dac, int declarationOrder, DacInfo baseInfo) :
+		protected DacInfo(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder, DacInfo baseInfo) :
 					 base(node, dac, declarationOrder, baseInfo)
 		{
 		}
 
-		protected DacInfo(ClassDeclarationSyntax? node, INamedTypeSymbol dac, int declarationOrder) :
+		protected DacInfo(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder) :
 					 base(node, dac, declarationOrder)
 		{
 		}
 
-		public static DacInfo? Create(INamedTypeSymbol? dac, ClassDeclarationSyntax? dacNode, PXContext pxContext, 
+		public static DacInfo? Create(ITypeSymbol? dac, ClassDeclarationSyntax? dacNode, PXContext pxContext, 
 									  int dacDeclarationOrder, CancellationToken cancellation)
 		{
 			if (dac == null)
@@ -30,12 +30,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			cancellation.ThrowIfCancellationRequested();
 
 			var dacBaseTypesFromBaseToDerived = dac.GetDacBaseTypesThatMayStoreDacProperties(pxContext)
-												   .OfType<INamedTypeSymbol>()
 												   .Reverse();
 			bool isInSource = dacNode != null;
 			DacInfo? aggregatedBaseDacInfo = null, prevDacInfo = null;
 
-			foreach (INamedTypeSymbol baseType in dacBaseTypesFromBaseToDerived)
+			foreach (ITypeSymbol baseType in dacBaseTypesFromBaseToDerived)
 			{
 				cancellation.ThrowIfCancellationRequested();
 

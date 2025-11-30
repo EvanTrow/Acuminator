@@ -13,7 +13,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 	{
 		public DacInfo? Dac { get; }
 
-		public DacExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol dacExtension, DacInfo? dac, int declarationOrder, 
+		public DacExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol dacExtension, DacInfo? dac, int declarationOrder, 
 								DacExtensionInfo baseInfo) :
 						   this(node, dacExtension, dac, declarationOrder)
 		{
@@ -21,13 +21,13 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			CombineWithBaseInfo();
 		}
 
-		public DacExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol dacExtension, DacInfo? dac, int declarationOrder) :
+		public DacExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol dacExtension, DacInfo? dac, int declarationOrder) :
 						   base(node, dacExtension, declarationOrder)
 		{
 			Dac = dac;
 		}
 
-		public static DacExtensionInfo? Create(INamedTypeSymbol? dacExtension, ClassDeclarationSyntax? dacExtensionNode, ITypeSymbol? dac, 
+		public static DacExtensionInfo? Create(ITypeSymbol? dacExtension, ClassDeclarationSyntax? dacExtensionNode, ITypeSymbol? dac, 
 											   PXContext pxContext, int dacExtDeclarationOrder, CancellationToken cancellation)
 		{
 			if (dacExtension == null)
@@ -36,12 +36,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			cancellation.ThrowIfCancellationRequested();
 
 			var dacNode = dac.GetSyntax(cancellation) as ClassDeclarationSyntax;
-			var dacInfo = DacInfo.Create(dac as INamedTypeSymbol, dacNode, pxContext, dacDeclarationOrder: 0, cancellation);
+			var dacInfo = DacInfo.Create(dac, dacNode, pxContext, dacDeclarationOrder: 0, cancellation);
 			
 			var extensionTypesFromFirstToLastLevel = dacExtension.GetBaseExtensions(pxContext, SortDirection.Ascending, includeDac: false);
 			DacExtensionInfo? aggregatedBaseDacInfo = null, prevDacInfo = null;
 
-			foreach (INamedTypeSymbol baseExtensionType in extensionTypesFromFirstToLastLevel)
+			foreach (ITypeSymbol baseExtensionType in extensionTypesFromFirstToLastLevel)
 			{
 				cancellation.ThrowIfCancellationRequested();
 
