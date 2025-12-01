@@ -45,6 +45,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// </remarks>
 		bool IInferredAcumaticaFrameworkTypeInfo.HasMultipleRootTypes => false;
 
+		/// <inheritdoc path="/summary"/>
+		/// <remarks>
+		/// <inheritdoc path="/remarks"/>
+		/// <br/><br/>
+		/// DAC and constructed DAC extension info have successfully collected type hierarchy.
+		/// </remarks>
+		bool IInferredAcumaticaFrameworkTypeInfo.FailedToCollectTypeHierarchy => false;
+
 		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder, TInfo baseInfo) :
 								 base(node, dac, declarationOrder, baseInfo)
 		{

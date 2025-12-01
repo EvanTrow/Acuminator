@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -15,7 +14,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	/// <summary>
 	/// Information about the correctly declared graph extension without issues in the type hierarchy.
 	/// </summary>
-	public class GraphExtensionInfo : GraphOrGraphExtInfoBase, IInferredAcumaticaFrameworkTypeInfo
+	public class GraphExtensionInfo : GraphOrGraphExtInfoBase
 	{
 		public GraphInfo? BaseGraph { get; }
 
@@ -26,22 +25,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		ImmutableArray<GraphExtensionInfo> BaseGraphExtensions { get; }
 
 		public bool IsFirstLevelExtension => BaseGraphExtensions.IsDefaultOrEmpty;
-
-		/// <inheritdoc path="/summary"/>
-		/// <remarks>
-		/// <inheritdoc path="/remarks"/>
-		/// <br/>
-		/// The constructed correct graph extension info can't have circular references.
-		/// </remarks>
-		bool IInferredAcumaticaFrameworkTypeInfo.HasCircularReferences => false;
-
-		/// <inheritdoc path="/summary"/>
-		/// <remarks>
-		/// <inheritdoc path="/remarks"/>
-		/// <br/><br/>
-		/// The constructed correct graph extension info can't have multiple root types.
-		/// </remarks>
-		bool IInferredAcumaticaFrameworkTypeInfo.HasMultipleRootTypes => false;
 
 		public GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
 								  int declarationOrder) :
