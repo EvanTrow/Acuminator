@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {

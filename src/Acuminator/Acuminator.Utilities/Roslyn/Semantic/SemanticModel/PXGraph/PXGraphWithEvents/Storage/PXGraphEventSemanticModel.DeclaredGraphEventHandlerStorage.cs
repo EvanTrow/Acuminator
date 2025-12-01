@@ -131,7 +131,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					? handlersByName.Values.Sum(handlers => handlers.Length)
 					: 0;
 
-			public static IDeclaredGraphEventHandlerStorage FromOverridesChainsStorageInDerivedToBaseOrder(INamedTypeSymbol containingType,
+			public static IDeclaredGraphEventHandlerStorage FromOverridesChainsStorageInDerivedToBaseOrder(ITypeSymbol containingType,
 																				IGraphEventHandlerOverridesChainsStorage overrideChainsStorage) =>
 				new DeclaredGraphEventHandlerStorage(
 						 rowSelectingByName: GetDeclaredEventHandlersFromDerivedToBase(containingType, overrideChainsStorage.RowSelectingByName),
@@ -228,7 +228,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				}
 			}
 
-			private static ImmutableDictionary<string, ImmutableArray<THandler>> GetDeclaredEventHandlersFromDerivedToBase<THandler>(INamedTypeSymbol containingType,
+			private static ImmutableDictionary<string, ImmutableArray<THandler>> GetDeclaredEventHandlersFromDerivedToBase<THandler>(ITypeSymbol containingType,
 																								ImmutableDictionary<string, THandler> overridesChainsOfSameEventType)
 			where THandler : GraphEventHandlerInfoBase<THandler>
 			{
@@ -253,7 +253,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 					   ImmutableDictionary<string, ImmutableArray<THandler>>.Empty;
 			}
 
-			private static ImmutableArray<THandler>? GetDeclaredEventHandlersFromOverridesChain<THandler>(INamedTypeSymbol containingType, 
+			private static ImmutableArray<THandler>? GetDeclaredEventHandlersFromOverridesChain<THandler>(ITypeSymbol containingType, 
 																										  THandler mostDerivedEventHandler)
 			where THandler : GraphEventHandlerInfoBase<THandler>
 			{

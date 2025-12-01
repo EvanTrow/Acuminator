@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 
@@ -33,7 +31,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Shared
 		/// <returns>
 		/// The <see cref="IsActiveMethodInfo"/> DTO if extension contains IsActive method, otherwise <see langword="null"/>.
 		/// </returns>
-		internal static IsActiveMethodInfo? GetIsActiveMethodInfo(INamedTypeSymbol dacOrGraphExtension, CancellationToken cancellationToken,
+		internal static IsActiveMethodInfo? GetIsActiveMethodInfo(ITypeSymbol dacOrGraphExtension, CancellationToken cancellationToken,
 																  int? customDeclarationOrder = null)
 		{
 			cancellationToken.ThrowIfCancellationRequested();

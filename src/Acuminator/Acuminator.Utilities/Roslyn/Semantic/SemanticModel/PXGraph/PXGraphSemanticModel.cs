@@ -38,7 +38,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		[MemberNotNullWhen(returnValue: true, nameof(Node))]
 		public bool IsInSource => GraphOrGraphExtInfo.IsInSource;
 
-		public INamedTypeSymbol Symbol => GraphOrGraphExtInfo.Symbol;
+		public ITypeSymbol Symbol => GraphOrGraphExtInfo.Symbol;
 
 		public ClassDeclarationSyntax? Node => GraphOrGraphExtInfo.Node;
 
@@ -57,7 +57,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </summary>
 		/// <remarks>
 		/// By initializers Acuminator understands special code elements of graph or graph extension that configure graph's initial state.<br/>
-		/// Currently, initalizers consists of:
+		/// Currently, initializers consists of:
 		/// <list type="bullet">
 		/// <item>Graph and graph extension constructors.</item>
 		/// <item><c>Initialize</c> method override of a graph extension.</item>
@@ -305,7 +305,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </summary>
 		/// <remarks>
 		/// By initializer Acuminator understands special code elements of graph or graph extension that configure graph's initial state.<br/>
-		/// Currently, initalizers consists of:
+		/// Currently, initializers consists of:
 		/// <list type="bullet">
 		/// <item>Graph and graph extension constructors.</item>
 		/// <item><c>Initialize</c> method override of a graph extension.</item>
@@ -320,9 +320,21 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		{
 			_cancellation.ThrowIfCancellationRequested();
 
-			var constructors = Symbol.GetDeclaredInstanceConstructors(_cancellation)
-									 .Select((ctr, order) => new GraphInitializerInfo(GraphInitializerType.InstanceConstructor, ctr.Node, ctr.Symbol, order));
-			var initializerInfos = constructors.ToList(capacity: 4);
+			var instanceConstructors = Symbol.GetDeclaredInstanceConstructors(_cancellation);
+			List<GraphInitializerInfo> initializerInfos;
+
+			if (instanceConstructors.Count > 0)
+			{
+				var constructorInitializerInfos = 
+					instanceConstructors.Select((constructor, order) => new GraphInitializerInfo(GraphInitializerType.InstanceConstructor,
+																								constructor.Node, constructor.Symbol, order));
+				initializerInfos = constructorInitializerInfos.ToList(capacity: 4);
+			}
+			else
+			{
+				initializerInfos = [];
+			}
+
 			int declarationOrder = initializerInfos.Count;
 
 			if (DeclaredInitializeMethodInfo is { } declaredInitializeMethod)

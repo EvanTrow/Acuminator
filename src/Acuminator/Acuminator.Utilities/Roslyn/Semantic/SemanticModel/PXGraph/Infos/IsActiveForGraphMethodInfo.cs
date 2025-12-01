@@ -35,7 +35,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <returns>
 		/// The <see cref="IsActiveForGraphMethodInfo"/> DTO if the graph extension contains IsActiveForGraph&lt;TGraph&gt; method, otherwise <see langword="null"/>.
 		/// </returns>
-		internal static IsActiveForGraphMethodInfo? GetIsActiveForGraphMethodInfo(INamedTypeSymbol graphExtension, CancellationToken cancellationToken,
+		internal static IsActiveForGraphMethodInfo? GetIsActiveForGraphMethodInfo(ITypeSymbol graphExtension, CancellationToken cancellationToken,
 																				  int? customDeclarationOrder = null)
 		{
 			cancellationToken.ThrowIfCancellationRequested();

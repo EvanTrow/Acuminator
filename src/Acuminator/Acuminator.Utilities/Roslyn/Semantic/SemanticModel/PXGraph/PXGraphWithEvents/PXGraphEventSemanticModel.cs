@@ -53,7 +53,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public ClassDeclarationSyntax? Node => BaseGraphModel.Node;
 
 		/// <inheritdoc cref="PXGraphSemanticModel.Symbol"/>
-		public INamedTypeSymbol Symbol => BaseGraphModel.Symbol;
+		public ITypeSymbol Symbol => BaseGraphModel.Symbol;
 
 		/// <inheritdoc cref="PXGraphSemanticModel.GraphSymbol"/>
 		public ITypeSymbol? GraphSymbol => BaseGraphModel.GraphSymbol;
