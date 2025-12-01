@@ -20,11 +20,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer
 
 		public IReadOnlyCollection<TRootInfo> RootTypes => RootTypesMutable;
 
-		public bool HasCircularReferences 
-		{ 
-			get;
-			internal set;
-		}
+		public ITypeSymbol? CircularReferenceExtension { get; internal set; }
+
+		public bool HasCircularReferences => CircularReferenceExtension != null;
 
 		public bool HasMultipleRootTypes => RootTypes.Count > 1;
 
