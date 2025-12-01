@@ -11,6 +11,7 @@ using System.Threading;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
+using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -570,28 +571,33 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 			return initializers;
 		}
 
-		public static ImmutableArray<StaticConstructorInfo> GetStaticConstructors(this INamedTypeSymbol typeSymbol,
-																				  CancellationToken cancellation = default)
+		public static ImmutableArray<StaticConstructorInfo> GetStaticConstructors(this ITypeSymbol typeSymbol, CancellationToken cancellation)
 		{
 			typeSymbol.ThrowOnNull();
 
-			int order = 0;
-			List<StaticConstructorInfo> staticCtrs = new List<StaticConstructorInfo>();
+			if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+				return [];
 
-			foreach (IMethodSymbol ctr in typeSymbol.StaticConstructors)
+			var staticConstructors = namedTypeSymbol.StaticConstructors;
+
+			if (staticConstructors.IsDefaultOrEmpty)
+				return [];
+
+			int order = 0;
+			var builder = ImmutableArray.CreateBuilder<StaticConstructorInfo>(staticConstructors.Length);
+
+			foreach (IMethodSymbol constructor in staticConstructors)
 			{
 				cancellation.ThrowIfCancellationRequested();
 
-				SyntaxReference? reference = ctr.DeclaringSyntaxReferences.FirstOrDefault();
+				var node = constructor.GetSyntax(cancellation) as ConstructorDeclarationSyntax;
+				var staticConstructorInfo = new StaticConstructorInfo(node, constructor, order);
 
-				if (reference?.GetSyntax(cancellation) is not ConstructorDeclarationSyntax node)
-					continue;
-
-				staticCtrs.Add(new StaticConstructorInfo(node, ctr, order));
+				builder.Add(staticConstructorInfo);
 				order++;
 			}
 
-			return staticCtrs.ToImmutableArray();
+			return builder.ToImmutable();
 		}
 
 		/// <summary>
