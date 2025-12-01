@@ -14,15 +14,15 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	{
 		public GraphInfo? Base { get; }
 
-		protected GraphInfo(ClassDeclarationSyntax? node, ITypeSymbol graph, int declarationOrder, GraphInfo baseGraphInfo) :
-					   base(node, graph, declarationOrder)
+		internal GraphInfo(ClassDeclarationSyntax? node, ITypeSymbol graph, int declarationOrder, GraphInfo baseGraphInfo) :
+					  base(node, graph, declarationOrder)
 		{
 			Base = baseGraphInfo.CheckIfNull();
 			CombineWithBaseInfo();
 		}
 
-		protected GraphInfo(ClassDeclarationSyntax? node, ITypeSymbol graph, int declarationOrder) :
-					   base(node, graph, declarationOrder)
+		internal GraphInfo(ClassDeclarationSyntax? node, ITypeSymbol graph, int declarationOrder) :
+					  base(node, graph, declarationOrder)
 		{ }
 
 		public static GraphInfo? Create(ITypeSymbol? graph, ClassDeclarationSyntax? graphNode, PXContext pxContext,

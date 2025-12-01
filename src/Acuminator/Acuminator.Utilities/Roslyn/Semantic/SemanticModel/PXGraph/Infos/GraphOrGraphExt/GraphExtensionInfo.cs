@@ -26,25 +26,25 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 		public bool IsFirstLevelExtension => BaseGraphExtensions.IsDefaultOrEmpty;
 
-		public GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
-								  int declarationOrder) :
+		internal GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
+									int declarationOrder) :
 							 this(node, graphExtension, graph, declarationOrder, baseGraphExtensions: [])
 		{ }
 
-		public GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
-								  int declarationOrder, GraphExtensionInfo baseGraphExtension) :
+		internal GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
+									int declarationOrder, GraphExtensionInfo baseGraphExtension) :
 							 this(node, graphExtension, graph, declarationOrder,
 								  [baseGraphExtension.CheckIfNull()])
 		{ }
 
-		public GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
-								  int declarationOrder, IEnumerable<GraphExtensionInfo> baseGraphExtensions) :
+		internal GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
+									int declarationOrder, IEnumerable<GraphExtensionInfo> baseGraphExtensions) :
 							 this(node, graphExtension, graph, declarationOrder, 
 								  baseGraphExtensions?.ToImmutableArray() ?? [])
 		{ }
 
-		public GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
-								  int declarationOrder, ImmutableArray<GraphExtensionInfo> baseGraphExtensions) :
+		internal GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
+									int declarationOrder, ImmutableArray<GraphExtensionInfo> baseGraphExtensions) :
 							 base(node, graphExtension, declarationOrder)
 		{
 			BaseGraph = graph;
