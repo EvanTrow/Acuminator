@@ -544,31 +544,31 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 			return typeNameWithoutGeneric + DefaultGenericArgsCountSeparator + typeArgs.Length;
 		}
 
-		internal static IEnumerable<(ConstructorDeclarationSyntax Node, IMethodSymbol Symbol)> GetDeclaredInstanceConstructors(
-			this INamedTypeSymbol typeSymbol, CancellationToken cancellation = default)
+		internal static IReadOnlyCollection<(ConstructorDeclarationSyntax? Node, IMethodSymbol Symbol)> GetDeclaredInstanceConstructors(
+																												this ITypeSymbol typeSymbol, 
+																												CancellationToken cancellation)
 		{
 			typeSymbol.ThrowOnNull();
 
-			List<(ConstructorDeclarationSyntax, IMethodSymbol)> initializers = new List<(ConstructorDeclarationSyntax, IMethodSymbol)>();
+			if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+				return [];
 
-			foreach (IMethodSymbol ctr in typeSymbol.InstanceConstructors)
+			var instanceConstructors = namedTypeSymbol.InstanceConstructors;
+
+			if (instanceConstructors.IsDefaultOrEmpty)
+				return [];
+
+			var instanceConstructorsWithNodes = new List<(ConstructorDeclarationSyntax?, IMethodSymbol)>(instanceConstructors.Length);
+
+			foreach (IMethodSymbol constructor in instanceConstructors)
 			{
 				cancellation.ThrowIfCancellationRequested();
 
-				if (!ctr.IsDefinition)
-					continue;
-
-				SyntaxReference? reference = ctr.DeclaringSyntaxReferences.FirstOrDefault();
-				if (reference == null)
-					continue;
-
-				if (reference.GetSyntax(cancellation) is not ConstructorDeclarationSyntax node)
-					continue;
-
-				initializers.Add((node, ctr));
+				var node = constructor.GetSyntax(cancellation) as ConstructorDeclarationSyntax;
+				instanceConstructorsWithNodes.Add((node, constructor));
 			}
 
-			return initializers;
+			return instanceConstructorsWithNodes;
 		}
 
 		public static ImmutableArray<StaticConstructorInfo> GetStaticConstructors(this ITypeSymbol typeSymbol, CancellationToken cancellation)
