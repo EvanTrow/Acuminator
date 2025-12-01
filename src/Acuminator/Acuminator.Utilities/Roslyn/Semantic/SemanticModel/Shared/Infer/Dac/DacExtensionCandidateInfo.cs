@@ -10,7 +10,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer
 {
 	public class DacExtensionCandidateInfo : ExtensionCandidateInfo<DacInfo, DacExtensionInfo>
 	{
-		public DacExtensionCandidateInfo(ClassDeclarationSyntax? extensionNode, INamedTypeSymbol extensionSymbol, int declarationOrder) :
+		public DacExtensionCandidateInfo(ClassDeclarationSyntax? extensionNode, ITypeSymbol extensionSymbol, int declarationOrder) :
 									base(extensionNode, extensionSymbol, declarationOrder)
 		{
 		}

@@ -178,7 +178,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			(GraphType, GraphSymbol) = graphOrGraphExtInfo switch
 			{
 				GraphInfo graphInfo 			=> (GraphType.PXGraph, graphInfo.Symbol),
-				GraphExtensionInfo graphExtInfo => (GraphType.PXGraphExtension, graphExtInfo.Graph?.Symbol),
+				GraphExtensionInfo graphExtInfo => (GraphType.PXGraphExtension, graphExtInfo.BaseGraph?.Symbol),
 				_ 								=> throw new ArgumentOutOfRangeException(nameof(graphOrGraphExtInfo),
 														$"The \"{nameof(graphOrGraphExtInfo)}\" parameter must be either {nameof(GraphInfo)} or {nameof(GraphExtensionInfo)}.")
 			};

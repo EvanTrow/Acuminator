@@ -10,7 +10,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer
 {
 	public class GraphExtensionCandidateInfo : ExtensionCandidateInfo<GraphInfo, GraphExtensionInfo>
 	{
-		public GraphExtensionCandidateInfo(ClassDeclarationSyntax? extensionNode, INamedTypeSymbol extensionSymbol, int declarationOrder) :
+		public GraphExtensionCandidateInfo(ClassDeclarationSyntax? extensionNode, ITypeSymbol extensionSymbol, int declarationOrder) :
 									  base(extensionNode, extensionSymbol, declarationOrder)
 		{
 		}
