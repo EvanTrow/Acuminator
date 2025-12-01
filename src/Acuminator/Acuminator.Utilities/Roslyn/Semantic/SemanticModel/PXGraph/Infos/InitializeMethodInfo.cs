@@ -51,7 +51,7 @@ public class InitializeMethodInfo : OverridableNodeSymbolItem<InitializeMethodIn
 	/// <returns>
 	/// <see cref="InitializeMethodInfo"/> DTO if the graph / graph extension contains Initialize method, otherwise <see langword="null"/>.
 	/// </returns>
-	internal static InitializeMethodInfo? GetInitializeMethodInfo(INamedTypeSymbol graphOrGraphExtension, GraphType graphType, PXContext pxContext,
+	internal static InitializeMethodInfo? GetInitializeMethodInfo(ITypeSymbol graphOrGraphExtension, GraphType graphType, PXContext pxContext,
 																  CancellationToken cancellationToken, int? customDeclarationOrder = null)
 	{
 		cancellationToken.ThrowIfCancellationRequested();
@@ -82,7 +82,7 @@ public class InitializeMethodInfo : OverridableNodeSymbolItem<InitializeMethodIn
 		return null;
 	}
 
-	private static IMethodSymbol? GetOriginalInitializeMethod(GraphType graphType, INamedTypeSymbol graphOrGraphExtension, PXContext pxContext)
+	private static IMethodSymbol? GetOriginalInitializeMethod(GraphType graphType, ITypeSymbol graphOrGraphExtension, PXContext pxContext)
 	{
 		switch (graphType)
 		{

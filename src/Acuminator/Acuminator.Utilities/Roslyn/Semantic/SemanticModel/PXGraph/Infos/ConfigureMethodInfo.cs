@@ -54,7 +54,7 @@ public class ConfigureMethodInfo : OverridableNodeSymbolItem<ConfigureMethodInfo
 	/// <returns>
 	/// <see cref="ConfigureMethodInfo"/> DTO if the graph / graph extension contains one Configure method, otherwise <see langword="null"/>.
 	/// </returns>
-	internal static ConfigureMethodInfo? GetConfigureMethodInfo(INamedTypeSymbol graphOrGraphExtension, GraphType graphType, PXContext pxContext, 
+	internal static ConfigureMethodInfo? GetConfigureMethodInfo(ITypeSymbol graphOrGraphExtension, GraphType graphType, PXContext pxContext, 
 																CancellationToken cancellationToken, int? customDeclarationOrder = null)
 	{
 		cancellationToken.ThrowIfCancellationRequested();
