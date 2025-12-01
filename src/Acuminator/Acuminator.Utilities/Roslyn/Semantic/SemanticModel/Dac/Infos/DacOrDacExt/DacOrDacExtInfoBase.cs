@@ -1,11 +1,13 @@
 ﻿using System;
 
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 {
-	public abstract class DacOrDacExtInfoBase<TInfo> : DacOrDacExtInfoBase, IWriteableBaseItem<TInfo>
+	public abstract class DacOrDacExtInfoBase<TInfo> : DacOrDacExtInfoBase, IWriteableBaseItem<TInfo>, IInferredAcumaticaFrameworkTypeInfo
 	where TInfo : DacOrDacExtInfoBase<TInfo>
 	{
 		public new TInfo? Base => base.Base as TInfo;
@@ -26,6 +28,22 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 				}
 			}
 		}
+
+		/// <inheritdoc path="/summary"/>
+		/// <remarks>
+		/// <inheritdoc path="/remarks"/>
+		/// <br/>
+		/// DAC and constructed DAC extension info can't have circular references.
+		/// </remarks>
+		bool IInferredAcumaticaFrameworkTypeInfo.HasCircularReferences => false;
+
+		/// <inheritdoc path="/summary"/>
+		/// <remarks>
+		/// <inheritdoc path="/remarks"/>
+		/// <br/><br/>
+		/// DAC and constructed DAC extension info can't have multiple root types.
+		/// </remarks>
+		bool IInferredAcumaticaFrameworkTypeInfo.HasMultipleRootTypes => false;
 
 		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder, TInfo baseInfo) :
 								 base(node, dac, declarationOrder, baseInfo)
