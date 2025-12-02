@@ -167,4 +167,15 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 	protected abstract IEnumerable<ITypeSymbol> GetBaseExtensionTypesFromDerivedToBase(ITypeSymbol extensionTypeSymbol);
 
 	protected abstract INamedTypeSymbol? GetExtensionBaseType(ITypeSymbol extensionTypeSymbol, PXContext pxContext);
+
+	/// <summary>
+	/// Gets the chained base extension types from the base generic extension type.
+	/// </summary>
+	/// <param name="baseGenericExtensionType">The base generic extension type from which all extensions derive.</param>
+	/// <param name="pxContext">The Acumatica context.</param>
+	/// <returns>
+	/// The chained base extension types.
+	/// </returns>
+	protected abstract IReadOnlyCollection<ITypeSymbol>? GetChainedBaseExtensionTypesFromBaseGenericExtensionType(ITypeSymbol baseGenericExtensionType,
+																												  PXContext pxContext);
 }

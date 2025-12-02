@@ -56,4 +56,16 @@ public class GraphAndGraphExtInfoBuilder : SymbolInfoBuilderBase<GraphInfo, Grap
 	protected override INamedTypeSymbol? GetExtensionBaseType(ITypeSymbol graphExtension, PXContext pxContext) =>
 		graphExtension.GetBaseTypesAndThis()
 					  .FirstOrDefault(type => type.IsGraphExtensionBaseType()) as INamedTypeSymbol;
+
+	/// <summary>
+	/// Gets the chained base graph extension types from the base PXGraphExtension type.
+	/// </summary>
+	/// <param name="pxGraphExtensionBaseType">The base PXGraphExtension type from which all extensions derive.</param>
+	/// <param name="pxContext">The Acumatica context.</param>
+	/// <returns>
+	/// The chained base graph extension types.
+	/// </returns>
+	protected override IReadOnlyCollection<ITypeSymbol>? GetChainedBaseExtensionTypesFromBaseGenericExtensionType(ITypeSymbol pxGraphExtensionBaseType, 
+																												  PXContext pxContext) => 
+		GraphSymbolHierarchyUtils.GetChainedExtensionTypesFromPxGraphExtensionTypeArgsUnsafe(pxGraphExtensionBaseType, pxContext);
 }
