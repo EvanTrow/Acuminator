@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Graph;
 
-public class GraphAndGraphExtInfoBuilder : AcumaticaFrameworkTypeInfoBuilderBase<GraphInfo, GraphExtensionInfo>
+public class GraphAndGraphExtInfoBuilder : SymbolInfoBuilderBase<GraphInfo, GraphExtensionInfo>
 {
 	protected override bool IsRootFrameworkType(ITypeSymbol typeSymbol, PXContext pxContext) =>
 		typeSymbol.IsPXGraph(pxContext);
@@ -52,4 +52,8 @@ public class GraphAndGraphExtInfoBuilder : AcumaticaFrameworkTypeInfoBuilderBase
 
 	protected override bool DoesExtensionExtendOnlyRootSymbol(ITypeSymbol graphExtension, PXContext pxContext) =>
 		graphExtension.BaseType.IsGraphExtensionBaseType() && graphExtension.BaseType.TypeParameters.Length == 1;
+
+	protected override INamedTypeSymbol? GetExtensionBaseType(ITypeSymbol graphExtension, PXContext pxContext) =>
+		graphExtension.GetBaseTypesAndThis()
+					  .FirstOrDefault(type => type.IsGraphExtensionBaseType()) as INamedTypeSymbol;
 }

@@ -13,7 +13,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
 
-public abstract class AcumaticaFrameworkTypeInfoBuilderBase<TRootInfo, TExtensionInfo>
+public abstract partial class SymbolInfoBuilderBase<TRootInfo, TExtensionInfo>
 where TRootInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaFrameworkTypeInfo
 where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaFrameworkTypeInfo
 {
@@ -45,6 +45,8 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 		else
 			return null;
 	}
+
+	protected virtual ExtensionTypeHierarchyVisitor GetTypeHierarchyVisitor(CancellationToken cancellation)
 
 	/// <summary>
 	/// Determines whether the <paramref name="typeSymbol"/> is a root Acumatica Framework type (for example, graph or DAC).
@@ -82,7 +84,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 		cancellation.ThrowIfCancellationRequested();
 
 		var rootNode = rootTypeSymbol.GetSyntax(cancellation) as ClassDeclarationSyntax;
-		var rootBaseTypesFromBaseToDerived = GetBaseRootTypes(rootTypeSymbol).Reverse();
+		var rootBaseTypesFromBaseToDerived = GetBaseRootTypesFromDerivedToBase(rootTypeSymbol).Reverse();
 		bool isInSource = rootNode != null;
 		TRootInfo? aggregatedBaseRootTypesInfo = null, prevRootInfo = null;
 
@@ -111,13 +113,13 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 	}
 
 	/// <summary>
-	/// Gets the base root types of the <paramref name="rootTypeSymbol"/>.
+	/// Gets the base root types of the <paramref name="rootTypeSymbol"/> from the most derived to the most base type.
 	/// </summary>
 	/// <param name="rootTypeSymbol">The root type symbol.</param>
 	/// <returns>
 	/// Base root types of the <paramref name="rootTypeSymbol"/>.
 	/// </returns>
-	protected abstract IEnumerable<ITypeSymbol> GetBaseRootTypes(ITypeSymbol rootTypeSymbol);
+	protected abstract IEnumerable<ITypeSymbol> GetBaseRootTypesFromDerivedToBase(ITypeSymbol rootTypeSymbol);
 
 	protected abstract TRootInfo RootSymbolInfoConstructor(ClassDeclarationSyntax? node, ITypeSymbol rootType,
 														   int declarationOrder);
@@ -135,60 +137,69 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 	/// </returns>
 	protected abstract ITypeSymbol? GetRootTypeFromExtensionType(ITypeSymbol extensionTypeSymbol, PXContext pxContext);
 
-	protected virtual InferredExtensionSymbolInfo<TRootInfo, TExtensionInfo>? InferExtensionInfo(ITypeSymbol extensionTypeSymbol,
-																								 PXContext pxContext, int? customDeclarationOrder, 
-																								 CancellationToken cancellation)
+	
+
+	/// <summary>
+	/// Check if the extension extends only root symbol and no other extension.
+	/// </summary>
+	/// <param name="extensionTypeSymbol">The extension type symbol.</param>
+	/// <param name="pxContext">The Acumatica context.</param>
+	/// <returns/>
+	protected abstract bool DoesExtensionExtendOnlyRootSymbol(ITypeSymbol extensionTypeSymbol, PXContext pxContext);
+
+	protected ExtensionCandidateInfo<TRootInfo, TExtensionInfo>? InferExtensionCandidate(ITypeSymbol extensionTypeSymbol,
+																			ClassDeclarationSyntax? extensionNode, PXContext pxContext, 
+																			int extensionDeclarationOrder, ,
+																 			int recursionDepth, )
 	{
+		const int MaxRecursionDepth = 100;
 		cancellation.ThrowIfCancellationRequested();
-		var extensionNode = extensionTypeSymbol.GetSyntax(cancellation) as ClassDeclarationSyntax;
 
-		// Trivial popular hot path optimization
-		if (extensionTypeSymbol.BaseType.IsGraphExtensionBaseType())
+		if (recursionDepth > MaxRecursionDepth)
+			return null;
+
+		INamedTypeSymbol? extensionBaseType = GetExtensionBaseType(extensionTypeSymbol, pxContext);
+
+		if (extensionBaseType == null)
+			return null;
+
+		var candidate = ExtensionCandidateInfoConstructor(extensionNode, extensionTypeSymbol, extensionDeclarationOrder);
+		var baseRootTypeSymbol = GetRootTypeFromExtensionType(extensionTypeSymbol, pxContext);
+		var rootInfo = baseRootTypeSymbol != null
+			? CreateRootSymbolInfo(baseRootTypeSymbol, pxContext, customDeclarationOrder: null, cancellation)
+			: null;
+
+		if (rootInfo != null)
+			candidate.RootTypesMutable.Add(rootInfo);
+
+		if (!visitedExtensions.Add(extensionTypeSymbol))
 		{
-			var baseRootTypeSymbol = GetRootTypeFromExtensionType(extensionTypeSymbol, pxContext);
-
-			if (baseRootTypeSymbol == null)
-				return null;
-
-			var rootSymbolInfo = CreateRootSymbolInfo(baseRootTypeSymbol, pxContext, customDeclarationOrder: null, cancellation);
-			int extensionDeclarationOrder = customDeclarationOrder ?? 0;
-			var extensionInfo = ExtensionSymbolInfoConstructor(extensionNode, extensionTypeSymbol, rootSymbolInfo, extensionDeclarationOrder);
-			return new InferredExtensionSymbolInfo<TRootInfo, TExtensionInfo>(extensionInfo);
+			candidate.CircularReferenceExtension = extensionTypeSymbol;
+			return candidate;
 		}
 
-		//, GraphInfo? graphInfo,
-		//var ownExtensionGraph = GetRootTypeFromExtensionType(typeSymbol, pxContext);//typeSymbol.GetGraphFromGraphExtension(pxContext);
-
-		//if (ownExtensionGraph == null)
-		//	return null;
-
-
-
-		//var graphNode = ownExtensionGraph.GetSyntax(cancellation) as ClassDeclarationSyntax;
-		//var graphInfo = GraphInfo.Create(graph as INamedTypeSymbol, graphNode, pxContext, graphDeclarationOrder: 0, cancellation);
-
-		var visitedExtensions = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
-		return Create(graphExtension, graphExtensionNode, graphInfo, pxContext, graphExtDeclarationOrder, visitedExtensions, cancellation);
-	}
-
-	protected ExtensionCandidateInfo<TRootInfo, TExtensionInfo> InferExtensionCandidate(INamedTypeSymbol? extensionTypeSymbol,
-																			ClassDeclarationSyntax? extensionNode, PXContext pxContext, 
-																			int extensionDeclarationOrder, HashSet<INamedTypeSymbol> visitedExtensions,
-																			int recursionDepth, CancellationToken cancellation)
-	{
-		cancellation.ThrowIfCancellationRequested();
-
-		if (extensionTypeSymbol == null)
-			return (Info: null, HasCircularReferences: false);
-		else if (!visitedExtensions.Add(extensionTypeSymbol))
-			return (Info: null, HasCircularReferences: true);
-
-		INamedTypeSymbol? extensionBaseType = extensionTypeSymbol.GetBaseTypesAndThis()
-															.FirstOrDefault(type => type.IsGraphExtensionBaseType()) as INamedTypeSymbol;
-		if (extensionBaseType == null)
-			return (Info: null, HasCircularReferences: false);
-
 		bool isInSource = extensionNode != null;
+
+		// Extension is derived from some custom extension
+		if (!SymbolEqualityComparer.Default.Equals(extensionTypeSymbol.BaseType, extensionBaseType))
+		{
+			var baseExtensionCandidateInfo = GetExtensionInfoFromBaseType(extensionTypeSymbol, rootInfo, visitedExtensions, isInSource, cancellation);
+
+			if (baseExtensionCandidateInfo == null)
+			{
+				candidate.FailedToCollectTypeHierarchy = true;
+				return candidate;
+			}
+
+			
+
+
+			(aggregatedBaseGraphExtInfo, hasCircularReferences) =
+				GetAggregatedBaseExtensions(extensionTypeSymbol, graphInfo, extensionFromPreviousLevels, visitedExtensions, isInSource, cancellation);
+		}
+
+
+	
 		var (extensionFromPreviousLevels, hasCircularReferences) = GetAggregatedExtensionFromPreviousLevels(extensionBaseType, pxContext,
 																											 visitedExtensions, graphInfo,
 																											 cancellation);
@@ -197,11 +208,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 
 		GraphExtensionInfo? aggregatedBaseGraphExtInfo = null;
 
-		if (!SymbolEqualityComparer.Default.Equals(extensionTypeSymbol.BaseType, extensionBaseType))
-		{
-			(aggregatedBaseGraphExtInfo, hasCircularReferences) =
-				GetAggregatedBaseExtensions(extensionTypeSymbol, graphInfo, extensionFromPreviousLevels, visitedExtensions, isInSource, cancellation);
-		}
+		
 
 		GraphOrGraphExtInfoBase? baseInfo = aggregatedBaseGraphExtInfo ?? extensionFromPreviousLevels ?? graphInfo as GraphOrGraphExtInfoBase;
 		var graphExtensionInfo = baseInfo switch
@@ -218,7 +225,40 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 		return (graphExtensionInfo, HasCircularReferences: false);
 	}
 
-	private static (GraphExtensionInfo? Info, bool HasCircularReferences) GetAggregatedExtensionFromPreviousLevels(
+	protected ExtensionCandidateInfo<TRootInfo, TExtensionInfo>? GetExtensionInfoFromBaseType(ITypeSymbol extensionTypeSymbol, TRootInfo? rootInfo,
+																					HashSet<ITypeSymbol> collectedExtensionsFromOtherLevels, bool isInSource,
+																					CancellationToken cancellation)
+	{
+		var extensionsBaseTypesFromBaseToDerived = GetBaseExtensionTypesFromDerivedToBase(extensionTypeSymbol).Reverse();
+
+		GraphExtensionInfo? aggregatedBaseGraphExtensionInfo = null;
+		GraphExtensionInfo? prevGraphExtensionInfo = aggregatedExtensionFromBaseLevels;
+
+		foreach (ITypeSymbol baseType in extensionsBaseTypesFromBaseToDerived)
+		{
+			cancellation.ThrowIfCancellationRequested();
+
+			if (collectedExtensionsFromOtherLevels.Contains(baseType))
+				return (Info: null, HasCircularReferences: true);
+
+			var baseGraphExtensionNode = isInSource
+				? baseType.GetSyntax(cancellation) as ClassDeclarationSyntax
+				: null;
+
+			isInSource = baseGraphExtensionNode != null;
+			aggregatedBaseGraphExtensionInfo = prevGraphExtensionInfo != null
+				? new GraphExtensionInfo(baseGraphExtensionNode, baseType, rootInfo, declarationOrder: 0, prevGraphExtensionInfo)
+				: rootInfo != null
+					? new GraphExtensionInfo(baseGraphExtensionNode, baseType, rootInfo, declarationOrder: 0, rootInfo)
+					: new GraphExtensionInfo(baseGraphExtensionNode, baseType, rootInfo, declarationOrder: 0);
+
+			prevGraphExtensionInfo = aggregatedBaseGraphExtensionInfo;
+		}
+
+		return (aggregatedBaseGraphExtensionInfo, HasCircularReferences: false);
+	}
+
+	private (GraphExtensionInfo? Info, bool HasCircularReferences) GetAggregatedExtensionFromPreviousLevels(
 																				INamedTypeSymbol extensionBaseType, PXContext pxContext,
 																				HashSet<INamedTypeSymbol> collectedExtensionsFromOtherLevels,
 																				GraphInfo? graphInfo, CancellationToken cancellation)
@@ -245,6 +285,26 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 	}
 
 
-	protected abstract TExtensionInfo ExtensionSymbolInfoConstructor(ClassDeclarationSyntax? node, ITypeSymbol rootType, TRootInfo? rootInfo,
-																	 int declarationOrder);
+	protected abstract TExtensionInfo ExtensionSymbolInfoConstructor(ClassDeclarationSyntax? extensionNode, ITypeSymbol extensionSymbol,
+																	 TRootInfo? rootInfo, int declarationOrder);
+
+	protected abstract TExtensionInfo ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? extensionNode, ITypeSymbol extensionSymbol,
+																				 TRootInfo? rootInfo, int declarationOrder, TExtensionInfo baseExtension);
+
+	protected abstract TExtensionInfo ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? extensionNode, ITypeSymbol extensionSymbol,
+																	TRootInfo? rootInfo, int declarationOrder, IEnumerable<TExtensionInfo> baseExtensions);
+
+	protected abstract ExtensionCandidateInfo<TRootInfo, TExtensionInfo> ExtensionCandidateInfoConstructor(ClassDeclarationSyntax? extensionNode,
+																							ITypeSymbol extensionSymbol, int declarationOrder);
+
+	/// <summary>
+	/// Gets the base extension types of the <paramref name="extensionTypeSymbol"/> from the most derived to the most base type.
+	/// </summary>
+	/// <param name="extensionTypeSymbol">The extension type symbol.</param>
+	/// <returns>
+	/// Base extension types of the <paramref name="extensionTypeSymbol"/>.
+	/// </returns>
+	protected abstract IEnumerable<ITypeSymbol> GetBaseExtensionTypesFromDerivedToBase(ITypeSymbol extensionTypeSymbol);
+
+	protected abstract INamedTypeSymbol? GetExtensionBaseType(ITypeSymbol extensionTypeSymbol, PXContext pxContext);
 }
