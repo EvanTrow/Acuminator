@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -61,6 +62,45 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsGraphExtensionBaseType([NotNullWhen(returnValue: true)]this ITypeSymbol? type) => 
 			type?.Name == TypeNames.PXGraphExtension;
+
+		/// <summary>
+		/// Get chained graph extension types from the PXGraphExtension base type's type arguments.
+		/// </summary>
+		/// <param name="pxGraphExtensionBaseType">The PXGraphExtension base type to act on.</param>
+		/// <param name="pxContext">Acumatica context.</param>
+		/// <returns>
+		/// Chained graph extension types from the PXGraphExtension base type's type arguments.<br/>
+		/// If there is a problem in any of the type arguments (e.g. not a PXGraphExtension), <see langword="null"/> is returned.
+		/// </returns>
+		/// <remarks>
+		/// For performance reasons this method is unsafe and does not perform validation of the input <paramref name="pxGraphExtensionBaseType"/> type.
+		/// </remarks>
+		internal static IReadOnlyCollection<ITypeSymbol>? GetChainedExtensionTypesFromPxGraphExtensionTypeArgsUnsafe(
+																	ITypeSymbol pxGraphExtensionBaseType, PXContext pxContext)
+		{
+			if (pxGraphExtensionBaseType is not INamedTypeSymbol namedPXGraphExtensionBaseType)
+				return [];
+
+			var typeArguments = namedPXGraphExtensionBaseType.TypeArguments;
+
+			if (typeArguments.IsDefault || typeArguments.Length <= 1)
+				return[];
+
+			//Excluding graph type: graphIndex is typeArguments.Length - 1;
+			var extensions = new ITypeSymbol[typeArguments.Length - 1];
+
+			for (int i = 0; i < extensions.Length; i++)
+			{
+				var chainedExtension = typeArguments[i];
+
+				if (!chainedExtension.IsPXGraphExtension(pxContext))
+					return null;
+
+				extensions[i] = chainedExtension;
+			}
+
+			return extensions;
+		}
 
 		/// <summary>
 		/// Gets base graph extensions from graph extension type.

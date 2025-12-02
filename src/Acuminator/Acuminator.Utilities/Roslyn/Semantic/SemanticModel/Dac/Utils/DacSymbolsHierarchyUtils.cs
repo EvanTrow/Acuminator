@@ -130,6 +130,45 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			type?.Name == TypeNames.PXCacheExtension;
 
 		/// <summary>
+		/// Get chained DAC extension types from the PXCacheExtension base type's type arguments.
+		/// </summary>
+		/// <param name="pxDacExtensionBaseType">The PXCacheExtension base type to act on.</param>
+		/// <param name="pxContext">Acumatica context.</param>
+		/// <returns>
+		/// Chained DAC extension types from the PXCacheExtension base type's type arguments.<br/>
+		/// If there is a problem in any of the type arguments (e.g. not a PXCacheExtension), <see langword="null"/> is returned.
+		/// </returns>
+		/// <remarks>
+		/// For performance reasons this method is unsafe and does not perform validation of the input <paramref name="pxDacExtensionBaseType"/> type.
+		/// </remarks>
+		internal static IReadOnlyCollection<ITypeSymbol>? GetChainedExtensionTypesFromPxCacheExtensionTypeArgsUnsafe(
+																	ITypeSymbol pxDacExtensionBaseType, PXContext pxContext)
+		{
+			if (pxDacExtensionBaseType is not INamedTypeSymbol namedDacExtensionBaseType)
+				return [];
+
+			var typeArguments = namedDacExtensionBaseType.TypeArguments;
+
+			if (typeArguments.IsDefault || typeArguments.Length <= 1)
+				return [];
+
+			//Excluding DAC type: dacIndex is typeArguments.Length - 1;
+			var extensions = new ITypeSymbol[typeArguments.Length - 1];
+
+			for (int i = 0; i < extensions.Length; i++)
+			{
+				var chainedExtension = typeArguments[i];
+
+				if (!chainedExtension.IsDacExtension(pxContext))
+					return null;
+
+				extensions[i] = chainedExtension;
+			}
+
+			return extensions;
+		}
+
+		/// <summary>
 		/// Gets base DAC extensions from DAC extension type. The type itself is not included.
 		/// </summary>
 		/// <param name="dacExtension">The DAC extension to act on.</param>
