@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 {
-	public abstract class DacOrDacExtInfoBase<TInfo> : DacOrDacExtInfoBase, IWriteableBaseItem<TInfo>, IInferredAcumaticaFrameworkTypeInfo
+	public abstract class DacOrDacExtInfoBase<TInfo> : DacOrDacExtInfoBase, IWriteableBaseItem<TInfo>, IInferredAcumaticaSymbolInfo
 	where TInfo : DacOrDacExtInfoBase<TInfo>
 	{
 		public new TInfo? Base => base.Base as TInfo;
@@ -28,30 +28,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 				}
 			}
 		}
-
-		/// <inheritdoc path="/summary"/>
-		/// <remarks>
-		/// <inheritdoc path="/remarks"/>
-		/// <br/>
-		/// DAC and constructed DAC extension info can't have circular references.
-		/// </remarks>
-		bool IInferredAcumaticaFrameworkTypeInfo.HasCircularReferences => false;
-
-		/// <inheritdoc path="/summary"/>
-		/// <remarks>
-		/// <inheritdoc path="/remarks"/>
-		/// <br/><br/>
-		/// DAC and constructed DAC extension info can't have multiple root types.
-		/// </remarks>
-		bool IInferredAcumaticaFrameworkTypeInfo.HasMultipleRootTypes => false;
-
-		/// <inheritdoc path="/summary"/>
-		/// <remarks>
-		/// <inheritdoc path="/remarks"/>
-		/// <br/><br/>
-		/// DAC and constructed DAC extension info have successfully collected type hierarchy.
-		/// </remarks>
-		bool IInferredAcumaticaFrameworkTypeInfo.FailedToCollectTypeHierarchy => false;
 
 		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder, TInfo baseInfo) :
 								 base(node, dac, declarationOrder, baseInfo)
