@@ -1,0 +1,281 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Threading;
+
+using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Syntax;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
+
+public abstract partial class SymbolInfoBuilderBase<TRootInfo, TExtensionInfo>
+where TRootInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaFrameworkTypeInfo
+where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaFrameworkTypeInfo
+{
+	/// <summary>
+	/// An extension type hierarchy visitor. Uses depth first search (DFS) based algorithm for cycle detection.
+	/// </summary>
+	protected class ExtensionTypeHierarchyVisitor
+	{
+		private const int MaxPathLength = 150;
+
+		private readonly SymbolInfoBuilderBase<TRootInfo, TExtensionInfo> _builder;
+		private readonly PXContext _pxContext;
+		private readonly CancellationToken _cancellation;
+
+		private readonly Dictionary<ITypeSymbol, TExtensionInfo?> _visitedExtensionInfos = new(SymbolEqualityComparer.Default);
+		private readonly Stack<ITypeSymbol> _currentPath = new();
+
+		private readonly Dictionary<ITypeSymbol, TRootInfo?> _collectedRootInfos = new(SymbolEqualityComparer.Default);
+
+		public IReadOnlyCollection<ITypeSymbol> CollectedRootTypes => _collectedRootInfos.Keys;
+
+		public IReadOnlyCollection<TRootInfo?> CollectedRootInfos => _collectedRootInfos.Values;
+
+		public ITypeSymbol? CircularReferenceExtension { get; private set; }
+
+		public ITypeSymbol? ExtensionWithBadBaseExtensions { get; private set; }
+
+		protected bool FailedToCollectTypeHierarchy { get; private set; }
+
+		public ExtensionTypeHierarchyVisitor(SymbolInfoBuilderBase<TRootInfo, TExtensionInfo> builder, PXContext pxContext, 
+											 CancellationToken cancellation)
+		{
+			_builder = builder;
+			_pxContext = pxContext;
+			_cancellation = cancellation;
+		}
+
+		public InferResultKind GetResultKind()
+		{
+			if (CircularReferenceExtension != null)
+				return InferResultKind.CircularReferences;
+			else if (_collectedRootInfos.Count > 0)
+				return InferResultKind.MultipleRootTypes;
+			else if (ExtensionWithBadBaseExtensions != null)
+				return InferResultKind.BadBaseExtensions;
+			else if (FailedToCollectTypeHierarchy)
+				return InferResultKind.UnrecognizedError;
+			else
+				return InferResultKind.Success;
+		}
+
+		public TExtensionInfo? InferExtensionInfo(ITypeSymbol extensionTypeSymbol, int? customDeclarationOrder)
+		{
+			extensionTypeSymbol.ThrowOnNull();
+			_cancellation.ThrowIfCancellationRequested();
+
+			ClearState();
+			var extensionInfo = VisitExtensionType(extensionTypeSymbol, isInSource: true, precalcedRootTypeSymbol: null, 
+													customDeclarationOrder);
+			return extensionInfo;
+		}
+
+		protected TExtensionInfo? VisitExtensionType(ITypeSymbol extensionTypeSymbol, bool isInSource, 
+													 ITypeSymbol? precalcedRootTypeSymbol, int? extensionDeclarationOrder)
+		{
+			// Stop all infer operations early if the type hierarchy is already recognized as inconsistent 
+			if (GetResultKind() != InferResultKind.Success)
+				return null;
+
+			if (_visitedExtensionInfos.TryGetValue(extensionTypeSymbol, out var alreadyCalcedInfo))
+				return alreadyCalcedInfo;
+
+			if (IsTypeAlreadyVisitedInCurrentPath(extensionTypeSymbol))
+			{
+				CircularReferenceExtension = extensionTypeSymbol;
+				_visitedExtensionInfos[extensionTypeSymbol] = null;			// Cache problem info for extension with proven circular reference
+				return null;
+			}
+			else if (!CheckBaseExtensionsAreCorrect(extensionTypeSymbol))
+			{
+				ExtensionWithBadBaseExtensions = extensionTypeSymbol;
+				_visitedExtensionInfos[extensionTypeSymbol] = null;			// Cache problem info for extension with proven bad base extensions
+				return null;
+			}
+			else if (_currentPath.Count > MaxPathLength)
+			{
+				FailedToCollectTypeHierarchy = true;
+				return null;
+			}
+
+			int declarationOrder = extensionDeclarationOrder ?? 0;
+			_currentPath.Push(extensionTypeSymbol);
+
+			try
+			{
+				TExtensionInfo? inferredExtensionInfo;
+				var extensionNode = isInSource
+					? extensionTypeSymbol.GetSyntax(_cancellation) as ClassDeclarationSyntax
+					: null;
+
+				// Trivial popular hot path optimization
+				if (_builder.DoesExtensionExtendOnlyRootSymbol(extensionTypeSymbol, _pxContext))
+				{
+					inferredExtensionInfo = InferExtensionExtendingOnlyRootSymbol(extensionTypeSymbol, extensionNode,
+																				  precalcedRootTypeSymbol, declarationOrder);
+				}
+				else
+				{
+					inferredExtensionInfo = InferExtensionRecursively(extensionTypeSymbol, extensionNode, precalcedRootTypeSymbol, 
+																	  declarationOrder);
+				}
+
+				_visitedExtensionInfos[extensionTypeSymbol] = inferredExtensionInfo;    // Cache infer failures and successes
+				return inferredExtensionInfo;
+			}
+			finally
+			{
+				_currentPath.Pop();
+			}
+		}
+
+		protected TExtensionInfo? InferExtensionExtendingOnlyRootSymbol(ITypeSymbol extensionTypeSymbol, ClassDeclarationSyntax? extensionNode,
+																		ITypeSymbol? precalcedRootTypeSymbol, int declarationOrder)
+		{
+			_cancellation.ThrowIfCancellationRequested();
+			var rootTypeSymbol = precalcedRootTypeSymbol ?? _builder.GetRootTypeFromExtensionType(extensionTypeSymbol, _pxContext);
+
+			if (rootTypeSymbol == null)
+			{
+				FailedToCollectTypeHierarchy = true;
+				return null;
+			}
+			else
+			{
+				// Use cache of root symbols infos
+				if (!_collectedRootInfos.TryGetValue(rootTypeSymbol, out var rootInfo))
+				{
+					rootInfo = _builder.CreateRootSymbolInfo(rootTypeSymbol, _pxContext, customDeclarationOrder: null, _cancellation);
+					_collectedRootInfos[rootTypeSymbol] = rootInfo;
+				}
+
+				var extensionInfo = _builder.ExtensionSymbolInfoConstructor(extensionNode, extensionTypeSymbol, rootInfo, declarationOrder);
+				return extensionInfo;
+			}
+		}
+
+		protected TExtensionInfo? InferExtensionRecursively(ITypeSymbol extensionTypeSymbol, ClassDeclarationSyntax? extensionNode,
+															ITypeSymbol? precalcedRootTypeSymbol, int declarationOrder)
+		{
+			_cancellation.ThrowIfCancellationRequested();
+			INamedTypeSymbol? baseGenericExtensionType = _builder.GetBaseGenericExtensionType(extensionTypeSymbol, _pxContext);
+
+			if (baseGenericExtensionType == null)
+			{
+				FailedToCollectTypeHierarchy = true;
+				return null;
+			}
+
+			var rootTypeSymbol = precalcedRootTypeSymbol ?? _builder.GetRootTypeFromExtensionType(extensionTypeSymbol, _pxContext);
+
+			if (rootTypeSymbol == null)
+			{
+				FailedToCollectTypeHierarchy = true;
+				return null;
+			}
+
+			// Use cache of root symbols infos
+			if (!_collectedRootInfos.TryGetValue(rootTypeSymbol, out var rootInfo))
+			{
+				rootInfo = _builder.CreateRootSymbolInfo(rootTypeSymbol, _pxContext, customDeclarationOrder: null, _cancellation);
+				_collectedRootInfos[rootTypeSymbol] = rootInfo;
+			}
+
+			_cancellation.ThrowIfCancellationRequested();
+			bool isInSource = extensionNode != null;
+
+			// Extension base type is PXGraphExtension type, we need to calculate all base extensions from previous levels
+			if (SymbolEqualityComparer.Default.Equals(extensionTypeSymbol.BaseType, baseGenericExtensionType))
+			{
+				var baseChainedExtensionTypes = GetBaseChainedExtensionTypes(baseGenericExtensionType);
+
+				switch (baseChainedExtensionTypes?.Count)
+				{
+					case 0:
+						return InferExtensionExtendingOnlyRootSymbol(extensionTypeSymbol, extensionNode, precalcedRootTypeSymbol, declarationOrder);
+					case null:
+						FailedToCollectTypeHierarchy = true;
+						return null;
+					default:
+					{
+						var baseChainedExtensionInfos = new List<TExtensionInfo>(baseChainedExtensionTypes.Count);
+
+						foreach (ITypeSymbol chainedExtensionType in baseChainedExtensionTypes)
+						{
+							// Deliberately do not use the precalcedRootTypeSymbol here since it can be different for chained extensions
+							var chainedExtensionInfo = VisitExtensionType(extensionTypeSymbol, isInSource, precalcedRootTypeSymbol: null,
+																		  extensionDeclarationOrder: null);
+							if (chainedExtensionInfo == null)
+								return null;
+
+							baseChainedExtensionInfos.Add(chainedExtensionInfo);
+						}
+
+						var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
+																								declarationOrder, baseChainedExtensionInfos);
+						return extensionInfo;
+					}
+				}
+			}
+			else	// Extension is derived from some custom extension, we need to get only one base extension info
+			{
+				// Small optimization - re-use calculation of root type symbol since it is the same for the base extension type
+				var baseExtensionInfo = VisitExtensionType(extensionTypeSymbol, isInSource, precalcedRootTypeSymbol: rootTypeSymbol, 
+														   extensionDeclarationOrder: null);
+				if (baseExtensionInfo == null)
+					return null;
+
+				var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
+																						declarationOrder, baseExtensionInfo);
+				return extensionInfo;
+			}
+		}
+
+		protected IReadOnlyCollection<ITypeSymbol>? GetBaseChainedExtensionTypes(INamedTypeSymbol baseGenericExtensionType)
+		{
+			if (!baseGenericExtensionType.IsGenericType)
+				return [];
+
+			var typeArguments = baseGenericExtensionType.TypeArguments;
+
+			if (typeArguments.Length <= 1)
+				return [];
+
+			var chainedBaseExtensions = _builder.GetChainedBaseExtensionTypesFromBaseGenericExtensionType(baseGenericExtensionType, _pxContext);
+			return chainedBaseExtensions;
+		}
+
+		private bool IsTypeAlreadyVisitedInCurrentPath(ITypeSymbol typeSymbol) => _currentPath.Count switch
+		{
+			0 => false,
+			1 => SymbolEqualityComparer.Default.Equals(typeSymbol, _currentPath.Peek()),
+
+			// Linear lookup is used here instead of hash table because the expected path length is less than 10,
+			// Hash table will have a worse performance than simple linear search in this case
+			_ => _currentPath.Contains(typeSymbol, SymbolEqualityComparer.Default)
+		};
+
+		protected virtual bool CheckBaseExtensionsAreCorrect(ITypeSymbol extensionTypeSymbol) => true;
+
+		protected void ClearState()
+		{
+			if (_visitedExtensionInfos.Count > 0)
+				_visitedExtensionInfos.Clear();
+
+			if (_currentPath.Count > 0)
+				_currentPath.Clear();
+
+			if (_collectedRootInfos.Count > 0)
+				_collectedRootInfos.Clear();
+
+			FailedToCollectTypeHierarchy = false;
+			CircularReferenceExtension = null;
+			ExtensionWithBadBaseExtensions = null;
+		}
+	}
+}
