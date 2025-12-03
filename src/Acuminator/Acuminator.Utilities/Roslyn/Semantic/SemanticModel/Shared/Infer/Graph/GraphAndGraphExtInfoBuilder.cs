@@ -53,7 +53,7 @@ public class GraphAndGraphExtInfoBuilder : SymbolInfoBuilderBase<GraphInfo, Grap
 	protected override bool DoesExtensionExtendOnlyRootSymbol(ITypeSymbol graphExtension, PXContext pxContext) =>
 		graphExtension.BaseType.IsGraphExtensionBaseType() && graphExtension.BaseType.TypeParameters.Length == 1;
 
-	protected override INamedTypeSymbol? GetExtensionBaseType(ITypeSymbol graphExtension, PXContext pxContext) =>
+	protected override INamedTypeSymbol? GetBaseGenericExtensionType(ITypeSymbol graphExtension, PXContext pxContext) =>
 		graphExtension.GetBaseTypesAndThis()
 					  .FirstOrDefault(type => type.IsGraphExtensionBaseType()) as INamedTypeSymbol;
 

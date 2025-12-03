@@ -166,7 +166,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 	/// </returns>
 	protected abstract IEnumerable<ITypeSymbol> GetBaseExtensionTypesFromDerivedToBase(ITypeSymbol extensionTypeSymbol);
 
-	protected abstract INamedTypeSymbol? GetExtensionBaseType(ITypeSymbol extensionTypeSymbol, PXContext pxContext);
+	protected abstract INamedTypeSymbol? GetBaseGenericExtensionType(ITypeSymbol extensionTypeSymbol, PXContext pxContext);
 
 	/// <summary>
 	/// Gets the chained base extension types from the base generic extension type.
