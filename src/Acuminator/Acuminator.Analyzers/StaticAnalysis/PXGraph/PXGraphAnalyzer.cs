@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 using Acuminator.Analyzers.StaticAnalysis.ActionHandlerAttributes;
 using Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator;
@@ -28,10 +28,13 @@ using Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions;
 using Acuminator.Analyzers.StaticAnalysis.TypoInViewAndActionHandlerName;
 using Acuminator.Analyzers.StaticAnalysis.UiPresentationLogic;
 using Acuminator.Analyzers.StaticAnalysis.ViewDeclarationOrder;
+
 using Acuminator.Utilities;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Graph;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -88,7 +91,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 			if (context.Symbol is not INamedTypeSymbol type)
 				return;
 
-			var graphOrGraphExtModel = PXGraphEventSemanticModel.InferModel(pxContext, type, GraphSemanticModelCreationOptions.CollectAll,
+			var graphOrGraphExtInfo = InferSymbolInfo(context, pxContext, type);
+
+			if (graphOrGraphExtInfo == null)
+				return;
+
+			var graphOrGraphExtModel = PXGraphEventSemanticModel.InferModel(pxContext, graphOrGraphExtInfo, GraphSemanticModelCreationOptions.CollectAll,
 																			cancellation: context.CancellationToken);
 			if (graphOrGraphExtModel == null)
 				return;
@@ -105,6 +113,47 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 				var analyzer = effectiveAnalyzers[analyzerIndex];
 				analyzer.Analyze(context, pxContext, graphOrGraphExtModel);
 			});
+		}
+
+		private GraphOrGraphExtInfoBase? InferSymbolInfo(SymbolAnalysisContext context, PXContext pxContext, INamedTypeSymbol type)
+		{
+			var graphInfoBuilder = new GraphAndGraphExtInfoBuilder();
+			InferredSymbolInfo? inferredInfo = graphInfoBuilder.InferTypeInfo(type, pxContext, customDeclarationOrder: null, context.CancellationToken);
+
+			if (inferredInfo == null)
+				return null;
+
+			InferResultKind resultKind = inferredInfo.GetResultKind();
+
+			switch (resultKind)
+			{
+				case InferResultKind.MultipleRootTypes:
+					ReportMultipleRoots(context, pxContext, type, inferredInfo.CollectedRootTypes);
+					return null;
+				case InferResultKind.CircularReferences:
+					ReportCircularExtensions(context, pxContext, type, inferredInfo.CircularReferenceExtension!);
+					return null;
+
+				case InferResultKind.Success:
+					return inferredInfo.InferredInfo as GraphOrGraphExtInfoBase;
+
+				// For unknown errors and bad base graph extensions in graphs we do not report anything
+				case InferResultKind.BadBaseExtensions:
+				case InferResultKind.UnrecognizedError:
+				default:
+					return null;
+			}
+		}
+
+		private void ReportMultipleRoots(SymbolAnalysisContext context, PXContext pxContext, INamedTypeSymbol type, 
+										 IReadOnlyCollection<ITypeSymbol> multipleRootTypes)
+		{
+			// TODO implement diagnostic for multiple root types
+		}
+
+		private void ReportCircularExtensions(SymbolAnalysisContext context, PXContext pxContext, INamedTypeSymbol type, ITypeSymbol circularExtension)
+		{
+			// TODO implement diagnostic for circular extensions
 		}
 	}
 }
