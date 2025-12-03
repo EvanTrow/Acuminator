@@ -1,6 +1,5 @@
-﻿#nullable enable
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -120,13 +119,24 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// </summary>
 		/// <param name="extensionType">The DAC extension type to act on.</param>
 		/// <returns/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<ITypeSymbol> GetDacExtensionWithBaseTypes(this ITypeSymbol extensionType) =>
-			extensionType.CheckIfNull()
-						 .GetBaseTypesAndThis()
+			extensionType.GetBaseTypesAndThis()
 						 .TakeWhile(type => !type.IsDacExtensionBaseType());
 
+		/// <summary>
+		/// Gets the DAC extension base types up to first met <c>PX.Data.PXCacheExtension</c>.
+		/// </summary>
+		/// <param name="extensionType">The DAC extension type to act on.</param>
+		/// <returns/>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool IsDacExtensionBaseType(this ITypeSymbol type) =>
+		public static IEnumerable<ITypeSymbol> GetDacExtensionBaseTypes(this ITypeSymbol extensionType) =>
+			extensionType.GetBaseTypes()
+						 .TakeWhile(type => !type.IsDacExtensionBaseType());
+
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsDacExtensionBaseType([NotNullWhen(returnValue: true)] this ITypeSymbol? type) =>
 			type?.Name == TypeNames.PXCacheExtension;
 
 		/// <summary>

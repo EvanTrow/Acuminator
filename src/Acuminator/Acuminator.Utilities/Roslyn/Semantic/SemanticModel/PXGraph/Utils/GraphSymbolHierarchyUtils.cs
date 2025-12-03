@@ -21,6 +21,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </summary>
 		/// <param name="graphType">The graph type to act on.</param>
 		/// <returns/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<ITypeSymbol> GetGraphBaseTypes(this ITypeSymbol graphType) =>
 			graphType.GetBaseTypes()
 					 .TakeWhile(type => !type.IsGraphBaseType());
@@ -30,15 +31,17 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </summary>
 		/// <param name="graphType">The graph type to act on.</param>
 		/// <returns/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<ITypeSymbol> GetGraphWithBaseTypes(this ITypeSymbol graphType) =>
 			graphType.GetBaseTypesAndThis()
 					 .TakeWhile(type => !type.IsGraphBaseType());
 
 		/// <summary>
-		/// Gets the extension base types up to first met <see cref="PX.Data.PXGraphExtension"/>.
+		/// Gets the graph extension base types up to first met <c>PX.Data.PXGraphExtension</c>.
 		/// </summary>
-		/// <param name="extensionType">The extension type to act on.</param>
+		/// <param name="extensionType">The graph extension type to act on.</param>
 		/// <returns/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<ITypeSymbol> GetGraphExtensionBaseTypes(this ITypeSymbol extensionType) =>
 			extensionType.GetBaseTypes()
 						 .TakeWhile(type => !type.IsGraphExtensionBaseType());
@@ -48,6 +51,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </summary>
 		/// <param name="extensionType">The extension type to act on.</param>
 		/// <returns/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<ITypeSymbol> GetGraphExtensionWithBaseTypes(this ITypeSymbol extensionType) =>
 			extensionType.GetBaseTypesAndThis()
 						 .TakeWhile(type => !type.IsGraphExtensionBaseType());
