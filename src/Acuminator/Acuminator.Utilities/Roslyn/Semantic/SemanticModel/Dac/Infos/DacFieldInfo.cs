@@ -29,7 +29,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 		DacFieldInfo? IWriteableBaseItem<DacFieldInfo>.Base
 		{
-			get => Base;
 			set 
 			{
 				_baseInfo = value;

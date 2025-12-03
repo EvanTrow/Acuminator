@@ -55,7 +55,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		public DbBoundnessType DeclaredDbBoundness { get; }
 
 		/// <summary>
-		/// The effective bound type for this property obtained by the combination of <see cref="DeclaredDbBoundness"/>s of this propety's override chain. 
+		/// The effective bound type for this property obtained by the combination of <see cref="DeclaredDbBoundness"/>s of this property's override chain. 
 		/// </summary>
 		public DbBoundnessType EffectiveDbBoundness
 		{

@@ -14,7 +14,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 		TInfo? IWriteableBaseItem<TInfo>.Base
 		{
-			get => Base;
 			set 
 			{
 				if (this is IWriteableBaseItem<DacOrDacExtInfoBase> baseInterface)

@@ -26,7 +26,6 @@ where T : IWriteableBaseItem<T>
 	/// <inheritdoc cref="IOverridableItem{T}.Base"/>
 	new T? Base
 	{
-		get;
 		set;
 	}
 }

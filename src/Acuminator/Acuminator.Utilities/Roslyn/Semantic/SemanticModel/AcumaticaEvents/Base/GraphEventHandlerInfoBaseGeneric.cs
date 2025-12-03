@@ -31,7 +31,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 		/// </remarks>
 		TEventHandlerInfo? IWriteableBaseItem<TEventHandlerInfo>.Base
 		{
-			get => Base;
 			set 
 			{
 				_baseEventHandlerInfo = value;

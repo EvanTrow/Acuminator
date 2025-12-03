@@ -22,7 +22,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 		TInfo? IWriteableBaseItem<TInfo>.Base
 		{
-			get => Base;
 			set 
 			{
 				_baseInfo = value;
