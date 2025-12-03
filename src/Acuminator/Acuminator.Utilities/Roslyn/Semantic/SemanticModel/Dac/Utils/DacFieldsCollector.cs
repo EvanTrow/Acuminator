@@ -12,7 +12,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac;
 internal static class DacFieldsCollector
 {
 	public static ImmutableDictionary<string, DacFieldInfo> CollectDacFieldsFromDacPropertiesAndBqlFields(
-																			INamedTypeSymbol dacOrDacExtension, DacType dacType, PXContext pxContext, 
+																			ITypeSymbol dacOrDacExtension, DacType dacType, PXContext pxContext, 
 																			ImmutableDictionary<string, DacBqlFieldInfo> bqlFieldsByNames,
 																			ImmutableDictionary<string, DacPropertyInfo> propertiesByNames)
 	{
