@@ -154,9 +154,6 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 	protected abstract TExtensionInfo ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? extensionNode, ITypeSymbol extensionSymbol,
 																	TRootInfo? rootInfo, int declarationOrder, IEnumerable<TExtensionInfo> baseExtensions);
 
-	protected abstract ExtensionCandidateInfo<TRootInfo, TExtensionInfo> ExtensionCandidateInfoConstructor(ClassDeclarationSyntax? extensionNode,
-																							ITypeSymbol extensionSymbol, int declarationOrder);
-
 	/// <summary>
 	/// Gets the base extension types of the <paramref name="extensionTypeSymbol"/> from the most derived to the most base type.
 	/// </summary>

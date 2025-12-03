@@ -24,10 +24,6 @@ public class GraphAndGraphExtInfoBuilder : SymbolInfoBuilderBase<GraphInfo, Grap
 	protected override GraphInfo RootSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? graphNode, ITypeSymbol graphType, 
 																		int declarationOrder, GraphInfo baseGraphInfo) => 
 		new GraphInfo(graphNode, graphType, declarationOrder, baseGraphInfo);
-	
-	protected override ExtensionCandidateInfo<GraphInfo, GraphExtensionInfo> ExtensionCandidateInfoConstructor(ClassDeclarationSyntax? graphExtensionNode, 
-																							ITypeSymbol graphExtension, int declarationOrder) =>
-		new GraphExtensionCandidateInfo(graphExtensionNode, graphExtension, declarationOrder);
 
 	protected override GraphExtensionInfo ExtensionSymbolInfoConstructor(ClassDeclarationSyntax? graphExtensionNode, ITypeSymbol graphExtension,
 																		 GraphInfo? graphInfo, int declarationOrder) => 
