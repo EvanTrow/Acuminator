@@ -90,7 +90,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 		cancellation.ThrowIfCancellationRequested();
 
 		var rootNode = rootTypeSymbol.GetSyntax(cancellation) as ClassDeclarationSyntax;
-		var rootBaseTypesFromBaseToDerived = GetBaseRootTypesFromDerivedToBase(rootTypeSymbol).Reverse();
+		var rootBaseTypesFromBaseToDerived = GetBaseRootTypesFromDerivedToBase(rootTypeSymbol, pxContext).Reverse();
 		bool isInSource = rootNode != null;
 		TRootInfo? aggregatedBaseRootTypesInfo = null, prevRootInfo = null;
 
@@ -122,10 +122,11 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 	/// Gets the base root types of the <paramref name="rootTypeSymbol"/> from the most derived to the most base type.
 	/// </summary>
 	/// <param name="rootTypeSymbol">The root type symbol.</param>
+	/// <param name="pxContext">The Acumatica context.</param>
 	/// <returns>
 	/// Base root types of the <paramref name="rootTypeSymbol"/>.
 	/// </returns>
-	protected abstract IEnumerable<ITypeSymbol> GetBaseRootTypesFromDerivedToBase(ITypeSymbol rootTypeSymbol);
+	protected abstract IEnumerable<ITypeSymbol> GetBaseRootTypesFromDerivedToBase(ITypeSymbol rootTypeSymbol, PXContext pxContext);
 
 	protected abstract TRootInfo RootSymbolInfoConstructor(ClassDeclarationSyntax? node, ITypeSymbol rootType,
 														   int declarationOrder);
@@ -159,15 +160,6 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 
 	protected abstract TExtensionInfo? ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? extensionNode, ITypeSymbol extensionSymbol,
 																	TRootInfo? rootInfo, int declarationOrder, IEnumerable<TExtensionInfo> baseExtensions);
-
-	/// <summary>
-	/// Gets the base extension types of the <paramref name="extensionTypeSymbol"/> from the most derived to the most base type.
-	/// </summary>
-	/// <param name="extensionTypeSymbol">The extension type symbol.</param>
-	/// <returns>
-	/// Base extension types of the <paramref name="extensionTypeSymbol"/>.
-	/// </returns>
-	protected abstract IEnumerable<ITypeSymbol> GetBaseExtensionTypesFromDerivedToBase(ITypeSymbol extensionTypeSymbol);
 
 	protected abstract INamedTypeSymbol? GetBaseGenericExtensionType(ITypeSymbol extensionTypeSymbol, PXContext pxContext);
 

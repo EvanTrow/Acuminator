@@ -11,13 +11,13 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 {
 	public class DacInfo : DacOrDacExtInfoBase<DacInfo>
 	{
-		protected DacInfo(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder, DacInfo baseInfo) :
-					 base(node, dac, declarationOrder, baseInfo)
+		internal DacInfo(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder, DacInfo baseInfo) :
+					base(node, dac, declarationOrder, baseInfo)
 		{
 		}
 
-		protected DacInfo(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder) :
-					 base(node, dac, declarationOrder)
+		internal DacInfo(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder) :
+					base(node, dac, declarationOrder)
 		{
 		}
 

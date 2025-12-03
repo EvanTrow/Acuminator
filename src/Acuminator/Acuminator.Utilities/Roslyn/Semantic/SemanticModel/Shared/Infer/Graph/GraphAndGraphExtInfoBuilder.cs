@@ -37,17 +37,15 @@ public class GraphAndGraphExtInfoBuilder : SymbolInfoBuilderBase<GraphInfo, Grap
 																GraphInfo? graphInfo, int declarationOrder, IEnumerable<GraphExtensionInfo> baseExtensions) => 
 		new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo, declarationOrder, baseExtensions);
 
-	protected override IEnumerable<ITypeSymbol> GetBaseExtensionTypesFromDerivedToBase(ITypeSymbol graphExtension) =>
-		 graphExtension.GetGraphExtensionBaseTypes();
-
-	protected override IEnumerable<ITypeSymbol> GetBaseRootTypesFromDerivedToBase(ITypeSymbol graphTypeSymbol) =>
+	protected override IEnumerable<ITypeSymbol> GetBaseRootTypesFromDerivedToBase(ITypeSymbol graphTypeSymbol, PXContext pxContext) =>
 		graphTypeSymbol.GetGraphBaseTypes();
 
 	protected override ITypeSymbol? GetRootTypeFromExtensionType(ITypeSymbol graphExtension, PXContext pxContext) => 
 		graphExtension.GetGraphFromGraphExtension(pxContext);
 
 	protected override bool DoesExtensionExtendOnlyRootSymbol(ITypeSymbol graphExtension, PXContext pxContext) =>
-		graphExtension.BaseType.IsGraphExtensionBaseType() && graphExtension.BaseType.TypeParameters.Length == 1;
+		graphExtension.BaseType.IsGraphExtensionBaseType() &&
+		(graphExtension.BaseType.TypeParameters.IsDefault || graphExtension.BaseType.TypeParameters.Length <= 1);
 
 	protected override INamedTypeSymbol? GetBaseGenericExtensionType(ITypeSymbol graphExtension, PXContext pxContext) =>
 		graphExtension.GetBaseTypesAndThis()
