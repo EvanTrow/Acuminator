@@ -13,8 +13,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
 
 public abstract partial class SymbolInfoBuilderBase<TRootInfo, TExtensionInfo>
-where TRootInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaFrameworkTypeInfo
-where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaFrameworkTypeInfo
+where TRootInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaSymbolInfo
+where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaSymbolInfo
 {
 	/// <summary>
 	/// An extension type hierarchy visitor. Uses depth first search (DFS) based algorithm for cycle detection.
@@ -40,7 +40,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 
 		public ITypeSymbol? ExtensionWithBadBaseExtensions { get; private set; }
 
-		protected bool FailedToCollectTypeHierarchy { get; private set; }
+		public bool FailedToCollectTypeHierarchy { get; private set; }
 
 		public ExtensionTypeHierarchyVisitor(SymbolInfoBuilderBase<TRootInfo, TExtensionInfo> builder, PXContext pxContext, 
 											 CancellationToken cancellation)

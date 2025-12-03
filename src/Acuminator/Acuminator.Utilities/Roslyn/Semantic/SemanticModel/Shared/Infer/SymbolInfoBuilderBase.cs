@@ -12,11 +12,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
 
 public abstract partial class SymbolInfoBuilderBase<TRootInfo, TExtensionInfo>
-where TRootInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaFrameworkTypeInfo
-where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaFrameworkTypeInfo
+where TRootInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaSymbolInfo
+where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaSymbolInfo
 {
-	public virtual IInferredAcumaticaFrameworkTypeInfo? InferTypeInfo(ITypeSymbol? typeSymbol, PXContext pxContext,
-																	  int? customDeclarationOrder, CancellationToken cancellation)
+	public virtual InferredSymbolInfo? InferTypeInfo(ITypeSymbol? typeSymbol, PXContext pxContext,
+													 int? customDeclarationOrder, CancellationToken cancellation)
 	{
 		pxContext.ThrowOnNull();
 
@@ -28,18 +28,24 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 		if (IsRootFrameworkType(typeSymbol, pxContext))
 		{
 			var rootSymbolInfo = CreateRootSymbolInfo(typeSymbol, pxContext, customDeclarationOrder, cancellation);
-			return rootSymbolInfo;
+			return rootSymbolInfo != null
+				? new InferredSymbolInfo(rootSymbolInfo, collectedRootTypes: [typeSymbol])
+				: null;
 		}
 		else if (IsExtensionType(typeSymbol, pxContext))
 		{
 			var extensionTypeHierarchyVisitor = GetExtensionTypeHierarchyVisitor(pxContext, cancellation);
-			var inferredInfo = extensionTypeHierarchyVisitor.InferExtensionInfo(typeSymbol, customDeclarationOrder);
+			var inferredExtensionInfo = extensionTypeHierarchyVisitor.InferExtensionInfo(typeSymbol, customDeclarationOrder);
 
-			if (inferredInfo == null)
+			if (inferredExtensionInfo == null)
 				return null;
 
-			return inferredInfo.Value.InferredExtensionInfo as IInferredAcumaticaFrameworkTypeInfo ?? 
-				   inferredInfo.Value.ExtensionInfoCandidate;
+			return new InferredSymbolInfo(inferredExtensionInfo, extensionTypeHierarchyVisitor.CollectedRootTypes)
+			{
+				CircularReferenceExtension	   = extensionTypeHierarchyVisitor.CircularReferenceExtension,
+				ExtensionWithBadBaseExtensions = extensionTypeHierarchyVisitor.ExtensionWithBadBaseExtensions,
+				FailedToCollectTypeHierarchy   = extensionTypeHierarchyVisitor.FailedToCollectTypeHierarchy
+			};
 		}
 		else
 			return null;
