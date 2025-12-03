@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
@@ -10,8 +11,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Dac;
 
-public class DacAndDacExtInfoBuilder : SymbolInfoBuilderBase<DacInfo, DacExtensionInfo>
+public partial class DacAndDacExtInfoBuilder : SymbolInfoBuilderBase<DacInfo, DacExtensionInfo>
 {
+	protected override ExtensionTypeHierarchyVisitor GetExtensionTypeHierarchyVisitor(PXContext pxContext, CancellationToken cancellation) => 
+		new DacExtensionTypeHierarchyVisitor(this, pxContext, cancellation);
+
 	protected override bool IsRootFrameworkType(ITypeSymbol typeSymbol, PXContext pxContext) =>
 		typeSymbol.IsDAC(pxContext);
 	
