@@ -132,8 +132,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 			Attributes		  = GetDacAttributes();
 			BqlFieldsByNames  = GetDacBqlFields();
-			PropertiesByNames = GetDacProperties();
-			DacFieldsByNames  = DacFieldsCollector.CollectDacFieldsFromDacPropertiesAndBqlFields(Symbol, DacType, PXContext,
+			PropertiesByNames = GetDacProperties(BqlFieldsByNames);
+			DacFieldsByNames  = DacFieldsCollector.CollectDacFieldsFromDacPropertiesAndBqlFields(DacOrDacExtInfo, PXContext,
 																								 BqlFieldsByNames, PropertiesByNames);
 			IsActiveMethodInfo = GetIsActiveMethodInfo();
 
@@ -206,8 +206,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			DacOrDacExtInfo.GetDacBqlFieldInfos(PXContext, _cancellation)
 						   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
-		protected ImmutableDictionary<string, DacPropertyInfo> GetDacProperties() =>
-			DacOrDacExtInfo.GetPropertyInfos(PXContext, BqlFieldsByNames, _cancellation)
+		protected ImmutableDictionary<string, DacPropertyInfo> GetDacProperties(IDictionary<string, DacBqlFieldInfo> dacBqlFields) =>
+			DacOrDacExtInfo.GetPropertyInfos(PXContext, dacBqlFields, _cancellation)
 						   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
 		protected IsActiveMethodInfo? GetIsActiveMethodInfo()
