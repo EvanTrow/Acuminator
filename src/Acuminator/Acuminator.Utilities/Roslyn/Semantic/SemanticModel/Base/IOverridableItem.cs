@@ -21,7 +21,7 @@ where T : IOverridableItem<T>
 }
 
 internal interface IWriteableBaseItem<T> : IOverridableItem<T>
-where T : IWriteableBaseItem<T>
+where T : IOverridableItem<T>
 {
 	/// <inheritdoc cref="IOverridableItem{T}.Base"/>
 	new T? Base
