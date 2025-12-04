@@ -189,7 +189,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 			StaticConstructors 	 = GraphOrGraphExtInfo.Symbol.GetStaticConstructors(_cancellation);
 			ViewsByNames 		 = GetDataViews();
-			ViewDelegatesByNames = GetDataViewDelegates();
+			ViewDelegatesByNames = GetDataViewDelegates(ViewsByNames);
 
 			ActionsByNames 		  = GetActions();
 			ActionHandlersByNames = GetActionHandlers();
@@ -277,9 +277,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			GraphOrGraphExtInfo.GetViewInfos(PXContext, _cancellation)
 							   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
-		protected ImmutableDictionary<string, DataViewDelegateInfo> GetDataViewDelegates() =>
-			GetInfos(() => Symbol.GetViewDelegatesFromGraph(ViewsByNames, PXContext, cancellation: _cancellation),
-					 () => Symbol.GetViewDelegatesFromGraphExtensionAndBaseGraph(ViewsByNames, PXContext, _cancellation));
+		protected ImmutableDictionary<string, DataViewDelegateInfo> GetDataViewDelegates(IDictionary<string, DataViewInfo> viewsByName) =>
+			GraphOrGraphExtInfo.GetViewDelegateInfos(PXContext, viewsByName, _cancellation)
+							   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
 		protected ImmutableDictionary<string, ActionInfo> GetActions() =>
 			GetInfos(() => Symbol.GetActionSymbolsWithTypesFromGraph(PXContext),

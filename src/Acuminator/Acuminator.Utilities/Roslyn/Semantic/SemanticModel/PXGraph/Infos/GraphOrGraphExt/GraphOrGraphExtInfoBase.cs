@@ -5,6 +5,7 @@ using System.Threading;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
+using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -16,8 +17,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 public abstract class GraphOrGraphExtInfoBase : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaSymbolInfo
 
 {
-	private const int EstimatedNumberOfViewDelegatesInGraph = 8;
-
 	public abstract ITypeSymbol? GraphType { get; }
 
 	protected GraphOrGraphExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol graphOrGraphExt, int declarationOrder) :
@@ -28,12 +27,29 @@ public abstract class GraphOrGraphExtInfoBase : NodeSymbolItem<ClassDeclarationS
 
 	public abstract IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromBaseGraphToDerivedExtension(bool includeSelf);
 
+	internal OverridableItemsCollection<DataViewDelegateInfo> GetViewDelegateInfos(PXContext pxContext, IDictionary<string, DataViewInfo> viewsByName,
+																				   CancellationToken cancellation)
+	{
+		const int estimatedNumberOfViewDelegatesInGraph = 8;
 
-	
+		var graphViewDelegatesByName = new OverridableItemsCollection<DataViewDelegateInfo>(estimatedNumberOfViewDelegatesInGraph);
+		var rawGraphViewDelegatesDataFromBaseGraphToDerivedExtension = 
+			GetRawViewDelegatesData(pxContext, viewsByName, includeFromBaseInfos: true, cancellation);
 
+		int declarationOrder = 0;
 
+		foreach (var (viewDelegateNode, viewDelegateSymbol) in rawGraphViewDelegatesDataFromBaseGraphToDerivedExtension)
+		{
+			cancellation.ThrowIfCancellationRequested();
+			var graphViewInfo = new DataViewDelegateInfo(viewDelegateNode, viewDelegateSymbol, declarationOrder);
 
-	
+			graphViewDelegatesByName.Add(graphViewInfo);
+			declarationOrder++;
+		}
+
+		return graphViewDelegatesByName;
+	}
+
 	internal OverridableItemsCollection<DataViewInfo> GetViewInfos(PXContext pxContext, CancellationToken cancellation)
 	{
 		const int estimatedNumberOfViewsInGraph = 16;
@@ -58,6 +74,11 @@ public abstract class GraphOrGraphExtInfoBase : NodeSymbolItem<ClassDeclarationS
 	private IEnumerable<RawGraphViewData> GetRawGraphViewsData(PXContext pxContext, bool includeFromBaseInfos, 
 															   CancellationToken cancellation) =>
 		GetRawData(includeFromBaseInfos, graphOrGraphExtInfo => GetRawGraphViewsData(graphOrGraphExtInfo, pxContext, cancellation));
+
+	private IEnumerable<(MethodDeclarationSyntax? Node, IMethodSymbol Symbol)> GetRawViewDelegatesData(PXContext pxContext,
+																							IDictionary<string, DataViewInfo> viewsByName,
+																							bool includeFromBaseInfos, CancellationToken cancellation) =>
+		GetRawData(includeFromBaseInfos, graphOrGraphExtInfo => GetRawViewDelegatesData(graphOrGraphExtInfo, viewsByName, pxContext, cancellation));
 
 	private IEnumerable<TRawData> GetRawData<TRawData>(bool includeFromBaseInfos,
 													   Func<GraphOrGraphExtInfoBase, IEnumerable<TRawData>> rawDataGetter)
@@ -96,6 +117,24 @@ public abstract class GraphOrGraphExtInfoBase : NodeSymbolItem<ClassDeclarationS
 			{
 				yield return (member, viewType);
 			}	
+		}
+	}
+
+	private static IEnumerable<(MethodDeclarationSyntax? Node, IMethodSymbol Symbol)> GetRawViewDelegatesData(GraphOrGraphExtInfoBase graphOrGraphExtInfo, 
+																								IDictionary<string, DataViewInfo> viewsByName,
+																								PXContext pxContext, CancellationToken cancellation)
+	{
+		var methods = graphOrGraphExtInfo.Symbol.GetMethods();
+
+		foreach (IMethodSymbol method in methods)
+		{
+			cancellation.ThrowIfCancellationRequested();
+
+			if (method.IsValidViewDelegate(pxContext) && viewsByName.ContainsKey(method.Name))
+			{
+				var node = method.GetSyntax(cancellation) as MethodDeclarationSyntax;
+				yield return (node, method);
+			}
 		}
 	}
 }
