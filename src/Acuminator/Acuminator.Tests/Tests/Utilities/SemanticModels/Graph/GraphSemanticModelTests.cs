@@ -233,7 +233,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 								  GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: true,
 								  EventType.FieldUpdated, EventHandlerSignatureType.Classic, EventTargetKind.Field);
 
-				var allFieldUpdatedInBaseExtension = fieldUpdatedOverrides.JustOverridenItems()
+				var allFieldUpdatedInBaseExtension = fieldUpdatedOverrides.JustOverriddenItems()
 																		  .Where(h => h.Symbol.IsDeclaredInType(baseExtension.Symbol))
 																		  .ToList();
 				allFieldUpdatedInBaseExtension.Should().HaveCount(1);
@@ -248,7 +248,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 								  GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
 								  EventType.FieldUpdated, EventHandlerSignatureType.Classic, EventTargetKind.Field);
 
-				var allFieldUpdatedInGraph = fieldUpdatedOverrides.JustOverridenItems()
+				var allFieldUpdatedInGraph = fieldUpdatedOverrides.JustOverriddenItems()
 																  .Where(h => h.Symbol.IsDeclaredInType(graph))
 																  .ToList();
 				allFieldUpdatedInGraph.Should().HaveCount(2);
@@ -279,7 +279,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 								  GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
 								  EventType.FieldSelecting, EventHandlerSignatureType.Generic, EventTargetKind.Field);
 
-				var fieldSelectingEventHandlersInGraph = fieldSelectingOverrides.JustOverridenItems()
+				var fieldSelectingEventHandlersInGraph = fieldSelectingOverrides.JustOverriddenItems()
 																				.Where(h => h.Symbol.IsDeclaredInType(graph))
 																				.ToList();
 				fieldSelectingEventHandlersInGraph.Should().HaveCount(3);

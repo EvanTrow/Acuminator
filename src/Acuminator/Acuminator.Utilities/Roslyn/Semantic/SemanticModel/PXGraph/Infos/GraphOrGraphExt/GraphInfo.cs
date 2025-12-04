@@ -27,8 +27,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 		public override IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromDerivedExtensionToBaseGraph(bool includeSelf) =>
 			includeSelf
-				? this.ThisAndOverridenItems()
-				: this.JustOverridenItems();
+				? this.ThisAndOverriddenItems()
+				: this.JustOverriddenItems();
 
 		public override IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromBaseGraphToDerivedExtension(bool includeSelf) =>
 			GetInfosFromDerivedExtensionToBaseGraph(includeSelf).Reverse();

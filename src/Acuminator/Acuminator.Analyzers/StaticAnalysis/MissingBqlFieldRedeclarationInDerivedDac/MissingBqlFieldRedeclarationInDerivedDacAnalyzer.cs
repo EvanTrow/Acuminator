@@ -80,7 +80,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MissingBqlFieldRedeclarationInDeri
 		private NotRedeclaredBqlFieldInfo? AnalyzeNotRedeclaredBqlField(SymbolAnalysisContext symbolContext, PXContext pxContext, DacSemanticModel dac,
 																		DacFieldInfo notRedeclaredBqlField, bool isDacFieldDeclaredInDac)
 		{
-			var dacFieldWithDeclaredBqlField = notRedeclaredBqlField.ThisAndOverridenItems()
+			var dacFieldWithDeclaredBqlField = notRedeclaredBqlField.ThisAndOverriddenItems()
 																	.FirstOrDefault(dacField => dacField.HasBqlFieldDeclared);
 			if (dacFieldWithDeclaredBqlField == null)
 				return null;

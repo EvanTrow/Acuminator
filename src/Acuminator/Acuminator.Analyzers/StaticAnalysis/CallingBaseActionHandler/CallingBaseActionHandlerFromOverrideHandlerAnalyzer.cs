@@ -39,13 +39,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.CallingBaseActionHandler
 				.ToList();
 
 			var baseHandlersHashSet = redeclaredHandlersWithoutActionsList
-				.SelectMany(handler => handler.JustOverridenItems()
+				.SelectMany(handler => handler.JustOverriddenItems()
 											  .Select(baseHandler => baseHandler.Symbol))
 				.ToHashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
 
 			var baseActionsHashSet = redeclaredHandlersWithoutActionsList
 				.SelectMany(handler => graphExtension.ActionsByNames[handler.Symbol.Name]
-													 .ThisAndOverridenItems()
+													 .ThisAndOverriddenItems()
 													 .Select(action => action.Symbol))
 				.ToHashSet(SymbolEqualityComparer.Default);
 

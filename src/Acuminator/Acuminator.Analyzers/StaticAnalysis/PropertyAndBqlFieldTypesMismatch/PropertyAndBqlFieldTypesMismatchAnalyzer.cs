@@ -109,7 +109,7 @@ public class PropertyAndBqlFieldTypesMismatchAnalyzer : DacAggregatedAnalyzerBas
 		if (declaredDacFieldWithMismatchingTypes.BqlFieldInfo != null)
 			return declaredDacFieldWithMismatchingTypes.BqlFieldInfo.Name;
 
-		return declaredDacFieldWithMismatchingTypes.ThisAndOverridenItems()
+		return declaredDacFieldWithMismatchingTypes.ThisAndOverriddenItems()
 												   .FirstOrDefault(dacFieldInfo => dacFieldInfo.BqlFieldInfo != null)
 												  ?.BqlFieldInfo?.Name;
 	}

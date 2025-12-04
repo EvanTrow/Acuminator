@@ -267,7 +267,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				if (mostDerivedEventHandler.Base == null)     // optimization for most popular case when handler is not an override
 					return handlersArrayBuilder.ToImmutable();
 
-				var baseHandlersDeclaredInType = mostDerivedEventHandler.JustOverridenItems()
+				var baseHandlersDeclaredInType = mostDerivedEventHandler.JustOverriddenItems()
 																		.TakeWhile(handler => handler.Symbol.IsDeclaredInType(containingType));
 				handlersArrayBuilder.AddRange(baseHandlersDeclaredInType);
 				return handlersArrayBuilder.ToImmutable();

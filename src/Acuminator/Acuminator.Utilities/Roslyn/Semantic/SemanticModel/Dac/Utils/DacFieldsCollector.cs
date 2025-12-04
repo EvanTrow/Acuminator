@@ -67,7 +67,7 @@ internal static class DacFieldsCollector
 	where TInfo : SymbolItem<TSymbol>, IOverridableItem<TInfo>
 	where TSymbol : ISymbol
 	{
-		return infos.SelectMany(info => info.ThisAndOverridenItems())
+		return infos.SelectMany(info => info.ThisAndOverriddenItems())
 					.GroupBy(info => info.Symbol.ContainingType,
 							 SymbolEqualityComparer.Default as IEqualityComparer<ITypeSymbol>)
 					.ToDictionary(groupedByType => groupedByType.Key,
