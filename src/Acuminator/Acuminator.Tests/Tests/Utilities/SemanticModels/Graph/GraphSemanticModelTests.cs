@@ -384,9 +384,8 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			INamedTypeSymbol? graphOrGraphExtSymbol = context.SemanticModel.GetDeclaredSymbol(graphOrGraphExtDeclaration, cancellation);
 			graphOrGraphExtSymbol.Should().NotBeNull();
 
-			var graphBuilder = new GraphAndGraphExtInfoBuilder();
-			InferredSymbolInfo? inferredInfo = graphBuilder.InferTypeInfo(graphOrGraphExtSymbol!, context.PXContext, 
-																		   customDeclarationOrder: null, cancellation);
+			InferredSymbolInfo? inferredInfo = GraphAndGraphExtInfoBuilder.Instance.InferTypeInfo(graphOrGraphExtSymbol!, context.PXContext, 
+																								  customDeclarationOrder: null, cancellation);
 			inferredInfo.Should().NotBeNull();
 			inferredInfo.ThrowOnNull();
 

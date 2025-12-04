@@ -69,9 +69,8 @@ namespace Acuminator.Utilities.Roslyn.PrimaryDacFinder
 			if (!graphOrGraphExtension.IsPXGraphOrExtension(pxContext))
 				return null;
 
-			var graphInfoBuilder = new GraphAndGraphExtInfoBuilder();
-			InferredSymbolInfo? inferredInfo = graphInfoBuilder.InferTypeInfo(graphOrGraphExtension, pxContext, customDeclarationOrder: null, 
-																			  cancellationToken);
+			InferredSymbolInfo? inferredInfo = GraphAndGraphExtInfoBuilder.Instance.InferTypeInfo(graphOrGraphExtension, pxContext,
+																								  customDeclarationOrder: null, cancellationToken);
 
 			if (inferredInfo == null || inferredInfo.GetResultKind() != InferResultKind.Success ||
 				inferredInfo.InferredInfo is not GraphOrGraphExtInfoBase graphOrGraphExtInfo)

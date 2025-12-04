@@ -109,9 +109,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 
 		private DacOrDacExtInfoBase? InferSymbolInfo(SymbolAnalysisContext context, PXContext pxContext, INamedTypeSymbol type)
 		{
-			var dacInfoBuilder = new DacAndDacExtInfoBuilder();
-			InferredSymbolInfo? inferredInfo = dacInfoBuilder.InferTypeInfo(type, pxContext, customDeclarationOrder: null, context.CancellationToken);
-
+			InferredSymbolInfo? inferredInfo = DacAndDacExtInfoBuilder.Instance.InferTypeInfo(type, pxContext, customDeclarationOrder: null, 
+																							  context.CancellationToken);
 			if (inferredInfo == null)
 				return null;
 

@@ -117,9 +117,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 
 		private GraphOrGraphExtInfoBase? InferSymbolInfo(SymbolAnalysisContext context, PXContext pxContext, INamedTypeSymbol type)
 		{
-			var graphInfoBuilder = new GraphAndGraphExtInfoBuilder();
-			InferredSymbolInfo? inferredInfo = graphInfoBuilder.InferTypeInfo(type, pxContext, customDeclarationOrder: null, context.CancellationToken);
-
+			InferredSymbolInfo? inferredInfo = GraphAndGraphExtInfoBuilder.Instance.InferTypeInfo(type, pxContext, customDeclarationOrder: null, 
+																								  context.CancellationToken);
 			if (inferredInfo == null)
 				return null;
 
