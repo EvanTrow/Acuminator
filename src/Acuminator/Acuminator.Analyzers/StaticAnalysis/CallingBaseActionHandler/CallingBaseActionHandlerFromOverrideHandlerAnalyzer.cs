@@ -43,9 +43,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.CallingBaseActionHandler
 				.ToHashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
 
 			var baseActionsHashSet = redeclaredDelegatesWithoutActionsList
-				.SelectMany(handler => graphExtension.ActionsByNames[handler.Symbol.Name]
-													 .ThisAndOverriddenItems()
-													 .Select(action => action.Symbol))
+				.SelectMany(actionDelegate => graphExtension.ActionsByNames[actionDelegate.Symbol.Name]
+															.ThisAndOverriddenItems()
+															.Select(action => action.Symbol))
 				.ToHashSet(SymbolEqualityComparer.Default);
 
 			var walker = new Walker(context, pxContext, baseActionsHashSet, baseDelegatesHashSet);
