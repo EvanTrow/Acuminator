@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -24,47 +25,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		internal GraphInfo(ClassDeclarationSyntax? node, ITypeSymbol graph, int declarationOrder) :
 					  base(node, graph, declarationOrder)
 		{ }
-
-		public static GraphInfo? Create(ITypeSymbol? graph, ClassDeclarationSyntax? graphNode, PXContext pxContext,
-										int graphDeclarationOrder, CancellationToken cancellation)
-		{
-			if (graph == null || !graph.IsPXGraph(pxContext))
-				return null;
-
-			return CreateUnsafe(graph, graphNode, pxContext, graphDeclarationOrder, cancellation);
-		}
-
-		internal static GraphInfo CreateUnsafe(ITypeSymbol graph, ClassDeclarationSyntax? graphNode, PXContext pxContext,
-											   int graphDeclarationOrder, CancellationToken cancellation)
-		{
-			cancellation.ThrowIfCancellationRequested();
-			var graphBaseTypesFromBaseToDerived = graph.GetGraphBaseTypes()
-													   .Reverse();
-			bool isInSource = graphNode != null;
-			GraphInfo? aggregatedBaseGraphInfo = null, prevGraphInfo = null;
-
-			foreach (ITypeSymbol baseType in graphBaseTypesFromBaseToDerived)
-			{
-				cancellation.ThrowIfCancellationRequested();
-
-				var baseGraphNode = isInSource
-					? baseType.GetSyntax(cancellation) as ClassDeclarationSyntax
-					: null;
-
-				isInSource = baseGraphNode != null;
-				aggregatedBaseGraphInfo = prevGraphInfo != null
-					? new GraphInfo(baseGraphNode, baseType, declarationOrder: 0, prevGraphInfo)
-					: new GraphInfo(baseGraphNode, baseType, declarationOrder: 0);
-
-				prevGraphInfo = aggregatedBaseGraphInfo;
-			}
-
-			var graphInfo = aggregatedBaseGraphInfo != null
-				? new GraphInfo(graphNode, graph, graphDeclarationOrder, aggregatedBaseGraphInfo)
-				: new GraphInfo(graphNode, graph, graphDeclarationOrder);
-
-			return graphInfo;
-		}
 
 		void IOverridableItem<GraphInfo>.CombineWithBaseInfo() => CombineWithBaseInfo();
 
