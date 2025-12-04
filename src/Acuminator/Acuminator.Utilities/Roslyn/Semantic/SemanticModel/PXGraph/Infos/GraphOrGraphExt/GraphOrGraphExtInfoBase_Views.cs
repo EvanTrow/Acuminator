@@ -10,13 +10,34 @@ using Acuminator.Utilities.Roslyn.Syntax;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using RawGraphViewData = (Microsoft.CodeAnalysis.ISymbol ViewSymbol, Microsoft.CodeAnalysis.INamedTypeSymbol ViewType);
+using RawGraphViewData = (Microsoft.CodeAnalysis.ISymbol ViewSymbol, Microsoft.CodeAnalysis.ITypeSymbol ViewType);
 
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 
 public abstract partial class GraphOrGraphExtInfoBase : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaSymbolInfo
 
 {
+	internal OverridableItemsCollection<DataViewInfo> GetViewInfos(PXContext pxContext, CancellationToken cancellation)
+	{
+		const int estimatedNumberOfViewsInGraph = 16;
+
+		var graphViewsByName = new OverridableItemsCollection<DataViewInfo>(estimatedNumberOfViewsInGraph);
+		var rawGraphViewDataFromBaseGraphToDerivedExtension = GetRawGraphViewsData(pxContext, includeFromBaseInfos: true, cancellation);
+
+		int declarationOrder = 0;
+
+		foreach (var (viewSymbol, viewType) in rawGraphViewDataFromBaseGraphToDerivedExtension)
+		{
+			cancellation.ThrowIfCancellationRequested();
+			var graphViewInfo = new DataViewInfo(viewSymbol, viewType, pxContext, declarationOrder);
+
+			graphViewsByName.Add(graphViewInfo);
+			declarationOrder++;
+		}
+
+		return graphViewsByName;
+	}
+
 	internal OverridableItemsCollection<DataViewDelegateInfo> GetViewDelegateInfos(PXContext pxContext, IDictionary<string, DataViewInfo> viewsByName,
 																				   CancellationToken cancellation)
 	{
@@ -40,27 +61,6 @@ public abstract partial class GraphOrGraphExtInfoBase : NodeSymbolItem<ClassDecl
 		return graphViewDelegatesByName;
 	}
 
-	internal OverridableItemsCollection<DataViewInfo> GetViewInfos(PXContext pxContext, CancellationToken cancellation)
-	{
-		const int estimatedNumberOfViewsInGraph = 16;
-
-		var graphViewsByName = new OverridableItemsCollection<DataViewInfo>(estimatedNumberOfViewsInGraph);
-		var rawGraphViewDataFromBaseGraphToDerivedExtension = GetRawGraphViewsData(pxContext, includeFromBaseInfos: true, cancellation);
-
-		int declarationOrder = 0;
-
-		foreach (var (viewSymbol, viewType) in rawGraphViewDataFromBaseGraphToDerivedExtension)
-		{
-			cancellation.ThrowIfCancellationRequested();
-			var graphViewInfo = new DataViewInfo(viewSymbol, viewType, pxContext, declarationOrder);
-
-			graphViewsByName.Add(graphViewInfo);
-			declarationOrder++;
-		}
-
-		return graphViewsByName;
-	}
-
 	private IEnumerable<RawGraphViewData> GetRawGraphViewsData(PXContext pxContext, bool includeFromBaseInfos, 
 															   CancellationToken cancellation) =>
 		GetRawData(includeFromBaseInfos, graphOrGraphExtInfo => GetRawGraphViewsData(graphOrGraphExtInfo, pxContext, cancellation));
@@ -78,27 +78,20 @@ public abstract partial class GraphOrGraphExtInfoBase : NodeSymbolItem<ClassDecl
 		if (members.IsDefaultOrEmpty)
 			yield break;
 
-		foreach (ISymbol member in members)
+		foreach (var field in members.OfType<IFieldSymbol>())
 		{
 			cancellation.ThrowIfCancellationRequested();
 
-			var viewType = member switch
+			if (field.DeclaredAccessibility == Accessibility.Public && field.Type.InheritsFrom(pxContext.PXSelectBase.Type))
 			{
-				IFieldSymbol field 		 => field.Type as INamedTypeSymbol,
-				IPropertySymbol property => property.Type as INamedTypeSymbol,
-				_ 						 => null
-			};
-
-			if (viewType != null && member.DeclaredAccessibility == Accessibility.Public && viewType.InheritsFrom(pxContext.PXSelectBase.Type))
-			{
-				yield return (member, viewType);
-			}	
+				yield return (field, field.Type);
+			}
 		}
 	}
 
-	private static IEnumerable<(MethodDeclarationSyntax? Node, IMethodSymbol Symbol)> GetRawViewDelegatesData(GraphOrGraphExtInfoBase graphOrGraphExtInfo, 
-																								IDictionary<string, DataViewInfo> viewsByName,
-																								PXContext pxContext, CancellationToken cancellation)
+	private static IEnumerable<(MethodDeclarationSyntax? Node, IMethodSymbol Symbol)> GetRawViewDelegatesData(GraphOrGraphExtInfoBase graphOrGraphExtInfo,
+																							IDictionary<string, DataViewInfo> viewsByName, PXContext pxContext,
+																							CancellationToken cancellation)
 	{
 		var methods = graphOrGraphExtInfo.Symbol.GetMethods();
 
