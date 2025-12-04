@@ -57,8 +57,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DeclarationAnalysisGraph
 		protected virtual void CheckIfGraphOrGraphExtensionIsGenericNonAbstract(SymbolAnalysisContext context, PXContext pxContext,
 																				PXGraphEventSemanticModel graphOrGraphExt)
 		{
-			if (graphOrGraphExt.Symbol.IsAbstract || !graphOrGraphExt.Symbol.IsGenericType ||
-				graphOrGraphExt.Symbol.TypeParameters.IsDefaultOrEmpty)
+			if (graphOrGraphExt.Symbol.IsAbstract || !graphOrGraphExt.Symbol.IsGenericType() ||
+				graphOrGraphExt.Symbol.TypeParameters().IsDefaultOrEmpty)
 			{
 				return;
 			}
