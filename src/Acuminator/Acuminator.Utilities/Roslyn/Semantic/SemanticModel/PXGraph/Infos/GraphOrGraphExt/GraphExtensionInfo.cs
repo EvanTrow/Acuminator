@@ -21,9 +21,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// The overridden base graph extensions if any.<br/>
 		/// Contains either direct base graph extension or chained graph extensions.
 		/// </summary>
-		ImmutableArray<GraphExtensionInfo> BaseGraphExtensions { get; }
-
-		public bool IsFirstLevelExtension => BaseGraphExtensions.IsDefaultOrEmpty;
+		public ImmutableArray<GraphExtensionInfo> BaseGraphExtensions { get; }
 
 		internal GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
 									int declarationOrder) :
@@ -49,6 +47,72 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			BaseGraph = graph;
 			BaseGraphExtensions = baseGraphExtensions;
 			CombineWithBaseGraphAndGraphExtensions();
+		}
+
+		public override IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromDerivedExtensionToBaseGraph(bool includeSelf)
+		{
+			var graphInfos = BaseGraph?.GetInfosFromDerivedExtensionToBaseGraph(includeSelf);
+			var extensionInfos = GetExtensionInfosFromDerivedExtensionToBaseExtensions(includeSelf);
+
+			return graphInfos != null
+				? extensionInfos.Concat(graphInfos)
+				: extensionInfos;
+		}
+
+		public override IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromBaseGraphToDerivedExtension(bool includeSelf)
+		{
+			var graphInfos = BaseGraph?.GetInfosFromBaseGraphToDerivedExtension(includeSelf);
+			var extensionInfos = GetInfosFromBaseGraphToDerivedExtension(includeSelf);
+
+			return graphInfos != null
+				? graphInfos.Concat(extensionInfos)
+				: extensionInfos;
+		}
+
+		/// <summary>
+		/// Gets extension infos from base extensions to derived extension level by level.
+		/// </summary>
+		/// <param name="includeSelf">True to include self, false to exclude.</param>
+		/// <returns>
+		/// Collection of extension infos from base extensions to derived extension level by level.
+		/// </returns>
+		public IEnumerable<GraphExtensionInfo> GetExtensionInfosFromBaseExtensionsToDerivedExtension(bool includeSelf) =>
+			GetExtensionInfosFromDerivedExtensionToBaseExtensions(includeSelf).Reverse();
+
+		/// <summary>
+		/// Get extension infos from derived extension to base extensions level by level.
+		/// </summary>
+		/// <param name="includeSelf">True to include self, false to exclude.</param>
+		/// <returns>
+		/// Collection of extension infos from derived extension to base extensions level by level.
+		/// </returns>
+		public IEnumerable<GraphExtensionInfo> GetExtensionInfosFromDerivedExtensionToBaseExtensions(bool includeSelf)
+		{
+			if (includeSelf)
+				yield return this;
+
+			if (BaseGraphExtensions.IsDefaultOrEmpty)
+				yield break;
+
+			// Use breadth first traversal to get level by level extensions + add hard guard on iterations count against infinite loops
+			const int maxIterationCount = 10_000;
+			int iterationCount = 0;
+			var queue = new Queue<GraphExtensionInfo>(BaseGraphExtensions);
+
+			while (queue.Count > 0 && iterationCount < maxIterationCount)
+			{
+				iterationCount++;
+				var baseOrChainedGraphExtension = queue.Dequeue();
+				yield return baseOrChainedGraphExtension;
+
+				if (baseOrChainedGraphExtension.BaseGraphExtensions.IsDefaultOrEmpty)
+					continue;
+
+				foreach (var descendantGraphExtension in baseOrChainedGraphExtension.BaseGraphExtensions)
+				{
+					queue.Enqueue(descendantGraphExtension);
+				}
+			}
 		}
 
 		/// <summary>
