@@ -274,8 +274,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		}
 
 		protected ImmutableDictionary<string, DataViewInfo> GetDataViews() =>
-			GetInfos(() => Symbol.GetViewsWithSymbolsFromPXGraph(PXContext),
-					 () => Symbol.GetViewsFromGraphExtensionAndBaseGraph(PXContext));
+			GraphOrGraphExtInfo.GetViewInfos(PXContext, _cancellation)
+							   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
 		protected ImmutableDictionary<string, DataViewDelegateInfo> GetDataViewDelegates() =>
 			GetInfos(() => Symbol.GetViewDelegatesFromGraph(ViewsByNames, PXContext, cancellation: _cancellation),

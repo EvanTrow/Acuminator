@@ -14,6 +14,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	{
 		public GraphInfo? Base { get; }
 
+		public override ITypeSymbol GraphType => Symbol;
+
 		internal GraphInfo(ClassDeclarationSyntax? node, ITypeSymbol graph, int declarationOrder, GraphInfo baseGraphInfo) :
 					  base(node, graph, declarationOrder)
 		{

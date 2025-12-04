@@ -12,29 +12,10 @@ using Acuminator.Utilities.Roslyn.Syntax;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using ViewSymbolWithTypeCollection = System.Collections.Generic.IEnumerable<(Microsoft.CodeAnalysis.ISymbol ViewSymbol, Microsoft.CodeAnalysis.INamedTypeSymbol ViewType)>;
-
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
 	public static class GraphViewSymbolUtils
 	{
-		private const int EstimatedNumberOfViewsInGraph = 16;
-		private const int EstimatedNumberOfViewDelegatesInGraph = 8;
-
-		/// <summary>
-		/// A delegate type for an action which extracts info DTOs about graph views/view delegates from <paramref name="graphOrgraphExtension"/> 
-		/// and adds them to the <paramref name="viewInfos"/> collection with account for views/view delegates declaration order.
-		/// Returns the number following the last assigned declaration order.
-		/// </summary>
-		/// <typeparam name="TInfo">Generic type parameter representing overridable info type.</typeparam>
-		/// <param name="viewInfos">The action infos.</param>
-		/// <param name="graphOrgraphExtension">The graph orgraph extension.</param>
-		/// <param name="startingOrder">The declaration order which should be assigned to the first DTO.</param>
-		/// <returns/>
-		private delegate int AddViewInfoWithOrderDelegate<TInfo>(OverridableItemsCollection<TInfo> viewInfos,
-																 ITypeSymbol graphOrgraphExtension, int startingOrder)
-		where TInfo : IOverridableItem<TInfo>;
-
 		/// <summary>
 		/// Returns true if the data view is a processing view
 		/// </summary>
@@ -47,106 +28,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			pxContext.ThrowOnNull();
 
 			return view.CheckIfNull().InheritsFromOrEqualsGeneric(pxContext.PXProcessingBase.Type);
-		}
-
-		/// <summary>
-		/// Gets all declared view symbols and types from the graph and its base graphs,
-		/// if there is a graphs class hierarchy and <paramref name="includeViewsFromInheritanceChain"/> parameter is <c>true</c>.
-		/// </summary>
-		/// <param name="graph">The graph to act on.</param>
-		/// <param name="pxContext">Context.</param>
-		/// <param name="includeViewsFromInheritanceChain">(Optional) True to include, false to exclude the views from inheritance chain.</param>
-		/// <returns/>
-		public static OverridableItemsCollection<DataViewInfo> GetViewsWithSymbolsFromPXGraph(this ITypeSymbol graph, PXContext pxContext,
-																							  bool includeViewsFromInheritanceChain = true)
-		{
-			pxContext.ThrowOnNull();
-
-			if (graph?.InheritsFrom(pxContext.PXGraph.Type) != true)
-				return new OverridableItemsCollection<DataViewInfo>();
-
-			var viewsByName = new OverridableItemsCollection<DataViewInfo>(capacity: EstimatedNumberOfViewsInGraph);
-			var graphViews = GetRawViewsFromGraphImpl(graph, pxContext, includeViewsFromInheritanceChain);
-			viewsByName.AddRangeWithDeclarationOrder(graphViews, startingOrder: 0,
-													 (view, order) => new DataViewInfo(view.ViewSymbol, view.ViewType, pxContext, order));
-			return viewsByName;
-		}
-
-		/// <summary>
-		/// Get all views from graph or graph extension and its base graphs and base graph extensions (extended via Acumatica Customization).
-		/// </summary>
-		/// <param name="graphOrExtension">The graph Or graph extension to act on.</param>
-		/// <param name="pxContext">Context.</param>
-		/// <returns/>
-		public static OverridableItemsCollection<DataViewInfo> GetViewsFromGraphOrGraphExtensionAndBaseGraph(this ITypeSymbol graphOrExtension,
-																											 PXContext pxContext)
-		{
-			bool isGraph = graphOrExtension.IsPXGraph(pxContext);
-
-			if (!isGraph && !graphOrExtension.IsPXGraphExtension(pxContext))
-				return new OverridableItemsCollection<DataViewInfo>();
-
-			return isGraph
-				? graphOrExtension.GetViewsWithSymbolsFromPXGraph(pxContext)
-				: graphOrExtension.GetViewsFromGraphExtensionAndBaseGraph(pxContext);
-		}
-
-		/// <summary>
-		/// Get all view symbols and types from the graph extension and its base graph
-		/// </summary>
-		/// <param name="graphExtension">The graph extension to act on</param>
-		/// <param name="pxContext">Context</param>
-		/// <returns></returns>
-		public static OverridableItemsCollection<DataViewInfo> GetViewsFromGraphExtensionAndBaseGraph(this ITypeSymbol graphExtension, PXContext pxContext)
-		{
-			graphExtension.ThrowOnNull();
-			pxContext.ThrowOnNull();
-
-			return GetViewInfoFromGraphExtension<DataViewInfo>(graphExtension, pxContext, AddViewsFromGraph, AddViewsFromGraphExtension);
-
-
-			int AddViewsFromGraph(OverridableItemsCollection<DataViewInfo> views, ITypeSymbol graph, int startingOrder)
-			{
-				var rawGraphViews = graph.GetRawViewsFromGraphImpl(pxContext);
-				return views.AddRangeWithDeclarationOrder(rawGraphViews, startingOrder,
-														  (view, order) => new DataViewInfo(view.ViewSymbol, view.ViewType, pxContext, order));
-			}
-
-			int AddViewsFromGraphExtension(OverridableItemsCollection<DataViewInfo> views, ITypeSymbol graphExt, int startingOrder)
-			{
-				var rawGraphExtentionsViews = GetRawViewSymbolsWithTypesFromPXGraphOrPXGraphExtensionImpl(graphExt, pxContext);
-				return views.AddRangeWithDeclarationOrder(rawGraphExtentionsViews, startingOrder,
-														  (view, order) => new DataViewInfo(view.ViewSymbol, view.ViewType, pxContext, order));
-			}
-		}
-
-		private static ViewSymbolWithTypeCollection GetRawViewsFromGraphImpl(this ITypeSymbol graph, PXContext pxContext,
-																			 bool includeViewsFromInheritanceChain = true)
-		{
-			if (includeViewsFromInheritanceChain)
-			{
-				return graph.GetBaseTypesAndThis()
-							.TakeWhile(baseGraph => !baseGraph.IsGraphBaseType())
-							.Reverse()
-							.SelectMany(baseGraph => GetRawViewSymbolsWithTypesFromPXGraphOrPXGraphExtensionImpl(baseGraph, pxContext));
-			}
-			else
-				return GetRawViewSymbolsWithTypesFromPXGraphOrPXGraphExtensionImpl(graph, pxContext);
-		}
-
-		private static ViewSymbolWithTypeCollection GetRawViewSymbolsWithTypesFromPXGraphOrPXGraphExtensionImpl(ITypeSymbol graphOrExtension,
-																												PXContext pxContext)
-		{
-			foreach (ISymbol member in graphOrExtension.GetMembers())
-			{
-				if (member is not IFieldSymbol field || field.DeclaredAccessibility != Accessibility.Public)
-					continue;
-
-				if (field.Type is not INamedTypeSymbol fieldType || !fieldType.InheritsFrom(pxContext.PXSelectBase.Type))
-					continue;
-
-				yield return (field, fieldType);
-			}
 		}
 
 		/// <summary>
@@ -246,37 +127,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			}
 		}
 
-		private static OverridableItemsCollection<TInfo> GetViewInfoFromGraphExtension<TInfo>(ITypeSymbol graphExtension, PXContext pxContext,
-																						AddViewInfoWithOrderDelegate<TInfo> addGraphViewInfo,
-																						AddViewInfoWithOrderDelegate<TInfo> addGraphExtensionViewInfo)
-		where TInfo : IOverridableItem<TInfo>
-		{
-			if (!graphExtension.InheritsFrom(pxContext.PXGraphExtension.Type))
-				return new OverridableItemsCollection<TInfo>();
-
-			var graphType = graphExtension.GetGraphFromGraphExtension(pxContext);
-
-			if (graphType == null)
-				return new OverridableItemsCollection<TInfo>();
-
-			var allExtensionsFromBaseToDerived = graphExtension.GetGraphExtensionWithBaseExtensions(pxContext, SortDirection.Ascending,
-																									includeGraph: false);
-			if (allExtensionsFromBaseToDerived.IsNullOrEmpty())
-				return new OverridableItemsCollection<TInfo>();
-
-			int estimatedCapacity = typeof(TInfo) == typeof(DataViewInfo)
-				? EstimatedNumberOfViewsInGraph
-				: EstimatedNumberOfViewDelegatesInGraph;
-
-			var infoByView = new OverridableItemsCollection<TInfo>(capacity: estimatedCapacity);
-			int declarationOrder = addGraphViewInfo(infoByView, graphType, startingOrder: 0);
-
-			foreach (ITypeSymbol extension in allExtensionsFromBaseToDerived)
-			{
-				declarationOrder = addGraphExtensionViewInfo(infoByView, extension, declarationOrder);
-			}
-
-			return infoByView;
-		}
+		
 	}
 }

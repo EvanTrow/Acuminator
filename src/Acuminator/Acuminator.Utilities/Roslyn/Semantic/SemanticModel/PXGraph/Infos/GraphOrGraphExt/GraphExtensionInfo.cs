@@ -17,6 +17,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	{
 		public GraphInfo? BaseGraph { get; }
 
+		public override ITypeSymbol? GraphType => BaseGraph?.Symbol;
+
 		public ExtensionMechanismType BaseExtensionsMechanismType { get; }
 
 		/// <summary>
