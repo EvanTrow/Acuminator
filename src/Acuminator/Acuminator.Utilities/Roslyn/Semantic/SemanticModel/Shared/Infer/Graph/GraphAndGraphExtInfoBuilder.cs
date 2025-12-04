@@ -13,6 +13,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Graph;
 
 public class GraphAndGraphExtInfoBuilder : SymbolInfoBuilderBase<GraphInfo, GraphExtensionInfo>
 {
+	public static GraphAndGraphExtInfoBuilder Instance { get; } = new GraphAndGraphExtInfoBuilder();
+
 	protected override bool IsRootFrameworkType(ITypeSymbol typeSymbol, PXContext pxContext) =>
 		typeSymbol.IsPXGraph(pxContext);
 	

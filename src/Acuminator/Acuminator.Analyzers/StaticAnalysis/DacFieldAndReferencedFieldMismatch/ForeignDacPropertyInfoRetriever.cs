@@ -7,6 +7,8 @@ using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Dac;
 
 using Microsoft.CodeAnalysis;
 
@@ -91,10 +93,23 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 				return existingDacModel;
 			else
 			{
-				var newDacModel = DacSemanticModel.InferModel(_pxContext, dacType, cancellation: _cancellation);
+				var newDacModel = InferModel(dacType);
 				_dacModelsCache.Add(dacType, newDacModel);
 				return newDacModel;
 			}
+		}
+
+		private DacSemanticModel? InferModel(INamedTypeSymbol dacType)
+		{
+			var inferredDacInfo = DacAndDacExtInfoBuilder.Instance.InferTypeInfo(dacType, _pxContext, customDeclarationOrder: null, _cancellation);
+
+			if (inferredDacInfo?.GetResultKind() != InferResultKind.Success ||
+				inferredDacInfo.InferredInfo is not DacOrDacExtInfoBase dacOrDacExtInfo)
+			{
+				return null;
+			}
+
+			return DacSemanticModel.InferModel(_pxContext, dacOrDacExtInfo, cancellation: _cancellation);
 		}
 	}
 }

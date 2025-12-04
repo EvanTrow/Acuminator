@@ -14,6 +14,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Dac;
 
 public partial class DacAndDacExtInfoBuilder : SymbolInfoBuilderBase<DacInfo, DacExtensionInfo>
 {
+	public static DacAndDacExtInfoBuilder Instance { get; } = new DacAndDacExtInfoBuilder();
+
 	protected override bool IsRootFrameworkType(ITypeSymbol typeSymbol, PXContext pxContext) =>
 		typeSymbol.IsDAC(pxContext);
 	
