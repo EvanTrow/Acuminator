@@ -10,6 +10,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 {
 	public sealed class DacInfo : DacOrDacExtInfoBase<DacInfo>
 	{
+		public override ITypeSymbol DacType => Symbol;
+
 		internal DacInfo(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder, DacInfo baseInfo) :
 					base(node, dac, declarationOrder, baseInfo)
 		{

@@ -15,6 +15,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 	{
 		public DacInfo? Dac { get; }
 
+		public override ITypeSymbol? DacType => Dac?.Symbol;
+
 		public ExtensionMechanismType BaseExtensionsMechanismType { get; }
 
 		ImmutableArray<DacExtensionInfo> IExtensionInfo<DacExtensionInfo>.BaseExtensions =>

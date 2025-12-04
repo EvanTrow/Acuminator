@@ -14,13 +14,15 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 {
 	public abstract class DacOrDacExtInfoBase : OverridableNodeSymbolItem<DacOrDacExtInfoBase, ClassDeclarationSyntax, ITypeSymbol>
 	{
-		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder, DacOrDacExtInfoBase baseInfo) :
-								 base(node, dac, declarationOrder, baseInfo)
+		public abstract ITypeSymbol? DacType { get; }
+
+		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dacOrDacExt, int declarationOrder, DacOrDacExtInfoBase baseInfo) :
+								 base(node, dacOrDacExt, declarationOrder, baseInfo)
 		{
 		}
 
-		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder) :
-								 base(node, dac, declarationOrder)
+		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dacOrDacExt, int declarationOrder) :
+								 base(node, dacOrDacExt, declarationOrder)
 		{
 		}
 
@@ -39,54 +41,64 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		public IEnumerable<DacOrDacExtInfoBase> GetInfosFromBaseDacToDerivedExtension(bool includeSelf) =>
 			GetInfosFromDerivedExtensionToBaseDac(includeSelf).Reverse();
 
-			{
-				if (this is IWriteableBaseItem<DacOrDacExtInfoBase> baseInterface)
-					baseInterface.Base = value;
-				else
-				{
-					_baseInfo = value;
+		public OverridableItemsCollection<DacPropertyInfo> GetPropertyInfos(PXContext pxContext, IDictionary<string, DacBqlFieldInfo> dacFields,
+																			CancellationToken cancellation)
+		{
+			var dbBoundnessCalculator = new DbBoundnessCalculator(pxContext);
+			int estimatedCapacity = DacType?.GetTypeMembers().Length ?? 0;
+			var propertiesByName = new OverridableItemsCollection<DacPropertyInfo>(estimatedCapacity);
+			var rawPropertiesDataFromBaseDacToDerivedExtension = GetRawPropertiesData(pxContext, includeFromBaseInfos: true, cancellation);
 
-					if (value != null)
-						CombineWithBaseInfo();
-				}
+			int declarationOrder = 0;
+
+			foreach (var (propertyNode, propertySymbol) in rawPropertiesDataFromBaseDacToDerivedExtension)
+			{
+				cancellation.ThrowIfCancellationRequested();
+				var propertyInfo = DacPropertyInfo.CreateUnsafe(pxContext, propertyNode, propertySymbol, declarationOrder,
+																dbBoundnessCalculator, dacFields);
+				propertiesByName.Add(propertyInfo);
+				declarationOrder++;
+			}
+
+			return propertiesByName;
+		}
+
+		/// <summary>
+		/// Get all properties with nodes from DAC or DAC extension and its base infos.
+		/// </summary>
+		/// <param name="pxContext">Acumatica context.</param>
+		/// <param name="includeFromBaseInfos">True to include, false to exclude DAC properties from base infos.</param>
+		/// <param name="cancellation">Cancellation token.</param>
+		/// <returns/>
+		private IEnumerable<(PropertyDeclarationSyntax? Node, IPropertySymbol Symbol)> GetRawPropertiesData(PXContext pxContext,
+																											bool includeFromBaseInfos,
+																											CancellationToken cancellation)
+		{
+			if (includeFromBaseInfos)
+			{
+				return GetInfosFromBaseDacToDerivedExtension(includeFromBaseInfos)
+						.SelectMany(dacOrDacExtInfo => dacOrDacExtInfo.GetRawPropertiesData(pxContext, cancellation));
+			}
+			else
+			{
+				return GetRawPropertiesData(pxContext, cancellation);
 			}
 		}
 
-		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder, TInfo baseInfo) :
-								 base(node, dac, declarationOrder, baseInfo)
+		private IEnumerable<(PropertyDeclarationSyntax? Node, IPropertySymbol Symbol)> GetRawPropertiesData(PXContext pxContext, 
+																											CancellationToken cancellation)
 		{
-		}
+			var dacProperties = Symbol.GetMembers()
+									  .OfType<IPropertySymbol>()
+									  .Where(p => p.DeclaredAccessibility == Accessibility.Public && !p.IsStatic);
 
-		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder) :
-								 base(node, dac, declarationOrder)
-		{
-		}
-
-		void IOverridableItem<TInfo>.CombineWithBaseInfo() => CombineWithBaseInfo();
-
-		protected sealed override void CombineWithBaseInfo()
-		{
-			if (_baseInfo == null)
-				return;
-			else if (_baseInfo is not TInfo)
+			foreach (IPropertySymbol property in dacProperties)
 			{
-				throw new ArgumentOutOfRangeException(nameof(_baseInfo),
-								$"Type \"{_baseInfo.GetType().FullName}\" is not \"{typeof(TInfo).FullName}\" or derived from it.");
+				cancellation.ThrowIfCancellationRequested();
+
+				var propertyNode = property.GetSyntax(cancellation) as PropertyDeclarationSyntax;
+				yield return (propertyNode, property);
 			}
-		}
-	}
-
-
-	public abstract class DacOrDacExtInfoBase : OverridableNodeSymbolItem<DacOrDacExtInfoBase, ClassDeclarationSyntax, ITypeSymbol>
-	{
-		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder, DacOrDacExtInfoBase baseInfo) :
-								 base(node, dac, declarationOrder, baseInfo)
-		{
-		}
-
-		protected DacOrDacExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol dac, int declarationOrder) :
-								 base(node, dac, declarationOrder)
-		{
 		}
 	}
 }
