@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Semantic.Shared;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,6 +18,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	{
 		public GraphInfo? BaseGraph { get; }
 
+		public ExtensionMechanismType BaseExtensionsMechanismType { get; }
+
 		/// <summary>
 		/// The overridden base graph extensions if any.<br/>
 		/// Contains either direct base graph extension or chained graph extensions.
@@ -25,27 +28,33 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 		internal GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
 									int declarationOrder) :
-							 this(node, graphExtension, graph, declarationOrder, baseGraphExtensions: [])
+							 this(node, graphExtension, graph, declarationOrder, baseGraphExtensions: [],
+								  ExtensionMechanismType.None)
 		{ }
 
 		internal GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
-									int declarationOrder, GraphExtensionInfo baseGraphExtension) :
-							 this(node, graphExtension, graph, declarationOrder,
-								  [baseGraphExtension.CheckIfNull()])
+									int declarationOrder, GraphExtensionInfo baseGraphExtension,
+									ExtensionMechanismType extensionMechanismType) :
+							 this(node, graphExtension, graph, declarationOrder, [baseGraphExtension.CheckIfNull()], 
+								  extensionMechanismType)
 		{ }
 
 		internal GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
-									int declarationOrder, IEnumerable<GraphExtensionInfo> baseGraphExtensions) :
-							 this(node, graphExtension, graph, declarationOrder, 
-								  baseGraphExtensions?.ToImmutableArray() ?? [])
+									int declarationOrder, IEnumerable<GraphExtensionInfo> baseGraphExtensions,
+									ExtensionMechanismType extensionMechanismType) :
+							 this(node, graphExtension, graph, declarationOrder, baseGraphExtensions?.ToImmutableArray() ?? [],
+								  extensionMechanismType)
 		{ }
 
 		internal GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
-									int declarationOrder, ImmutableArray<GraphExtensionInfo> baseGraphExtensions) :
+									int declarationOrder, ImmutableArray<GraphExtensionInfo> baseGraphExtensions,
+									ExtensionMechanismType extensionMechanismType) :
 							 base(node, graphExtension, declarationOrder)
 		{
-			BaseGraph = graph;
-			BaseGraphExtensions = baseGraphExtensions;
+			BaseGraph 					= graph;
+			BaseExtensionsMechanismType = extensionMechanismType;
+			BaseGraphExtensions 		= baseGraphExtensions;
+
 			CombineWithBaseGraphAndGraphExtensions();
 		}
 

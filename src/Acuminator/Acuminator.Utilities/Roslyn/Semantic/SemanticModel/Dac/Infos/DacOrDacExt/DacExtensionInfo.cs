@@ -2,6 +2,7 @@
 using System.Threading;
 
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Semantic.Shared;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -13,17 +14,21 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 	{
 		public DacInfo? Dac { get; }
 
-		public DacExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol dacExtension, DacInfo? dac, int declarationOrder, 
-								DacExtensionInfo baseInfo) :
+		public ExtensionMechanismType BaseExtensionsMechanismType { get; }
+
+		internal DacExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol dacExtension, DacInfo? dac, int declarationOrder, 
+								  DacExtensionInfo baseInfo, ExtensionMechanismType extensionMechanismType) :
 						   this(node, dacExtension, dac, declarationOrder)
 		{
+			BaseExtensionsMechanismType = extensionMechanismType;
 			_baseInfo = baseInfo.CheckIfNull();
 			CombineWithBaseInfo();
 		}
 
-		public DacExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol dacExtension, DacInfo? dac, int declarationOrder) :
-						   base(node, dacExtension, declarationOrder)
+		internal DacExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol dacExtension, DacInfo? dac, int declarationOrder) :
+							 base(node, dacExtension, declarationOrder)
 		{
+			BaseExtensionsMechanismType = ExtensionMechanismType.None;
 			Dac = dac;
 		}
 
