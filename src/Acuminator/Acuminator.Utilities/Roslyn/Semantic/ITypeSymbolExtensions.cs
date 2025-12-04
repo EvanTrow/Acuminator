@@ -744,8 +744,54 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// <returns>
 		/// True if one dimensional string array, false if not.
 		/// </returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsOneDimensionalStringArray(this ITypeSymbol? typeSymbol) =>
 			typeSymbol is IArrayTypeSymbol arrayType && arrayType.Rank == 1 && 
 			arrayType.ElementType.SpecialType == SpecialType.System_String;
+
+		public static bool IsGenericType(this ITypeSymbol? typeSymbol)
+		{
+			if (typeSymbol is INamedTypeSymbol namedTypeSymbol)
+				return namedTypeSymbol.IsGenericType;
+			else if (typeSymbol is ITypeParameterSymbol typeParameterSymbol && !typeParameterSymbol.ConstraintTypes.IsDefaultOrEmpty)
+			{
+				// Generic interfaces can be applied to non-generic types, so we don't consider them here
+				bool hasGenericConstraint = typeParameterSymbol.GetAllConstraintTypes(includeInterfaces: false)
+															   .OfType<INamedTypeSymbol>()
+															   .Any(constraintType => constraintType.IsGenericType);
+				return hasGenericConstraint;
+			}
+			else
+				return false;
+		}
+
+		public static ImmutableArray<ITypeSymbol> TypeArguments(this ITypeSymbol? typeSymbol)
+		{
+			if (typeSymbol is INamedTypeSymbol namedTypeSymbol)
+				return namedTypeSymbol.TypeArguments;
+			else if (typeSymbol is ITypeParameterSymbol typeParameterSymbol && !typeParameterSymbol.ConstraintTypes.IsDefaultOrEmpty)
+			{
+				return typeParameterSymbol.GetAllConstraintTypes(includeInterfaces: false)
+										  .Where(constraintType => constraintType.TypeKind is TypeKind.Class or TypeKind.Struct)
+										  .ToImmutableArray();
+			}
+			else
+				return [];
+		}
+
+		public static ImmutableArray<ITypeParameterSymbol> TypeParameters(this ITypeSymbol? typeSymbol)
+		{
+			if (typeSymbol is INamedTypeSymbol namedTypeSymbol)
+				return namedTypeSymbol.TypeParameters;
+			else if (typeSymbol is ITypeParameterSymbol typeParameterSymbol && !typeParameterSymbol.ConstraintTypes.IsDefaultOrEmpty)
+			{
+				return typeParameterSymbol.GetAllConstraintTypes(includeInterfaces: false)
+										  .OfType<INamedTypeSymbol>()
+										  .SelectMany(constraintType => constraintType.TypeParameters)
+										  .ToImmutableArray();
+			}
+			else
+				return [];
+		}
 	}
 }
