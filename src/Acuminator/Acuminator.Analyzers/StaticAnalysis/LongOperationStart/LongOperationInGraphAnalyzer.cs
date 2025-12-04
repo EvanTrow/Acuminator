@@ -89,32 +89,32 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationStart
 		protected virtual void CheckActionDelegateStartingLongRunOperationsHasCorrectSignatures(SymbolAnalysisContext context, PXContext pxContext,
 																								PXGraphEventSemanticModel pxGraphOrGraphExt)
 		{
-			if (pxGraphOrGraphExt.ActionHandlersByNames.Count == 0)
+			if (pxGraphOrGraphExt.ActionDelegateByNames.Count == 0)
 				return;
 
-			foreach (var actionHandler in pxGraphOrGraphExt.DeclaredActionHandlers)
+			foreach (var actionDelegate in pxGraphOrGraphExt.DeclaredActionDelegates)
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
 
-				if (actionHandler.Node != null)
+				if (actionDelegate.Node != null)
 				{
-					CheckActionHandlerReturnType(context, pxContext, actionHandler);
+					CheckActionDelegateReturnType(context, pxContext, actionDelegate);
 				}
 			}
 		}
 
-		private void CheckActionHandlerReturnType(SymbolAnalysisContext context, PXContext pxContext, ActionHandlerInfo actionHandlerInfo)
+		private void CheckActionDelegateReturnType(SymbolAnalysisContext context, PXContext pxContext, ActionDelegateInfo actionDelegateInfo)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			if (pxContext.SystemTypes.IEnumerable.Equals(actionHandlerInfo.Symbol.ReturnType, SymbolEqualityComparer.Default) ||
-				!StartsLongOperation(pxContext, actionHandlerInfo.Node!, context.CancellationToken))
+			if (pxContext.SystemTypes.IEnumerable.Equals(actionDelegateInfo.Symbol.ReturnType, SymbolEqualityComparer.Default) ||
+				!StartsLongOperation(pxContext, actionDelegateInfo.Node!, context.CancellationToken))
 			{
 				return;
 			}
 
-			var location = actionHandlerInfo.Node!.Identifier.GetLocation().NullIfLocationKindIsNone() ??
-						   actionHandlerInfo.Symbol.Locations.FirstOrDefault();
+			var location = actionDelegateInfo.Node!.Identifier.GetLocation().NullIfLocationKindIsNone() ??
+						   actionDelegateInfo.Symbol.Locations.FirstOrDefault();
 			var diagnostic = Diagnostic.Create(Descriptors.PX1013_PXActionHandlerInvalidReturnType,
 											  location);
 

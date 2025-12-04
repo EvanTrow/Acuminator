@@ -13,6 +13,6 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap.Graph
 	public enum GraphMemberInfoType
 	{
 		ViewDelegate,
-		ActionHandler,
+		ActionDelegate,
 	}
 }

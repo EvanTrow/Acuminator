@@ -237,11 +237,11 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override IEnumerable<TreeNodeViewModel>? VisitNode(ActionNodeViewModel actionNode)
 		{
-			var hasActionHandler =
-				actionNode.MemberCategory.GraphSemanticModel.ActionHandlersByNames.TryGetValue(actionNode.MemberSymbol.Name,
-																							   out ActionHandlerInfo? actionHandler);
-			return hasActionHandler
-				? new GraphMemberInfoNodeViewModel(actionNode, actionHandler!, GraphMemberInfoType.ActionHandler, ExpandCreatedNodesCalculator).ToEnumerable()
+			var hasActionDelegate =
+				actionNode.MemberCategory.GraphSemanticModel.ActionDelegateByNames.TryGetValue(actionNode.MemberSymbol.Name,
+																							   out ActionDelegateInfo? actionDelegate);
+			return hasActionDelegate
+				? new GraphMemberInfoNodeViewModel(actionNode, actionDelegate!, GraphMemberInfoType.ActionDelegate, ExpandCreatedNodesCalculator).ToEnumerable()
 				: DefaultValue;
 		}
 

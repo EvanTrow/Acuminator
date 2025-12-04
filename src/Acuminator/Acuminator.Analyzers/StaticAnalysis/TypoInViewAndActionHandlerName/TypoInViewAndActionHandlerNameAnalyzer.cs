@@ -42,7 +42,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.TypoInViewAndActionHandlerName
 
 				context.CancellationToken.ThrowIfCancellationRequested();
 
-				AnalyzeActionHandlers(context, pxContext, graphModel, declaredNonOverriddenMethods);
+				AnalyzeActionDelegates(context, pxContext, graphModel, declaredNonOverriddenMethods);
 			}
 		}
 
@@ -65,18 +65,18 @@ namespace Acuminator.Analyzers.StaticAnalysis.TypoInViewAndActionHandlerName
 			}
 		}
 
-		private void AnalyzeActionHandlers(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel graphModel,
-										   List<IMethodSymbol> declaredNonOverriddenMethods)
+		private void AnalyzeActionDelegates(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel graphModel,
+											List<IMethodSymbol> declaredNonOverriddenMethods)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			var declaredActionHandlersByName = graphModel.DeclaredActionHandlers
+			var declaredActionDelegatesByName = graphModel.DeclaredActionDelegates
 												 .ToDictionary(handlerInfo => handlerInfo.Name, StringComparer.OrdinalIgnoreCase);
-			var actionsWithoutDelegatesNames = GetNamesOfViewsOrActionsWithoutDelegate(graphModel.Actions, declaredActionHandlersByName);
+			var actionsWithoutDelegatesNames = GetNamesOfViewsOrActionsWithoutDelegate(graphModel.Actions, declaredActionDelegatesByName);
 
 			if (actionsWithoutDelegatesNames.Count > 0)
 			{
-				var actionHandlerCandidates = GetActionHandlerCandidates(declaredNonOverriddenMethods, declaredActionHandlersByName, pxContext);
+				var actionHandlerCandidates = GetActionDelegateCandidates(declaredNonOverriddenMethods, declaredActionDelegatesByName, pxContext);
 
 				AnalyzeCandidatesForViewOrActionDelegates(context, Descriptors.PX1005_TypoInActionDelegateName,
 														  actionHandlerCandidates, actionsWithoutDelegatesNames, pxContext,
@@ -123,20 +123,20 @@ namespace Acuminator.Analyzers.StaticAnalysis.TypoInViewAndActionHandlerName
 		private IEnumerable<IMethodSymbol> GetViewDelegateCandidates(List<IMethodSymbol> declaredNonOverriddenMethods,
 																	 Dictionary<string, DataViewDelegateInfo> declaredViewDelegatesByName, PXContext pxContext)
 		{
-			var candidates = GetActionHandlerOrViewDelegateCandidates(declaredNonOverriddenMethods, declaredViewDelegatesByName, pxContext)
+			var candidates = GetActionOrViewDelegateCandidates(declaredNonOverriddenMethods, declaredViewDelegatesByName, pxContext)
 													.Where(method => method.IsValidViewDelegate(pxContext) && !method.IsValidActionHandler(pxContext));
 			return candidates;
 		}
 
-		private IEnumerable<IMethodSymbol> GetActionHandlerCandidates(List<IMethodSymbol> declaredNonOverriddenMethods,
-																	  Dictionary<string, ActionHandlerInfo> declaredActionHandlersByName, PXContext pxContext)
+		private IEnumerable<IMethodSymbol> GetActionDelegateCandidates(List<IMethodSymbol> declaredNonOverriddenMethods,
+																	   Dictionary<string, ActionDelegateInfo> declaredActionHandlersByName, PXContext pxContext)
 		{
-			var candidates = GetActionHandlerOrViewDelegateCandidates(declaredNonOverriddenMethods, declaredActionHandlersByName, pxContext)
+			var candidates = GetActionOrViewDelegateCandidates(declaredNonOverriddenMethods, declaredActionHandlersByName, pxContext)
 													.Where(method => method.IsValidActionHandler(pxContext));
 			return candidates;
 		}
 
-		private IEnumerable<IMethodSymbol> GetActionHandlerOrViewDelegateCandidates<TDelegateOrHandlerInfo>(List<IMethodSymbol> declaredNonOverriddenMethods,
+		private IEnumerable<IMethodSymbol> GetActionOrViewDelegateCandidates<TDelegateOrHandlerInfo>(List<IMethodSymbol> declaredNonOverriddenMethods,
 																				Dictionary<string, TDelegateOrHandlerInfo> declaredViewOrActionDelegatesByName,
 																				PXContext pxContext)
 		where TDelegateOrHandlerInfo : SymbolItem<IMethodSymbol>

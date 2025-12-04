@@ -64,7 +64,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoIsActiveMethodForExtension
 
 		private bool IsWorkflowExtensionWithBusinessLogic(PXGraphEventSemanticModel graphExtension)
 		{
-			if (graphExtension.DeclaredActions.Any() || graphExtension.DeclaredActionHandlers.Any() ||
+			if (graphExtension.DeclaredActions.Any() || graphExtension.DeclaredActionDelegates.Any() ||
 				graphExtension.DeclaredViews.Any()   || graphExtension.DeclaredViewDelegates.Any() ||
 				!graphExtension.DeclaredPXOverrides.IsDefaultOrEmpty)
 			{

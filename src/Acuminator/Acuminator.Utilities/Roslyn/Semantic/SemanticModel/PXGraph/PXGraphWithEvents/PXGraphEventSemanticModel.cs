@@ -85,11 +85,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <inheritdoc cref="PXGraphSemanticModel.Actions"/>
 		public IEnumerable<ActionInfo> Actions => BaseGraphModel.Actions;
 
-		/// <inheritdoc cref="PXGraphSemanticModel.ActionHandlersByNames"/>
-		public ImmutableDictionary<string, ActionHandlerInfo> ActionHandlersByNames => BaseGraphModel.ActionHandlersByNames;
+		/// <inheritdoc cref="PXGraphSemanticModel.ActionDelegateByNames"/>
+		public ImmutableDictionary<string, ActionDelegateInfo> ActionDelegateByNames => BaseGraphModel.ActionDelegateByNames;
 
-		/// <inheritdoc cref="PXGraphSemanticModel.ActionHandlers"/>
-		public IEnumerable<ActionHandlerInfo> ActionHandlers => BaseGraphModel.ActionHandlers;
+		/// <inheritdoc cref="PXGraphSemanticModel.ActionDelegates"/>
+		public IEnumerable<ActionDelegateInfo> ActionDelegates => BaseGraphModel.ActionDelegates;
 
 		/// <inheritdoc cref="PXGraphSemanticModel.IsActiveMethodInfo"/>
 		public IsActiveMethodInfo? IsActiveMethodInfo => BaseGraphModel.IsActiveMethodInfo;
@@ -115,8 +115,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <inheritdoc cref="PXGraphSemanticModel.DeclaredActions"/>
 		public IEnumerable<ActionInfo> DeclaredActions => BaseGraphModel.DeclaredActions;
 
-		/// <inheritdoc cref="PXGraphSemanticModel.DeclaredActionHandlers"/>
-		public IEnumerable<ActionHandlerInfo> DeclaredActionHandlers => BaseGraphModel.DeclaredActionHandlers;
+		/// <inheritdoc cref="PXGraphSemanticModel.DeclaredActionDelegates"/>
+		public IEnumerable<ActionDelegateInfo> DeclaredActionDelegates => BaseGraphModel.DeclaredActionDelegates;
 
 		/// <inheritdoc cref="PXGraphSemanticModel.DeclaredViews"/>
 		public IEnumerable<DataViewInfo> DeclaredViews => BaseGraphModel.DeclaredViews;

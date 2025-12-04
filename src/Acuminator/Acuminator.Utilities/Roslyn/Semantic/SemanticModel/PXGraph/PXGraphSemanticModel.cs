@@ -79,8 +79,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public ImmutableDictionary<string, ActionInfo> ActionsByNames { get; }
 		public IEnumerable<ActionInfo> Actions => ActionsByNames.Values;
 
-		public ImmutableDictionary<string, ActionHandlerInfo> ActionHandlersByNames { get; }
-		public IEnumerable<ActionHandlerInfo> ActionHandlers => ActionHandlersByNames.Values;
+		public ImmutableDictionary<string, ActionDelegateInfo> ActionDelegateByNames { get; }
+		public IEnumerable<ActionDelegateInfo> ActionDelegates => ActionDelegateByNames.Values;
 
 		public ImmutableArray<PXOverrideInfo> DeclaredPXOverrides { get; }
 
@@ -91,10 +91,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			Actions.Where(action => action.Symbol.IsDeclaredInType(Symbol));
 
 		/// <summary>
-		/// Action handlers which are declared in the graph or the graph extension that is represented by this instance of the semantic model.
+		/// Action delegates which are declared in the graph or the graph extension that is represented by this instance of the semantic model.
 		/// </summary>
-		public IEnumerable<ActionHandlerInfo> DeclaredActionHandlers =>
-			ActionHandlers.Where(handler => handler.Symbol.IsDeclaredInType(Symbol));
+		public IEnumerable<ActionDelegateInfo> DeclaredActionDelegates =>
+			ActionDelegates.Where(handler => handler.Symbol.IsDeclaredInType(Symbol));
 
 		/// <summary>
 		/// Views which are declared in the graph or the graph extension that is represented by this instance of the semantic model.
@@ -192,7 +192,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			ViewDelegatesByNames = GetDataViewDelegates(ViewsByNames);
 
 			ActionsByNames 		  = GetActions();
-			ActionHandlersByNames = GetActionHandlers();
+			ActionDelegateByNames = GetActionDelegates();
 
 			InitProcessingDelegatesInfo();
 
@@ -285,7 +285,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			GraphOrGraphExtInfo.GetActionInfos(PXContext, _cancellation)
 							   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
-		protected ImmutableDictionary<string, ActionHandlerInfo> GetActionHandlers() =>
+		protected ImmutableDictionary<string, ActionDelegateInfo> GetActionDelegates() =>
 			GetInfos(() => Symbol.GetActionHandlersFromGraph(ActionsByNames, PXContext, cancellation: _cancellation),
 					 () => Symbol.GetActionHandlersFromGraphExtensionAndBaseGraph(ActionsByNames, PXContext, _cancellation));
 

@@ -55,7 +55,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			graphMemberInfoType switch
 			{
 				GraphMemberInfoType.ViewDelegate  => Icon.ViewDelegate,
-				GraphMemberInfoType.ActionHandler => Icon.ActionHandler,
+				GraphMemberInfoType.ActionDelegate => Icon.ActionHandler,
 				_                                 => Icon.None,
 			};
 
