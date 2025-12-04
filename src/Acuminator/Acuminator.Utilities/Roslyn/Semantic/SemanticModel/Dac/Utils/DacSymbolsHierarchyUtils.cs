@@ -151,8 +151,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// <remarks>
 		/// For performance reasons this method is unsafe and does not perform validation of the input <paramref name="pxDacExtensionBaseType"/> type.
 		/// </remarks>
-		internal static IReadOnlyCollection<ITypeSymbol>? GetChainedExtensionTypesFromPxCacheExtensionTypeArgsUnsafe(
-																	ITypeSymbol pxDacExtensionBaseType, PXContext pxContext)
+		internal static IReadOnlyList<ITypeSymbol>? GetChainedExtensionTypesFromPxCacheExtensionTypeArgsUnsafe(ITypeSymbol pxDacExtensionBaseType,
+																											   PXContext pxContext)
 		{
 			if (pxDacExtensionBaseType is not INamedTypeSymbol namedDacExtensionBaseType)
 				return [];

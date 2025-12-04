@@ -64,7 +64,7 @@ public partial class DacAndDacExtInfoBuilder : SymbolInfoBuilderBase<DacInfo, Da
 	/// <returns>
 	/// The chained base DAC extension types.
 	/// </returns>
-	protected override IReadOnlyCollection<ITypeSymbol>? GetChainedBaseExtensionTypesFromBaseGenericExtensionType(ITypeSymbol pxDacExtensionBaseType,
-																												  PXContext pxContext) => 
+	protected override IReadOnlyList<ITypeSymbol>? GetChainedBaseExtensionTypesFromBaseGenericExtensionType(ITypeSymbol pxDacExtensionBaseType,
+																											PXContext pxContext) => 
 		DacSymbolsHierarchyUtils.GetChainedExtensionTypesFromPxCacheExtensionTypeArgsUnsafe(pxDacExtensionBaseType, pxContext);
 }

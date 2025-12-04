@@ -59,7 +59,7 @@ public class GraphAndGraphExtInfoBuilder : SymbolInfoBuilderBase<GraphInfo, Grap
 	/// <returns>
 	/// The chained base graph extension types.
 	/// </returns>
-	protected override IReadOnlyCollection<ITypeSymbol>? GetChainedBaseExtensionTypesFromBaseGenericExtensionType(ITypeSymbol pxGraphExtensionBaseType, 
-																												  PXContext pxContext) => 
+	protected override IReadOnlyList<ITypeSymbol>? GetChainedBaseExtensionTypesFromBaseGenericExtensionType(ITypeSymbol pxGraphExtensionBaseType, 
+																											PXContext pxContext) => 
 		GraphSymbolHierarchyUtils.GetChainedExtensionTypesFromPxGraphExtensionTypeArgsUnsafe(pxGraphExtensionBaseType, pxContext);
 }

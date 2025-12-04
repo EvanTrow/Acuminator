@@ -79,8 +79,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <remarks>
 		/// For performance reasons this method is unsafe and does not perform validation of the input <paramref name="pxGraphExtensionBaseType"/> type.
 		/// </remarks>
-		internal static IReadOnlyCollection<ITypeSymbol>? GetChainedExtensionTypesFromPxGraphExtensionTypeArgsUnsafe(
-																	ITypeSymbol pxGraphExtensionBaseType, PXContext pxContext)
+		internal static IReadOnlyList<ITypeSymbol>? GetChainedExtensionTypesFromPxGraphExtensionTypeArgsUnsafe(ITypeSymbol pxGraphExtensionBaseType,
+																											   PXContext pxContext)
 		{
 			if (pxGraphExtensionBaseType is not INamedTypeSymbol namedPXGraphExtensionBaseType)
 				return [];

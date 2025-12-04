@@ -171,6 +171,6 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 	/// <returns>
 	/// The chained base extension types.
 	/// </returns>
-	protected abstract IReadOnlyCollection<ITypeSymbol>? GetChainedBaseExtensionTypesFromBaseGenericExtensionType(ITypeSymbol baseGenericExtensionType,
-																												  PXContext pxContext);
+	protected abstract IReadOnlyList<ITypeSymbol>? GetChainedBaseExtensionTypesFromBaseGenericExtensionType(ITypeSymbol baseGenericExtensionType,
+																											PXContext pxContext);
 }
