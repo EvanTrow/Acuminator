@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 {
-	public class DacExtensionInfo : DacOrDacExtInfoBase<DacExtensionInfo>, IExtensionInfo<DacExtensionInfo>
+	public sealed class DacExtensionInfo : DacOrDacExtInfoBase<DacExtensionInfo>, IExtensionInfo<DacExtensionInfo>
 	{
 		public DacInfo? Dac { get; }
 
@@ -23,18 +23,32 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 		internal DacExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol dacExtension, DacInfo? dac, int declarationOrder, 
 								  DacExtensionInfo baseInfo, ExtensionMechanismType extensionMechanismType) :
-						   this(node, dacExtension, dac, declarationOrder)
+							 base(node, dacExtension, declarationOrder, baseInfo)
 		{
+			Dac = dac;
 			BaseExtensionsMechanismType = extensionMechanismType;
-			_baseInfo = baseInfo.CheckIfNull();
+
 			CombineWithBaseInfo();
 		}
 
 		internal DacExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol dacExtension, DacInfo? dac, int declarationOrder) :
 							 base(node, dacExtension, declarationOrder)
 		{
-			BaseExtensionsMechanismType = ExtensionMechanismType.None;
 			Dac = dac;
+			BaseExtensionsMechanismType = ExtensionMechanismType.None;
+
+			CombineWithBaseInfo();
 		}
+		protected override void CombineWithBaseInfo()
+		{
+			if (Base != null)
+				CombineWithBaseDacExtension();
+			else
+				CombineWithBaseDac();
+		}
+
+		private void CombineWithBaseDacExtension() { }
+
+		private void CombineWithBaseDac() { }
 	}
 }

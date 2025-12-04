@@ -9,7 +9,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	/// <summary>
 	/// The DTO with information about the action declared in graph.
 	/// </summary>
-	public class ActionInfo : OverridableSymbolItem<ActionInfo, ISymbol>
+	public sealed class ActionInfo : OverridableSymbolItem<ActionInfo, ISymbol>
 	{
 		/// <summary>
 		/// Indicates whether the action is predefined system action in Acumatica like <see cref="PX.Data.PXSave{TNode}"/>
@@ -37,5 +37,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			Type = type.CheckIfNull();
 			IsSystem = isSystem;
 		}
+
+		protected override void CombineWithBaseInfo() { }
 	}
 }

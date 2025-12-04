@@ -43,16 +43,5 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		}
 
 		void IOverridableItem<TInfo>.CombineWithBaseInfo() => CombineWithBaseInfo();
-
-		protected sealed override void CombineWithBaseInfo()
-		{
-			if (_baseInfo == null)
-				return;
-			else if (_baseInfo is not TInfo)
-			{
-				throw new ArgumentOutOfRangeException(nameof(_baseInfo),
-								$"Type \"{_baseInfo.GetType().FullName}\" is not \"{typeof(TInfo).FullName}\" or derived from it.");
-			}
-		}
 	}
 }

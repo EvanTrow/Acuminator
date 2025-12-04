@@ -10,7 +10,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	/// <summary>
 	/// Information about the action's handler in graph.
 	/// </summary>
-	public class ActionHandlerInfo : OverridableNodeSymbolItem<ActionHandlerInfo, MethodDeclarationSyntax, IMethodSymbol>
+	public sealed class ActionHandlerInfo : OverridableNodeSymbolItem<ActionHandlerInfo, MethodDeclarationSyntax, IMethodSymbol>
 	{
 		public ActionHandlerInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder) :
 							base(node, symbol, declarationOrder)
@@ -20,6 +20,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public ActionHandlerInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder, ActionHandlerInfo baseInfo) :
 							base(node, symbol, declarationOrder, baseInfo)
 		{
+			CombineWithBaseInfo();
 		}
+
+		protected override void CombineWithBaseInfo() { }
 	}
 }

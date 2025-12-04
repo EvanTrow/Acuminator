@@ -1,5 +1,4 @@
-﻿#nullable enable
-using Acuminator.Utilities.Common;
+﻿using Acuminator.Utilities.Common;
 
 using Microsoft.CodeAnalysis;
 
@@ -34,7 +33,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		protected OverridableNodeSymbolItem(N? node, S symbol, int declarationOrder, TInfo baseInfo) : this(node, symbol, declarationOrder)
 		{
 			_baseInfo = baseInfo.CheckIfNull();
-			CombineWithBaseInfo();
 		}
 
 		protected OverridableNodeSymbolItem(N? node, S symbol, int declarationOrder) : base(node, symbol, declarationOrder)
@@ -45,9 +43,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 			CombineWithBaseInfo();
 
 		/// <inheritdoc cref="IOverridableItem{T}.CombineWithBaseInfo()"/>
-		protected virtual void CombineWithBaseInfo()
-		{
-
-		}
+		protected abstract void CombineWithBaseInfo();
 	}
 }

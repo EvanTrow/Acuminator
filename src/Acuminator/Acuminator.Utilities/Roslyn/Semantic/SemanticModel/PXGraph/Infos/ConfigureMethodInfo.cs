@@ -15,7 +15,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 /// <summary>
 /// Information about the Configure special method in graph extensions.
 /// </summary>
-public class ConfigureMethodInfo : OverridableNodeSymbolItem<ConfigureMethodInfo, MethodDeclarationSyntax, IMethodSymbol>
+public sealed class ConfigureMethodInfo : OverridableNodeSymbolItem<ConfigureMethodInfo, MethodDeclarationSyntax, IMethodSymbol>
 {
 	/// <summary>
 	/// The Configure method declaration order to place it fourth after the Initialize method.
@@ -26,12 +26,15 @@ public class ConfigureMethodInfo : OverridableNodeSymbolItem<ConfigureMethodInfo
 							   ConfigureMethodInfo baseInfo) : 
 						  base(configureMethodNode, configureMethod, declarationOrder, baseInfo)
 	{
+		CombineWithBaseInfo();
 	}
 
 	public ConfigureMethodInfo(MethodDeclarationSyntax? configureMethodNode, IMethodSymbol configureMethod, int declarationOrder) : 
 						  base(configureMethodNode, configureMethod, declarationOrder)
 	{
 	}
+
+	protected override void CombineWithBaseInfo() { }
 
 	/// <summary>
 	/// Collects info about Configure method overrides from a graph or graph extension symbol and creates a <see cref="ConfigureMethodInfo"/> DTO.

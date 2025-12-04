@@ -7,7 +7,7 @@ using Acuminator.Utilities.Common;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 {
-	public class DacBqlFieldInfo : OverridableNodeSymbolItem<DacBqlFieldInfo, ClassDeclarationSyntax, INamedTypeSymbol>, IEquatable<DacBqlFieldInfo>
+	public sealed class DacBqlFieldInfo : OverridableNodeSymbolItem<DacBqlFieldInfo, ClassDeclarationSyntax, INamedTypeSymbol>, IEquatable<DacBqlFieldInfo>
 	{
 		/// <summary>
 		/// The declared BQL field data type corresponding to the BQL field type. 
@@ -24,15 +24,15 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// </summary>
 		public ITypeSymbol? BqlFieldDataTypeEffective { get; private set; }
 
-		protected DacBqlFieldInfo(ClassDeclarationSyntax? node, INamedTypeSymbol bqlField, int declarationOrder, DacBqlFieldInfo baseInfo) :
-							 this(node, bqlField, declarationOrder)
+		private DacBqlFieldInfo(ClassDeclarationSyntax? node, INamedTypeSymbol bqlField, int declarationOrder, DacBqlFieldInfo baseInfo) :
+						   this(node, bqlField, declarationOrder)
 		{
 			_baseInfo = baseInfo.CheckIfNull();
 			CombineWithBaseInfo();
 		}
 
-		protected DacBqlFieldInfo(ClassDeclarationSyntax? node, INamedTypeSymbol bqlField, int declarationOrder) :
-							 base(node, bqlField, declarationOrder)
+		private DacBqlFieldInfo(ClassDeclarationSyntax? node, INamedTypeSymbol bqlField, int declarationOrder) :
+						   base(node, bqlField, declarationOrder)
 		{
 			ITypeSymbol? bqlFieldDataType = bqlField.GetBqlFieldDataTypeFromBqlFieldSymbol();
 

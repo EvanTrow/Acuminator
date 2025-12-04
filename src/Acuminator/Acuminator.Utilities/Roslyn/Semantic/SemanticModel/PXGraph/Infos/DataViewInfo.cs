@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
-	public class DataViewInfo : OverridableSymbolItem<DataViewInfo, ISymbol>
+	public sealed class DataViewInfo : OverridableSymbolItem<DataViewInfo, ISymbol>
 	{
 		/// <summary>
 		/// Indicates whether the data view is processing data view
@@ -66,6 +66,13 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 		protected override string DebuggerDisplay => $"{base.DebuggerDisplay} |Type: {Type.ToString()}";
 
+		public DataViewInfo(ISymbol symbol, INamedTypeSymbol type, PXContext pxContext, int declarationOrder, DataViewInfo baseInfo)
+					 : this(symbol, type, pxContext, declarationOrder)
+		{
+			_baseInfo = baseInfo.CheckIfNull(nameof(baseInfo));
+			CombineWithBaseInfo();
+		}
+
 		public DataViewInfo(ISymbol symbol, INamedTypeSymbol type, PXContext pxContext, int declarationOrder)
 					 : base(symbol, declarationOrder)
 		{
@@ -83,11 +90,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			DAC = Type.GetDacFromView(pxContext);
 		}
 
-		public DataViewInfo(ISymbol symbol, INamedTypeSymbol type, PXContext pxContext, int declarationOrder, DataViewInfo baseInfo)
-					 : this(symbol, type, pxContext, declarationOrder)
-		{
-			_baseInfo = baseInfo.CheckIfNull(nameof(baseInfo));
-			CombineWithBaseInfo();
-		}
+		protected override void CombineWithBaseInfo() { }
 	}
 }

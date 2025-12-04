@@ -56,7 +56,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			BaseExtensionsMechanismType = extensionMechanismType;
 			BaseGraphExtensions 		= baseGraphExtensions;
 
-			CombineWithBaseGraphAndGraphExtensions();
+			CombineWithBaseInfo();
 		}
 
 		public override IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromDerivedExtensionToBaseGraph(bool includeSelf)
@@ -101,12 +101,16 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 				? this.GetAllBaseExtensionInfosAndThisBFS()
 				: this.GetAllBaseExtensionInfosBFS();
 
-		/// <summary>
-		/// Combine this info with info from base graph and graph extensions.
-		/// </summary>
-		private void CombineWithBaseGraphAndGraphExtensions()
+		private void CombineWithBaseInfo()
 		{
-
+			if (BaseGraphExtensions.IsDefaultOrEmpty)
+				CombineWithBaseGraphExtension();
+			else
+				CombineWithBaseGraph();
 		}
+
+		private void CombineWithBaseGraphExtension() { }
+
+		private void CombineWithBaseGraph() { }
 	}
 }

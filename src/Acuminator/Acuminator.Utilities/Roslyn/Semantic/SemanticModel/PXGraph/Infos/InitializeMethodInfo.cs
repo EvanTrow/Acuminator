@@ -15,7 +15,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 /// <summary>
 /// Information about the Initialize special method in graph extensions.
 /// </summary>
-public class InitializeMethodInfo : OverridableNodeSymbolItem<InitializeMethodInfo, MethodDeclarationSyntax, IMethodSymbol>
+public sealed class InitializeMethodInfo : OverridableNodeSymbolItem<InitializeMethodInfo, MethodDeclarationSyntax, IMethodSymbol>
 {
 	/// <summary>
 	/// The Initialize method declaration order to place it third after IsActiveForGraph method.
@@ -26,12 +26,15 @@ public class InitializeMethodInfo : OverridableNodeSymbolItem<InitializeMethodIn
 							    InitializeMethodInfo baseInfo) :
 						  base(initializeMethodNode, initializeMethod, declarationOrder, baseInfo)
 	{
+		CombineWithBaseInfo();
 	}
 
 	public InitializeMethodInfo(MethodDeclarationSyntax? initializeMethodNode, IMethodSymbol initializeMethod, int declarationOrder) :
 						  base(initializeMethodNode, initializeMethod, declarationOrder)
 	{
 	}
+
+	protected override void CombineWithBaseInfo() { }
 
 	/// <summary>
 	/// Collects info about Initialize method overrides from a graph or graph extension symbol and creates a <see cref="InitializeMethodInfo"/> DTO.

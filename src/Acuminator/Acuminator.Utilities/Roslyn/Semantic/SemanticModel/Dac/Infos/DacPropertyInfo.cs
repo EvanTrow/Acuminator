@@ -14,7 +14,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 {
-	public class DacPropertyInfo : OverridableNodeSymbolItem<DacPropertyInfo, PropertyDeclarationSyntax, IPropertySymbol>
+	public sealed class DacPropertyInfo : OverridableNodeSymbolItem<DacPropertyInfo, PropertyDeclarationSyntax, IPropertySymbol>
 	{
 		public ImmutableArray<DacFieldAttributeInfo> Attributes { get; }
 
@@ -88,18 +88,18 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// </summary>
 		public CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes EffectivePropertyAndDataTypeAttributeTypesCompatibility { get; private set; }
 
-		protected DacPropertyInfo(PropertyDeclarationSyntax? node, IPropertySymbol symbol, ITypeSymbol propertyTypeUnwrappedNullable,
-								  int declarationOrder, bool hasBqlField, IEnumerable<DacFieldAttributeInfo> attributeInfos, 
-								  DacPropertyInfo baseInfo) :
-							 this(node, symbol, propertyTypeUnwrappedNullable, declarationOrder, hasBqlField, attributeInfos)
+		private DacPropertyInfo(PropertyDeclarationSyntax? node, IPropertySymbol symbol, ITypeSymbol propertyTypeUnwrappedNullable,
+								int declarationOrder, bool hasBqlField, IEnumerable<DacFieldAttributeInfo> attributeInfos, 
+								DacPropertyInfo baseInfo) :
+						   this(node, symbol, propertyTypeUnwrappedNullable, declarationOrder, hasBqlField, attributeInfos)
 		{
 			_baseInfo = baseInfo.CheckIfNull();
 			CombineWithBaseInfo();
 		}
 
-		protected DacPropertyInfo(PropertyDeclarationSyntax? node, IPropertySymbol symbol, ITypeSymbol propertyTypeUnwrappedNullable,
-								  int declarationOrder, bool hasBqlField, IEnumerable<DacFieldAttributeInfo> attributeInfos) :
-							 base(node, symbol, declarationOrder)
+		private DacPropertyInfo(PropertyDeclarationSyntax? node, IPropertySymbol symbol, ITypeSymbol propertyTypeUnwrappedNullable,
+								int declarationOrder, bool hasBqlField, IEnumerable<DacFieldAttributeInfo> attributeInfos) :
+						   base(node, symbol, declarationOrder)
 		{
 			Attributes 			 = attributeInfos.ToImmutableArray();
 			HasBqlFieldDeclared  = hasBqlField;
