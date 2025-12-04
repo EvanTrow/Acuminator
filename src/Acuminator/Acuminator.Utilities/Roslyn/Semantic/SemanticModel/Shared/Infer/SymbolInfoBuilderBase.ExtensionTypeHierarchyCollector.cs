@@ -18,9 +18,9 @@ where TRootInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferred
 where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExtensionInfo<TExtensionInfo>, IInferredAcumaticaSymbolInfo
 {
 	/// <summary>
-	/// An extension type hierarchy visitor. Uses depth first search (DFS) based algorithm for cycle detection.
+	/// An extension type hierarchy collector. Uses depth first search (DFS) based algorithm for cycle detection.
 	/// </summary>
-	protected class ExtensionTypeHierarchyVisitor
+	protected sealed class ExtensionTypeHierarchyCollector
 	{
 		private const int MaxPathLength = 150;
 
@@ -43,8 +43,8 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 
 		public bool FailedToCollectTypeHierarchy { get; private set; }
 
-		public ExtensionTypeHierarchyVisitor(SymbolInfoBuilderBase<TRootInfo, TExtensionInfo> builder, PXContext pxContext, 
-											 CancellationToken cancellation)
+		public ExtensionTypeHierarchyCollector(SymbolInfoBuilderBase<TRootInfo, TExtensionInfo> builder, PXContext pxContext, 
+											   CancellationToken cancellation)
 		{
 			_builder = builder;
 			_pxContext = pxContext;
@@ -76,8 +76,8 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			return extensionInfo;
 		}
 
-		protected TExtensionInfo? VisitExtensionType(ITypeSymbol extensionTypeSymbol, bool isInSource, 
-													 ITypeSymbol? precalcedRootTypeSymbol, int? extensionDeclarationOrder)
+		private TExtensionInfo? VisitExtensionType(ITypeSymbol extensionTypeSymbol, bool isInSource, 
+												   ITypeSymbol? precalcedRootTypeSymbol, int? extensionDeclarationOrder)
 		{
 			// Stop all infer operations early if the type hierarchy is already recognized as inconsistent 
 			if (GetResultKind() != InferResultKind.Success)
@@ -129,8 +129,8 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			}
 		}
 
-		protected TExtensionInfo? InferExtensionExtendingOnlyRootSymbol(ITypeSymbol extensionTypeSymbol, ClassDeclarationSyntax? extensionNode,
-																		ITypeSymbol? precalcedRootTypeSymbol, int declarationOrder)
+		private TExtensionInfo? InferExtensionExtendingOnlyRootSymbol(ITypeSymbol extensionTypeSymbol, ClassDeclarationSyntax? extensionNode,
+																	  ITypeSymbol? precalcedRootTypeSymbol, int declarationOrder)
 		{
 			_cancellation.ThrowIfCancellationRequested();
 			var rootTypeSymbol = precalcedRootTypeSymbol ?? _builder.GetRootTypeFromExtensionType(extensionTypeSymbol, _pxContext);
@@ -160,8 +160,8 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			}
 		}
 
-		protected TExtensionInfo? InferExtensionRecursively(ITypeSymbol extensionTypeSymbol, ClassDeclarationSyntax? extensionNode,
-															ITypeSymbol? precalcedRootTypeSymbol, int declarationOrder)
+		private TExtensionInfo? InferExtensionRecursively(ITypeSymbol extensionTypeSymbol, ClassDeclarationSyntax? extensionNode,
+														  ITypeSymbol? precalcedRootTypeSymbol, int declarationOrder)
 		{
 			_cancellation.ThrowIfCancellationRequested();
 			INamedTypeSymbol? baseGenericExtensionType = _builder.GetBaseGenericExtensionType(extensionTypeSymbol, _pxContext);
@@ -201,8 +201,8 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			}
 		}
 
-		protected virtual TExtensionInfo? InferExtensionDerivedFromCustomExtension(ITypeSymbol extensionTypeSymbol, ClassDeclarationSyntax? extensionNode,
-																				   ITypeSymbol rootTypeSymbol, TRootInfo? rootInfo, int declarationOrder)
+		private TExtensionInfo? InferExtensionDerivedFromCustomExtension(ITypeSymbol extensionTypeSymbol, ClassDeclarationSyntax? extensionNode,
+																		 ITypeSymbol rootTypeSymbol, TRootInfo? rootInfo, int declarationOrder)
 		{
 			bool isInSource = extensionNode != null;
 
@@ -224,7 +224,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			return extensionInfo;
 		}
 
-		protected TExtensionInfo? InferExtensionDerivedFromBaseGenericExtensionType(ITypeSymbol extensionTypeSymbol, 
+		private TExtensionInfo? InferExtensionDerivedFromBaseGenericExtensionType(ITypeSymbol extensionTypeSymbol, 
 																ClassDeclarationSyntax? extensionNode, INamedTypeSymbol baseGenericExtensionType,
 																ITypeSymbol rootTypeSymbol, TRootInfo? rootInfo, int declarationOrder)
 		{
@@ -267,7 +267,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			}
 		}
 
-		protected IReadOnlyList<ITypeSymbol>? GetBaseChainedExtensionTypes(INamedTypeSymbol baseGenericExtensionType)
+		private IReadOnlyList<ITypeSymbol>? GetBaseChainedExtensionTypes(INamedTypeSymbol baseGenericExtensionType)
 		{
 			if (!baseGenericExtensionType.IsGenericType)
 				return [];
@@ -281,7 +281,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			return chainedBaseExtensions;
 		}
 
-		protected virtual TExtensionInfo? InferExtensionDerivedFromBaseGenericExtensionTypeWithMultipleChainedExtensions(ITypeSymbol extensionTypeSymbol,
+		private TExtensionInfo? InferExtensionDerivedFromBaseGenericExtensionTypeWithMultipleChainedExtensions(ITypeSymbol extensionTypeSymbol,
 																					ClassDeclarationSyntax? extensionNode, TRootInfo? rootInfo, 
 																					int declarationOrder, IReadOnlyList<ITypeSymbol> baseChainedExtensionTypes)
 		{
@@ -328,7 +328,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 		/// Another important thing is that due to the recursive nature of the infer algorithm the compaction will be also done recursively<br/>
 		/// from the most base extension infos to the most derived extensions. Therefore, the final result will be fully compacted extension infos tree.
 		/// </remarks>
-		protected List<TExtensionInfo> CompactExtensionInfos(List<TExtensionInfo> uncompactedExtensionList)
+		private List<TExtensionInfo> CompactExtensionInfos(List<TExtensionInfo> uncompactedExtensionList)
 		{
 			if (uncompactedExtensionList.Count <= 1)
 				return uncompactedExtensionList;
@@ -374,8 +374,6 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 		};
 
 		private void ClearState()
-
-		protected void ClearState()
 		{
 			if (_visitedExtensionInfos.Count > 0)
 				_visitedExtensionInfos.Clear();

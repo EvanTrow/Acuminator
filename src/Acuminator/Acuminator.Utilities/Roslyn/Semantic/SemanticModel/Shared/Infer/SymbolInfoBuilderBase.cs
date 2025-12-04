@@ -36,25 +36,25 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 		}
 		else if (IsExtensionType(typeSymbol, pxContext))
 		{
-			var extensionTypeHierarchyVisitor = GetExtensionTypeHierarchyVisitor(pxContext, cancellation);
-			var inferredExtensionInfo = extensionTypeHierarchyVisitor.InferExtensionInfo(typeSymbol, customDeclarationOrder);
+			var extensionTypeHierarchyCollector = GetExtensionTypeHierarchyCollector(pxContext, cancellation);
+			var inferredExtensionInfo = extensionTypeHierarchyCollector.InferExtensionInfo(typeSymbol, customDeclarationOrder);
 
 			if (inferredExtensionInfo == null)
 				return null;
 
-			return new InferredSymbolInfo(inferredExtensionInfo, extensionTypeHierarchyVisitor.CollectedRootTypes)
+			return new InferredSymbolInfo(inferredExtensionInfo, extensionTypeHierarchyCollector.CollectedRootTypes)
 			{
-				CircularReferenceExtension	   = extensionTypeHierarchyVisitor.CircularReferenceExtension,
-				ExtensionWithBadBaseExtensions = extensionTypeHierarchyVisitor.ExtensionWithBadBaseExtensions,
-				FailedToCollectTypeHierarchy   = extensionTypeHierarchyVisitor.FailedToCollectTypeHierarchy
+				CircularReferenceExtension	   = extensionTypeHierarchyCollector.CircularReferenceExtension,
+				ExtensionWithBadBaseExtensions = extensionTypeHierarchyCollector.ExtensionWithBadBaseExtensions,
+				FailedToCollectTypeHierarchy   = extensionTypeHierarchyCollector.FailedToCollectTypeHierarchy
 			};
 		}
 		else
 			return null;
 	}
 
-	protected ExtensionTypeHierarchyVisitor GetExtensionTypeHierarchyVisitor(PXContext pxContext, CancellationToken cancellation) =>
-		new ExtensionTypeHierarchyVisitor(this, pxContext, cancellation);
+	protected ExtensionTypeHierarchyCollector GetExtensionTypeHierarchyCollector(PXContext pxContext, CancellationToken cancellation) =>
+		new ExtensionTypeHierarchyCollector(this, pxContext, cancellation);
 
 	/// <summary>
 	/// Determines whether the <paramref name="typeSymbol"/> is a root Acumatica Framework type (for example, graph or DAC).
