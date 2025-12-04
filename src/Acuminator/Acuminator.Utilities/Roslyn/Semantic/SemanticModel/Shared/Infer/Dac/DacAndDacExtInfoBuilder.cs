@@ -5,6 +5,7 @@ using System.Threading;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Extensions;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -34,12 +35,14 @@ public partial class DacAndDacExtInfoBuilder : SymbolInfoBuilderBase<DacInfo, Da
 		new DacExtensionInfo(dacExtensionNode, dacExtension, dacInfo, declarationOrder);
 
 	protected override DacExtensionInfo ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? dacExtensionNode, ITypeSymbol dacExtension,
-																		DacInfo? dacInfo, int declarationOrder, DacExtensionInfo baseExtension) => 
-		new DacExtensionInfo(dacExtensionNode, dacExtension, dacInfo, declarationOrder, baseExtension);
+																		DacInfo? dacInfo, int declarationOrder, DacExtensionInfo baseExtension, 
+																		ExtensionMechanismType extensionMechanismType) => 
+		new DacExtensionInfo(dacExtensionNode, dacExtension, dacInfo, declarationOrder, baseExtension, extensionMechanismType);
 
 	protected override DacExtensionInfo? ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? dacExtensionNode, ITypeSymbol dacExtension,
 																					DacInfo? dacInfo, int declarationOrder,
-																					IEnumerable<DacExtensionInfo> baseExtensions) =>
+																					IEnumerable<DacExtensionInfo> baseExtensions, 
+																					ExtensionMechanismType extensionMechanismType) =>
 		null;
 
 	protected override IEnumerable<ITypeSymbol> GetBaseRootTypesFromDerivedToBase(ITypeSymbol dacTypeSymbol, PXContext pxContext) =>

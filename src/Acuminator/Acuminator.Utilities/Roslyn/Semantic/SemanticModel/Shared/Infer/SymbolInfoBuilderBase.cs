@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Extensions;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -156,10 +158,12 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 																	 TRootInfo? rootInfo, int declarationOrder);
 
 	protected abstract TExtensionInfo ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? extensionNode, ITypeSymbol extensionSymbol,
-																				 TRootInfo? rootInfo, int declarationOrder, TExtensionInfo baseExtension);
+																				 TRootInfo? rootInfo, int declarationOrder, TExtensionInfo baseExtension,
+																				 ExtensionMechanismType extensionMechanismType);
 
 	protected abstract TExtensionInfo? ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? extensionNode, ITypeSymbol extensionSymbol,
-																	TRootInfo? rootInfo, int declarationOrder, IEnumerable<TExtensionInfo> baseExtensions);
+																	TRootInfo? rootInfo, int declarationOrder, IEnumerable<TExtensionInfo> baseExtensions, 
+																	ExtensionMechanismType extensionMechanismType);
 
 	protected abstract INamedTypeSymbol? GetBaseGenericExtensionType(ITypeSymbol extensionTypeSymbol, PXContext pxContext);
 

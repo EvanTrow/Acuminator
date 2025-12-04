@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Extensions;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -212,7 +213,8 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 				return null;
 
 			var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
-																					declarationOrder, baseExtensionInfo);
+																					declarationOrder, baseExtensionInfo, 
+																					ExtensionMechanismType.Inheritance);
 			return extensionInfo;
 		}
 
@@ -240,7 +242,8 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 						return null;
 
 					var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
-																							declarationOrder, chainedExtensionInfo);
+																							declarationOrder, chainedExtensionInfo,
+																							ExtensionMechanismType.Chaining);
 					return extensionInfo;
 				}
 				case null:
@@ -285,7 +288,8 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 			}
 
 			var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
-																					declarationOrder, baseChainedExtensionInfos);
+																					declarationOrder, baseChainedExtensionInfos,
+																					ExtensionMechanismType.Chaining);
 			return extensionInfo;
 		}
 

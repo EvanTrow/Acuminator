@@ -77,6 +77,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			{
 				cancellation.ThrowIfCancellationRequested();
 
+				// TODO - rewrite the collection of event handlers in the future to recognize different types of extension mechanisms
 				var graphHierarchyFromBaseGraphToDerivedExtension = 
 					_graphEventSemanticModel.GraphOrGraphExtInfo.GetInfosFromBaseGraphToDerivedExtension(includeSelf: true);
 				int declarationOrder = 0;

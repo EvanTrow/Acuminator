@@ -4,6 +4,7 @@ using System.Linq;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Extensions;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -30,12 +31,14 @@ public class GraphAndGraphExtInfoBuilder : SymbolInfoBuilderBase<GraphInfo, Grap
 		new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo, declarationOrder);
 
 	protected override GraphExtensionInfo ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? graphExtensionNode, ITypeSymbol graphExtension,
-																			GraphInfo? graphInfo, int declarationOrder, GraphExtensionInfo baseExtension) => 
-		new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo, declarationOrder, baseExtension);
+																			GraphInfo? graphInfo, int declarationOrder, GraphExtensionInfo baseExtension,
+																			ExtensionMechanismType extensionMechanismType) => 
+		new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo, declarationOrder, baseExtension, extensionMechanismType);
 
 	protected override GraphExtensionInfo ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? graphExtensionNode, ITypeSymbol graphExtension,
-																GraphInfo? graphInfo, int declarationOrder, IEnumerable<GraphExtensionInfo> baseExtensions) => 
-		new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo, declarationOrder, baseExtensions);
+																GraphInfo? graphInfo, int declarationOrder, IEnumerable<GraphExtensionInfo> baseExtensions,
+																ExtensionMechanismType extensionMechanismType) => 
+		new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo, declarationOrder, baseExtensions, extensionMechanismType);
 
 	protected override IEnumerable<ITypeSymbol> GetBaseRootTypesFromDerivedToBase(ITypeSymbol graphTypeSymbol, PXContext pxContext) =>
 		graphTypeSymbol.GetGraphBaseTypes();

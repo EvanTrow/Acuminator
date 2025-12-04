@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Acuminator.Utilities.Roslyn.Semantic.Shared
+namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Extensions
 {
 	/// <summary>
 	/// The type of the mechanism used to extend base extension.
