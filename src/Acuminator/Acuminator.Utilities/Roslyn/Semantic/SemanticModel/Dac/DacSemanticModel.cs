@@ -202,24 +202,13 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			return builder.ToImmutable();
 		}
 
-		protected ImmutableDictionary<string, DacPropertyInfo> GetDacProperties() =>
-			GetInfos(() => Symbol.GetDacPropertiesFromDac(PXContext, BqlFieldsByNames, cancellation: _cancellation),
-					 () => Symbol.GetPropertiesFromDacExtensionAndBaseDac(PXContext, BqlFieldsByNames, _cancellation));
-
 		protected ImmutableDictionary<string, DacBqlFieldInfo> GetDacBqlFields() =>
-			GetInfos(() => Symbol.GetDacBqlFieldsFromDac(PXContext, cancellation: _cancellation),
-					 () => Symbol.GetDacBqlFieldsFromDacExtensionAndBaseDac(PXContext, _cancellation));
+			DacOrDacExtInfo.GetDacBqlFieldInfos(PXContext, _cancellation)
+						   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
-		protected ImmutableDictionary<string, TInfo> GetInfos<TInfo>(Func<OverridableItemsCollection<TInfo>> dacInfosSelector,
-																	 Func<OverridableItemsCollection<TInfo>> dacExtInfosSelector)
-		where TInfo : IOverridableItem<TInfo>
-		{
-			var infos = DacType == DacType.Dac
-				? dacInfosSelector()
-				: dacExtInfosSelector();
-
-			return infos.ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
-		}
+		protected ImmutableDictionary<string, DacPropertyInfo> GetDacProperties() =>
+			DacOrDacExtInfo.GetPropertyInfos(PXContext, BqlFieldsByNames, _cancellation)
+						   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
 		protected IsActiveMethodInfo? GetIsActiveMethodInfo()
 		{

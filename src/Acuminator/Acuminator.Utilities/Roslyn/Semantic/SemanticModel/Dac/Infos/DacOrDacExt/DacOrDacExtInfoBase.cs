@@ -41,8 +41,28 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		public IEnumerable<DacOrDacExtInfoBase> GetInfosFromBaseDacToDerivedExtension(bool includeSelf) =>
 			GetInfosFromDerivedExtensionToBaseDac(includeSelf).Reverse();
 
-		public OverridableItemsCollection<DacPropertyInfo> GetPropertyInfos(PXContext pxContext, IDictionary<string, DacBqlFieldInfo> dacFields,
-																			CancellationToken cancellation)
+		internal OverridableItemsCollection<DacBqlFieldInfo> GetDacBqlFieldInfos(PXContext pxContext, CancellationToken cancellation)
+		{
+			int estimatedCapacity = DacType?.GetTypeMembers().Length ?? 0;
+			var bqlFieldsByName = new OverridableItemsCollection<DacBqlFieldInfo>(estimatedCapacity);
+			var rawBqlFieldsDataFromBaseDacToDerivedExtension = GetRawBqlFieldsData(pxContext, includeFromBaseInfos: true, cancellation);
+
+			int declarationOrder = 0;
+
+			foreach (var (bqlFieldNode, bqlFieldSymbol) in rawBqlFieldsDataFromBaseDacToDerivedExtension)
+			{
+				cancellation.ThrowIfCancellationRequested();
+				var propertyInfo = DacBqlFieldInfo.CreateUnsafe(pxContext, bqlFieldNode, bqlFieldSymbol, declarationOrder);
+
+				bqlFieldsByName.Add(propertyInfo);
+				declarationOrder++;
+			}
+
+			return bqlFieldsByName;
+		}
+
+		internal OverridableItemsCollection<DacPropertyInfo> GetPropertyInfos(PXContext pxContext, IDictionary<string, DacBqlFieldInfo> dacFields,
+																			  CancellationToken cancellation)
 		{
 			var dbBoundnessCalculator = new DbBoundnessCalculator(pxContext);
 			int estimatedCapacity = DacType?.GetTypeMembers().Length ?? 0;
@@ -72,25 +92,45 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// <returns/>
 		private IEnumerable<(PropertyDeclarationSyntax? Node, IPropertySymbol Symbol)> GetRawPropertiesData(PXContext pxContext,
 																											bool includeFromBaseInfos,
-																											CancellationToken cancellation)
+																											CancellationToken cancellation) =>
+			GetRawData(includeFromBaseInfos,
+						dacOrDacExtInfo => GetRawPropertiesData(dacOrDacExtInfo, pxContext, cancellation));
+		
+		/// <summary>
+		/// Get all DAC BQL fields with nodes from DAC or DAC extension and its base infos.
+		/// </summary>
+		/// <param name="pxContext">Acumatica context.</param>
+		/// <param name="includeFromBaseInfos">True to include, false to exclude DAC BQL fields from base infos.</param>
+		/// <param name="cancellation">Cancellation token.</param>
+		/// <returns/>
+		private IEnumerable<(ClassDeclarationSyntax? Node, INamedTypeSymbol Symbol)> GetRawBqlFieldsData(PXContext pxContext,
+																										 bool includeFromBaseInfos,
+																										 CancellationToken cancellation) =>
+			GetRawData(includeFromBaseInfos, 
+						dacOrDacExtInfo => GetRawBqlFieldsData(dacOrDacExtInfo, pxContext, cancellation));
+		
+		private IEnumerable<TRawData> GetRawData<TRawData>(bool includeFromBaseInfos,
+														   Func<DacOrDacExtInfoBase, IEnumerable<TRawData>> rawDataGetter)
 		{
 			if (includeFromBaseInfos)
 			{
 				return GetInfosFromBaseDacToDerivedExtension(includeFromBaseInfos)
-						.SelectMany(dacOrDacExtInfo => dacOrDacExtInfo.GetRawPropertiesData(pxContext, cancellation));
+						  .SelectMany(dacOrDacExtInfo => rawDataGetter(dacOrDacExtInfo));
 			}
 			else
 			{
-				return GetRawPropertiesData(pxContext, cancellation);
+				return rawDataGetter(this);
 			}
 		}
 
-		private IEnumerable<(PropertyDeclarationSyntax? Node, IPropertySymbol Symbol)> GetRawPropertiesData(PXContext pxContext, 
+		private static IEnumerable<(PropertyDeclarationSyntax? Node, IPropertySymbol Symbol)> GetRawPropertiesData(
+																											DacOrDacExtInfoBase dacOrDacExtInfo,
+																											PXContext pxContext, 
 																											CancellationToken cancellation)
 		{
-			var dacProperties = Symbol.GetMembers()
-									  .OfType<IPropertySymbol>()
-									  .Where(p => p.DeclaredAccessibility == Accessibility.Public && !p.IsStatic);
+			var dacProperties = dacOrDacExtInfo.Symbol.GetMembers()
+													  .OfType<IPropertySymbol>()
+													  .Where(p => p.DeclaredAccessibility == Accessibility.Public && !p.IsStatic);
 
 			foreach (IPropertySymbol property in dacProperties)
 			{
@@ -98,6 +138,23 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 				var propertyNode = property.GetSyntax(cancellation) as PropertyDeclarationSyntax;
 				yield return (propertyNode, property);
+			}
+		}
+
+		private static IEnumerable<(ClassDeclarationSyntax? Node, INamedTypeSymbol Symbol)> GetRawBqlFieldsData(
+																									DacOrDacExtInfoBase dacOrDacExtInfo,
+																									PXContext pxContext, 
+																									CancellationToken cancellation)
+		{
+			var dacBqlFields = dacOrDacExtInfo.Symbol.GetTypeMembers()
+													 .Where(type => type.IsDacBqlField(pxContext));
+
+			foreach (INamedTypeSymbol bqlField in dacBqlFields)
+			{
+				cancellation.ThrowIfCancellationRequested();
+				var bqlFieldNode = bqlField.GetSyntax(cancellation) as ClassDeclarationSyntax;
+
+				yield return (bqlFieldNode, bqlField);
 			}
 		}
 	}
