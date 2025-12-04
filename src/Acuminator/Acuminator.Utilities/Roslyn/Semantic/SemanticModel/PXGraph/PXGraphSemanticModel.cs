@@ -282,8 +282,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 							   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
 		protected ImmutableDictionary<string, ActionInfo> GetActions() =>
-			GetInfos(() => Symbol.GetActionSymbolsWithTypesFromGraph(PXContext),
-					 () => Symbol.GetActionsFromGraphExtensionAndBaseGraph(PXContext));
+			GraphOrGraphExtInfo.GetActionInfos(PXContext, _cancellation)
+							   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
 		protected ImmutableDictionary<string, ActionHandlerInfo> GetActionHandlers() =>
 			GetInfos(() => Symbol.GetActionHandlersFromGraph(ActionsByNames, PXContext, cancellation: _cancellation),
