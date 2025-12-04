@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
@@ -39,6 +40,22 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 			CombineWithBaseInfo();
 		}
+
+		public override IEnumerable<DacOrDacExtInfoBase> GetInfosFromDerivedExtensionToBaseDac(bool includeSelf)
+		{
+			var dacExtensionInfos = includeSelf
+				? this.ThisAndOverriddenItems()
+				: this.JustOverriddenItems();
+
+			if (Dac != null)
+			{
+				var dacInfos = Dac.GetInfosFromDerivedExtensionToBaseDac(includeSelf: true);
+				return dacExtensionInfos.Concat(dacInfos);
+			}
+			else
+				return dacExtensionInfos;
+		}
+
 		protected override void CombineWithBaseInfo()
 		{
 			if (Base != null)

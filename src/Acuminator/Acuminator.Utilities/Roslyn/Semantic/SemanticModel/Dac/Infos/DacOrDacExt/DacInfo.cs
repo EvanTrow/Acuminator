@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -19,6 +20,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 					base(node, dac, declarationOrder)
 		{
 		}
+
+		public override IEnumerable<DacOrDacExtInfoBase> GetInfosFromDerivedExtensionToBaseDac(bool includeSelf) =>
+			includeSelf
+				? this.ThisAndOverriddenItems()
+				: this.JustOverriddenItems();
+
 		protected override void CombineWithBaseInfo() { }
 	}
 }
