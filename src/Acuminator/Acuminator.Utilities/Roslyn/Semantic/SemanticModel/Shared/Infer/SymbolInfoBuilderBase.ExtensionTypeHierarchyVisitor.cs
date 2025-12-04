@@ -287,10 +287,29 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 				baseChainedExtensionInfos.Add(chainedExtensionInfo);
 			}
 
+			var compactedBaseChainedExtensionInfos = CompactExtensionInfos(baseChainedExtensionInfos);
 			var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
-																					declarationOrder, baseChainedExtensionInfos,
+																					declarationOrder, compactedBaseChainedExtensionInfos,
 																					ExtensionMechanismType.Chaining);
 			return extensionInfo;
+		}
+
+		protected List<TExtensionInfo> CompactExtensionInfos(List<TExtensionInfo> uncompactedExtensionList)
+		{
+			if (uncompactedExtensionList.Count <= 1)
+				return uncompactedExtensionList;
+
+			bool somethingChanged = true;
+			var compactedExtensionsList = new List<TExtensionInfo>(uncompactedExtensionList.Count);
+
+			// For compaction we will use Acumatica Framework rule that higher-level extensions 
+
+			while (somethingChanged)
+			{
+
+			}
+
+			return compactedExtensionsList;
 		}
 
 		private bool IsTypeAlreadyVisitedInCurrentPath(ITypeSymbol typeSymbol) => _currentPath.Count switch

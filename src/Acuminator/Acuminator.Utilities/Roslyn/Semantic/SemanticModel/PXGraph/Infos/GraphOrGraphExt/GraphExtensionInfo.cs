@@ -14,7 +14,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	/// <summary>
 	/// Information about the correctly declared graph extension without issues in the type hierarchy.
 	/// </summary>
-	public class GraphExtensionInfo : GraphOrGraphExtInfoBase
+	public class GraphExtensionInfo : GraphOrGraphExtInfoBase, IExtensionInfo<GraphExtensionInfo>
 	{
 		public GraphInfo? BaseGraph { get; }
 
@@ -25,6 +25,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// Contains either direct base graph extension or chained graph extensions.
 		/// </summary>
 		public ImmutableArray<GraphExtensionInfo> BaseGraphExtensions { get; }
+
+		ImmutableArray<GraphExtensionInfo> IExtensionInfo<GraphExtensionInfo>.BaseExtensions => BaseGraphExtensions;
 
 		internal GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
 									int declarationOrder) :
