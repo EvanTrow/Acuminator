@@ -131,12 +131,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 		}
 
 		private static void ReportTypeSizeMismatch(SymbolAnalysisContext context, PXContext pxContext, 
-												   DacFieldAttributeInfo localDataTypeAtributeToReport,
+												   DacFieldAttributeInfo localDataTypeAttributeToReport,
 												   string localDacPropertyName, string foreignDacPropertyName, 
 												   DacFieldSize foreignDacFieldSize)
 		{
-			var location = localDataTypeAtributeToReport.AttributeData.GetLocation(context.CancellationToken)
-																	  .NullIfLocationKindIsNone();
+			var location = localDataTypeAttributeToReport.AttributeData.GetLocation(context.CancellationToken)
+																	   .NullIfLocationKindIsNone();
 			if (location is null)
 				return;
 
