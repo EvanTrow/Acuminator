@@ -192,7 +192,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			ViewDelegatesByNames = GetDataViewDelegates(ViewsByNames);
 
 			ActionsByNames 		  = GetActions();
-			ActionDelegateByNames = GetActionDelegates();
+			ActionDelegateByNames = GetActionDelegates(ActionsByNames);
 
 			InitProcessingDelegatesInfo();
 
@@ -285,20 +285,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			GraphOrGraphExtInfo.GetActionInfos(PXContext, _cancellation)
 							   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
-		protected ImmutableDictionary<string, ActionDelegateInfo> GetActionDelegates() =>
-			GetInfos(() => Symbol.GetActionHandlersFromGraph(ActionsByNames, PXContext, cancellation: _cancellation),
-					 () => Symbol.GetActionHandlersFromGraphExtensionAndBaseGraph(ActionsByNames, PXContext, _cancellation));
-
-		protected ImmutableDictionary<string, TInfo> GetInfos<TInfo>(Func<OverridableItemsCollection<TInfo>> graphInfosSelector,
-																   Func<OverridableItemsCollection<TInfo>> graphExtInfosSelector)
-		where TInfo : IOverridableItem<TInfo>
-		{
-			var infos = GraphType == GraphType.PXGraph
-				? graphInfosSelector()
-				: graphExtInfosSelector();
-
-			return infos.ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
-		}
+		protected ImmutableDictionary<string, ActionDelegateInfo> GetActionDelegates(IDictionary<string, ActionInfo> actionsByName) =>
+			GraphOrGraphExtInfo.GetActionDelegateInfos(PXContext, actionsByName, _cancellation)
+							   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
 		/// <summary>
 		/// Gets the declared initializers in this collection.

@@ -52,9 +52,9 @@ public abstract partial class GraphOrGraphExtInfoBase : NodeSymbolItem<ClassDecl
 		foreach (var (viewDelegateNode, viewDelegateSymbol) in rawGraphViewDelegatesDataFromBaseGraphToDerivedExtension)
 		{
 			cancellation.ThrowIfCancellationRequested();
-			var graphViewInfo = new DataViewDelegateInfo(viewDelegateNode, viewDelegateSymbol, declarationOrder);
+			var graphViewDelegateInfo = new DataViewDelegateInfo(viewDelegateNode, viewDelegateSymbol, declarationOrder);
 
-			graphViewDelegatesByName.Add(graphViewInfo);
+			graphViewDelegatesByName.Add(graphViewDelegateInfo);
 			declarationOrder++;
 		}
 

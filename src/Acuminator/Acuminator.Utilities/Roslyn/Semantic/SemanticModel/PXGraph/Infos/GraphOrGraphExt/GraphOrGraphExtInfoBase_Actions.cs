@@ -41,13 +41,37 @@ public abstract partial class GraphOrGraphExtInfoBase : NodeSymbolItem<ClassDecl
 		return graphActionsByName;
 	}
 
-	
+	internal OverridableItemsCollection<ActionDelegateInfo> GetActionDelegateInfos(PXContext pxContext, IDictionary<string, ActionInfo> actionsByName,
+																				   CancellationToken cancellation)
+	{
+		const int estimatedNumberOfActionDelegatesInGraph = 8;
+
+		var graphActionDelegatesByName = new OverridableItemsCollection<ActionDelegateInfo>(estimatedNumberOfActionDelegatesInGraph);
+		var rawGraphActionDelegatesDataFromBaseGraphToDerivedExtension =
+			GetRawActionDelegatesData(pxContext, actionsByName, includeFromBaseInfos: true, cancellation);
+
+		int declarationOrder = 0;
+
+		foreach (var (actionDelegateNode, actionDelegateSymbol) in rawGraphActionDelegatesDataFromBaseGraphToDerivedExtension)
+		{
+			cancellation.ThrowIfCancellationRequested();
+			var graphActionDelegateInfo = new ActionDelegateInfo(actionDelegateNode, actionDelegateSymbol, declarationOrder);
+
+			graphActionDelegatesByName.Add(graphActionDelegateInfo);
+			declarationOrder++;
+		}
+
+		return graphActionDelegatesByName;
+	}
 
 	private IEnumerable<RawGraphActionData> GetRawGraphActionsData(PXContext pxContext, bool includeFromBaseInfos,
 																   CancellationToken cancellation) =>
 		GetRawData(includeFromBaseInfos, graphOrGraphExtInfo => GetRawGraphActionsData(graphOrGraphExtInfo, pxContext, cancellation));
 
-	
+	private IEnumerable<(MethodDeclarationSyntax? Node, IMethodSymbol Symbol)> GetRawActionDelegatesData(PXContext pxContext, 
+																				IDictionary<string, ActionInfo> actionsByName,
+																				bool includeFromBaseInfos, CancellationToken cancellation) =>
+		GetRawData(includeFromBaseInfos, graphOrGraphExtInfo => GetRawActionDelegatesData(graphOrGraphExtInfo, actionsByName, pxContext, cancellation));
 
 	private static IEnumerable<RawGraphActionData> GetRawGraphActionsData(GraphOrGraphExtInfoBase graphOrGraphExtInfo, PXContext pxContext,
 																		  CancellationToken cancellation)
@@ -66,5 +90,21 @@ public abstract partial class GraphOrGraphExtInfoBase : NodeSymbolItem<ClassDecl
 		}
 	}
 
-	
+	private static IEnumerable<(MethodDeclarationSyntax? Node, IMethodSymbol Symbol)> GetRawActionDelegatesData(GraphOrGraphExtInfoBase graphOrGraphExtInfo,
+																								IDictionary<string, ActionInfo> actionsByName,
+																								PXContext pxContext, CancellationToken cancellation)
+	{
+		var methods = graphOrGraphExtInfo.Symbol.GetMethods();
+
+		foreach (IMethodSymbol method in methods)
+		{
+			cancellation.ThrowIfCancellationRequested();
+
+			if (method.IsValidActionHandler(pxContext) && actionsByName.ContainsKey(method.Name))
+			{
+				var node = method.GetSyntax(cancellation) as MethodDeclarationSyntax;
+				yield return (node, method);
+			}
+		}
+	}
 }

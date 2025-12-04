@@ -107,19 +107,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		}
 
 		/// <summary>
-		/// Gets base graph extensions from graph extension type.
-		/// </summary>
-		/// <param name="graphExtension">The graph extension to act on.</param>
-		/// <param name="pxContext">Context.</param>
-		/// <param name="sortDirection">The sort direction. The <see cref="SortDirection.Descending"/> order is from the extension to its base extensions/graph.
-		/// The <see cref="SortDirection.Ascending"/> order is from the graph/base extensions to the most derived one.</param>
-		/// <param name="includeGraph">True to include, false to exclude the graph type.</param>
-		/// <returns/>
-		public static IEnumerable<ITypeSymbol> GetBaseGraphExtensions(this ITypeSymbol graphExtension, PXContext pxContext,
-																	  SortDirection sortDirection, bool includeGraph) =>
-			GetGraphExtensionWithBaseExtensions(graphExtension, pxContext, sortDirection, includeGraph, includeGraphExtension: false);
-
-		/// <summary>
 		/// Gets the graph extension with its base graph extensions from graph extension type.
 		/// </summary>
 		/// <param name="graphExtension">The graph extension to act on.</param>
