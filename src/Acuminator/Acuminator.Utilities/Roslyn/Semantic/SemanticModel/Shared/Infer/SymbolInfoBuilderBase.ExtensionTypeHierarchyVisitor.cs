@@ -216,7 +216,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 			return extensionInfo;
 		}
 
-		protected virtual TExtensionInfo? InferExtensionDerivedFromBaseGenericExtensionType(ITypeSymbol extensionTypeSymbol, 
+		protected TExtensionInfo? InferExtensionDerivedFromBaseGenericExtensionType(ITypeSymbol extensionTypeSymbol, 
 																ClassDeclarationSyntax? extensionNode, INamedTypeSymbol baseGenericExtensionType,
 																ITypeSymbol rootTypeSymbol, TRootInfo? rootInfo, int declarationOrder)
 		{
@@ -247,25 +247,8 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 					FailedToCollectTypeHierarchy = true;
 					return null;
 				default:
-				{
-					bool isInSource = extensionNode != null;
-					var baseChainedExtensionInfos = new List<TExtensionInfo>(baseChainedExtensionTypes.Count);
-
-					foreach (ITypeSymbol chainedExtensionType in baseChainedExtensionTypes)
-					{
-						// Deliberately do not use the precalcedRootTypeSymbol here since it can be different for chained extensions
-						var chainedExtensionInfo = VisitExtensionType(extensionTypeSymbol, isInSource, precalcedRootTypeSymbol: null,
-																	  extensionDeclarationOrder: null);
-						if (chainedExtensionInfo == null)
-							return null;
-
-						baseChainedExtensionInfos.Add(chainedExtensionInfo);
-					}
-
-					var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
-																							declarationOrder, baseChainedExtensionInfos);
-					return extensionInfo;
-				}
+					return InferExtensionDerivedFromBaseGenericExtensionTypeWithMultipleChainedExtensions(extensionTypeSymbol, extensionNode, rootInfo,
+																										  declarationOrder, baseChainedExtensionTypes);
 			}
 		}
 
@@ -281,6 +264,29 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 
 			var chainedBaseExtensions = _builder.GetChainedBaseExtensionTypesFromBaseGenericExtensionType(baseGenericExtensionType, _pxContext);
 			return chainedBaseExtensions;
+		}
+
+		protected virtual TExtensionInfo? InferExtensionDerivedFromBaseGenericExtensionTypeWithMultipleChainedExtensions(ITypeSymbol extensionTypeSymbol,
+																					ClassDeclarationSyntax? extensionNode, TRootInfo? rootInfo, 
+																					int declarationOrder, IReadOnlyList<ITypeSymbol> baseChainedExtensionTypes)
+		{
+			bool isInSource = extensionNode != null;
+			var baseChainedExtensionInfos = new List<TExtensionInfo>(baseChainedExtensionTypes.Count);
+
+			foreach (ITypeSymbol chainedExtensionType in baseChainedExtensionTypes)
+			{
+				// Deliberately do not use the precalcedRootTypeSymbol here since it can be different for chained extensions
+				var chainedExtensionInfo = VisitExtensionType(extensionTypeSymbol, isInSource, precalcedRootTypeSymbol: null,
+															  extensionDeclarationOrder: null);
+				if (chainedExtensionInfo == null)
+					return null;
+
+				baseChainedExtensionInfos.Add(chainedExtensionInfo);
+			}
+
+			var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
+																					declarationOrder, baseChainedExtensionInfos);
+			return extensionInfo;
 		}
 
 		private bool IsTypeAlreadyVisitedInCurrentPath(ITypeSymbol typeSymbol) => _currentPath.Count switch
