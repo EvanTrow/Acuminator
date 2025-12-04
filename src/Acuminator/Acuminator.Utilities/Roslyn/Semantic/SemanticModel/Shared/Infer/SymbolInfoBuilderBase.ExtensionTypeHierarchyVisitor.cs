@@ -226,6 +226,23 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 			{
 				case 0:
 					return InferExtensionExtendingOnlyRootSymbol(extensionTypeSymbol, extensionNode, rootTypeSymbol, declarationOrder);
+
+				// Optimization - simple and popular case with only one base extension. No compaction of base extension is required in this case
+				case 1:
+				{
+					bool isInSource = extensionNode != null;
+					ITypeSymbol baseChainedExtensionType = baseChainedExtensionTypes[0];
+
+					// Deliberately do not use the precalcedRootTypeSymbol here since it can be different for chained extension
+					var chainedExtensionInfo = VisitExtensionType(extensionTypeSymbol, isInSource, precalcedRootTypeSymbol: null,
+																  extensionDeclarationOrder: null);
+					if (chainedExtensionInfo == null)
+						return null;
+
+					var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
+																							declarationOrder, chainedExtensionInfo);
+					return extensionInfo;
+				}
 				case null:
 					FailedToCollectTypeHierarchy = true;
 					return null;
@@ -252,7 +269,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 			}
 		}
 
-		protected IReadOnlyCollection<ITypeSymbol>? GetBaseChainedExtensionTypes(INamedTypeSymbol baseGenericExtensionType)
+		protected IReadOnlyList<ITypeSymbol>? GetBaseChainedExtensionTypes(INamedTypeSymbol baseGenericExtensionType)
 		{
 			if (!baseGenericExtensionType.IsGenericType)
 				return [];
