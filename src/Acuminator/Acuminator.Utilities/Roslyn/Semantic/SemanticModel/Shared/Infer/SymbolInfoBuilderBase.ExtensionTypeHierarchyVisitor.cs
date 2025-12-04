@@ -92,12 +92,6 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 				_visitedExtensionInfos[extensionTypeSymbol] = null;			// Cache problem info for extension with proven circular reference
 				return null;
 			}
-			else if (!CheckBaseExtensionsAreCorrect(extensionTypeSymbol))
-			{
-				ExtensionWithBadBaseExtensions = extensionTypeSymbol;
-				_visitedExtensionInfos[extensionTypeSymbol] = null;			// Cache problem info for extension with proven bad base extensions
-				return null;
-			}
 			else if (_currentPath.Count > MaxPathLength)
 			{
 				FailedToCollectTypeHierarchy = true;
@@ -124,6 +118,15 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 				{
 					inferredExtensionInfo = InferExtensionRecursively(extensionTypeSymbol, extensionNode, precalcedRootTypeSymbol, 
 																	  declarationOrder);
+				}
+
+				// Check base extensions correctness after the extension info and its base extensions are collected
+				if (inferredExtensionInfo != null && !CheckBaseExtensionsAreCorrect(inferredExtensionInfo))
+				{
+					ExtensionWithBadBaseExtensions = extensionTypeSymbol;
+
+					// Reset inferred info for extension with proven bad base extensions to cache the problem
+					inferredExtensionInfo = null;
 				}
 
 				_visitedExtensionInfos[extensionTypeSymbol] = inferredExtensionInfo;    // Cache infer failures and successes
@@ -303,7 +306,10 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 		/// The compacted list of extension infos.
 		/// </returns>
 		/// <remarks>
-		/// In the current implementation the returned list is the same list as the input one. For performance, this is a mutating operation.
+		/// In the current implementation the returned list is the same list as the input one. For performance, this is a mutating operation.<br/>
+		/// <br/>
+		/// Another important thing is that due to the recursive nature of the infer algorithm the compaction will be also done recursively<br/>
+		/// from the most base extension infos to the most derived extensions. Therefore, the final result will be fully compacted extension infos tree.
 		/// </remarks>
 		protected List<TExtensionInfo> CompactExtensionInfos(List<TExtensionInfo> uncompactedExtensionList)
 		{
@@ -350,7 +356,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			_ => _currentPath.Contains(typeSymbol, SymbolEqualityComparer.Default)
 		};
 
-		protected virtual bool CheckBaseExtensionsAreCorrect(ITypeSymbol extensionTypeSymbol) => true;
+		protected virtual bool CheckBaseExtensionsAreCorrect(TExtensionInfo extensionInfo) => true;
 
 		protected void ClearState()
 		{
