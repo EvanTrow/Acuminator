@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
 
@@ -13,4 +14,8 @@ public abstract class GraphOrGraphExtInfoBase : NodeSymbolItem<ClassDeclarationS
 	protected GraphOrGraphExtInfoBase(ClassDeclarationSyntax? node, ITypeSymbol graphOrGraphExt, int declarationOrder) :
 								 base(node, graphOrGraphExt, declarationOrder)
 	{ }
+
+	public abstract IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromDerivedExtensionToBaseGraph(bool includeSelf);
+
+	public abstract IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromBaseGraphToDerivedExtension(bool includeSelf);
 }

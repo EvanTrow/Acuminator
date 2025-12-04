@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -25,6 +24,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		internal GraphInfo(ClassDeclarationSyntax? node, ITypeSymbol graph, int declarationOrder) :
 					  base(node, graph, declarationOrder)
 		{ }
+
+		public override IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromDerivedExtensionToBaseGraph(bool includeSelf) =>
+			includeSelf
+				? this.ThisAndOverridenItems()
+				: this.JustOverridenItems();
+
+		public override IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromBaseGraphToDerivedExtension(bool includeSelf) =>
+			GetInfosFromDerivedExtensionToBaseGraph(includeSelf).Reverse();
 
 		void IOverridableItem<GraphInfo>.CombineWithBaseInfo() => CombineWithBaseInfo();
 
