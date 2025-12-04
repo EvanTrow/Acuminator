@@ -42,7 +42,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <summary>
 		/// The type of the data view symbol
 		/// </summary>
-		public INamedTypeSymbol Type { get; }
+		public ITypeSymbol Type { get; }
 		
 		public ITypeSymbol? DAC { get; }
 
@@ -66,14 +66,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 		protected override string DebuggerDisplay => $"{base.DebuggerDisplay} |Type: {Type.ToString()}";
 
-		public DataViewInfo(ISymbol symbol, INamedTypeSymbol type, PXContext pxContext, int declarationOrder, DataViewInfo baseInfo)
+		public DataViewInfo(ISymbol symbol, ITypeSymbol type, PXContext pxContext, int declarationOrder, DataViewInfo baseInfo)
 					 : this(symbol, type, pxContext, declarationOrder)
 		{
 			_baseInfo = baseInfo.CheckIfNull(nameof(baseInfo));
 			CombineWithBaseInfo();
 		}
 
-		public DataViewInfo(ISymbol symbol, INamedTypeSymbol type, PXContext pxContext, int declarationOrder)
+		public DataViewInfo(ISymbol symbol, ITypeSymbol type, PXContext pxContext, int declarationOrder)
 					 : base(symbol, declarationOrder)
 		{
 			pxContext.ThrowOnNull();
