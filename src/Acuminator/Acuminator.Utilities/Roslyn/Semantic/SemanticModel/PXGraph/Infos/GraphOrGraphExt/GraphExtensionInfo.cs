@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Threading;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Shared.Extensions;
@@ -97,34 +96,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <returns>
 		/// Collection of extension infos from derived extension to base extensions level by level.
 		/// </returns>
-		public IEnumerable<GraphExtensionInfo> GetExtensionInfosFromDerivedExtensionToBaseExtensions(bool includeSelf)
-		{
-			if (includeSelf)
-				yield return this;
-
-			if (BaseGraphExtensions.IsDefaultOrEmpty)
-				yield break;
-
-			// Use breadth first traversal to get level by level extensions + add hard guard on iterations count against infinite loops
-			const int maxIterationCount = 10_000;
-			int iterationCount = 0;
-			var queue = new Queue<GraphExtensionInfo>(BaseGraphExtensions);
-
-			while (queue.Count > 0 && iterationCount < maxIterationCount)
-			{
-				iterationCount++;
-				var baseOrChainedGraphExtension = queue.Dequeue();
-				yield return baseOrChainedGraphExtension;
-
-				if (baseOrChainedGraphExtension.BaseGraphExtensions.IsDefaultOrEmpty)
-					continue;
-
-				foreach (var descendantGraphExtension in baseOrChainedGraphExtension.BaseGraphExtensions)
-				{
-					queue.Enqueue(descendantGraphExtension);
-				}
-			}
-		}
+		public IEnumerable<GraphExtensionInfo> GetExtensionInfosFromDerivedExtensionToBaseExtensions(bool includeSelf) =>
+			includeSelf
+				? this.GetAllBaseExtensionInfosAndThisBFS()
+				: this.GetAllBaseExtensionInfosBFS();
 
 		/// <summary>
 		/// Combine this info with info from base graph and graph extensions.
