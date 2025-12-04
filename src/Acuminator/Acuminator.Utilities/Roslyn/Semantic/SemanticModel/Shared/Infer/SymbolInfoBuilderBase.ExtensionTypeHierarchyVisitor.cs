@@ -120,15 +120,6 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 																	  declarationOrder);
 				}
 
-				// Check base extensions correctness after the extension info and its base extensions are collected
-				if (inferredExtensionInfo != null && !CheckBaseExtensionsAreCorrect(inferredExtensionInfo))
-				{
-					ExtensionWithBadBaseExtensions = extensionTypeSymbol;
-
-					// Reset inferred info for extension with proven bad base extensions to cache the problem
-					inferredExtensionInfo = null;
-				}
-
 				_visitedExtensionInfos[extensionTypeSymbol] = inferredExtensionInfo;    // Cache infer failures and successes
 				return inferredExtensionInfo;
 			}
@@ -156,6 +147,12 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 				{
 					rootInfo = _builder.CreateRootSymbolInfo(rootTypeSymbol, _pxContext, customDeclarationOrder: null, _cancellation);
 					_collectedRootInfos[rootTypeSymbol] = rootInfo;
+				}
+
+				if (!_builder.CheckBaseExtensionsAreCorrect(Array.Empty<TExtensionInfo>()))
+				{
+					ExtensionWithBadBaseExtensions = extensionTypeSymbol;
+					return null;
 				}
 
 				var extensionInfo = _builder.ExtensionSymbolInfoConstructor(extensionNode, extensionTypeSymbol, rootInfo, declarationOrder);
@@ -215,6 +212,12 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			if (baseExtensionInfo == null)
 				return null;
 
+			if (!_builder.CheckBaseExtensionsAreCorrect([baseExtensionInfo]))
+			{
+				ExtensionWithBadBaseExtensions = extensionTypeSymbol;
+				return null;
+			}
+
 			var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
 																					declarationOrder, baseExtensionInfo, 
 																					ExtensionMechanismType.Inheritance);
@@ -243,6 +246,12 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 																  extensionDeclarationOrder: null);
 					if (chainedExtensionInfo == null)
 						return null;
+
+					if (!_builder.CheckBaseExtensionsAreCorrect([chainedExtensionInfo]))
+					{
+						ExtensionWithBadBaseExtensions = extensionTypeSymbol;
+						return null;
+					}
 
 					var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
 																							declarationOrder, chainedExtensionInfo,
@@ -291,6 +300,14 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			}
 
 			var compactedBaseChainedExtensionInfos = CompactExtensionInfos(baseChainedExtensionInfos);
+
+			// Check base extensions correctness after they are collected and compacted
+			if (!_builder.CheckBaseExtensionsAreCorrect(compactedBaseChainedExtensionInfos))
+			{
+				ExtensionWithBadBaseExtensions = extensionTypeSymbol;
+				return null;
+			}
+
 			var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
 																					declarationOrder, compactedBaseChainedExtensionInfos,
 																					ExtensionMechanismType.Chaining);
@@ -356,7 +373,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			_ => _currentPath.Contains(typeSymbol, SymbolEqualityComparer.Default)
 		};
 
-		protected virtual bool CheckBaseExtensionsAreCorrect(TExtensionInfo extensionInfo) => true;
+		private void ClearState()
 
 		protected void ClearState()
 		{

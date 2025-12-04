@@ -36,8 +36,8 @@ public class GraphAndGraphExtInfoBuilder : SymbolInfoBuilderBase<GraphInfo, Grap
 		new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo, declarationOrder, baseExtension, extensionMechanismType);
 
 	protected override GraphExtensionInfo ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? graphExtensionNode, ITypeSymbol graphExtension,
-																GraphInfo? graphInfo, int declarationOrder, IEnumerable<GraphExtensionInfo> baseExtensions,
-																ExtensionMechanismType extensionMechanismType) => 
+															GraphInfo? graphInfo, int declarationOrder, IReadOnlyCollection<GraphExtensionInfo> baseExtensions,
+															ExtensionMechanismType extensionMechanismType) => 
 		new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo, declarationOrder, baseExtensions, extensionMechanismType);
 
 	protected override IEnumerable<ITypeSymbol> GetBaseRootTypesFromDerivedToBase(ITypeSymbol graphTypeSymbol, PXContext pxContext) =>
@@ -65,4 +65,6 @@ public class GraphAndGraphExtInfoBuilder : SymbolInfoBuilderBase<GraphInfo, Grap
 	protected override IReadOnlyList<ITypeSymbol>? GetChainedBaseExtensionTypesFromBaseGenericExtensionType(ITypeSymbol pxGraphExtensionBaseType, 
 																											PXContext pxContext) => 
 		GraphSymbolHierarchyUtils.GetChainedExtensionTypesFromPxGraphExtensionTypeArgsUnsafe(pxGraphExtensionBaseType, pxContext);
+
+	protected override bool CheckBaseExtensionsAreCorrect(IReadOnlyCollection<GraphExtensionInfo> baseExtensions) => true;
 }

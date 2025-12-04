@@ -14,9 +14,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Dac;
 
 public partial class DacAndDacExtInfoBuilder : SymbolInfoBuilderBase<DacInfo, DacExtensionInfo>
 {
-	protected override ExtensionTypeHierarchyVisitor GetExtensionTypeHierarchyVisitor(PXContext pxContext, CancellationToken cancellation) => 
-		new DacExtensionTypeHierarchyVisitor(this, pxContext, cancellation);
-
 	protected override bool IsRootFrameworkType(ITypeSymbol typeSymbol, PXContext pxContext) =>
 		typeSymbol.IsDAC(pxContext);
 	
@@ -39,11 +36,17 @@ public partial class DacAndDacExtInfoBuilder : SymbolInfoBuilderBase<DacInfo, Da
 																		ExtensionMechanismType extensionMechanismType) => 
 		new DacExtensionInfo(dacExtensionNode, dacExtension, dacInfo, declarationOrder, baseExtension, extensionMechanismType);
 
-	protected override DacExtensionInfo? ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? dacExtensionNode, ITypeSymbol dacExtension,
-																					DacInfo? dacInfo, int declarationOrder,
-																					IEnumerable<DacExtensionInfo> baseExtensions, 
-																					ExtensionMechanismType extensionMechanismType) =>
-		null;
+	protected override DacExtensionInfo ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? dacExtensionNode, ITypeSymbol dacExtension,
+																				   DacInfo? dacInfo, int declarationOrder,
+																				   IReadOnlyCollection<DacExtensionInfo> baseExtensions, 
+																				   ExtensionMechanismType extensionMechanismType)
+	{
+		var baseExtension = baseExtensions.FirstOrDefault();
+		return baseExtension != null
+			? ExtensionSymbolInfoConstructorWithBaseInfo(dacExtensionNode, dacExtension, dacInfo, declarationOrder, baseExtension,
+														 extensionMechanismType)
+			: ExtensionSymbolInfoConstructor(dacExtensionNode, dacExtension, dacInfo, declarationOrder);
+	}
 
 	protected override IEnumerable<ITypeSymbol> GetBaseRootTypesFromDerivedToBase(ITypeSymbol dacTypeSymbol, PXContext pxContext) =>
 		dacTypeSymbol.GetDacBaseTypesThatMayStoreDacProperties(pxContext);
@@ -70,4 +73,15 @@ public partial class DacAndDacExtInfoBuilder : SymbolInfoBuilderBase<DacInfo, Da
 	protected override IReadOnlyList<ITypeSymbol>? GetChainedBaseExtensionTypesFromBaseGenericExtensionType(ITypeSymbol pxDacExtensionBaseType,
 																											PXContext pxContext) => 
 		DacSymbolsHierarchyUtils.GetChainedExtensionTypesFromPxCacheExtensionTypeArgsUnsafe(pxDacExtensionBaseType, pxContext);
+
+	/// <summary>
+	/// Check that the inferred base DAC extensions are correct.<br/>
+	/// For DAC extensions it is allowed to have no more than one base DAC extension after compaction because DAC type hierarchies can be only linear.
+	/// </summary>
+	/// <param name="baseDacExtensions">The base DAC extensions.</param>
+	/// <returns>
+	/// True if base DAC extensions are correct, false if not.
+	/// </returns>
+	protected override bool CheckBaseExtensionsAreCorrect(IReadOnlyCollection<DacExtensionInfo> baseDacExtensions) =>
+		baseDacExtensions.Count <= 1;
 }

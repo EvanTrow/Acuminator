@@ -53,7 +53,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			return null;
 	}
 
-	protected virtual ExtensionTypeHierarchyVisitor GetExtensionTypeHierarchyVisitor(PXContext pxContext, CancellationToken cancellation) =>
+	protected ExtensionTypeHierarchyVisitor GetExtensionTypeHierarchyVisitor(PXContext pxContext, CancellationToken cancellation) =>
 		new ExtensionTypeHierarchyVisitor(this, pxContext, cancellation);
 
 	/// <summary>
@@ -161,9 +161,9 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 																				 TRootInfo? rootInfo, int declarationOrder, TExtensionInfo baseExtension,
 																				 ExtensionMechanismType extensionMechanismType);
 
-	protected abstract TExtensionInfo? ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? extensionNode, ITypeSymbol extensionSymbol,
-																	TRootInfo? rootInfo, int declarationOrder, IEnumerable<TExtensionInfo> baseExtensions, 
-																	ExtensionMechanismType extensionMechanismType);
+	protected abstract TExtensionInfo ExtensionSymbolInfoConstructorWithBaseInfo(ClassDeclarationSyntax? extensionNode, ITypeSymbol extensionSymbol,
+																TRootInfo? rootInfo, int declarationOrder, IReadOnlyCollection<TExtensionInfo> baseExtensions, 
+																ExtensionMechanismType extensionMechanismType);
 
 	protected abstract INamedTypeSymbol? GetBaseGenericExtensionType(ITypeSymbol extensionTypeSymbol, PXContext pxContext);
 
@@ -177,4 +177,13 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 	/// </returns>
 	protected abstract IReadOnlyList<ITypeSymbol>? GetChainedBaseExtensionTypesFromBaseGenericExtensionType(ITypeSymbol baseGenericExtensionType,
 																											PXContext pxContext);
+
+	/// <summary>
+	/// Check that the inferred base extensions are correct.
+	/// </summary>
+	/// <param name="baseExtensions">The base extensions.</param>
+	/// <returns>
+	/// True if base extensions are correct, false if not.
+	/// </returns>
+	protected abstract bool CheckBaseExtensionsAreCorrect(IReadOnlyCollection<TExtensionInfo> baseExtensions);
 }
