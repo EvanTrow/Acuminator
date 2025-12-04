@@ -15,7 +15,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
 
 public abstract partial class SymbolInfoBuilderBase<TRootInfo, TExtensionInfo>
 where TRootInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaSymbolInfo
-where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaSymbolInfo
+where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExtensionInfo<TExtensionInfo>, IInferredAcumaticaSymbolInfo
 {
 	public virtual InferredSymbolInfo? InferTypeInfo(ITypeSymbol? typeSymbol, PXContext pxContext,
 													 int? customDeclarationOrder, CancellationToken cancellation)

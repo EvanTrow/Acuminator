@@ -15,7 +15,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
 
 public abstract partial class SymbolInfoBuilderBase<TRootInfo, TExtensionInfo>
 where TRootInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaSymbolInfo
-where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInferredAcumaticaSymbolInfo
+where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExtensionInfo<TExtensionInfo>, IInferredAcumaticaSymbolInfo
 {
 	/// <summary>
 	/// An extension type hierarchy visitor. Uses depth first search (DFS) based algorithm for cycle detection.
@@ -294,22 +294,50 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IInf
 			return extensionInfo;
 		}
 
+		/// <summary>
+		/// Perform the in-place compaction of the base extension infos list to remove repeated lower-level extension infos<br/>
+		/// that are already present in higher-level extension info subtree.
+		/// </summary>
+		/// <param name="uncompactedExtensionList">List of uncompacted extensions.</param>
+		/// <returns>
+		/// The compacted list of extension infos.
+		/// </returns>
+		/// <remarks>
+		/// In the current implementation the returned list is the same list as the input one. For performance, this is a mutating operation.
+		/// </remarks>
 		protected List<TExtensionInfo> CompactExtensionInfos(List<TExtensionInfo> uncompactedExtensionList)
 		{
 			if (uncompactedExtensionList.Count <= 1)
 				return uncompactedExtensionList;
 
-			bool somethingChanged = true;
-			var compactedExtensionsList = new List<TExtensionInfo>(uncompactedExtensionList.Count);
-
-			// For compaction we will use Acumatica Framework rule that higher-level extensions 
-
-			while (somethingChanged)
+			for (int currentExtensionIndex = 0; currentExtensionIndex < uncompactedExtensionList.Count; currentExtensionIndex++)
 			{
+				// Here we implicitly rely on the Acumatica Framework rule that higher-level extension come first
+				TExtensionInfo currentExtension = uncompactedExtensionList[currentExtensionIndex];
+				var baseExtensionsOfCurrentExtension = currentExtension.BaseExtensions;
 
+				if (baseExtensionsOfCurrentExtension.IsDefaultOrEmpty)
+					continue;
+
+				var baseExtensionsSubTreeOfCurrentExtension = currentExtension.GetAllBaseExtensionInfosBFS()
+																			  .ToList(capacity: baseExtensionsOfCurrentExtension.Length);
+
+				// Check if any of the specified lower-level extensions are already among base types of the current extension.
+				// Remove them if they are.
+				for (int j = uncompactedExtensionList.Count - 1; j > currentExtensionIndex; j--)
+				{
+					var lowerOrSameLevelExtension = uncompactedExtensionList[j];
+					bool isInBaseExtensionsSubTree =
+						baseExtensionsSubTreeOfCurrentExtension.Any(extInfo => lowerOrSameLevelExtension.Symbol.Equals(extInfo.Symbol,
+																				SymbolEqualityComparer.Default));
+					if (isInBaseExtensionsSubTree)
+					{
+						uncompactedExtensionList.RemoveAt(j);
+					}
+				}
 			}
 
-			return compactedExtensionsList;
+			return uncompactedExtensionList;
 		}
 
 		private bool IsTypeAlreadyVisitedInCurrentPath(ITypeSymbol typeSymbol) => _currentPath.Count switch
