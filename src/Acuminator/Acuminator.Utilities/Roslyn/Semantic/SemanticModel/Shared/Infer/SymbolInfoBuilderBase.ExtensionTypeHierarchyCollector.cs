@@ -207,7 +207,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			bool isInSource = extensionNode != null;
 
 			// Small optimization - re-use calculation of root type symbol since it is the same for the base extension type
-			var baseExtensionInfo = VisitExtensionType(extensionTypeSymbol, isInSource, precalcedRootTypeSymbol: rootTypeSymbol,
+			var baseExtensionInfo = VisitExtensionType(extensionTypeSymbol.BaseType!, isInSource, precalcedRootTypeSymbol: rootTypeSymbol,
 													   extensionDeclarationOrder: null);
 			if (baseExtensionInfo == null)
 				return null;
