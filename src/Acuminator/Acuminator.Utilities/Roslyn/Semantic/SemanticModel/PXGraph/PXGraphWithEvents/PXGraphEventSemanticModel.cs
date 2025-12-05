@@ -150,7 +150,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public IDeclaredGraphEventHandlerStorage DeclaredEventHandlers { get; }
 		#endregion
 
-		private PXGraphEventSemanticModel(PXGraphSemanticModel baseGraphModel, CancellationToken cancellation = default)
+		private PXGraphEventSemanticModel(PXGraphSemanticModel baseGraphModel, CancellationToken cancellation)
 		{
 			_cancellation = cancellation;
 			BaseGraphModel = baseGraphModel.CheckIfNull();
@@ -163,15 +163,50 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		}
 
 		public static PXGraphEventSemanticModel EnrichGraphModelWithEvents(PXGraphSemanticModel baseGraphModel, 
-																		   CancellationToken cancellationToken = default) =>
+																		   CancellationToken cancellationToken) =>
 			new PXGraphEventSemanticModel(baseGraphModel.CheckIfNull(), cancellationToken);
 
+		/// <summary>
+		/// Returns the semantic model enriched with collected Acumatica event handlers of graph or graph extension which is inferred from <paramref name="graphOrGraphExtensionTypeSymbol"/>.
+		/// </summary>
+		/// <param name="pxContext">Acumatica context.</param>
+		/// <param name="graphOrGraphExtensionTypeSymbol">The graph or graph extension type symbol.</param>
+		/// <param name="modelCreationOptions">Options for controlling the semantic model creation.</param>
+		/// <param name="customDeclarationOrder">(Optional) The declaration order.</param>
+		/// <param name="cancellation">(Optional) Cancellation token.</param>
+		/// <returns>
+		/// A semantic model for a given graph or graph extension type <paramref name="graphOrGraphExtensionTypeSymbol"/>.
+		/// </returns>
+		public static PXGraphEventSemanticModel? InferModel(PXContext pxContext, ITypeSymbol? graphOrGraphExtensionTypeSymbol,
+														GraphSemanticModelCreationOptions modelCreationOptions,
+														int? customDeclarationOrder = null, CancellationToken cancellation = default)
+		{
+			var baseGraphModel = PXGraphSemanticModel.InferModel(pxContext, graphOrGraphExtensionTypeSymbol, modelCreationOptions,
+																 customDeclarationOrder, cancellation);
+			return baseGraphModel != null
+				? new PXGraphEventSemanticModel(baseGraphModel, cancellation)
+				: null;
+		}
+
+		/// <summary>
+		/// Infer semantic model enriched with collected Acumatica event handlers for a given <paramref name="graphOrGraphExtInferredInfo"/>.
+		/// If <paramref name="graphOrGraphExtInferredInfo"/> is not a graph or graph extension, returns <see langword="null"/>.
+		/// </summary>
+		/// <param name="pxContext">Acumatica context.</param>
+		/// <param name="graphOrGraphExtInferredInfo">
+		/// The graph or graph extension inferred information obtained from resolving a hierarchy of chained graph extensions and base types.
+		/// </param>
+		/// <param name="modelCreationOptions">Options for controlling the semantic model creation.</param>
+		/// <param name="cancellation">Cancellation token.</param>
+		/// <returns>
+		/// A semantic model enriched with collected Acumatica event handlers for a given graph or graph extension <paramref name="graphOrGraphExtInferredInfo"/>.<br/>
+		/// If <paramref name="graphOrGraphExtInferredInfo"/> is not graph or graph extension, then returns <see langword="null"/>.
+		/// </returns>
 		public static PXGraphEventSemanticModel? InferModel(PXContext pxContext, GraphOrGraphExtInfoBase graphOrGraphExtInferredInfo,
-															GraphSemanticModelCreationOptions modelCreationOptions,
-															int? declarationOrder = null, CancellationToken cancellation = default)
+															GraphSemanticModelCreationOptions modelCreationOptions, CancellationToken cancellation)
 		{	
 			var baseGraphModel = PXGraphSemanticModel.InferModel(pxContext, graphOrGraphExtInferredInfo, modelCreationOptions, 
-																 declarationOrder, cancellation);
+																 cancellation);
 			return baseGraphModel != null 
 				? new PXGraphEventSemanticModel(baseGraphModel, cancellation)
 				: null;

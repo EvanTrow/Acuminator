@@ -4,11 +4,12 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
-using System.Xml.Linq;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
 using Acuminator.Utilities.Roslyn.Semantic.Shared;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Graph;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -168,7 +169,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public ImmutableArray<GraphAttributeInfo> Attributes { get; }
 
 		protected PXGraphSemanticModel(PXContext pxContext, GraphOrGraphExtInfoBase graphOrGraphExtInfo, GraphSemanticModelCreationOptions modelCreationOptions,
-									   int declarationOrder, CancellationToken cancellation = default)
+									   CancellationToken cancellation)
 		{
 			cancellation.ThrowIfCancellationRequested();
 
@@ -345,32 +346,55 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		}
 
 		/// <summary>
-		/// Infer semantic model for a given <paramref name="graphOrGraphExtTypeSymbol"/>. 
-		/// If <paramref name="graphOrGraphExtTypeSymbol"/> is not a graph or graph extension, returns <see langword="null"/>.
+		/// Returns the semantic model of graph or graph extension which is inferred from <paramref name="graphOrGraphExtensionTypeSymbol"/>.
 		/// </summary>
 		/// <param name="pxContext">Acumatica context.</param>
-		/// <param name="graphOrGraphExtInferredInfo">The graph or graph extension inferred information obtained from resolving a hierarchy of chained graph extensions and base types.</param>
+		/// <param name="graphOrGraphExtensionTypeSymbol">The graph or graph extension type symbol.</param>
 		/// <param name="modelCreationOptions">Options for controlling the semantic model creation.</param>
 		/// <param name="customDeclarationOrder">(Optional) The declaration order.</param>
 		/// <param name="cancellation">(Optional) Cancellation token.</param>
 		/// <returns>
-		/// A semantic model for a given graph or graph extension <paramref name="graphOrGraphExtTypeSymbol"/>.<br/>
-		/// If <paramref name="graphOrGraphExtTypeSymbol"/> is not graph or graph extension, then returns <see langword="null"/>.
+		/// A semantic model for a given graph or graph extension type <paramref name="graphOrGraphExtensionTypeSymbol"/>.
 		/// </returns>
-		public static PXGraphSemanticModel? InferModel(PXContext pxContext, GraphOrGraphExtInfoBase graphOrGraphExtInferredInfo,
+		public static PXGraphSemanticModel? InferModel(PXContext pxContext, ITypeSymbol? graphOrGraphExtensionTypeSymbol,
 													   GraphSemanticModelCreationOptions modelCreationOptions,
 													   int? customDeclarationOrder = null, CancellationToken cancellation = default)
 		{
-			pxContext.ThrowOnNull();
-			graphOrGraphExtInferredInfo.ThrowOnNull();
+			cancellation.ThrowIfCancellationRequested();
+
+			var inferredInfo = GraphAndGraphExtInfoBuilder.Instance.InferTypeInfo(graphOrGraphExtensionTypeSymbol, pxContext, 
+																				  customDeclarationOrder, cancellation);
+
+			if (inferredInfo?.GetResultKind() != InferResultKind.Success || inferredInfo.InferredInfo is not GraphOrGraphExtInfoBase graphOrGraphExt)
+				return null;
+
+			return InferModel(pxContext, graphOrGraphExt, modelCreationOptions, cancellation);
+		}
+
+		/// <summary>
+		/// Infer semantic model for a given <paramref name="graphOrGraphExtInferredInfo"/>.
+		/// If <paramref name="graphOrGraphExtInferredInfo"/> is not a graph or graph extension, returns <see langword="null"/>.
+		/// </summary>
+		/// <param name="pxContext">Acumatica context.</param>
+		/// <param name="graphOrGraphExtInferredInfo">
+		/// The graph or graph extension inferred information obtained from resolving a hierarchy of chained graph extensions and base types.
+		/// </param>
+		/// <param name="modelCreationOptions">Options for controlling the semantic model creation.</param>
+		/// <param name="cancellation">Cancellation token.</param>
+		/// <returns>
+		/// A semantic model for a given graph or graph extension <paramref name="graphOrGraphExtInferredInfo"/>.<br/>
+		/// If <paramref name="graphOrGraphExtInferredInfo"/> is not graph or graph extension, then returns <see langword="null"/>.
+		/// </returns>
+		public static PXGraphSemanticModel? InferModel(PXContext pxContext, GraphOrGraphExtInfoBase graphOrGraphExtInferredInfo,
+													   GraphSemanticModelCreationOptions modelCreationOptions,
+													   CancellationToken cancellation)
+		{
 			cancellation.ThrowIfCancellationRequested();
 
 			if (graphOrGraphExtInferredInfo is not (GraphInfo or GraphExtensionInfo))
 				return null;
 
-			int declarationOrder = customDeclarationOrder ?? 0;
-			return new PXGraphSemanticModel(pxContext, graphOrGraphExtInferredInfo, modelCreationOptions, 
-											declarationOrder, cancellation);
+			return new PXGraphSemanticModel(pxContext, graphOrGraphExtInferredInfo, modelCreationOptions, cancellation);
 		}
 
 		protected IsActiveMethodInfo? GetIsActiveMethodInfo() =>
