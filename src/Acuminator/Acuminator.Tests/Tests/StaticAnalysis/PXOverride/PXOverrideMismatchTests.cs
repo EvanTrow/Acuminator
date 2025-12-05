@@ -176,7 +176,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\OverridenMethodIsInTheBaseOfTheBaseExtension.cs")]
-		public Task OverridenMethodIsInTheBaseOfTheBaseExtension(string source) => VerifyCSharpDiagnosticAsync(source);
+		public Task OverriddenMethodIsInTheBaseOfTheBaseExtension(string source) => VerifyCSharpDiagnosticAsync(source);
 
 
 		private sealed class PXOverrideAnalyzerForSignatureMismatchTests : PXOverrideAnalyzer
