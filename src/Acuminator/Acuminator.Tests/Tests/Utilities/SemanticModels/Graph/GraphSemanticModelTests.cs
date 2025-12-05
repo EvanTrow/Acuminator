@@ -11,8 +11,6 @@ using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
-using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
-using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Graph;
 
 using FluentAssertions;
 
@@ -383,18 +381,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 
 			INamedTypeSymbol? graphOrGraphExtSymbol = context.SemanticModel.GetDeclaredSymbol(graphOrGraphExtDeclaration, cancellation);
 			graphOrGraphExtSymbol.Should().NotBeNull();
-
-			InferredSymbolInfo? inferredInfo = GraphAndGraphExtInfoBuilder.Instance.InferTypeInfo(graphOrGraphExtSymbol!, context.PXContext, 
-																								  customDeclarationOrder: null, cancellation);
-			inferredInfo.Should().NotBeNull();
-			inferredInfo.ThrowOnNull();
-
-			inferredInfo.GetResultKind().Should().Be(InferResultKind.Success);
-
-			var graphOrGraphExtInfo = inferredInfo.InferredInfo as GraphOrGraphExtInfoBase;
-			graphOrGraphExtInfo.Should().NotBeNull();
-
-			var graphSemanticModel = PXGraphSemanticModel.InferModel(context.PXContext, graphOrGraphExtInfo.CheckIfNull(),
+			var graphSemanticModel = PXGraphSemanticModel.InferModel(context.PXContext, graphOrGraphExtSymbol,
 																	 GraphSemanticModelCreationOptions.CollectGeneralGraphInfo,
 																	 cancellation: cancellation);
 			graphSemanticModel.Should().NotBeNull();

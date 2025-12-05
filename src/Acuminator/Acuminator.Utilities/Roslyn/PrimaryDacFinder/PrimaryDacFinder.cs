@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -11,8 +9,6 @@ using Acuminator.Utilities.Roslyn.PrimaryDacFinder.PrimaryDacRules.RulesProvider
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
-using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
-using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Graph;
 
 using Microsoft.CodeAnalysis;
 
@@ -69,16 +65,7 @@ namespace Acuminator.Utilities.Roslyn.PrimaryDacFinder
 			if (!graphOrGraphExtension.IsPXGraphOrExtension(pxContext))
 				return null;
 
-			InferredSymbolInfo? inferredInfo = GraphAndGraphExtInfoBuilder.Instance.InferTypeInfo(graphOrGraphExtension, pxContext,
-																								  customDeclarationOrder: null, cancellationToken);
-
-			if (inferredInfo == null || inferredInfo.GetResultKind() != InferResultKind.Success ||
-				inferredInfo.InferredInfo is not GraphOrGraphExtInfoBase graphOrGraphExtInfo)
-			{
-				return null;
-			}
-
-			var graphSemanticModel = PXGraphSemanticModel.InferModel(pxContext, graphOrGraphExtInfo,
+			var graphSemanticModel = PXGraphSemanticModel.InferModel(pxContext, graphOrGraphExtension,
 																	 GraphSemanticModelCreationOptions.CollectGeneralGraphInfo,
 																	 cancellation: cancellationToken);
 			return graphSemanticModel != null 
