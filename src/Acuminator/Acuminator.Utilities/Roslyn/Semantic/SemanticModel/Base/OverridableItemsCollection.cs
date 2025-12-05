@@ -17,40 +17,6 @@ where TInfo : IOverridableItem<TInfo>
 	{
 	}
 
-	/// <summary>
-	/// Adds a range of DTO info items from the raw data maintaining the declaration order. Returns the number following the last assigned declaration order.
-	/// </summary>
-	/// <typeparam name="TRawData">Type of the raw data.</typeparam>
-	/// <typeparam name="TWriteableInfo">Type of the writeable information.</typeparam>
-	/// <param name="itemsToAdd">The items to add.</param>
-	/// <param name="startingOrder">The starting order.</param>
-	/// <param name="infoConstructor">The DTO info constructor.</param>
-	/// <returns/>
-	internal int AddRangeWithDeclarationOrder<TRawData, TWriteableInfo>(IEnumerable<TRawData> itemsToAdd, int startingOrder, 
-																		Func<TRawData, int, TWriteableInfo> infoConstructor)
-	where TWriteableInfo : TInfo, IWriteableBaseItem<TInfo>
-	{
-		itemsToAdd.ThrowOnNull();
-
-		int order = startingOrder;
-
-		foreach (TRawData rawData in itemsToAdd)
-		{
-			Add(rawData, order, infoConstructor);
-			order++;
-		}
-
-		return order;
-	}
-
-	internal void Add<TRawData, TWriteableInfo>(TRawData rawData, int declarationOrder, Func<TRawData, int, TWriteableInfo> infoConstructor)
-	where TWriteableInfo : TInfo, IWriteableBaseItem<TInfo>
-	{
-		infoConstructor.ThrowOnNull();
-		TWriteableInfo info = infoConstructor(rawData, declarationOrder);
-		Add(info);
-	}
-
 	internal void Add<TWriteableInfo>(TWriteableInfo info)
 	where TWriteableInfo : TInfo, IWriteableBaseItem<TInfo>
 	{
