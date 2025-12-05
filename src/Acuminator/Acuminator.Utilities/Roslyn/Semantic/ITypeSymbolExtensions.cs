@@ -765,6 +765,22 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 				return false;
 		}
 
+		public static bool IsUnboundGenericType(this ITypeSymbol? typeSymbol)
+		{
+			if (typeSymbol is INamedTypeSymbol namedTypeSymbol)
+				return namedTypeSymbol.IsUnboundGenericType;
+			else if (typeSymbol is ITypeParameterSymbol typeParameterSymbol && !typeParameterSymbol.ConstraintTypes.IsDefaultOrEmpty)
+			{
+				// Generic interfaces can be applied to non-generic types, so we don't consider them here
+				bool hasGenericConstraint = typeParameterSymbol.GetAllConstraintTypes(includeInterfaces: false)
+															   .OfType<INamedTypeSymbol>()
+															   .Any(constraintType => constraintType.IsUnboundGenericType);
+				return hasGenericConstraint;
+			}
+			else
+				return false;
+		}
+
 		public static ImmutableArray<ITypeSymbol> TypeArguments(this ITypeSymbol? typeSymbol)
 		{
 			if (typeSymbol is INamedTypeSymbol namedTypeSymbol)
