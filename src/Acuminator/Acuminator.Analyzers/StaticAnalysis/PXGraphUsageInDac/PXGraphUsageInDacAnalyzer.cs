@@ -1,5 +1,4 @@
-﻿
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Immutable;
 using System.Collections.Generic;
 
@@ -17,13 +16,13 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Acuminator.Analyzers.StaticAnalysis.PXGraphUsageInDac
 {
-    public class PXGraphUsageInDacAnalyzer : DacAggregatedAnalyzerBase
-    {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create
-            (
-                Descriptors.PX1029_PXGraphUsageInDac
-            );
+	public class PXGraphUsageInDacAnalyzer : DacAggregatedAnalyzerBase
+	{
+		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+			ImmutableArray.Create
+			(
+				Descriptors.PX1029_PXGraphUsageInDac
+			);
 
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dac)
 		{
@@ -39,7 +38,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphUsageInDac
 
 			// Analyze only DAC members, avoid nested types analysis. For possible nested DACs this analyser will be executed separately. 
 			// We do not want to analyse possible internal helper classes or analyze DAC's attributes, ID, lis of base classes and so on.
-			var membersToVisit = dac.Node.Members.Where(member => !member.IsKind(SyntaxKind.ClassDeclaration) && 
+			var membersToVisit = dac.Node.Members.Where(member => !member.IsKind(SyntaxKind.ClassDeclaration) &&
 																  !member.IsKind(SyntaxKind.StructDeclaration) &&
 																  !member.IsKind(SyntaxKind.InterfaceDeclaration));
 
@@ -49,40 +48,40 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphUsageInDac
 			}
 		}
 
-        private class GraphUsageInDacWalker : CSharpSyntaxWalker
-        {
-            private readonly SymbolAnalysisContext _context;
-            private readonly PXContext _pxContext;
+		private class GraphUsageInDacWalker : CSharpSyntaxWalker
+		{
+			private readonly SymbolAnalysisContext _context;
+			private readonly PXContext _pxContext;
 			private readonly SemanticModel _semanticModel;
 
-            public GraphUsageInDacWalker(SymbolAnalysisContext context, PXContext pxContext, SemanticModel semanticModel)
-            {
-                _context = context;
-                _pxContext = pxContext;
+			public GraphUsageInDacWalker(SymbolAnalysisContext context, PXContext pxContext, SemanticModel semanticModel)
+			{
+				_context = context;
+				_pxContext = pxContext;
 				_semanticModel = semanticModel;
 			}
 
 			public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
-            {
-                ThrowIfCancellationRequested();
+			{
+				ThrowIfCancellationRequested();
 
-                if (node.IsStatic())
-                    return;
+				if (node.IsStatic())
+					return;
 
-                base.VisitMethodDeclaration(node);
-            }
+				base.VisitMethodDeclaration(node);
+			}
 
-            public override void VisitInvocationExpression(InvocationExpressionSyntax node)
-            {
+			public override void VisitInvocationExpression(InvocationExpressionSyntax node)
+			{
 				ThrowIfCancellationRequested();
 
 				SymbolInfo symbolInfo = _semanticModel.GetSymbolInfo(node, _context.CancellationToken);
 
-                if (symbolInfo.Symbol == null || (symbolInfo.Symbol.Kind == SymbolKind.Method && symbolInfo.Symbol.IsStatic))
-                    return;
+				if (symbolInfo.Symbol == null || (symbolInfo.Symbol.Kind == SymbolKind.Method && symbolInfo.Symbol.IsStatic))
+					return;
 
-                base.VisitInvocationExpression(node);
-            }
+				base.VisitInvocationExpression(node);
+			}
 
 			public override void VisitIdentifierName(IdentifierNameSyntax node)
 			{
@@ -109,13 +108,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphUsageInDac
 			}
 
 			public override void VisitAttributeList(AttributeListSyntax node)
-            {
-            }
+			{
+			}
 
-	        private void ThrowIfCancellationRequested()
-	        {
+			private void ThrowIfCancellationRequested()
+			{
 				_context.CancellationToken.ThrowIfCancellationRequested();
 			}
-        }
-    }
+		}
+	}
 }
