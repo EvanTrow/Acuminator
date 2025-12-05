@@ -33,7 +33,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public override ExtendedObservableCollection<ExtraInfoViewModel> ExtraInfos { get; }
 
 		#region IPlaceholderNode implementation
-		INamedTypeSymbol IPlaceholderNode.PlaceholderSymbol => GraphOrGraphExtInfo.Symbol;
+		ITypeSymbol IPlaceholderNode.PlaceholderSymbol => GraphOrGraphExtInfo.Symbol;
 
 		int IPlaceholderNode.PlaceholderSymbolDeclarationOrder => GraphOrGraphExtInfo.DeclarationOrder;
 		#endregion
