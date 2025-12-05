@@ -48,9 +48,27 @@ public class GraphAndGraphExtInfoBuilder : SymbolInfoBuilderBase<GraphInfo, Grap
 	protected override ITypeSymbol? GetRootTypeFromExtensionType(ITypeSymbol graphExtension, PXContext pxContext) => 
 		graphExtension.GetGraphFromGraphExtension(pxContext);
 
-	protected override bool DoesExtensionExtendOnlyRootSymbol(ITypeSymbol graphExtension, PXContext pxContext) =>
-		graphExtension.BaseType.IsGraphExtensionBaseType() &&
-		(graphExtension.BaseType.TypeParameters.IsDefault || graphExtension.BaseType.TypeParameters.Length <= 1);
+	protected override bool DoesExtensionExtendOnlyRootSymbol(ITypeSymbol graphExtension, PXContext pxContext)
+	{
+		if (graphExtension is INamedTypeSymbol graphExtensionNamedType)
+		{
+			var baseType = graphExtensionNamedType.BaseType;
+			return baseType.IsGraphExtensionBaseType() &&
+				  (baseType.TypeParameters.IsDefault || baseType.TypeParameters.Length <= 1);
+		}
+		else if (graphExtension is ITypeParameterSymbol graphExtensionTypeParameter)
+		{
+			var graphExtensionBaseTypeInConstraints = 
+				graphExtensionTypeParameter.GetAllConstraintTypes(includeInterfaces: false)
+										   .OfType<INamedTypeSymbol>()
+										   .FirstOrDefault(constraintType => constraintType.IsGraphExtensionBaseType());
+
+			return graphExtensionBaseTypeInConstraints != null && 
+				  (graphExtensionBaseTypeInConstraints.TypeParameters.IsDefault || graphExtensionBaseTypeInConstraints.TypeParameters.Length <= 1);
+		}
+		else
+			return false;
+	}
 
 	protected override INamedTypeSymbol? GetBaseGenericExtensionType(ITypeSymbol graphExtension, PXContext pxContext) =>
 		graphExtension.GetBaseTypesAndThis()

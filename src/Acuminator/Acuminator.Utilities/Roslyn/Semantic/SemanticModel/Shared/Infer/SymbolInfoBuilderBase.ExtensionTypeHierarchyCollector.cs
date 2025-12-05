@@ -190,7 +190,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			_cancellation.ThrowIfCancellationRequested();
 			
 			// Extension base type is the base generic extension type, we need to calculate all chained base extensions
-			if (SymbolEqualityComparer.Default.Equals(extensionTypeSymbol.BaseType, baseGenericExtensionType))
+			if (IsDerivedFromFromBaseGenericExtensionType(extensionTypeSymbol, baseGenericExtensionType))
 			{
 				return InferExtensionDerivedFromBaseGenericExtensionType(extensionTypeSymbol, extensionNode, baseGenericExtensionType,
 																		 rootTypeSymbol, rootInfo, declarationOrder);
@@ -201,13 +201,33 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			}
 		}
 
+		private bool IsDerivedFromFromBaseGenericExtensionType(ITypeSymbol extensionTypeSymbol, INamedTypeSymbol baseGenericExtensionType)
+		{
+			if (extensionTypeSymbol is INamedTypeSymbol extensionNamedTypeSymbol)
+				return SymbolEqualityComparer.Default.Equals(extensionTypeSymbol.BaseType, baseGenericExtensionType);
+			else if (extensionTypeSymbol is ITypeParameterSymbol typeParameterSymbol)
+			{
+				var constraintTypes = typeParameterSymbol.GetAllConstraintTypes(includeInterfaces: false)
+														 .OfType<INamedTypeSymbol>();
+				return constraintTypes.Contains(baseGenericExtensionType, SymbolEqualityComparer.Default);
+			}	
+			else
+				return false;
+		}
+
 		private TExtensionInfo? InferExtensionDerivedFromCustomExtension(ITypeSymbol extensionTypeSymbol, ClassDeclarationSyntax? extensionNode,
 																		 ITypeSymbol rootTypeSymbol, TRootInfo? rootInfo, int declarationOrder)
 		{
+			if (extensionTypeSymbol.BaseType == null)
+			{
+				FailedToCollectTypeHierarchy = true;
+				return null;
+			}
+
 			bool isInSource = extensionNode != null;
 
 			// Small optimization - re-use calculation of root type symbol since it is the same for the base extension type
-			var baseExtensionInfo = VisitExtensionType(extensionTypeSymbol.BaseType!, isInSource, precalcedRootTypeSymbol: rootTypeSymbol,
+			var baseExtensionInfo = VisitExtensionType(extensionTypeSymbol.BaseType, isInSource, precalcedRootTypeSymbol: rootTypeSymbol,
 													   extensionDeclarationOrder: null);
 			if (baseExtensionInfo == null)
 				return null;

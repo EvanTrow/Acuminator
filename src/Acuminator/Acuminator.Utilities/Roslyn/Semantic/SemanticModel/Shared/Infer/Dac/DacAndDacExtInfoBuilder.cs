@@ -56,9 +56,27 @@ public partial class DacAndDacExtInfoBuilder : SymbolInfoBuilderBase<DacInfo, Da
 	protected override ITypeSymbol? GetRootTypeFromExtensionType(ITypeSymbol dacExtension, PXContext pxContext) =>
 		dacExtension.GetDacFromDacExtension(pxContext);
 
-	protected override bool DoesExtensionExtendOnlyRootSymbol(ITypeSymbol dacExtension, PXContext pxContext) =>
-		dacExtension.BaseType.IsDacExtensionBaseType() && 
-		(dacExtension.BaseType.TypeParameters.IsDefault || dacExtension.BaseType.TypeParameters.Length <= 1);
+	protected override bool DoesExtensionExtendOnlyRootSymbol(ITypeSymbol dacExtension, PXContext pxContext)
+	{
+		if (dacExtension is INamedTypeSymbol dacExtensionNamedType)
+		{
+			var baseType = dacExtensionNamedType.BaseType;
+			return baseType.IsDacExtensionBaseType() &&
+				  (baseType.TypeParameters.IsDefault || baseType.TypeParameters.Length <= 1);
+		}
+		else if (dacExtension is ITypeParameterSymbol dacExtensionTypeParameter)
+		{
+			var dacExtensionBaseTypeInConstraints =
+				dacExtensionTypeParameter.GetAllConstraintTypes(includeInterfaces: false)
+										 .OfType<INamedTypeSymbol>()
+										 .FirstOrDefault(constraintType => constraintType.IsDacExtensionBaseType());
+
+			return dacExtensionBaseTypeInConstraints != null &&
+				  (dacExtensionBaseTypeInConstraints.TypeParameters.IsDefault || dacExtensionBaseTypeInConstraints.TypeParameters.Length <= 1);
+		}
+		else
+			return false;
+	}
 
 	protected override INamedTypeSymbol? GetBaseGenericExtensionType(ITypeSymbol dacExtension, PXContext pxContext) =>
 		dacExtension.GetBaseTypesAndThis()
