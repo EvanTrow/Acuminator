@@ -30,8 +30,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacExtensionDefaultAttribute
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(
                 Descriptors.PX1030_DefaultAttibuteToExistingRecordsOnDAC,
-                Descriptors.PX1030_DefaultAttibuteToExistingRecordsError,
-                Descriptors.PX1030_DefaultAttibuteToExistingRecordsWarning);
+                Descriptors.PX1030_DefaultAttributeToExistingRecordsError,
+                Descriptors.PX1030_DefaultAttributeToExistingRecordsWarning);
 
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, DacSemanticModel dacOrExtension)
 		{
@@ -86,7 +86,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacExtensionDefaultAttribute
 																		   .Add(DiagnosticProperty.IsBoundField, bool.FalseString);
             var descriptor = dacOrExtension.DacType == DacType.Dac
 				? Descriptors.PX1030_DefaultAttibuteToExistingRecordsOnDAC 
-				: Descriptors.PX1030_DefaultAttibuteToExistingRecordsError;
+				: Descriptors.PX1030_DefaultAttributeToExistingRecordsError;
             var diagnostic = Diagnostic.Create(descriptor, attributeLocation, diagnosticProperties);
 
             symbolContext.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
@@ -105,7 +105,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacExtensionDefaultAttribute
 
             var diagnosticProperties = ImmutableDictionary<string, string?>.Empty
 																		   .Add(DiagnosticProperty.IsBoundField, bool.TrueString);
-            var diagnostic = Diagnostic.Create(Descriptors.PX1030_DefaultAttibuteToExistingRecordsWarning, attributeLocation, diagnosticProperties);
+            var diagnostic = Diagnostic.Create(Descriptors.PX1030_DefaultAttributeToExistingRecordsWarning, attributeLocation, diagnosticProperties);
 
             symbolContext.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
         }

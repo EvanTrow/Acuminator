@@ -23,8 +23,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacExtensionDefaultAttribute
 	{
 		public override ImmutableArray<string> FixableDiagnosticIds { get; } =
 			ImmutableArray.Create(
-				Descriptors.PX1030_DefaultAttibuteToExistingRecordsError.Id,
-				Descriptors.PX1030_DefaultAttibuteToExistingRecordsWarning.Id,
+				Descriptors.PX1030_DefaultAttributeToExistingRecordsError.Id,
+				Descriptors.PX1030_DefaultAttributeToExistingRecordsWarning.Id,
 				Descriptors.PX1030_DefaultAttibuteToExistingRecordsOnDAC.Id);
 
 		protected override async Task RegisterCodeFixesForDiagnosticAsync(CodeFixContext context, Diagnostic diagnostic)
