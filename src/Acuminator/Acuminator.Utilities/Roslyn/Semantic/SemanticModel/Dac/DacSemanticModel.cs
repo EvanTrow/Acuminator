@@ -115,8 +115,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		{
 			cancellation.ThrowIfCancellationRequested();
 
-			PXContext 		= pxContext;
-			DacOrDacExtInfo = dacOrDacExtInfo;
+			PXContext 		= pxContext.CheckIfNull();
+			DacOrDacExtInfo = dacOrDacExtInfo.CheckIfNull();
 
 			(DacType, DacSymbol) = dacOrDacExtInfo switch
 			{
@@ -154,8 +154,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		public static DacSemanticModel? InferModel(PXContext pxContext, ITypeSymbol dacOrDacExtTypeSymbol, int? customDeclarationOrder = null,
 												   CancellationToken cancellation = default)
 		{
-			pxContext.ThrowOnNull();
-			dacOrDacExtTypeSymbol.ThrowOnNull();
 			cancellation.ThrowIfCancellationRequested();
 
 			var inferredInfo = DacAndDacExtInfoBuilder.Instance.InferTypeInfo(dacOrDacExtTypeSymbol, pxContext, customDeclarationOrder, cancellation);
@@ -178,8 +176,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// </returns>
 		public static DacSemanticModel? InferModel(PXContext pxContext, DacOrDacExtInfoBase dacOrDacExtInfo, CancellationToken cancellation)
 		{		
-			pxContext.ThrowOnNull();
-			dacOrDacExtInfo.ThrowOnNull();
 			cancellation.ThrowIfCancellationRequested();
 
 			if (dacOrDacExtInfo is not (DacInfo or DacExtensionInfo))
