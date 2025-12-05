@@ -29,7 +29,7 @@ public record InferredSymbolInfo
 	{
 		if (CircularReferenceExtension != null)
 			return InferResultKind.CircularReferences;
-		else if (CollectedRootTypes.Count > 0)
+		else if (CollectedRootTypes.Count > 1)
 			return InferResultKind.MultipleRootTypes;
 		else if (ExtensionWithBadBaseExtensions != null)
 			return InferResultKind.BadBaseExtensions;

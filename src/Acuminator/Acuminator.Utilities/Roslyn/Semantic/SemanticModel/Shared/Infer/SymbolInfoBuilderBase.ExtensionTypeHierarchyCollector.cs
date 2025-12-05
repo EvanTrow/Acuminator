@@ -55,7 +55,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 		{
 			if (CircularReferenceExtension != null)
 				return InferResultKind.CircularReferences;
-			else if (_collectedRootInfos.Count > 0)
+			else if (_collectedRootInfos.Count > 1)
 				return InferResultKind.MultipleRootTypes;
 			else if (ExtensionWithBadBaseExtensions != null)
 				return InferResultKind.BadBaseExtensions;
