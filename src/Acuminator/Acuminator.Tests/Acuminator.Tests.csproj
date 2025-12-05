@@ -27,7 +27,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
-    <NoWarn>$(NoWarn);VSTHRD200;CA1707;CA1708;CA1051</NoWarn>
+    <NoWarn>$(NoWarn);PX1099;PX1120;VSTHRD200;CA1707;CA1708;CA1051</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <DebugType>embedded</DebugType>
