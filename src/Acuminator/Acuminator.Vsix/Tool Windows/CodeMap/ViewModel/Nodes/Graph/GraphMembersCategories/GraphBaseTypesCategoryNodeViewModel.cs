@@ -19,7 +19,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public GraphInfo? BaseGraphInfo { get; }
 
-		public GraphExtensionInfo? BaseGraphExtensionInfo { get; }
+		public IReadOnlyList<GraphExtensionInfo> BaseGraphExtensionInfos { get; }
 
 		public GraphBaseTypesCategoryNodeViewModel(GraphNodeViewModel graphNodeViewModel, TreeNodeViewModel parent,
 												   Func<TreeNodeViewModel, bool> isExpandedCalculator) : 
@@ -28,21 +28,24 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			if (GraphViewModel.CodeMapGraphModel.GraphType == GraphType.PXGraph)
 			{
 				BaseGraphInfo = GraphViewModel.CodeMapGraphModel.GraphInfo?.Base;
-				BaseGraphExtensionInfo = null;
+				BaseGraphExtensionInfos = Array.Empty<GraphExtensionInfo>();
 			}
 			else
 			{
 				BaseGraphInfo = GraphViewModel.CodeMapGraphModel.GraphInfo;
-				BaseGraphExtensionInfo = GraphViewModel.CodeMapGraphModel.GraphExtensionInfo?.Base as GraphExtensionInfo;
+				var baseGraphExtensions = GraphViewModel.CodeMapGraphModel.GraphExtensionInfo?.BaseGraphExtensions;
+				BaseGraphExtensionInfos = baseGraphExtensions != null && !baseGraphExtensions.Value.IsDefaultOrEmpty
+					? baseGraphExtensions.Value
+					: Array.Empty<GraphExtensionInfo>();
 			}
 		}
 
 		public override IEnumerable<SymbolItem> GetCategoryGraphNodeSymbols() =>
-			(BaseGraphInfo != null, BaseGraphExtensionInfo != null) switch
+			(BaseGraphInfo != null, BaseGraphExtensionInfos.Count > 0) switch
 			{
-				(true, true)   => [BaseGraphInfo!, BaseGraphExtensionInfo!],
+				(true, true)   => [BaseGraphInfo!, ..BaseGraphExtensionInfos],
 				(true, false)  => [BaseGraphInfo!],
-				(false, true)  => [BaseGraphExtensionInfo!],
+				(false, true)  => BaseGraphExtensionInfos,
 				(false, false) => []
 			};
 
