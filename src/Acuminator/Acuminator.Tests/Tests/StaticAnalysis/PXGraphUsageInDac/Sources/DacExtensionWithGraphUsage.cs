@@ -59,4 +59,9 @@ namespace Acuminator.Tests.Sources
     {
         public static SOOrderMaintSync Graph { get; } = PXGraph.CreateInstance<SOOrderMaintSync>();
     }
+
+	[PXHidden]
+	public class SOOrder : PXBqlTable, IBqlTable
+	{
+	}
 }
