@@ -70,7 +70,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.MainDacOfProcessingViewMustContain
 			if (GetTypeNodeFromViewNode(viewNode) is not TypeSyntax viewTypeNode)
 				return processingView.Symbol.Locations.FirstOrDefault();
 
-			if (!processingView.Type.IsGenericType || processingView.Type.TypeArguments.IsDefaultOrEmpty)
+			if (!processingView.Type.IsGenericType() || processingView.Type.TypeArguments().IsDefaultOrEmpty)
 			{
 				return viewTypeNode.GetLocation().NullIfLocationKindIsNone() ??
 					   processingView.Symbol.Locations.FirstOrDefault();
@@ -81,9 +81,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.MainDacOfProcessingViewMustContain
 
 		private static Location? GetLocationFromViewTypeNode(TypeSyntax viewTypeNode, DataViewInfo processingView)
 		{
-			int mainDacIndex = processingView.Type.TypeArguments.IndexOf(processingView.DAC!, SymbolEqualityComparer.Default);
+			int mainDacIndex = processingView.Type.TypeArguments().IndexOf(processingView.DAC!, SymbolEqualityComparer.Default);
 
-			if (mainDacIndex < 0 || mainDacIndex >= processingView.Type.TypeArguments.Length)
+			if (mainDacIndex < 0 || mainDacIndex >= processingView.Type.TypeArguments().Length)
 			{
 				return viewTypeNode.GetLocation().NullIfLocationKindIsNone() ??
 					   processingView.Symbol.Locations.FirstOrDefault();
