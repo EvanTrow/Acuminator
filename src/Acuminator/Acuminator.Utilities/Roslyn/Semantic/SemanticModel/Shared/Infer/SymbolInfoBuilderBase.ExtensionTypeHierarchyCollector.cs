@@ -242,7 +242,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 					ITypeSymbol baseChainedExtensionType = baseChainedExtensionTypes[0];
 
 					// Deliberately do not use the precalcedRootTypeSymbol here since it can be different for chained extension
-					var chainedExtensionInfo = VisitExtensionType(extensionTypeSymbol, isInSource, precalcedRootTypeSymbol: null,
+					var chainedExtensionInfo = VisitExtensionType(baseChainedExtensionType, isInSource, precalcedRootTypeSymbol: null,
 																  extensionDeclarationOrder: null);
 					if (chainedExtensionInfo == null)
 						return null;
@@ -291,7 +291,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			foreach (ITypeSymbol chainedExtensionType in baseChainedExtensionTypes)
 			{
 				// Deliberately do not use the precalcedRootTypeSymbol here since it can be different for chained extensions
-				var chainedExtensionInfo = VisitExtensionType(extensionTypeSymbol, isInSource, precalcedRootTypeSymbol: null,
+				var chainedExtensionInfo = VisitExtensionType(chainedExtensionType, isInSource, precalcedRootTypeSymbol: null,
 															  extensionDeclarationOrder: null);
 				if (chainedExtensionInfo == null)
 					return null;

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Shared.Extensions;
@@ -74,7 +75,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public override IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromBaseGraphToDerivedExtension(bool includeSelf)
 		{
 			var graphInfos = BaseGraph?.GetInfosFromBaseGraphToDerivedExtension(includeSelf);
-			var extensionInfos = GetInfosFromBaseGraphToDerivedExtension(includeSelf);
+			var extensionInfos = GetExtensionInfosFromBaseExtensionsToDerivedExtension(includeSelf);
 
 			return graphInfos != null
 				? graphInfos.Concat(extensionInfos)
@@ -88,6 +89,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <returns>
 		/// Collection of extension infos from base extensions to derived extension level by level.
 		/// </returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public IEnumerable<GraphExtensionInfo> GetExtensionInfosFromBaseExtensionsToDerivedExtension(bool includeSelf) =>
 			GetExtensionInfosFromDerivedExtensionToBaseExtensions(includeSelf).Reverse();
 
@@ -98,6 +100,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <returns>
 		/// Collection of extension infos from derived extension to base extensions level by level.
 		/// </returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public IEnumerable<GraphExtensionInfo> GetExtensionInfosFromDerivedExtensionToBaseExtensions(bool includeSelf) =>
 			includeSelf
 				? this.GetAllBaseExtensionInfosAndThisBFS()
