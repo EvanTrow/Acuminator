@@ -56,11 +56,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXActionOnNonPrimaryDac
 			}
 		}
 
-		private static bool CheckActionIsDeclaredForPrimaryDAC(INamedTypeSymbol action, ITypeSymbol primaryDAC)
+		private static bool CheckActionIsDeclaredForPrimaryDAC(ITypeSymbol action, ITypeSymbol primaryDAC)
 		{
-			var actionTypeArgs = action.TypeArguments;
+			var actionTypeArgs = action.TypeArguments();
 
-			if (actionTypeArgs.Length == 0)   //Cannot infer action's DAC
+			if (actionTypeArgs.IsDefaultOrEmpty)	//Cannot infer action's DAC
 				return true;
 
 			ITypeSymbol pxActionDacType = actionTypeArgs[0];

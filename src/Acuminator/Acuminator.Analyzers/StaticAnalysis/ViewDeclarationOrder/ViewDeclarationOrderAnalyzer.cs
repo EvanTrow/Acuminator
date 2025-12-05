@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -55,7 +54,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.ViewDeclarationOrder
 		{
 			foreach (DataViewInfo view in graphSemanticModel.Views)
 			{
-				if (view.Type.TypeArguments.IsEmpty || view.Symbol.Locations.IsEmpty)
+				if (view.Type.TypeArguments().IsDefaultOrEmpty || view.Symbol.Locations.IsDefaultOrEmpty)
 					continue;
 
 				var baseTypes = view.DAC?.GetBaseTypesAndThis();
