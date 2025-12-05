@@ -10,7 +10,7 @@ using Acuminator.Utilities.Roslyn.PXFieldAttributes.Enum;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
-using Acuminator.Utilities.Roslyn.Semantic.SharedInfo;
+using Acuminator.Utilities.Roslyn.Semantic.Shared;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -131,12 +131,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacFieldAndReferencedFieldMismatch
 		}
 
 		private static void ReportTypeSizeMismatch(SymbolAnalysisContext context, PXContext pxContext, 
-												   DacFieldAttributeInfo localDataTypeAtributeToReport,
+												   DacFieldAttributeInfo localDataTypeAttributeToReport,
 												   string localDacPropertyName, string foreignDacPropertyName, 
 												   DacFieldSize foreignDacFieldSize)
 		{
-			var location = localDataTypeAtributeToReport.AttributeData.GetLocation(context.CancellationToken)
-																	  .NullIfLocationKindIsNone();
+			var location = localDataTypeAttributeToReport.AttributeData.GetLocation(context.CancellationToken)
+																	   .NullIfLocationKindIsNone();
 			if (location is null)
 				return;
 

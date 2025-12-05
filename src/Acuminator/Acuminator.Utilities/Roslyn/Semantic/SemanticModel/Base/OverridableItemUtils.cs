@@ -1,37 +1,34 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 using Acuminator.Utilities.Common;
 
-namespace Acuminator.Utilities.Roslyn.Semantic
+namespace Acuminator.Utilities.Roslyn.Semantic;
+
+/// <summary>
+/// A helper class for <see cref="IOverridableItem{T}"/>.
+/// </summary>
+public static class OverridableItemUtils
 {
-	/// <summary>
-	/// A helper class for <see cref="IOverridableItem{T}"/>.
-	/// </summary>
-	public static class OverridableItemUtils
+	public static IEnumerable<TInfo> ThisAndOverriddenItems<TInfo>(this TInfo info)
+	where TInfo : IOverridableItem<TInfo> =>
+		GetOverriddenItems(info.CheckIfNull(), includeOriginalItem: true);
+	
+	public static IEnumerable<TInfo> JustOverriddenItems<TInfo>(this TInfo info)
+	where TInfo : IOverridableItem<TInfo> =>
+		GetOverriddenItems(info.CheckIfNull(), includeOriginalItem: false);
+
+	private static IEnumerable<TInfo> GetOverriddenItems<TInfo>(TInfo info, bool includeOriginalItem)
+	where TInfo : IOverridableItem<TInfo>
 	{
-		public static IEnumerable<TInfo> ThisAndOverridenItems<TInfo>(this TInfo info)
-		where TInfo : IOverridableItem<TInfo> =>
-			GetOverridenItems(info.CheckIfNull(), includeOriginalItem: true);
-		
-		public static IEnumerable<TInfo> JustOverridenItems<TInfo>(this TInfo info)
-		where TInfo : IOverridableItem<TInfo> =>
-			GetOverridenItems(info.CheckIfNull(), includeOriginalItem: false);
+		TInfo? current = includeOriginalItem
+			? info
+			: info.Base;
 
-		private static IEnumerable<TInfo> GetOverridenItems<TInfo>(TInfo info, bool includeOriginalItem)
-		where TInfo : IOverridableItem<TInfo>
+		while (current != null)
 		{
-			TInfo? current = includeOriginalItem
-				? info
-				: info.Base;
-
-			while (current != null)
-			{
-				yield return current;
-				current = current.Base;
-			}
+			yield return current;
+			current = current.Base;
 		}
 	}
 }

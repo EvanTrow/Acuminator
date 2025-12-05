@@ -11,6 +11,7 @@ using System.Threading;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
+using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -543,55 +544,60 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 			return typeNameWithoutGeneric + DefaultGenericArgsCountSeparator + typeArgs.Length;
 		}
 
-		internal static IEnumerable<(ConstructorDeclarationSyntax Node, IMethodSymbol Symbol)> GetDeclaredInstanceConstructors(
-			this INamedTypeSymbol typeSymbol, CancellationToken cancellation = default)
+		internal static IReadOnlyCollection<(ConstructorDeclarationSyntax? Node, IMethodSymbol Symbol)> GetDeclaredInstanceConstructors(
+																												this ITypeSymbol typeSymbol, 
+																												CancellationToken cancellation)
 		{
 			typeSymbol.ThrowOnNull();
 
-			List<(ConstructorDeclarationSyntax, IMethodSymbol)> initializers = new List<(ConstructorDeclarationSyntax, IMethodSymbol)>();
+			if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+				return [];
 
-			foreach (IMethodSymbol ctr in typeSymbol.InstanceConstructors)
+			var instanceConstructors = namedTypeSymbol.InstanceConstructors;
+
+			if (instanceConstructors.IsDefaultOrEmpty)
+				return [];
+
+			var instanceConstructorsWithNodes = new List<(ConstructorDeclarationSyntax?, IMethodSymbol)>(instanceConstructors.Length);
+
+			foreach (IMethodSymbol constructor in instanceConstructors)
 			{
 				cancellation.ThrowIfCancellationRequested();
 
-				if (!ctr.IsDefinition)
-					continue;
-
-				SyntaxReference? reference = ctr.DeclaringSyntaxReferences.FirstOrDefault();
-				if (reference == null)
-					continue;
-
-				if (reference.GetSyntax(cancellation) is not ConstructorDeclarationSyntax node)
-					continue;
-
-				initializers.Add((node, ctr));
+				var node = constructor.GetSyntax(cancellation) as ConstructorDeclarationSyntax;
+				instanceConstructorsWithNodes.Add((node, constructor));
 			}
 
-			return initializers;
+			return instanceConstructorsWithNodes;
 		}
 
-		public static ImmutableArray<StaticConstructorInfo> GetStaticConstructors(this INamedTypeSymbol typeSymbol,
-																				  CancellationToken cancellation = default)
+		public static ImmutableArray<StaticConstructorInfo> GetStaticConstructors(this ITypeSymbol typeSymbol, CancellationToken cancellation)
 		{
 			typeSymbol.ThrowOnNull();
 
-			int order = 0;
-			List<StaticConstructorInfo> staticCtrs = new List<StaticConstructorInfo>();
+			if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+				return [];
 
-			foreach (IMethodSymbol ctr in typeSymbol.StaticConstructors)
+			var staticConstructors = namedTypeSymbol.StaticConstructors;
+
+			if (staticConstructors.IsDefaultOrEmpty)
+				return [];
+
+			int order = 0;
+			var builder = ImmutableArray.CreateBuilder<StaticConstructorInfo>(staticConstructors.Length);
+
+			foreach (IMethodSymbol constructor in staticConstructors)
 			{
 				cancellation.ThrowIfCancellationRequested();
 
-				SyntaxReference? reference = ctr.DeclaringSyntaxReferences.FirstOrDefault();
+				var node = constructor.GetSyntax(cancellation) as ConstructorDeclarationSyntax;
+				var staticConstructorInfo = new StaticConstructorInfo(node, constructor, order);
 
-				if (reference?.GetSyntax(cancellation) is not ConstructorDeclarationSyntax node)
-					continue;
-
-				staticCtrs.Add(new StaticConstructorInfo(node, ctr, order));
+				builder.Add(staticConstructorInfo);
 				order++;
 			}
 
-			return staticCtrs.ToImmutableArray();
+			return builder.ToImmutable();
 		}
 
 		/// <summary>
@@ -738,8 +744,70 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// <returns>
 		/// True if one dimensional string array, false if not.
 		/// </returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsOneDimensionalStringArray(this ITypeSymbol? typeSymbol) =>
 			typeSymbol is IArrayTypeSymbol arrayType && arrayType.Rank == 1 && 
 			arrayType.ElementType.SpecialType == SpecialType.System_String;
+
+		public static bool IsGenericType(this ITypeSymbol? typeSymbol)
+		{
+			if (typeSymbol is INamedTypeSymbol namedTypeSymbol)
+				return namedTypeSymbol.IsGenericType;
+			else if (typeSymbol is ITypeParameterSymbol typeParameterSymbol && !typeParameterSymbol.ConstraintTypes.IsDefaultOrEmpty)
+			{
+				// Generic interfaces can be applied to non-generic types, so we don't consider them here
+				bool hasGenericConstraint = typeParameterSymbol.GetAllConstraintTypes(includeInterfaces: false)
+															   .OfType<INamedTypeSymbol>()
+															   .Any(constraintType => constraintType.IsGenericType);
+				return hasGenericConstraint;
+			}
+			else
+				return false;
+		}
+
+		public static bool IsUnboundGenericType(this ITypeSymbol? typeSymbol)
+		{
+			if (typeSymbol is INamedTypeSymbol namedTypeSymbol)
+				return namedTypeSymbol.IsUnboundGenericType;
+			else if (typeSymbol is ITypeParameterSymbol typeParameterSymbol && !typeParameterSymbol.ConstraintTypes.IsDefaultOrEmpty)
+			{
+				// Generic interfaces can be applied to non-generic types, so we don't consider them here
+				bool hasGenericConstraint = typeParameterSymbol.GetAllConstraintTypes(includeInterfaces: false)
+															   .OfType<INamedTypeSymbol>()
+															   .Any(constraintType => constraintType.IsUnboundGenericType);
+				return hasGenericConstraint;
+			}
+			else
+				return false;
+		}
+
+		public static ImmutableArray<ITypeSymbol> TypeArguments(this ITypeSymbol? typeSymbol)
+		{
+			if (typeSymbol is INamedTypeSymbol namedTypeSymbol)
+				return namedTypeSymbol.TypeArguments;
+			else if (typeSymbol is ITypeParameterSymbol typeParameterSymbol && !typeParameterSymbol.ConstraintTypes.IsDefaultOrEmpty)
+			{
+				return typeParameterSymbol.GetAllConstraintTypes(includeInterfaces: false)
+										  .Where(constraintType => constraintType.TypeKind is TypeKind.Class or TypeKind.Struct)
+										  .ToImmutableArray();
+			}
+			else
+				return [];
+		}
+
+		public static ImmutableArray<ITypeParameterSymbol> TypeParameters(this ITypeSymbol? typeSymbol)
+		{
+			if (typeSymbol is INamedTypeSymbol namedTypeSymbol)
+				return namedTypeSymbol.TypeParameters;
+			else if (typeSymbol is ITypeParameterSymbol typeParameterSymbol && !typeParameterSymbol.ConstraintTypes.IsDefaultOrEmpty)
+			{
+				return typeParameterSymbol.GetAllConstraintTypes(includeInterfaces: false)
+										  .OfType<INamedTypeSymbol>()
+										  .SelectMany(constraintType => constraintType.TypeParameters)
+										  .ToImmutableArray();
+			}
+			else
+				return [];
+		}
 	}
 }

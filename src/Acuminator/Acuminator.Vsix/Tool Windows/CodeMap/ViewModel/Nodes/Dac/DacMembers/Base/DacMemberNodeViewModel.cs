@@ -15,7 +15,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public abstract class DacMemberNodeViewModel : TreeNodeViewModel, INodeWithDeclarationOrder
+	public abstract class DacMemberNodeViewModel : TreeNodeViewModel, IHaveDeclarationOrder
 	{
 		public override TreeNodeFilterBehavior FilterBehavior => TreeNodeFilterBehavior.DisplayedIfNodeOrChildrenMeetFilter;
 

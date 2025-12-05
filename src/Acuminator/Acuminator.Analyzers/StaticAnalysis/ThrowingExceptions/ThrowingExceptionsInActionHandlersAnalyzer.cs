@@ -22,9 +22,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.ThrowingExceptions
 			context.CancellationToken.ThrowIfCancellationRequested();
 
 			var walker = new WalkerForGraphAnalyzer(context, pxContext, Descriptors.PX1090_ThrowingSetupNotEnteredExceptionInActionHandlers);
-			var delegateNodes = pxGraph.DeclaredActionHandlers
-								.Where(h => h.Node != null)
-								.Select(h => h.Node);
+			var delegateNodes = pxGraph.DeclaredActionDelegates
+									   .Where(actionDelegate => actionDelegate.Node != null)
+									   .Select(actionDelegate => actionDelegate.Node);
 
 			foreach (var node in delegateNodes)
 			{

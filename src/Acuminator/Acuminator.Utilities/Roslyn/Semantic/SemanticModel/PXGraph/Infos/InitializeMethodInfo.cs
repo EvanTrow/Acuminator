@@ -15,7 +15,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 /// <summary>
 /// Information about the Initialize special method in graph extensions.
 /// </summary>
-public class InitializeMethodInfo : OverridableNodeSymbolItem<InitializeMethodInfo, MethodDeclarationSyntax, IMethodSymbol>
+public sealed class InitializeMethodInfo : OverridableNodeSymbolItem<InitializeMethodInfo, MethodDeclarationSyntax, IMethodSymbol>
 {
 	/// <summary>
 	/// The Initialize method declaration order to place it third after IsActiveForGraph method.
@@ -26,6 +26,7 @@ public class InitializeMethodInfo : OverridableNodeSymbolItem<InitializeMethodIn
 							    InitializeMethodInfo baseInfo) :
 						  base(initializeMethodNode, initializeMethod, declarationOrder, baseInfo)
 	{
+		CombineWithBaseInfo();
 	}
 
 	public InitializeMethodInfo(MethodDeclarationSyntax? initializeMethodNode, IMethodSymbol initializeMethod, int declarationOrder) :
@@ -33,14 +34,16 @@ public class InitializeMethodInfo : OverridableNodeSymbolItem<InitializeMethodIn
 	{
 	}
 
+	protected override void CombineWithBaseInfo() { }
+
 	/// <summary>
 	/// Collects info about Initialize method overrides from a graph or graph extension symbol and creates a <see cref="InitializeMethodInfo"/> DTO.
 	/// </summary>
 	/// <remarks>
 	/// We collect only Initialize method overrides from the class hierarchy because graph and graph extension overrides of Initialize method can be considered independent.<br/>
 	/// Therefore, for graph extension base graph's Initialize method overrides are not included into results.<br/>
-	/// Thus, only one <see cref="InitializeMethodInfo"/> will be created in the end. The created DTO will contain all Initialize method overrides as base infos.<br/>
-	/// The created <see cref="InitializeMethodInfo"/> DTO is not neccessary declared in the <paramref name="graphOrGraphExtension"/> symbol. <br/>
+	/// Thus, only one <see cref="InitializeMethodInfo"/> will be created in the end. The created DTO will contain all Initialize method overrides as base info.<br/>
+	/// The created <see cref="InitializeMethodInfo"/> DTO is not necessary declared in the <paramref name="graphOrGraphExtension"/> symbol. <br/>
 	/// It can be also declared in its base types.
 	/// </remarks>
 	/// <param name="graphOrGraphExtension">The graph or graph extension.</param>
@@ -51,7 +54,7 @@ public class InitializeMethodInfo : OverridableNodeSymbolItem<InitializeMethodIn
 	/// <returns>
 	/// <see cref="InitializeMethodInfo"/> DTO if the graph / graph extension contains Initialize method, otherwise <see langword="null"/>.
 	/// </returns>
-	internal static InitializeMethodInfo? GetInitializeMethodInfo(INamedTypeSymbol graphOrGraphExtension, GraphType graphType, PXContext pxContext,
+	internal static InitializeMethodInfo? GetInitializeMethodInfo(ITypeSymbol graphOrGraphExtension, GraphType graphType, PXContext pxContext,
 																  CancellationToken cancellationToken, int? customDeclarationOrder = null)
 	{
 		cancellationToken.ThrowIfCancellationRequested();
@@ -82,7 +85,7 @@ public class InitializeMethodInfo : OverridableNodeSymbolItem<InitializeMethodIn
 		return null;
 	}
 
-	private static IMethodSymbol? GetOriginalInitializeMethod(GraphType graphType, INamedTypeSymbol graphOrGraphExtension, PXContext pxContext)
+	private static IMethodSymbol? GetOriginalInitializeMethod(GraphType graphType, ITypeSymbol graphOrGraphExtension, PXContext pxContext)
 	{
 		switch (graphType)
 		{

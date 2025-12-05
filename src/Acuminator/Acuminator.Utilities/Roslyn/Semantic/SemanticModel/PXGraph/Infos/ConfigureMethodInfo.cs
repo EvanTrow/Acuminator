@@ -15,7 +15,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 /// <summary>
 /// Information about the Configure special method in graph extensions.
 /// </summary>
-public class ConfigureMethodInfo : OverridableNodeSymbolItem<ConfigureMethodInfo, MethodDeclarationSyntax, IMethodSymbol>
+public sealed class ConfigureMethodInfo : OverridableNodeSymbolItem<ConfigureMethodInfo, MethodDeclarationSyntax, IMethodSymbol>
 {
 	/// <summary>
 	/// The Configure method declaration order to place it fourth after the Initialize method.
@@ -26,12 +26,15 @@ public class ConfigureMethodInfo : OverridableNodeSymbolItem<ConfigureMethodInfo
 							   ConfigureMethodInfo baseInfo) : 
 						  base(configureMethodNode, configureMethod, declarationOrder, baseInfo)
 	{
+		CombineWithBaseInfo();
 	}
 
 	public ConfigureMethodInfo(MethodDeclarationSyntax? configureMethodNode, IMethodSymbol configureMethod, int declarationOrder) : 
 						  base(configureMethodNode, configureMethod, declarationOrder)
 	{
 	}
+
+	protected override void CombineWithBaseInfo() { }
 
 	/// <summary>
 	/// Collects info about Configure method overrides from a graph or graph extension symbol and creates a <see cref="ConfigureMethodInfo"/> DTO.
@@ -42,8 +45,8 @@ public class ConfigureMethodInfo : OverridableNodeSymbolItem<ConfigureMethodInfo
 	/// they can't affect workflow configuration done by the base extension or graph.<br/>
 	/// - Graph and graph extension overrides of Configure method can be considered independently.<br/>  
 	/// Therefore, for graph extension base graph's Configure method overrides are not included into results.<br/>
-	/// Thus, only one <see cref="ConfigureMethodInfo"/> will be created in the end. The created DTO will contain all Configure method overrides as base infos.<br/>
-	/// The created <see cref="ConfigureMethodInfo"/> DTO is not neccessary declared in the <paramref name="graphOrGraphExtension"/> symbol. <br/>
+	/// Thus, only one <see cref="ConfigureMethodInfo"/> will be created in the end. The created DTO will contain all Configure method overrides as base info.<br/>
+	/// The created <see cref="ConfigureMethodInfo"/> DTO is not necessary declared in the <paramref name="graphOrGraphExtension"/> symbol. <br/>
 	/// It can be also declared in its base types.
 	/// </remarks>
 	/// <param name="graphOrGraphExtension">The graph or graph extension.</param>
@@ -54,7 +57,7 @@ public class ConfigureMethodInfo : OverridableNodeSymbolItem<ConfigureMethodInfo
 	/// <returns>
 	/// <see cref="ConfigureMethodInfo"/> DTO if the graph / graph extension contains one Configure method, otherwise <see langword="null"/>.
 	/// </returns>
-	internal static ConfigureMethodInfo? GetConfigureMethodInfo(INamedTypeSymbol graphOrGraphExtension, GraphType graphType, PXContext pxContext, 
+	internal static ConfigureMethodInfo? GetConfigureMethodInfo(ITypeSymbol graphOrGraphExtension, GraphType graphType, PXContext pxContext, 
 																CancellationToken cancellationToken, int? customDeclarationOrder = null)
 	{
 		cancellationToken.ThrowIfCancellationRequested();

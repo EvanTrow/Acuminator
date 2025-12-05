@@ -65,7 +65,7 @@ namespace Acuminator.Vsix.GoToDeclaration
 
 #pragma warning disable CS8774 // Member must have a non-null value when exiting.
 		/// <summary>
-		/// Initializes the singleton instance of the command. Internal method shich should be called only from UI thread.
+		/// Initializes the singleton instance of the command. Internal method that should be called only from UI thread.
 		/// </summary>
 		/// <param name="package">Owner package, not null.</param>
 		/// <param name="oleCommandService">The OLE command service.</param>
@@ -183,19 +183,19 @@ namespace Acuminator.Vsix.GoToDeclaration
 		private async Task NavigateToPXActionHandlerAsync(Document document, IWpfTextView textView, ISymbol actionSymbol,
 														  PXGraphSemanticModel graphSemanticModel, PXContext context)
 		{
-			if (!graphSemanticModel.ActionHandlersByNames.TryGetValue(actionSymbol.Name, out ActionHandlerInfo? actionHandler) ||
-				actionHandler == null)
+			if (!graphSemanticModel.ActionDelegateByNames.TryGetValue(actionSymbol.Name, out ActionDelegateInfo? actionDelegate) ||
+				actionDelegate == null)
 			{
 				return;
 			}
 
 			// Try to navigate to the symbol using Visual Studio workspace
-			if (TryNavigateToSymbolWithVisualStudioWorkspace(document, actionHandler.Symbol))
+			if (TryNavigateToSymbolWithVisualStudioWorkspace(document, actionDelegate.Symbol))
 				return;
 			
 			IWpfTextView? textViewToNavigateTo = textView;
 
-			if (actionHandler.Node is not MethodDeclarationSyntax handlerNode || handlerNode.SyntaxTree == null)
+			if (actionDelegate.Node is not MethodDeclarationSyntax handlerNode || handlerNode.SyntaxTree == null)
 				return;
 
 			if (handlerNode.SyntaxTree.FilePath != document.FilePath)

@@ -9,7 +9,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 	/// <summary>
 	/// The DTO with information about the action declared in graph.
 	/// </summary>
-	public class ActionInfo : OverridableSymbolItem<ActionInfo, ISymbol>
+	public sealed class ActionInfo : OverridableSymbolItem<ActionInfo, ISymbol>
 	{
 		/// <summary>
 		/// Indicates whether the action is predefined system action in Acumatica like <see cref="PX.Data.PXSave{TNode}"/>
@@ -19,23 +19,25 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <summary>
 		/// The type of the action symbol.
 		/// </summary>
-		public INamedTypeSymbol Type { get; }
+		public ITypeSymbol Type { get; }
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		protected override string DebuggerDisplay => $"{base.DebuggerDisplay} |Type: {Type.ToString()}";
 
-		public ActionInfo(ISymbol symbol, INamedTypeSymbol type, int declarationOrder, bool isSystem, ActionInfo baseInfo) :
+		public ActionInfo(ISymbol symbol, ITypeSymbol type, int declarationOrder, bool isSystem, ActionInfo baseInfo) :
 					 this(symbol, type, declarationOrder, isSystem)
 		{
 			_baseInfo = baseInfo.CheckIfNull();
-			CombineWithBaseInfo(_baseInfo);
+			CombineWithBaseInfo();
 		}
 
-		public ActionInfo(ISymbol symbol, INamedTypeSymbol type, int declarationOrder, bool isSystem) :
+		public ActionInfo(ISymbol symbol, ITypeSymbol type, int declarationOrder, bool isSystem) :
 					 base(symbol, declarationOrder)
 		{
 			Type = type.CheckIfNull();
 			IsSystem = isSystem;
 		}
+
+		protected override void CombineWithBaseInfo() { }
 	}
 }

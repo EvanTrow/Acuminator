@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 
@@ -10,7 +8,7 @@ using Acuminator.Utilities.Roslyn.Syntax;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Acuminator.Utilities.Roslyn.Semantic.SharedInfo
+namespace Acuminator.Utilities.Roslyn.Semantic.Shared
 {
 	/// <summary>
 	/// Information about the IsActive special method in graph and DAC extensions.
@@ -33,7 +31,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.SharedInfo
 		/// <returns>
 		/// The <see cref="IsActiveMethodInfo"/> DTO if extension contains IsActive method, otherwise <see langword="null"/>.
 		/// </returns>
-		internal static IsActiveMethodInfo? GetIsActiveMethodInfo(INamedTypeSymbol dacOrGraphExtension, CancellationToken cancellationToken,
+		internal static IsActiveMethodInfo? GetIsActiveMethodInfo(ITypeSymbol dacOrGraphExtension, CancellationToken cancellationToken,
 																  int? customDeclarationOrder = null)
 		{
 			cancellationToken.ThrowIfCancellationRequested();

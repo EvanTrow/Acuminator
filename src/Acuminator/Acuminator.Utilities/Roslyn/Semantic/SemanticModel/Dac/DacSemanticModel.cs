@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -10,7 +8,9 @@ using System.Threading;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.PXFieldAttributes;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
-using Acuminator.Utilities.Roslyn.Semantic.SharedInfo;
+using Acuminator.Utilities.Roslyn.Semantic.Shared;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Dac;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -40,7 +40,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 		public int DeclarationOrder => DacOrDacExtInfo.DeclarationOrder;
 
-		public INamedTypeSymbol Symbol => DacOrDacExtInfo.Symbol;
+		public ITypeSymbol Symbol => DacOrDacExtInfo.Symbol;
 
 		/// <summary>
 		/// The DAC symbol. For the DAC, the value is the same as <see cref="Symbol"/>. 
@@ -111,32 +111,28 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		[MemberNotNullWhen(returnValue: true, nameof(AccumulatorAttribute))]
 		public bool HasAccumulatorAttribute => AccumulatorAttribute != null;
 
-		protected DacSemanticModel(PXContext pxContext, DacType dacType, INamedTypeSymbol symbol, ClassDeclarationSyntax? node,
-									int declarationOrder, CancellationToken cancellation)
+		protected DacSemanticModel(PXContext pxContext, DacOrDacExtInfoBase dacOrDacExtInfo, CancellationToken cancellation)
 		{
 			cancellation.ThrowIfCancellationRequested();
 
-			PXContext 	  = pxContext;
+			PXContext 		= pxContext.CheckIfNull();
+			DacOrDacExtInfo = dacOrDacExtInfo.CheckIfNull();
+
+			(DacType, DacSymbol) = dacOrDacExtInfo switch
+			{
+				DacInfo dacInfo				=> (DacType.Dac, dacInfo.Symbol),
+				DacExtensionInfo dacExtInfo => (DacType.DacExtension, dacExtInfo.Dac?.Symbol),
+				_							=> throw new ArgumentOutOfRangeException(nameof(dacOrDacExtInfo),
+													$"The \"{nameof(dacOrDacExtInfo)}\" parameter must be either {nameof(DacInfo)} or {nameof(DacExtensionInfo)}.")
+			};
+
 			_cancellation = cancellation;
-			DacType 	  = dacType;
-
-			if (DacType == DacType.Dac)
-			{
-				DacOrDacExtInfo = DacInfo.Create(symbol, node, PXContext, declarationOrder, cancellation).CheckIfNull();
-				DacSymbol = Symbol;
-			}
-			else
-			{
-				DacSymbol = symbol.GetDacFromDacExtension(PXContext);
-				DacOrDacExtInfo = DacExtensionInfo.Create(symbol, node, DacSymbol, PXContext, declarationOrder, cancellation).CheckIfNull();
-			}
-
 			IsMappedCacheExtension = Symbol.InheritsFromOrEquals(PXContext.PXMappedCacheExtensionType);
 
 			Attributes		  = GetDacAttributes();
 			BqlFieldsByNames  = GetDacBqlFields();
-			PropertiesByNames = GetDacProperties();
-			DacFieldsByNames  = DacFieldsCollector.CollectDacFieldsFromDacPropertiesAndBqlFields(Symbol, DacType, PXContext,
+			PropertiesByNames = GetDacProperties(BqlFieldsByNames);
+			DacFieldsByNames  = DacFieldsCollector.CollectDacFieldsFromDacPropertiesAndBqlFields(DacOrDacExtInfo, PXContext,
 																								 BqlFieldsByNames, PropertiesByNames);
 			IsActiveMethodInfo = GetIsActiveMethodInfo();
 
@@ -146,31 +142,46 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		}
 
 		/// <summary>
-		/// Returns the semantic model of DAC or DAC extension which is inferred from <paramref name="typeSymbol"/>.
+		/// Returns the semantic model of DAC or DAC extension which is inferred from <paramref name="dacOrDacExtTypeSymbol"/>.
 		/// </summary>
-		/// <param name="pxContext">Context instance</param>
-		/// <param name="typeSymbol">Symbol which is DAC or DAC extension descendant</param>
-		/// <param name="semanticModel">Semantic model</param>
-		/// <param name="cancellation">Cancellation token</param>
-		/// <returns/>
-		public static DacSemanticModel? InferModel(PXContext pxContext, INamedTypeSymbol typeSymbol, int? declarationOrder = null, 
+		/// <param name="pxContext">Context instance.</param>
+		/// <param name="dacOrDacExtTypeSymbol">The DAC or DAC extension type symbol.</param>
+		/// <param name="customDeclarationOrder">(Optional) The custom declaration order.</param>
+		/// <param name="cancellation">(Optional)Cancellation token.</param>
+		/// <returns>
+		/// A semantic model for a given DAC or DAC extension type <paramref name="dacOrDacExtTypeSymbol"/>.
+		/// </returns>
+		public static DacSemanticModel? InferModel(PXContext pxContext, ITypeSymbol dacOrDacExtTypeSymbol, int? customDeclarationOrder = null,
 												   CancellationToken cancellation = default)
-		{		
-			pxContext.ThrowOnNull();
-			typeSymbol.ThrowOnNull();
+		{
 			cancellation.ThrowIfCancellationRequested();
 
-			DacType? dacType = typeSymbol.IsDAC(pxContext)
-				? DacType.Dac
-				: typeSymbol.IsDacExtension(pxContext)
-					? DacType.DacExtension
-					: null;
+			var inferredInfo = DacAndDacExtInfoBuilder.Instance.InferTypeInfo(dacOrDacExtTypeSymbol, pxContext, customDeclarationOrder, cancellation);
 
-			if (dacType == null)
+			if (inferredInfo?.GetResultKind() != InferResultKind.Success || inferredInfo.InferredInfo is not DacOrDacExtInfoBase dacExtInfoBase)
 				return null;
 
-			var dacOrExtNode = typeSymbol.GetSyntax(cancellation) as ClassDeclarationSyntax;
-			return new DacSemanticModel(pxContext, dacType.Value, typeSymbol, dacOrExtNode, declarationOrder ?? 0, cancellation);
+			return InferModel(pxContext, dacExtInfoBase, cancellation);
+		}
+
+		/// <summary>
+		/// Returns the semantic model of DAC or DAC extension which is inferred from <paramref name="dacOrDacExtInfo"/>.
+		/// </summary>
+		/// <param name="pxContext">Context instance.</param>
+		/// <param name="dacOrDacExtInfo">The DAC or DAC extension inferred information obtained from resolving a hierarchy of chained DAC extensions and base types.</param>
+		/// <param name="cancellation">Cancellation token.</param>
+		/// <returns>
+		/// A semantic model for a given DAC or DAC extension <paramref name="dacOrDacExtInfo"/>.<br/>
+		/// If <paramref name="dacOrDacExtInfo"/> is not DAC or DAC extension, then returns <see langword="null"/>.
+		/// </returns>
+		public static DacSemanticModel? InferModel(PXContext pxContext, DacOrDacExtInfoBase dacOrDacExtInfo, CancellationToken cancellation)
+		{		
+			cancellation.ThrowIfCancellationRequested();
+
+			if (dacOrDacExtInfo is not (DacInfo or DacExtensionInfo))
+				return null;
+
+			return new DacSemanticModel(pxContext, dacOrDacExtInfo, cancellation);
 		}
 
 		/// <summary>
@@ -208,24 +219,13 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			return builder.ToImmutable();
 		}
 
-		protected ImmutableDictionary<string, DacPropertyInfo> GetDacProperties() =>
-			GetInfos(() => Symbol.GetDacPropertiesFromDac(PXContext, BqlFieldsByNames, cancellation: _cancellation),
-					 () => Symbol.GetPropertiesFromDacExtensionAndBaseDac(PXContext, BqlFieldsByNames, _cancellation));
-
 		protected ImmutableDictionary<string, DacBqlFieldInfo> GetDacBqlFields() =>
-			GetInfos(() => Symbol.GetDacBqlFieldsFromDac(PXContext, cancellation: _cancellation),
-					 () => Symbol.GetDacBqlFieldsFromDacExtensionAndBaseDac(PXContext, _cancellation));
+			DacOrDacExtInfo.GetDacBqlFieldInfos(PXContext, _cancellation)
+						   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
-		protected ImmutableDictionary<string, TInfo> GetInfos<TInfo>(Func<OverridableItemsCollection<TInfo>> dacInfosSelector,
-																	 Func<OverridableItemsCollection<TInfo>> dacExtInfosSelector)
-		where TInfo : IOverridableItem<TInfo>
-		{
-			var infos = DacType == DacType.Dac
-				? dacInfosSelector()
-				: dacExtInfosSelector();
-
-			return infos.ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
-		}
+		protected ImmutableDictionary<string, DacPropertyInfo> GetDacProperties(IDictionary<string, DacBqlFieldInfo> dacBqlFields) =>
+			DacOrDacExtInfo.GetPropertyInfos(PXContext, dacBqlFields, _cancellation)
+						   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
 		protected IsActiveMethodInfo? GetIsActiveMethodInfo()
 		{

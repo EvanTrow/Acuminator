@@ -6,8 +6,6 @@ using System.Threading;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents;
 
-using Microsoft.CodeAnalysis;
-
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
 	public partial class PXGraphEventSemanticModel : ISemanticModel
@@ -79,8 +77,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			{
 				cancellation.ThrowIfCancellationRequested();
 
-				var graphHierarchyFromBaseGraphToDerivedExtension = _graphEventSemanticModel.GraphOrGraphExtInfo
-																							.ThisAndOverridenItems().Reverse();
+				// TODO - rewrite the collection of event handlers in the future to recognize different types of extension mechanisms
+				var graphHierarchyFromBaseGraphToDerivedExtension = 
+					_graphEventSemanticModel.GraphOrGraphExtInfo.GetInfosFromBaseGraphToDerivedExtension(includeSelf: true);
 				int declarationOrder = 0;
 
 				foreach (GraphOrGraphExtInfoBase graphOrExtInfo in graphHierarchyFromBaseGraphToDerivedExtension)

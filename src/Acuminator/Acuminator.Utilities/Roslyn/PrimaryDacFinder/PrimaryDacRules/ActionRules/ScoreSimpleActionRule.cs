@@ -12,7 +12,7 @@ namespace Acuminator.Utilities.Roslyn.PrimaryDacFinder.PrimaryDacRules.ActionRul
 	{
 		public override sealed bool IsAbsolute => false;
 
-		public override bool SatisfyRule(PrimaryDacFinder dacFinder, ISymbol action, INamedTypeSymbol actionType)
+		public override bool SatisfyRule(PrimaryDacFinder dacFinder, ISymbol action, ITypeSymbol actionType)
 		{
 			dacFinder.CancellationToken.ThrowIfCancellationRequested();
 			return true;

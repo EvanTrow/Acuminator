@@ -13,8 +13,6 @@ using Acuminator.Vsix.Utilities;
 
 using Microsoft.CodeAnalysis;
 
-using static Acuminator.Utilities.BannedApi.ApiConstants.Format;
-
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
 	public class BaseDacPlaceholderNodeViewModel : DacNodeViewModelBase, IPlaceholderNode, IElementWithTooltip
@@ -32,7 +30,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		public override ExtendedObservableCollection<ExtraInfoViewModel> ExtraInfos { get; }
 
 		#region IPlaceholderNode implementation
-		INamedTypeSymbol IPlaceholderNode.PlaceholderSymbol => DacOrDacExtInfo.Symbol;
+		ITypeSymbol IPlaceholderNode.PlaceholderSymbol => DacOrDacExtInfo.Symbol;
 
 		int IPlaceholderNode.PlaceholderSymbolDeclarationOrder => DacOrDacExtInfo.DeclarationOrder;
 		#endregion

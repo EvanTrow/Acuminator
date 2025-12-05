@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -95,7 +94,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NonPublicGraphsDacsAndExtensions
 				_								 => null
 			};
 
-		private IEnumerable<ModifierSetsLocations> GetBadModifierSetsLocationsForTypeDeclarations(INamedTypeSymbol dacOrGraphType, 
+		private IEnumerable<ModifierSetsLocations> GetBadModifierSetsLocationsForTypeDeclarations(ITypeSymbol dacOrGraphType, 
 																								  CancellationToken cancellationToken)
 		{
 			if (dacOrGraphType.DeclaringSyntaxReferences.IsDefaultOrEmpty)
@@ -113,7 +112,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NonPublicGraphsDacsAndExtensions
 			return GetModifierSetsLocationsFromPartialType(dacOrGraphType, cancellationToken);
 		}
 
-		private IEnumerable<ModifierSetsLocations> GetModifierSetsLocationsFromPartialType(INamedTypeSymbol partialDacOrGraphType, 
+		private IEnumerable<ModifierSetsLocations> GetModifierSetsLocationsFromPartialType(ITypeSymbol partialDacOrGraphType, 
 																						   CancellationToken cancellationToken)
 		{
 			var partialTypeDeclarations = partialDacOrGraphType.DeclaringSyntaxReferences
@@ -133,15 +132,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.NonPublicGraphsDacsAndExtensions
 			if (classNode.Modifiers.Count == 0)
 				return [classNode.Identifier.GetLocation()];
 
-			List<List<SyntaxToken>> continousModifiersSets = GetContinousModifiersSets(classNode);
-			var locations = TransformContinousModifiersSetsToLocations(classNode, continousModifiersSets);
+			List<List<SyntaxToken>> continuousModifiersSets = GetContinuousModifiersSets(classNode);
+			var locations = TransformContinuousModifiersSetsToLocations(classNode, continuousModifiersSets);
 
 			return locations;
 		}
 
-		private List<List<SyntaxToken>> GetContinousModifiersSets(ClassDeclarationSyntax classNode)
+		private List<List<SyntaxToken>> GetContinuousModifiersSets(ClassDeclarationSyntax classNode)
 		{
-			List<List<SyntaxToken>> continousModifiersSets = new();
+			List<List<SyntaxToken>> continuousModifiersSets = new();
 			bool hasPreviousAccessModifier = false;
 
 			for (int i = 0; i < classNode.Modifiers.Count; i++)
@@ -157,41 +156,41 @@ namespace Acuminator.Analyzers.StaticAnalysis.NonPublicGraphsDacsAndExtensions
 					hasPreviousAccessModifier = false;
 			}
 
-			return continousModifiersSets;
+			return continuousModifiersSets;
 
 			//------------------------------------------------Local Function------------------------------------------------------------
 			void AddModifier(in SyntaxToken modifier)
 			{
-				bool needToAddNewContinousModifiersSet = !hasPreviousAccessModifier;
+				bool needToAddNewContinuousModifiersSet = !hasPreviousAccessModifier;
 
 				if (hasPreviousAccessModifier)
 				{
-					List<SyntaxToken>? lastModifiersSet = continousModifiersSets.LastOrDefault();
+					List<SyntaxToken>? lastModifiersSet = continuousModifiersSets.LastOrDefault();
 
 					if (lastModifiersSet != null)
 						lastModifiersSet.Add(modifier);
 					else
-						needToAddNewContinousModifiersSet = true;
+						needToAddNewContinuousModifiersSet = true;
 				}
 
-				if (needToAddNewContinousModifiersSet)
+				if (needToAddNewContinuousModifiersSet)
 				{
-					List<SyntaxToken> continousModifiers = [modifier];
-					continousModifiersSets.Add(continousModifiers);
+					List<SyntaxToken> continuousModifiers = [modifier];
+					continuousModifiersSets.Add(continuousModifiers);
 				}
 			}
 		}
 
-		private ModifierSetsLocations TransformContinousModifiersSetsToLocations(ClassDeclarationSyntax classNode, 
-																				 List<List<SyntaxToken>> continousModifiersSets)
+		private ModifierSetsLocations TransformContinuousModifiersSetsToLocations(ClassDeclarationSyntax classNode, 
+																				  List<List<SyntaxToken>> continuousModifiersSets)
 		{
-			if (continousModifiersSets.Count == 0)
+			if (continuousModifiersSets.Count == 0)
 				return [classNode.Identifier.GetLocation()];
 
 			bool classIdentifierLocationWasAdded = false;
-			ModifierSetsLocations locations = new(capacity: continousModifiersSets.Count);
+			ModifierSetsLocations locations = new(capacity: continuousModifiersSets.Count);
 
-			foreach (List<SyntaxToken> modifiersSet in continousModifiersSets)
+			foreach (List<SyntaxToken> modifiersSet in continuousModifiersSets)
 			{
 				if (CreateLocationFromModifiersSet(modifiersSet) is Location location)
 					locations.Add(location);

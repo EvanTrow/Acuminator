@@ -1,136 +1,121 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Threading;
+using System.Runtime.CompilerServices;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Syntax;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Extensions;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
-	public class GraphExtensionInfo : GraphOrGraphExtInfoBase
+	/// <summary>
+	/// Information about the correctly declared graph extension without issues in the type hierarchy.
+	/// </summary>
+	public class GraphExtensionInfo : GraphOrGraphExtInfoBase, IExtensionInfo<GraphExtensionInfo>
 	{
-		public GraphInfo? Graph { get; }
+		public GraphInfo? BaseGraph { get; }
 
-		protected GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
-									 int declarationOrder, GraphInfo baseGraph) :
-								base(node, graphExtension, declarationOrder, baseGraph)
+		public override ITypeSymbol? GraphType => BaseGraph?.Symbol;
+
+		public ExtensionMechanismType BaseExtensionsMechanismType { get; }
+
+		/// <summary>
+		/// The overridden base graph extensions if any.<br/>
+		/// Contains either direct base graph extension or chained graph extensions.
+		/// </summary>
+		public ImmutableArray<GraphExtensionInfo> BaseGraphExtensions { get; }
+
+		ImmutableArray<GraphExtensionInfo> IExtensionInfo<GraphExtensionInfo>.BaseExtensions => BaseGraphExtensions;
+
+		internal GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
+									int declarationOrder) :
+							 this(node, graphExtension, graph, declarationOrder, baseGraphExtensions: [],
+								  ExtensionMechanismType.None)
+		{ }
+
+		internal GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
+									int declarationOrder, GraphExtensionInfo baseGraphExtension,
+									ExtensionMechanismType extensionMechanismType) :
+							 this(node, graphExtension, graph, declarationOrder, [baseGraphExtension.CheckIfNull()], 
+								  extensionMechanismType)
+		{ }
+
+		internal GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
+									int declarationOrder, IEnumerable<GraphExtensionInfo> baseGraphExtensions,
+									ExtensionMechanismType extensionMechanismType) :
+							 this(node, graphExtension, graph, declarationOrder, baseGraphExtensions?.ToImmutableArray() ?? [],
+								  extensionMechanismType)
+		{ }
+
+		internal GraphExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol graphExtension, GraphInfo? graph,
+									int declarationOrder, ImmutableArray<GraphExtensionInfo> baseGraphExtensions,
+									ExtensionMechanismType extensionMechanismType) :
+							 base(node, graphExtension, declarationOrder)
 		{
-			Graph = graph;
+			BaseGraph 					= graph;
+			BaseExtensionsMechanismType = extensionMechanismType;
+			BaseGraphExtensions 		= baseGraphExtensions;
+
+			CombineWithBaseInfo();
 		}
 
-		protected GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph,
-									 int declarationOrder, GraphExtensionInfo baseGraphExtension) :
-								base(node, graphExtension, declarationOrder, baseGraphExtension)
+		public override IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromDerivedExtensionToBaseGraph(bool includeSelf)
 		{
-			Graph = graph;
+			var graphInfos = BaseGraph?.GetInfosFromDerivedExtensionToBaseGraph(includeSelf: true);
+			var extensionInfos = GetExtensionInfosFromDerivedExtensionToBaseExtensions(includeSelf);
+
+			return graphInfos != null
+				? extensionInfos.Concat(graphInfos)
+				: extensionInfos;
 		}
 
-		protected GraphExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol graphExtension, GraphInfo? graph, int declarationOrder) :
-								base(node, graphExtension, declarationOrder)
+		public override IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromBaseGraphToDerivedExtension(bool includeSelf)
 		{
-			Graph = graph;
+			var graphInfos = BaseGraph?.GetInfosFromBaseGraphToDerivedExtension(includeSelf: true);
+			var extensionInfos = GetExtensionInfosFromBaseExtensionsToDerivedExtension(includeSelf);
+
+			return graphInfos != null
+				? graphInfos.Concat(extensionInfos)
+				: extensionInfos;
 		}
 
-		protected override void CombineWithBaseInfo(GraphOrGraphExtInfoBase baseGraphOrGraphExtensionInfo) { }
+		/// <summary>
+		/// Gets extension infos from base extensions to derived extension level by level.
+		/// </summary>
+		/// <param name="includeSelf">True to include self, false to exclude.</param>
+		/// <returns>
+		/// Collection of extension infos from base extensions to derived extension level by level.
+		/// </returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public IEnumerable<GraphExtensionInfo> GetExtensionInfosFromBaseExtensionsToDerivedExtension(bool includeSelf) =>
+			GetExtensionInfosFromDerivedExtensionToBaseExtensions(includeSelf).Reverse();
 
-		public static GraphExtensionInfo? Create(INamedTypeSymbol? graphExtension, ClassDeclarationSyntax? graphExtensionNode, ITypeSymbol? graph,
-												 PXContext pxContext, int graphExtDeclarationOrder, CancellationToken cancellation)
+		/// <summary>
+		/// Get extension infos from derived extension to base extensions level by level.
+		/// </summary>
+		/// <param name="includeSelf">True to include self, false to exclude.</param>
+		/// <returns>
+		/// Collection of extension infos from derived extension to base extensions level by level.
+		/// </returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public IEnumerable<GraphExtensionInfo> GetExtensionInfosFromDerivedExtensionToBaseExtensions(bool includeSelf) =>
+			includeSelf
+				? this.GetAllBaseExtensionInfosAndThisBFS()
+				: this.GetAllBaseExtensionInfosBFS();
+
+		private void CombineWithBaseInfo()
 		{
-			var graphNode = graph.GetSyntax(cancellation) as ClassDeclarationSyntax;
-			var graphInfo = GraphInfo.Create(graph as INamedTypeSymbol, graphNode, pxContext, graphDeclarationOrder: 0, cancellation);
-
-			return Create(graphExtension, graphExtensionNode, graphInfo, pxContext, graphExtDeclarationOrder, cancellation);
+			if (BaseGraphExtensions.IsDefaultOrEmpty)
+				CombineWithBaseGraphExtension();
+			else
+				CombineWithBaseGraph();
 		}
 
-		public static GraphExtensionInfo? Create(INamedTypeSymbol? graphExtension, ClassDeclarationSyntax? graphExtensionNode, GraphInfo? graphInfo,
-												 PXContext pxContext, int graphExtDeclarationOrder, CancellationToken cancellation)
-		{
-			cancellation.ThrowIfCancellationRequested();
+		private void CombineWithBaseGraphExtension() { }
 
-			if (graphExtension == null)
-				return null;
-
-			INamedTypeSymbol? extensionBaseType = graphExtension.GetBaseTypesAndThis()
-																.FirstOrDefault(type => type.IsGraphExtensionBaseType()) as INamedTypeSymbol;
-			if (extensionBaseType == null)
-				return null;
-
-			bool isInSource = graphExtensionNode != null;
-			var extensionFromPreviousLevels = GetAggregatedExtensionFromPreviouslLevels(extensionBaseType, pxContext, graphInfo, cancellation);
-			GraphExtensionInfo? aggregatedBaseGraphExtInfo = !SymbolEqualityComparer.Default.Equals(graphExtension.BaseType, extensionBaseType)
-				? GetAggregatedBaseExtensions(graphExtension, graphInfo, extensionFromPreviousLevels, isInSource, cancellation)
-				: null;
-
-			GraphOrGraphExtInfoBase? baseInfo = aggregatedBaseGraphExtInfo ?? extensionFromPreviousLevels ?? graphInfo as GraphOrGraphExtInfoBase;
-			var graphExtensionInfo = baseInfo switch
-			{
-				GraphInfo baseGraphInfo => new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo,
-																  graphExtDeclarationOrder, baseGraphInfo),
-
-				GraphExtensionInfo baseExtensionInfo => new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo,
-																			   graphExtDeclarationOrder, baseExtensionInfo),
-
-				_ => new GraphExtensionInfo(graphExtensionNode, graphExtension, graphInfo, graphExtDeclarationOrder)
-			};
-
-			return graphExtensionInfo;
-		}
-
-		private static GraphExtensionInfo? GetAggregatedExtensionFromPreviouslLevels(INamedTypeSymbol extensionBaseType, PXContext pxContext,
-																					 GraphInfo? graphInfo, CancellationToken cancellation)
-		{
-			if (!extensionBaseType.IsGenericType)
-				return null;
-
-			var typeArguments = extensionBaseType.TypeArguments;
-
-			if (typeArguments.Length <= 1)
-				return null;
-
-			if (typeArguments[0] is not INamedTypeSymbol previousLevelExtensionType || !previousLevelExtensionType.IsPXGraphExtension(pxContext))
-				return null;
-
-			var prevLevelExtensionNode = previousLevelExtensionType.GetSyntax(cancellation) as ClassDeclarationSyntax;
-			var aggregatedPrevLevelGraphExtensionInfo = 
-				Create(previousLevelExtensionType, prevLevelExtensionNode, graphInfo, pxContext, graphExtDeclarationOrder: 0, cancellation);
-
-			return aggregatedPrevLevelGraphExtensionInfo;
-		}
-
-		private static GraphExtensionInfo? GetAggregatedBaseExtensions(INamedTypeSymbol graphExtension, GraphInfo? graphInfo,
-																	   GraphExtensionInfo? aggregatedExtensionFromBaseLevels,
-																	   bool isInSource, CancellationToken cancellation)
-		{
-			var graphExtensionsBaseTypesFromBaseToDerived = graphExtension.GetGraphExtensionBaseTypes()
-																		  .OfType<INamedTypeSymbol>()
-																		  .Reverse();
-
-			GraphExtensionInfo? aggregatedBaseGraphExtensionInfo = null; 
-			GraphExtensionInfo? prevGraphExtensionInfo = aggregatedExtensionFromBaseLevels;
-
-			foreach (INamedTypeSymbol baseType in graphExtensionsBaseTypesFromBaseToDerived)
-			{
-				cancellation.ThrowIfCancellationRequested();
-
-				var baseGraphExtensionNode = isInSource
-					? baseType.GetSyntax(cancellation) as ClassDeclarationSyntax
-					: null;
-
-				isInSource = baseGraphExtensionNode != null;
-				aggregatedBaseGraphExtensionInfo = prevGraphExtensionInfo != null
-					? new GraphExtensionInfo(baseGraphExtensionNode, baseType, graphInfo, declarationOrder: 0, prevGraphExtensionInfo)
-					: graphInfo != null 
-						? new GraphExtensionInfo(baseGraphExtensionNode, baseType, graphInfo, declarationOrder: 0, graphInfo)
-						: new GraphExtensionInfo(baseGraphExtensionNode, baseType, graphInfo, declarationOrder: 0);
-
-				prevGraphExtensionInfo = aggregatedBaseGraphExtensionInfo;
-			}
-
-			return aggregatedBaseGraphExtensionInfo;
-		}
+		private void CombineWithBaseGraph() { }
 	}
 }

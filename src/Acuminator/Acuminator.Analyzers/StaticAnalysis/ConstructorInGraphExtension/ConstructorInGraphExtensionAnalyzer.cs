@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Linq;
 
 using Acuminator.Analyzers.StaticAnalysis.PXGraph;
@@ -17,15 +16,20 @@ namespace Acuminator.Analyzers.StaticAnalysis.ConstructorInGraphExtension
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(Descriptors.PX1040_ConstructorInGraphExtension);
 
-		public override bool ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graph) =>
-			base.ShouldAnalyze(pxContext, graph) && graph.GraphType == GraphType.PXGraphExtension &&
-			!graph.Symbol.InstanceConstructors.IsDefaultOrEmpty && !graph.Symbol.IsGraphExtensionBaseType();
+		public override bool ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graphExtension) =>
+			base.ShouldAnalyze(pxContext, graphExtension) && graphExtension.GraphType == GraphType.PXGraphExtension &&
+			graphExtension.Symbol is INamedTypeSymbol namedTypeSymbol && !namedTypeSymbol.InstanceConstructors.IsDefaultOrEmpty && 
+			!namedTypeSymbol.IsGraphExtensionBaseType();
 
-		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel pxGraph)
+		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel graphExtension)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
-			var constructorLocations = pxGraph.Symbol.InstanceConstructors.Where(constructor => !constructor.IsImplicitlyDeclared)
-																		  .SelectMany(constructor => constructor.Locations);
+
+			if (graphExtension.Symbol is not INamedTypeSymbol graphExtensionType)
+				return;
+
+			var constructorLocations = graphExtensionType.InstanceConstructors.Where(constructor => !constructor.IsImplicitlyDeclared)
+																			  .SelectMany(constructor => constructor.Locations);
 			foreach (Location location in constructorLocations)
 			{
 				context.ReportDiagnosticWithSuppressionCheck(

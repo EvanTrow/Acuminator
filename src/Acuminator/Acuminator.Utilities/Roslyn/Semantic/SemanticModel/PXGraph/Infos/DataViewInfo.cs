@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
@@ -9,7 +7,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
-	public class DataViewInfo : OverridableSymbolItem<DataViewInfo, ISymbol>
+	public sealed class DataViewInfo : OverridableSymbolItem<DataViewInfo, ISymbol>
 	{
 		/// <summary>
 		/// Indicates whether the data view is processing data view
@@ -44,7 +42,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <summary>
 		/// The type of the data view symbol
 		/// </summary>
-		public INamedTypeSymbol Type { get; }
+		public ITypeSymbol Type { get; }
 		
 		public ITypeSymbol? DAC { get; }
 
@@ -68,7 +66,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 		protected override string DebuggerDisplay => $"{base.DebuggerDisplay} |Type: {Type.ToString()}";
 
-		public DataViewInfo(ISymbol symbol, INamedTypeSymbol type, PXContext pxContext, int declarationOrder)
+		public DataViewInfo(ISymbol symbol, ITypeSymbol type, PXContext pxContext, int declarationOrder, DataViewInfo baseInfo)
+					 : this(symbol, type, pxContext, declarationOrder)
+		{
+			_baseInfo = baseInfo.CheckIfNull(nameof(baseInfo));
+			CombineWithBaseInfo();
+		}
+
+		public DataViewInfo(ISymbol symbol, ITypeSymbol type, PXContext pxContext, int declarationOrder)
 					 : base(symbol, declarationOrder)
 		{
 			pxContext.ThrowOnNull();
@@ -85,11 +90,6 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			DAC = Type.GetDacFromView(pxContext);
 		}
 
-		public DataViewInfo(ISymbol symbol, INamedTypeSymbol type, PXContext pxContext, int declarationOrder, DataViewInfo baseInfo)
-					 : this(symbol, type, pxContext, declarationOrder)
-		{
-			_baseInfo = baseInfo.CheckIfNull(nameof(baseInfo));
-			CombineWithBaseInfo(_baseInfo);
-		}
+		protected override void CombineWithBaseInfo() { }
 	}
 }

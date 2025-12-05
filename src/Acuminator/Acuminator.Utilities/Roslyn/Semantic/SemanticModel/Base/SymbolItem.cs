@@ -1,8 +1,8 @@
-﻿#nullable enable
+﻿using System.Diagnostics;
 
-using System.Diagnostics;
-using Microsoft.CodeAnalysis;
 using Acuminator.Utilities.Common;
+
+using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Roslyn.Semantic
 {
@@ -10,7 +10,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 	///  A non generic class for items of a graph or DAC with symbol
 	/// </summary>
 	[DebuggerDisplay("{DebuggerDisplay,nq}")]
-	public abstract class SymbolItem
+	public abstract class SymbolItem : IHaveDeclarationOrder
 	{
 		/// <summary>
 		/// Declaration symbol of the item

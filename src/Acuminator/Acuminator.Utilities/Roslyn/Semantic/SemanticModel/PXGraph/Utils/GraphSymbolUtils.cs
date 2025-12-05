@@ -172,5 +172,19 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			return pxProtectedAccessAttribute != null &&
 				   graphExtension.HasAttribute(pxProtectedAccessAttribute, checkOverrides: false);
 		}
+
+		/// <summary>
+		/// Returns true if the data view is a processing view
+		/// </summary>
+		/// <param name="view">The type symbol of a data view</param>
+		/// <param name="pxContext">The context</param>
+		/// <returns></returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsProcessingView(this ITypeSymbol view, PXContext pxContext)
+		{
+			pxContext.ThrowOnNull();
+
+			return view.CheckIfNull().InheritsFromOrEqualsGeneric(pxContext.PXProcessingBase.Type);
+		}
 	}
 }

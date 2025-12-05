@@ -12,7 +12,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac;
 internal static class DacFieldsCollector
 {
 	public static ImmutableDictionary<string, DacFieldInfo> CollectDacFieldsFromDacPropertiesAndBqlFields(
-																			INamedTypeSymbol dacOrDacExtension, DacType dacType, PXContext pxContext, 
+																			DacOrDacExtInfoBase dacOrDacExtInfoBase, PXContext pxContext, 
 																			ImmutableDictionary<string, DacBqlFieldInfo> bqlFieldsByNames,
 																			ImmutableDictionary<string, DacPropertyInfo> propertiesByNames)
 	{
@@ -25,14 +25,12 @@ internal static class DacFieldsCollector
 		var bqlFieldsByTypes  = RegroupInfosByType<DacBqlFieldInfo, INamedTypeSymbol>(bqlFieldsByNames.Values);
 		var propertiesByTypes = RegroupInfosByType<DacPropertyInfo, IPropertySymbol>(propertiesByNames.Values);
 
-		var typeHierarchy = dacType == DacType.Dac
-			? dacOrDacExtension.GetDacWithBaseTypesThatMayStoreDacProperties(pxContext).Reverse()
-			: dacOrDacExtension.GetDacExtensionWithBaseExtensions(pxContext, SortDirection.Ascending, includeDac: true);
+		var typeInfosHierarchy = dacOrDacExtInfoBase.GetInfosFromBaseDacToDerivedExtension(includeSelf: true);
 
-		foreach (var type in typeHierarchy)
+		foreach (var typeInfo in typeInfosHierarchy)
 		{
-			bool hasBqlFields = bqlFieldsByTypes.TryGetValue(type, out var declaredBqlFields);
-			bool hasFieldProperties = propertiesByTypes.TryGetValue(type, out var declaredProperties);
+			bool hasBqlFields = bqlFieldsByTypes.TryGetValue(typeInfo.Symbol, out var declaredBqlFields);
+			bool hasFieldProperties = propertiesByTypes.TryGetValue(typeInfo.Symbol, out var declaredProperties);
 
 			if (!hasBqlFields && !hasFieldProperties)
 				continue;
@@ -67,7 +65,7 @@ internal static class DacFieldsCollector
 	where TInfo : SymbolItem<TSymbol>, IOverridableItem<TInfo>
 	where TSymbol : ISymbol
 	{
-		return infos.SelectMany(info => info.ThisAndOverridenItems())
+		return infos.SelectMany(info => info.ThisAndOverriddenItems())
 					.GroupBy(info => info.Symbol.ContainingType,
 							 SymbolEqualityComparer.Default as IEqualityComparer<ITypeSymbol>)
 					.ToDictionary(groupedByType => groupedByType.Key,

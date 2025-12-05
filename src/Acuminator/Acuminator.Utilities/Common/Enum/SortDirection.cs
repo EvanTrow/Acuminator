@@ -1,7 +1,7 @@
 ﻿namespace Acuminator.Utilities.Common
 {
 	/// <summary>
-	/// Values that represent the colection sort directions.
+	/// Values that represent the collection sort directions.
 	/// </summary>
 	public enum SortDirection : byte
 	{

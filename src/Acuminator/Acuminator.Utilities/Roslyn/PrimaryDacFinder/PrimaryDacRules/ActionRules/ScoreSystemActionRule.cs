@@ -14,7 +14,7 @@ namespace Acuminator.Utilities.Roslyn.PrimaryDacFinder.PrimaryDacRules.ActionRul
 	{
 		private readonly PXSystemActionsRegister _systemActionsRegister = new(context);
 
-		public override bool SatisfyRule(PrimaryDacFinder dacFinder, ISymbol action, INamedTypeSymbol actionType) =>
+		public override bool SatisfyRule(PrimaryDacFinder dacFinder, ISymbol action, ITypeSymbol actionType) =>
 			base.SatisfyRule(dacFinder, action, actionType) && 
 			_systemActionsRegister.IsSystemAction(actionType);
 	}

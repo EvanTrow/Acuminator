@@ -1,5 +1,4 @@
 ﻿#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -21,7 +20,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap.Dac
 
 		public DacExtensionInfo? DacExtensionInfo { get; }
 		
-		public INamedTypeSymbol Symbol => DacModel.Symbol;
+		public ITypeSymbol Symbol => DacModel.Symbol;
 
 		public PXContext PXContext => DacModel.PXContext;
 

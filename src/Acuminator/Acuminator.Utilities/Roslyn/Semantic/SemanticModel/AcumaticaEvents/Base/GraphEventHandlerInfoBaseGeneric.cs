@@ -23,7 +23,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 		/// </summary>
 		/// <remarks>
 		/// Internal setter is used for two reasons:
-		/// 1) Perfomance - to avoid allocation of objects during retrieval of overrides hierarchy.  
+		/// 1) Performance - to avoid allocation of objects during retrieval of overrides hierarchy.  
 		/// 2) Overcomplicated architecture - the use of completely readonly objects will require a more complex <see cref="GraphEventsCollection{TEventInfoType}"/> class
 		/// which will know how to create a new <typeparamref name="TEventHandlerInfo"/> event info. 
 		/// This will lead to a two concrete implementations of collection for <see cref="GraphRowEventHandlerInfo"/> and <see cref="GraphFieldEventHandlerInfo"/> 
@@ -31,14 +31,13 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 		/// </remarks>
 		TEventHandlerInfo? IWriteableBaseItem<TEventHandlerInfo>.Base
 		{
-			get => Base;
 			set 
 			{
 				_baseEventHandlerInfo = value;
 				OverrideType = GetOverrideType();
 
 				if (value != null)
-					CombineWithBaseInfo(value);
+					CombineWithBaseInfo();
 			}
 		}
 
@@ -58,12 +57,13 @@ namespace Acuminator.Utilities.Roslyn.Semantic.AcumaticaEvents
 			_baseEventHandlerInfo = baseEventHandlerInfo.CheckIfNull();
 			OverrideType = GetOverrideType();
 
-			CombineWithBaseInfo(baseEventHandlerInfo);
+			CombineWithBaseInfo();
 		}
 
-		void IWriteableBaseItem<TEventHandlerInfo>.CombineWithBaseInfo(TEventHandlerInfo baseInfo) => CombineWithBaseInfo(baseInfo);
+		void IOverridableItem<TEventHandlerInfo>.CombineWithBaseInfo() => CombineWithBaseInfo();
 
-		protected virtual void CombineWithBaseInfo(TEventHandlerInfo baseInfo)
+		/// <inheritdoc cref="IOverridableItem{T}.CombineWithBaseInfo()"/>
+		protected virtual void CombineWithBaseInfo()
 		{
 		}
 

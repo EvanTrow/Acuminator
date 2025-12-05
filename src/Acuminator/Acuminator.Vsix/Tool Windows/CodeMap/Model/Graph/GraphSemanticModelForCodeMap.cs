@@ -21,7 +21,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap.Graph
 
 		public ImmutableArray<BaseMemberOverrideInfo> BaseMemberOverrides { get; }
 
-		public INamedTypeSymbol Symbol => GraphModel.Symbol;
+		public ITypeSymbol Symbol => GraphModel.Symbol;
 
 		public PXContext PXContext => GraphModel.PXContext;
 
@@ -33,9 +33,9 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap.Graph
 
 		public GraphSemanticModelForCodeMap(PXGraphEventSemanticModel graphEventSemanticModel)
 		{
-			GraphModel 			 = graphEventSemanticModel.CheckIfNull();
+			GraphModel = graphEventSemanticModel.CheckIfNull();
 			InstanceConstructors = GetInstanceConstructors(graphEventSemanticModel.Symbol).ToImmutableArray();
-			BaseMemberOverrides  = GetBaseMemberOverrides(graphEventSemanticModel.Symbol).ToImmutableArray();
+			BaseMemberOverrides = GetBaseMemberOverrides(graphEventSemanticModel.Symbol).ToImmutableArray();
 
 			if (GraphType == GraphType.PXGraph)
 			{
@@ -45,16 +45,16 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap.Graph
 			else
 			{
 				GraphExtensionInfo = GraphModel.GraphOrGraphExtInfo as GraphExtensionInfo;
-				GraphInfo = GraphExtensionInfo?.Graph;
+				GraphInfo = GraphExtensionInfo?.BaseGraph;
 			}
 		}
 
-		protected virtual IEnumerable<InstanceConstructorInfo> GetInstanceConstructors(INamedTypeSymbol graphOrExtension)
+		protected virtual IEnumerable<InstanceConstructorInfo> GetInstanceConstructors(ITypeSymbol graphOrExtension)
 		{
-			if (graphOrExtension.InstanceConstructors.IsDefaultOrEmpty)
+			if (graphOrExtension is not INamedTypeSymbol graphOrExtensionNamedType || graphOrExtensionNamedType.InstanceConstructors.IsDefaultOrEmpty)
 				yield break;
 
-			var declaredConstructors = from constructor in graphOrExtension.InstanceConstructors
+			var declaredConstructors = from constructor in graphOrExtensionNamedType.InstanceConstructors
 									   where !constructor.IsImplicitlyDeclared && constructor.IsDeclaredInType(graphOrExtension)
 									   select constructor;
 			int declarationOrder = 0;
@@ -66,7 +66,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap.Graph
 			}
 		}
 
-		protected virtual IEnumerable<BaseMemberOverrideInfo> GetBaseMemberOverrides(INamedTypeSymbol graphOrExtension)
+		protected virtual IEnumerable<BaseMemberOverrideInfo> GetBaseMemberOverrides(ITypeSymbol graphOrExtension)
 		{
 			var baseMemberOverrides = from member in graphOrExtension.GetMembers()
 									  where !member.IsImplicitlyDeclared && member.IsOverride && 

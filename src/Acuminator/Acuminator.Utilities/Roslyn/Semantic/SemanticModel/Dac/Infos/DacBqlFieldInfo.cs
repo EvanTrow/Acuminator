@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System;
+﻿using System;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -8,7 +7,7 @@ using Acuminator.Utilities.Common;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 {
-	public class DacBqlFieldInfo : OverridableNodeSymbolItem<DacBqlFieldInfo, ClassDeclarationSyntax, INamedTypeSymbol>, IEquatable<DacBqlFieldInfo>
+	public sealed class DacBqlFieldInfo : OverridableNodeSymbolItem<DacBqlFieldInfo, ClassDeclarationSyntax, INamedTypeSymbol>, IEquatable<DacBqlFieldInfo>
 	{
 		/// <summary>
 		/// The declared BQL field data type corresponding to the BQL field type. 
@@ -25,15 +24,15 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// </summary>
 		public ITypeSymbol? BqlFieldDataTypeEffective { get; private set; }
 
-		protected DacBqlFieldInfo(ClassDeclarationSyntax? node, INamedTypeSymbol bqlField, int declarationOrder, DacBqlFieldInfo baseInfo) :
-							 this(node, bqlField, declarationOrder)
+		private DacBqlFieldInfo(ClassDeclarationSyntax? node, INamedTypeSymbol bqlField, int declarationOrder, DacBqlFieldInfo baseInfo) :
+						   this(node, bqlField, declarationOrder)
 		{
 			_baseInfo = baseInfo.CheckIfNull();
-			CombineWithBaseInfo(baseInfo);
+			CombineWithBaseInfo();
 		}
 
-		protected DacBqlFieldInfo(ClassDeclarationSyntax? node, INamedTypeSymbol bqlField, int declarationOrder) :
-							 base(node, bqlField, declarationOrder)
+		private DacBqlFieldInfo(ClassDeclarationSyntax? node, INamedTypeSymbol bqlField, int declarationOrder) :
+						   base(node, bqlField, declarationOrder)
 		{
 			ITypeSymbol? bqlFieldDataType = bqlField.GetBqlFieldDataTypeFromBqlFieldSymbol();
 
@@ -55,9 +54,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 				: new DacBqlFieldInfo(bqlFieldNode, bqlField, declarationOrder);
 		}
 
-		protected override void CombineWithBaseInfo(DacBqlFieldInfo baseInfo)
+		protected override void CombineWithBaseInfo()
 		{
-			BqlFieldDataTypeEffective ??= baseInfo.BqlFieldDataTypeEffective;
+			if (_baseInfo == null)
+				return;
+
+			BqlFieldDataTypeEffective ??= _baseInfo.BqlFieldDataTypeEffective;
 		}
 
 		public override bool Equals(object obj) => Equals(obj as DacBqlFieldInfo);

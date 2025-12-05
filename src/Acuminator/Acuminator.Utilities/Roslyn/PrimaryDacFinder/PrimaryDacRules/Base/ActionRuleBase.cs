@@ -21,6 +21,6 @@ namespace Acuminator.Utilities.Roslyn.PrimaryDacFinder.PrimaryDacRules.Base
 		/// <param name="action">The action.</param>
 		/// <param name="actionType">Type of the action.</param>
 		/// <returns/>
-		public abstract bool SatisfyRule(PrimaryDacFinder dacFinder, ISymbol action, INamedTypeSymbol actionType);
+		public abstract bool SatisfyRule(PrimaryDacFinder dacFinder, ISymbol action, ITypeSymbol actionType);
 	}
 }

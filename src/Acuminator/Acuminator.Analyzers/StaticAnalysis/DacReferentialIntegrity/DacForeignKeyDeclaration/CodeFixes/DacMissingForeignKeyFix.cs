@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
@@ -8,12 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.CodeGeneration;
+using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.PXFieldAttributes;
 using Acuminator.Utilities.Roslyn.Semantic;
-using Acuminator.Utilities.Roslyn.Semantic.Dac;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
+using Acuminator.Utilities.Roslyn.Semantic.Dac;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Dac;
 using Acuminator.Utilities.Roslyn.Syntax.Trivia;
 
 using Microsoft.CodeAnalysis;
@@ -23,7 +24,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-
 
 namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 {
@@ -147,7 +147,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 			if (foreignKeyAttributes.Count == 0)
 				return new List<DacPropertyInfo>();
 			
-			var dacSemanticModel = DacSemanticModel.InferModel(pxContext, dacTypeSymbol, cancellation: cancellation);
+			var dacSemanticModel = InferSemanticModel(pxContext, dacTypeSymbol, cancellation: cancellation);
 
 			if (dacSemanticModel == null || dacSemanticModel.DacType != DacType.Dac)
 				return new List<DacPropertyInfo>();
@@ -200,6 +200,19 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacReferentialIntegrity
 										   (memberType.IsDerivedFromOrAggregatesAttribute(selectorAttribute, pxContext) ||
 											memberType.IsDerivedFromOrAggregatesAttribute(dimensionSelectorAttribute, pxContext))); 
 			}
+		}
+
+		private DacSemanticModel? InferSemanticModel(PXContext pxContext, INamedTypeSymbol dacTypeSymbol, CancellationToken cancellation)
+		{
+			var inferredInfo = DacAndDacExtInfoBuilder.Instance.InferTypeInfo(dacTypeSymbol, pxContext, customDeclarationOrder: null, cancellation);
+
+			if (inferredInfo?.GetResultKind() != InferResultKind.Success ||
+				inferredInfo.InferredInfo is not DacOrDacExtInfoBase dacOrDacExtInfo)
+			{
+				return null;
+			}
+
+			return DacSemanticModel.InferModel(pxContext, dacOrDacExtInfo, cancellation: cancellation);
 		}
 
 		private static List<INamedTypeSymbol> GetForeignKeyAttributes(PXContext pxContext)

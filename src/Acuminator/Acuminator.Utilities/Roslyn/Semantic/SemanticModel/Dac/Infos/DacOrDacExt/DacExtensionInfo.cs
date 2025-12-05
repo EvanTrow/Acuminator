@@ -1,64 +1,73 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Syntax;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Extensions;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 {
-	public class DacExtensionInfo : DacOrDacExtInfoBase<DacExtensionInfo>
+	public sealed class DacExtensionInfo : DacOrDacExtInfoBase<DacExtensionInfo>, IExtensionInfo<DacExtensionInfo>
 	{
 		public DacInfo? Dac { get; }
 
-		protected DacExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol dacExtension, DacInfo? dac, int declarationOrder, 
-								   DacExtensionInfo baseInfo) :
-							  this(node, dacExtension, dac, declarationOrder)
-		{
-			_baseInfo = baseInfo.CheckIfNull();
-			CombineWithBaseInfo(baseInfo);
-		}
+		public override ITypeSymbol? DacType => Dac?.Symbol;
 
-		protected DacExtensionInfo(ClassDeclarationSyntax? node, INamedTypeSymbol dacExtension, DacInfo? dac, int declarationOrder) :
-							  base(node, dacExtension, declarationOrder)
+		public ExtensionMechanismType BaseExtensionsMechanismType { get; }
+
+		ImmutableArray<DacExtensionInfo> IExtensionInfo<DacExtensionInfo>.BaseExtensions =>
+			Base != null 
+				? [Base]
+				: ImmutableArray<DacExtensionInfo>.Empty;
+
+		internal DacExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol dacExtension, DacInfo? dac, int declarationOrder, 
+								  DacExtensionInfo baseInfo, ExtensionMechanismType extensionMechanismType) :
+							 base(node, dacExtension, declarationOrder, baseInfo)
 		{
 			Dac = dac;
+			BaseExtensionsMechanismType = extensionMechanismType;
+
+			CombineWithBaseInfo();
 		}
 
-		public static DacExtensionInfo? Create(INamedTypeSymbol? dacExtension, ClassDeclarationSyntax? dacExtensionNode, ITypeSymbol? dac, 
-											   PXContext pxContext, int dacExtDeclarationOrder, CancellationToken cancellation)
+		internal DacExtensionInfo(ClassDeclarationSyntax? node, ITypeSymbol dacExtension, DacInfo? dac, int declarationOrder) :
+							 base(node, dacExtension, declarationOrder)
 		{
-			if (dacExtension == null)
-				return null;
+			Dac = dac;
+			BaseExtensionsMechanismType = ExtensionMechanismType.None;
 
-			cancellation.ThrowIfCancellationRequested();
-
-			var dacNode = dac.GetSyntax(cancellation) as ClassDeclarationSyntax;
-			var dacInfo = DacInfo.Create(dac as INamedTypeSymbol, dacNode, pxContext, dacDeclarationOrder: 0, cancellation);
-			
-			var extensionTypesFromFirstToLastLevel = dacExtension.GetBaseExtensions(pxContext, SortDirection.Ascending, includeDac: false);
-			DacExtensionInfo? aggregatedBaseDacInfo = null, prevDacInfo = null;
-
-			foreach (INamedTypeSymbol baseExtensionType in extensionTypesFromFirstToLastLevel)
-			{
-				cancellation.ThrowIfCancellationRequested();
-
-				var baseDacExtNode = baseExtensionType.GetSyntax(cancellation) as ClassDeclarationSyntax;
-
-				aggregatedBaseDacInfo = prevDacInfo != null
-					? new DacExtensionInfo(baseDacExtNode, baseExtensionType, dacInfo, declarationOrder: 1, prevDacInfo)
-					: new DacExtensionInfo(baseDacExtNode, baseExtensionType, dacInfo, declarationOrder: 1);
-
-				prevDacInfo = aggregatedBaseDacInfo;
-			}
-
-			var dacExtensionInfo = aggregatedBaseDacInfo != null
-				? new DacExtensionInfo(dacExtensionNode, dacExtension, dacInfo, dacExtDeclarationOrder, aggregatedBaseDacInfo)
-				: new DacExtensionInfo(dacExtensionNode, dacExtension, dacInfo, dacExtDeclarationOrder);
-
-			return dacExtensionInfo;
+			CombineWithBaseInfo();
 		}
+
+		public override IEnumerable<DacOrDacExtInfoBase> GetInfosFromDerivedExtensionToBaseDac(bool includeSelf)
+		{
+			var dacExtensionInfos = includeSelf
+				? this.ThisAndOverriddenItems()
+				: this.JustOverriddenItems();
+
+			if (Dac != null)
+			{
+				var dacInfos = Dac.GetInfosFromDerivedExtensionToBaseDac(includeSelf: true);
+				return dacExtensionInfos.Concat(dacInfos);
+			}
+			else
+				return dacExtensionInfos;
+		}
+
+		protected override void CombineWithBaseInfo()
+		{
+			if (Base != null)
+				CombineWithBaseDacExtension();
+			else
+				CombineWithBaseDac();
+		}
+
+		private void CombineWithBaseDacExtension() { }
+
+		private void CombineWithBaseDac() { }
 	}
 }

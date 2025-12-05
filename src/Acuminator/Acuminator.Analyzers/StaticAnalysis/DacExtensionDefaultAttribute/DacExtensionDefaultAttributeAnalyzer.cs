@@ -120,7 +120,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.DacExtensionDefaultAttribute
             // If Dac extension contains PXDefaultAttribute without PersistingCheck.Nothing
             // we need to look to attribute wich it overrides:
             // if base attribute is also doesn't contain PersistingCheck.Nothing it is legitimately
-            foreach (DacPropertyInfo overridenProperty in property.JustOverridenItems())
+            foreach (DacPropertyInfo overridenProperty in property.JustOverriddenItems())
             {
                 var (pxDefaultAttributeBase, hasPersistingCheckNothingBase) = GetPXDefaultInfo(overridenProperty);
 

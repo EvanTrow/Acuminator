@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 using Acuminator.Utilities.Common;
@@ -9,7 +8,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 {
-	public class DataViewDelegateInfo : OverridableNodeSymbolItem<DataViewDelegateInfo, MethodDeclarationSyntax, IMethodSymbol>
+	public sealed class DataViewDelegateInfo : OverridableNodeSymbolItem<DataViewDelegateInfo, MethodDeclarationSyntax, IMethodSymbol>
 	{
 		public DataViewDelegateInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder)
 			: base(node, symbol, declarationOrder)
@@ -19,7 +18,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public DataViewDelegateInfo(MethodDeclarationSyntax? node, IMethodSymbol symbol, int declarationOrder, DataViewDelegateInfo baseInfo)
 			: base(node, symbol, declarationOrder, baseInfo)
 		{
+			CombineWithBaseInfo();
 		}
+
+		protected override void CombineWithBaseInfo() { }
 
 		/// <summary>
 		/// Gets a sequence of view delegates starting from the most derived override (including/excluding the instance depending on <paramref name="includeSelf"/> argument) and

@@ -73,7 +73,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap.Graph
 				return false;
 
 			return graphSemanticModel.ConfigureMethodOverride
-									 .ThisAndOverridenItems()
+									 .ThisAndOverriddenItems()
 									 .Any(configureMethodInfo => methodSymbol.Equals(configureMethodInfo.Symbol, SymbolEqualityComparer.Default));
 		}
 
@@ -83,7 +83,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap.Graph
 				return false;
 
 			return graphSemanticModel.InitializeMethodInfo
-									 .ThisAndOverridenItems()
+									 .ThisAndOverriddenItems()
 									 .Any(initializeMethodInfo => methodSymbol.Equals(initializeMethodInfo.Symbol, SymbolEqualityComparer.Default));
 		}
 

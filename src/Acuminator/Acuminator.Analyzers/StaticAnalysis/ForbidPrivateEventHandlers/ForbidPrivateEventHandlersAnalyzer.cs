@@ -39,7 +39,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.ForbidPrivateEventHandlers
 			}
 		}
 
-		private static List<IMethodSymbol>? GetAllInterfaceMethodsImplementations(INamedTypeSymbol graphOrGraphExtSymbol, PXContext pxContext)
+		private static List<IMethodSymbol>? GetAllInterfaceMethodsImplementations(ITypeSymbol graphOrGraphExtSymbol, PXContext pxContext)
 		{
 			var allInterfaces = graphOrGraphExtSymbol.AllInterfaces;
 

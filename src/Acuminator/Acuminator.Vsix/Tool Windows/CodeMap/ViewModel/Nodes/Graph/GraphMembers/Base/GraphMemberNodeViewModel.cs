@@ -14,7 +14,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public abstract class GraphMemberNodeViewModel : TreeNodeViewModel, INodeWithDeclarationOrder
+	public abstract class GraphMemberNodeViewModel : TreeNodeViewModel, IHaveDeclarationOrder
 	{
 		public override TreeNodeFilterBehavior FilterBehavior => TreeNodeFilterBehavior.DisplayedIfNodeOrChildrenMeetFilter;
 

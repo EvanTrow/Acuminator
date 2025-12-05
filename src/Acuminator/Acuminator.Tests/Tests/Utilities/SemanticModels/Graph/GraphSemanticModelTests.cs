@@ -1,7 +1,6 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +22,9 @@ using Xunit;
 
 namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 {
+	[SuppressMessage("Acuminator", "PX1120:Incorrect work with the Task types in the Acumatica asynchronous code. Task-typed expressions should be awaited.", 
+					 Justification = "<Pending>")]
+	[SuppressMessage("Acuminator", "PX1099:The forbidden API is used", Justification = "<Pending>")]
 	public class GraphSemanticModelTests : SemanticModelTestsBase<PXGraphSemanticModel>
 	{
 		[Theory]
@@ -33,18 +35,22 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			var graphExtensionInfo = graphSemanticModel.GraphOrGraphExtInfo as GraphExtensionInfo;
 
 			graphExtensionInfo.Should().NotBeNull();
-			graphExtensionInfo!.Graph.Should().NotBeNull();
-			graphExtensionInfo!.Graph!.Name.Should().Be("MyGraph");
-			graphExtensionInfo.Base.Should().NotBeNull();
-			graphExtensionInfo.Base!.Name.Should().Be("SecondLevelGraphExtension");
+			graphExtensionInfo!.BaseGraph.Should().NotBeNull();
+			graphExtensionInfo.BaseGraph!.Name.Should().Be("MyGraph");
+			graphExtensionInfo.BaseGraphExtensions.Should().HaveCount(1);
 
-			var extensionFromPreviousLevel = graphExtensionInfo.Base!.Base as GraphExtensionInfo;
+			var baseExtension = graphExtensionInfo.BaseGraphExtensions[0];
+			baseExtension.Name.Should().Be("SecondLevelGraphExtension");
+			baseExtension.BaseGraph.Should().NotBeNull();
+			baseExtension.BaseGraph.Should().Be(graphExtensionInfo.BaseGraph);
+			baseExtension.BaseGraphExtensions.Should().HaveCount(1);
 
-			extensionFromPreviousLevel.Should().NotBeNull();
-			extensionFromPreviousLevel!.Name.Should().Be("BaseExtension");
-			extensionFromPreviousLevel!.Graph.Should().NotBeNull();
-			extensionFromPreviousLevel.Base.Should().NotBeNull();
-			extensionFromPreviousLevel.Base.Should().Be(extensionFromPreviousLevel.Graph);
+			var extensionFromPreviousLevel = baseExtension.BaseGraphExtensions[0];
+
+			extensionFromPreviousLevel.Name.Should().Be("BaseExtension");
+			extensionFromPreviousLevel.BaseGraph.Should().NotBeNull();
+			extensionFromPreviousLevel.BaseGraph.Should().Be(graphExtensionInfo.BaseGraph);
+			extensionFromPreviousLevel.BaseGraphExtensions.Should().BeEmpty();
 		}
 
 		[Theory]
@@ -109,7 +115,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			var graphExtInfo = graphSemanticModel.GraphOrGraphExtInfo as GraphExtensionInfo;
 
 			graphExtInfo.Should().NotBeNull();
-			graphExtInfo!.Graph.Should().NotBeNull();
+			graphExtInfo!.BaseGraph.Should().NotBeNull();
 			graphSemanticModel.GraphType.Should().Be(GraphType.PXGraphExtension);
 			graphSemanticModel.InitializeMethodInfo.Should().BeNull();
 		}
@@ -129,14 +135,23 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			graphExtensionModelWithEvents.DeclaredPXOverrides.Should().HaveCount(3);
 
 			#region Graph Hierarchy 
-			graphExtensionModelWithEvents.GraphOrGraphExtInfo.Base.Should().NotBeNull();
-			var baseExtension = graphExtensionModelWithEvents.GraphOrGraphExtInfo.Base!;
+			var graphExtensionInfo = graphExtensionModelWithEvents.GraphOrGraphExtInfo as GraphExtensionInfo;
+			graphExtensionInfo.Should().NotBeNull();
+
+			graphExtensionInfo!.BaseGraph.Should().NotBeNull();
+			graphExtensionInfo.BaseGraphExtensions.Should().NotBeEmpty();
+			graphExtensionInfo.BaseGraphExtensions.Should().HaveCount(1);
+
+			var baseExtension = graphExtensionInfo.BaseGraphExtensions[0];
 			baseExtension.Should().NotBeNull();
 			baseExtension.Name.Should().Be("SomeGraphExtension");
+			baseExtension.BaseGraph.Should().NotBeNull();
+			baseExtension.BaseGraph.Should().Be(graphExtensionInfo.BaseGraph);
+			baseExtension.BaseGraphExtensions.Should().BeEmpty();
 
-			baseExtension.Base.Should().NotBeNull();
-			var graph = baseExtension.Base!.Symbol;
+			var graph = baseExtension.BaseGraph!.Symbol;
 			graph.Should().NotBeNull();
+			graph.Should().Be(graphExtensionInfo.BaseGraph!.Symbol);
 			graph.Should().Be(graphExtensionModel.GraphSymbol);
 			graph!.Name.Should().Be("SomeGraph");
 			#endregion
@@ -216,7 +231,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 								  GraphEventHandlerOverrideType.OverrideWithInterceptor, hasBaseDelegate: true,
 								  EventType.FieldUpdated, EventHandlerSignatureType.Classic, EventTargetKind.Field);
 
-				var allFieldUpdatedInBaseExtension = fieldUpdatedOverrides.JustOverridenItems()
+				var allFieldUpdatedInBaseExtension = fieldUpdatedOverrides.JustOverriddenItems()
 																		  .Where(h => h.Symbol.IsDeclaredInType(baseExtension.Symbol))
 																		  .ToList();
 				allFieldUpdatedInBaseExtension.Should().HaveCount(1);
@@ -231,7 +246,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 								  GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
 								  EventType.FieldUpdated, EventHandlerSignatureType.Classic, EventTargetKind.Field);
 
-				var allFieldUpdatedInGraph = fieldUpdatedOverrides.JustOverridenItems()
+				var allFieldUpdatedInGraph = fieldUpdatedOverrides.JustOverriddenItems()
 																  .Where(h => h.Symbol.IsDeclaredInType(graph))
 																  .ToList();
 				allFieldUpdatedInGraph.Should().HaveCount(2);
@@ -262,7 +277,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 								  GraphEventHandlerOverrideType.None, hasBaseDelegate: false,
 								  EventType.FieldSelecting, EventHandlerSignatureType.Generic, EventTargetKind.Field);
 
-				var fieldSelectingEventHandlersInGraph = fieldSelectingOverrides.JustOverridenItems()
+				var fieldSelectingEventHandlersInGraph = fieldSelectingOverrides.JustOverriddenItems()
 																				.Where(h => h.Symbol.IsDeclaredInType(graph))
 																				.ToList();
 				fieldSelectingEventHandlersInGraph.Should().HaveCount(3);
@@ -364,10 +379,9 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 														 .FirstOrDefault();
 			graphOrGraphExtDeclaration.Should().NotBeNull();
 
-			INamedTypeSymbol? graphOrGraphExtSymbol = context.SemanticModel.GetDeclaredSymbol(graphOrGraphExtDeclaration);
+			INamedTypeSymbol? graphOrGraphExtSymbol = context.SemanticModel.GetDeclaredSymbol(graphOrGraphExtDeclaration, cancellation);
 			graphOrGraphExtSymbol.Should().NotBeNull();
-
-			var graphSemanticModel = PXGraphSemanticModel.InferModel(context.PXContext, graphOrGraphExtSymbol!,
+			var graphSemanticModel = PXGraphSemanticModel.InferModel(context.PXContext, graphOrGraphExtSymbol,
 																	 GraphSemanticModelCreationOptions.CollectGeneralGraphInfo,
 																	 cancellation: cancellation);
 			graphSemanticModel.Should().NotBeNull();

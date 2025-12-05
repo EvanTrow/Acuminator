@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -19,6 +21,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </summary>
 		/// <param name="graphType">The graph type to act on.</param>
 		/// <returns/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<ITypeSymbol> GetGraphBaseTypes(this ITypeSymbol graphType) =>
 			graphType.GetBaseTypes()
 					 .TakeWhile(type => !type.IsGraphBaseType());
@@ -28,15 +31,17 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </summary>
 		/// <param name="graphType">The graph type to act on.</param>
 		/// <returns/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<ITypeSymbol> GetGraphWithBaseTypes(this ITypeSymbol graphType) =>
 			graphType.GetBaseTypesAndThis()
 					 .TakeWhile(type => !type.IsGraphBaseType());
 
 		/// <summary>
-		/// Gets the extension base types up to first met <see cref="PX.Data.PXGraphExtension"/>.
+		/// Gets the graph extension base types up to first met <c>PX.Data.PXGraphExtension</c>.
 		/// </summary>
-		/// <param name="extensionType">The extension type to act on.</param>
+		/// <param name="extensionType">The graph extension type to act on.</param>
 		/// <returns/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<ITypeSymbol> GetGraphExtensionBaseTypes(this ITypeSymbol extensionType) =>
 			extensionType.GetBaseTypes()
 						 .TakeWhile(type => !type.IsGraphExtensionBaseType());
@@ -46,33 +51,60 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </summary>
 		/// <param name="extensionType">The extension type to act on.</param>
 		/// <returns/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<ITypeSymbol> GetGraphExtensionWithBaseTypes(this ITypeSymbol extensionType) =>
 			extensionType.GetBaseTypesAndThis()
 						 .TakeWhile(type => !type.IsGraphExtensionBaseType());
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static bool IsGraphOrGraphExtensionBaseType(this ITypeSymbol? type) =>
+		internal static bool IsGraphOrGraphExtensionBaseType([NotNullWhen(returnValue: true)] this ITypeSymbol? type) =>
 			type != null && (type.Name == TypeNames.PXGraph || type.Name == TypeNames.PXGraphExtension);
 		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool IsGraphBaseType(this ITypeSymbol? type) => type?.Name == TypeNames.PXGraph;
+		public static bool IsGraphBaseType([NotNullWhen(returnValue: true)] this ITypeSymbol? type) => type?.Name == TypeNames.PXGraph;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool IsGraphExtensionBaseType(this ITypeSymbol? type) => 
+		public static bool IsGraphExtensionBaseType([NotNullWhen(returnValue: true)]this ITypeSymbol? type) => 
 			type?.Name == TypeNames.PXGraphExtension;
 
 		/// <summary>
-		/// Gets base graph extensions from graph extension type.
+		/// Get chained graph extension types from the PXGraphExtension base type's type arguments.
 		/// </summary>
-		/// <param name="graphExtension">The graph extension to act on.</param>
-		/// <param name="pxContext">Context.</param>
-		/// <param name="sortDirection">The sort direction. The <see cref="SortDirection.Descending"/> order is from the extension to its base extensions/graph.
-		/// The <see cref="SortDirection.Ascending"/> order is from the graph/base extensions to the most derived one.</param>
-		/// <param name="includeGraph">True to include, false to exclude the graph type.</param>
-		/// <returns/>
-		public static IEnumerable<ITypeSymbol> GetBaseGraphExtensions(this ITypeSymbol graphExtension, PXContext pxContext,
-																	  SortDirection sortDirection, bool includeGraph) =>
-			GetGraphExtensionWithBaseExtensions(graphExtension, pxContext, sortDirection, includeGraph, includeGraphExtension: false);
+		/// <param name="pxGraphExtensionBaseType">The PXGraphExtension base type to act on.</param>
+		/// <param name="pxContext">Acumatica context.</param>
+		/// <returns>
+		/// Chained graph extension types from the PXGraphExtension base type's type arguments.<br/>
+		/// If there is a problem in any of the type arguments (e.g. not a PXGraphExtension), <see langword="null"/> is returned.
+		/// </returns>
+		/// <remarks>
+		/// For performance reasons this method is unsafe and does not perform validation of the input <paramref name="pxGraphExtensionBaseType"/> type.
+		/// </remarks>
+		internal static IReadOnlyList<ITypeSymbol>? GetChainedExtensionTypesFromPxGraphExtensionTypeArgsUnsafe(ITypeSymbol pxGraphExtensionBaseType,
+																											   PXContext pxContext)
+		{
+			if (pxGraphExtensionBaseType is not INamedTypeSymbol namedPXGraphExtensionBaseType)
+				return [];
+
+			var typeArguments = namedPXGraphExtensionBaseType.TypeArguments;
+
+			if (typeArguments.IsDefault || typeArguments.Length <= 1)
+				return[];
+
+			//Excluding graph type: graphIndex is typeArguments.Length - 1;
+			var extensions = new ITypeSymbol[typeArguments.Length - 1];
+
+			for (int i = 0; i < extensions.Length; i++)
+			{
+				var chainedExtension = typeArguments[i];
+
+				if (!chainedExtension.IsPXGraphExtension(pxContext))
+					return null;
+
+				extensions[i] = chainedExtension;
+			}
+
+			return extensions;
+		}
 
 		/// <summary>
 		/// Gets the graph extension with its base graph extensions from graph extension type.

@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -9,7 +7,9 @@ using System.Threading;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
-using Acuminator.Utilities.Roslyn.Semantic.SharedInfo;
+using Acuminator.Utilities.Roslyn.Semantic.Shared;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Graph;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -39,7 +39,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		[MemberNotNullWhen(returnValue: true, nameof(Node))]
 		public bool IsInSource => GraphOrGraphExtInfo.IsInSource;
 
-		public INamedTypeSymbol Symbol => GraphOrGraphExtInfo.Symbol;
+		public ITypeSymbol Symbol => GraphOrGraphExtInfo.Symbol;
 
 		public ClassDeclarationSyntax? Node => GraphOrGraphExtInfo.Node;
 
@@ -58,7 +58,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </summary>
 		/// <remarks>
 		/// By initializers Acuminator understands special code elements of graph or graph extension that configure graph's initial state.<br/>
-		/// Currently, initalizers consists of:
+		/// Currently, initializers consists of:
 		/// <list type="bullet">
 		/// <item>Graph and graph extension constructors.</item>
 		/// <item><c>Initialize</c> method override of a graph extension.</item>
@@ -80,8 +80,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public ImmutableDictionary<string, ActionInfo> ActionsByNames { get; }
 		public IEnumerable<ActionInfo> Actions => ActionsByNames.Values;
 
-		public ImmutableDictionary<string, ActionHandlerInfo> ActionHandlersByNames { get; }
-		public IEnumerable<ActionHandlerInfo> ActionHandlers => ActionHandlersByNames.Values;
+		public ImmutableDictionary<string, ActionDelegateInfo> ActionDelegateByNames { get; }
+		public IEnumerable<ActionDelegateInfo> ActionDelegates => ActionDelegateByNames.Values;
 
 		public ImmutableArray<PXOverrideInfo> DeclaredPXOverrides { get; }
 
@@ -92,10 +92,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 			Actions.Where(action => action.Symbol.IsDeclaredInType(Symbol));
 
 		/// <summary>
-		/// Action handlers which are declared in the graph or the graph extension that is represented by this instance of the semantic model.
+		/// Action delegates which are declared in the graph or the graph extension that is represented by this instance of the semantic model.
 		/// </summary>
-		public IEnumerable<ActionHandlerInfo> DeclaredActionHandlers =>
-			ActionHandlers.Where(handler => handler.Symbol.IsDeclaredInType(Symbol));
+		public IEnumerable<ActionDelegateInfo> DeclaredActionDelegates =>
+			ActionDelegates.Where(handler => handler.Symbol.IsDeclaredInType(Symbol));
 
 		/// <summary>
 		/// Views which are declared in the graph or the graph extension that is represented by this instance of the semantic model.
@@ -168,41 +168,37 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </summary>
 		public ImmutableArray<GraphAttributeInfo> Attributes { get; }
 
-		protected PXGraphSemanticModel(PXContext pxContext, GraphType graphType, INamedTypeSymbol symbol, ClassDeclarationSyntax? node,
-										GraphSemanticModelCreationOptions modelCreationOptions, int declarationOrder,
-										CancellationToken cancellation = default)
+		protected PXGraphSemanticModel(PXContext pxContext, GraphOrGraphExtInfoBase graphOrGraphExtInfo, GraphSemanticModelCreationOptions modelCreationOptions,
+									   CancellationToken cancellation)
 		{
 			cancellation.ThrowIfCancellationRequested();
 
-			PXContext = pxContext.CheckIfNull();
-			GraphType = graphType;
+			PXContext 			= pxContext.CheckIfNull();
+			GraphOrGraphExtInfo = graphOrGraphExtInfo.CheckIfNull();
 
-			if (GraphType == GraphType.PXGraph)
+			(GraphType, GraphSymbol) = graphOrGraphExtInfo switch
 			{
-				GraphOrGraphExtInfo = GraphInfo.Create(symbol, node, PXContext, declarationOrder, cancellation).CheckIfNull();
-				GraphSymbol = Symbol;
-			}
-			else
-			{
-				GraphSymbol = symbol.GetGraphFromGraphExtension(PXContext);
-				GraphOrGraphExtInfo = GraphExtensionInfo.Create(symbol, node, GraphSymbol, PXContext, declarationOrder, cancellation).CheckIfNull();
-			}
+				GraphInfo graphInfo 			=> (GraphType.PXGraph, graphInfo.Symbol),
+				GraphExtensionInfo graphExtInfo => (GraphType.PXGraphExtension, graphExtInfo.BaseGraph?.Symbol),
+				_ 								=> throw new ArgumentOutOfRangeException(nameof(graphOrGraphExtInfo),
+														$"The \"{nameof(graphOrGraphExtInfo)}\" parameter must be either {nameof(GraphInfo)} or {nameof(GraphExtensionInfo)}.")
+			};
 
 			_cancellation 		 = cancellation;
 			ModelCreationOptions = modelCreationOptions;
 			Attributes			 = GetGraphAttributes();
 
-			StaticConstructors 	 = Symbol.GetStaticConstructors(_cancellation);
+			StaticConstructors 	 = GraphOrGraphExtInfo.Symbol.GetStaticConstructors(_cancellation);
 			ViewsByNames 		 = GetDataViews();
-			ViewDelegatesByNames = GetDataViewDelegates();
+			ViewDelegatesByNames = GetDataViewDelegates(ViewsByNames);
 
 			ActionsByNames 		  = GetActions();
-			ActionHandlersByNames = GetActionHandlers();
+			ActionDelegateByNames = GetActionDelegates(ActionsByNames);
 
 			InitProcessingDelegatesInfo();
 
-			ConfigureMethodOverride = ConfigureMethodInfo.GetConfigureMethodInfo(Symbol, GraphType, PXContext, _cancellation);
-			InitializeMethodInfo	= InitializeMethodInfo.GetInitializeMethodInfo(Symbol, GraphType, PXContext, _cancellation);
+			ConfigureMethodOverride = ConfigureMethodInfo.GetConfigureMethodInfo(GraphOrGraphExtInfo.Symbol, GraphType, PXContext, _cancellation);
+			InitializeMethodInfo	= InitializeMethodInfo.GetInitializeMethodInfo(GraphOrGraphExtInfo.Symbol, GraphType, PXContext, _cancellation);
 
 			DeclaredInitializers 	   = GetDeclaredInitializers().ToImmutableArray();
 			IsActiveMethodInfo 		   = GetIsActiveMethodInfo();
@@ -279,38 +275,27 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		}
 
 		protected ImmutableDictionary<string, DataViewInfo> GetDataViews() =>
-			GetInfos(() => Symbol.GetViewsWithSymbolsFromPXGraph(PXContext),
-					 () => Symbol.GetViewsFromGraphExtensionAndBaseGraph(PXContext));
+			GraphOrGraphExtInfo.GetViewInfos(PXContext, _cancellation)
+							   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
-		protected ImmutableDictionary<string, DataViewDelegateInfo> GetDataViewDelegates() =>
-			GetInfos(() => Symbol.GetViewDelegatesFromGraph(ViewsByNames, PXContext, cancellation: _cancellation),
-					 () => Symbol.GetViewDelegatesFromGraphExtensionAndBaseGraph(ViewsByNames, PXContext, _cancellation));
+		protected ImmutableDictionary<string, DataViewDelegateInfo> GetDataViewDelegates(IDictionary<string, DataViewInfo> viewsByName) =>
+			GraphOrGraphExtInfo.GetViewDelegateInfos(PXContext, viewsByName, _cancellation)
+							   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
 		protected ImmutableDictionary<string, ActionInfo> GetActions() =>
-			GetInfos(() => Symbol.GetActionSymbolsWithTypesFromGraph(PXContext),
-					 () => Symbol.GetActionsFromGraphExtensionAndBaseGraph(PXContext));
+			GraphOrGraphExtInfo.GetActionInfos(PXContext, _cancellation)
+							   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
-		protected ImmutableDictionary<string, ActionHandlerInfo> GetActionHandlers() =>
-			GetInfos(() => Symbol.GetActionHandlersFromGraph(ActionsByNames, PXContext, cancellation: _cancellation),
-					 () => Symbol.GetActionHandlersFromGraphExtensionAndBaseGraph(ActionsByNames, PXContext, _cancellation));
-
-		protected ImmutableDictionary<string, TInfo> GetInfos<TInfo>(Func<OverridableItemsCollection<TInfo>> graphInfosSelector,
-																   Func<OverridableItemsCollection<TInfo>> graphExtInfosSelector)
-		where TInfo : IOverridableItem<TInfo>
-		{
-			var infos = GraphType == GraphType.PXGraph
-				? graphInfosSelector()
-				: graphExtInfosSelector();
-
-			return infos.ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
-		}
+		protected ImmutableDictionary<string, ActionDelegateInfo> GetActionDelegates(IDictionary<string, ActionInfo> actionsByName) =>
+			GraphOrGraphExtInfo.GetActionDelegateInfos(PXContext, actionsByName, _cancellation)
+							   .ToImmutableDictionary(keyComparer: StringComparer.OrdinalIgnoreCase);
 
 		/// <summary>
 		/// Gets the declared initializers in this collection.
 		/// </summary>
 		/// <remarks>
 		/// By initializer Acuminator understands special code elements of graph or graph extension that configure graph's initial state.<br/>
-		/// Currently, initalizers consists of:
+		/// Currently, initializers consists of:
 		/// <list type="bullet">
 		/// <item>Graph and graph extension constructors.</item>
 		/// <item><c>Initialize</c> method override of a graph extension.</item>
@@ -325,9 +310,21 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		{
 			_cancellation.ThrowIfCancellationRequested();
 
-			var constructors = Symbol.GetDeclaredInstanceConstructors(_cancellation)
-									 .Select((ctr, order) => new GraphInitializerInfo(GraphInitializerType.InstanceConstructor, ctr.Node, ctr.Symbol, order));
-			var initializerInfos = constructors.ToList(capacity: 4);
+			var instanceConstructors = Symbol.GetDeclaredInstanceConstructors(_cancellation);
+			List<GraphInitializerInfo> initializerInfos;
+
+			if (instanceConstructors.Count > 0)
+			{
+				var constructorInitializerInfos = 
+					instanceConstructors.Select((constructor, order) => new GraphInitializerInfo(GraphInitializerType.InstanceConstructor,
+																								constructor.Node, constructor.Symbol, order));
+				initializerInfos = constructorInitializerInfos.ToList(capacity: 4);
+			}
+			else
+			{
+				initializerInfos = [];
+			}
+
 			int declarationOrder = initializerInfos.Count;
 
 			if (DeclaredInitializeMethodInfo is { } declaredInitializeMethod)
@@ -349,42 +346,55 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		}
 
 		/// <summary>
-		/// Infer semantic model for a given <paramref name="graphOrGraphExtTypeSymbol"/>.
-		/// If <paramref name="graphOrGraphExtTypeSymbol"/> is not a graph or graph extension, returns <see langword="null"/>.
+		/// Returns the semantic model of graph or graph extension which is inferred from <paramref name="graphOrGraphExtensionTypeSymbol"/>.
 		/// </summary>
 		/// <param name="pxContext">Acumatica context.</param>
-		/// <param name="graphOrGraphExtTypeSymbol">The graph or graph extension type symbol.</param>
+		/// <param name="graphOrGraphExtensionTypeSymbol">The graph or graph extension type symbol.</param>
 		/// <param name="modelCreationOptions">Options for controlling the semantic model creation.</param>
-		/// <param name="declarationOrder">(Optional) The declaration order.</param>
+		/// <param name="customDeclarationOrder">(Optional) The declaration order.</param>
 		/// <param name="cancellation">(Optional) Cancellation token.</param>
 		/// <returns>
-		/// A semantic model for a given graph or graph extension <paramref name="graphOrGraphExtTypeSymbol"/>.<br/>
-		/// If <paramref name="graphOrGraphExtTypeSymbol"/> is not graph or graph extension, then returns <see langword="null"/>.
+		/// A semantic model for a given graph or graph extension type <paramref name="graphOrGraphExtensionTypeSymbol"/>.
 		/// </returns>
-		public static PXGraphSemanticModel? InferModel(PXContext pxContext, INamedTypeSymbol graphOrGraphExtTypeSymbol,
+		public static PXGraphSemanticModel? InferModel(PXContext pxContext, ITypeSymbol? graphOrGraphExtensionTypeSymbol,
 													   GraphSemanticModelCreationOptions modelCreationOptions,
-													   int? declarationOrder = null, CancellationToken cancellation = default)
+													   int? customDeclarationOrder = null, CancellationToken cancellation = default)
 		{
-			pxContext.ThrowOnNull();
-			graphOrGraphExtTypeSymbol.ThrowOnNull();
 			cancellation.ThrowIfCancellationRequested();
 
-			GraphType graphType;
+			var inferredInfo = GraphAndGraphExtInfoBuilder.Instance.InferTypeInfo(graphOrGraphExtensionTypeSymbol, pxContext, 
+																				  customDeclarationOrder, cancellation);
 
-			if (graphOrGraphExtTypeSymbol.IsPXGraph(pxContext))
-			{
-				graphType = GraphType.PXGraph;
-			}
-			else if (graphOrGraphExtTypeSymbol.IsPXGraphExtension(pxContext))
-			{
-				graphType = GraphType.PXGraphExtension;
-			}
-			else
+			if (inferredInfo?.GetResultKind() != InferResultKind.Success || inferredInfo.InferredInfo is not GraphOrGraphExtInfoBase graphOrGraphExt)
 				return null;
 
-			var graphOrExtNode = graphOrGraphExtTypeSymbol.GetSyntax(cancellation) as ClassDeclarationSyntax;
-			return new PXGraphSemanticModel(pxContext, graphType, graphOrGraphExtTypeSymbol, graphOrExtNode, modelCreationOptions, 
-											declarationOrder ?? 0, cancellation);
+			return InferModel(pxContext, graphOrGraphExt, modelCreationOptions, cancellation);
+		}
+
+		/// <summary>
+		/// Infer semantic model for a given <paramref name="graphOrGraphExtInferredInfo"/>.
+		/// If <paramref name="graphOrGraphExtInferredInfo"/> is not a graph or graph extension, returns <see langword="null"/>.
+		/// </summary>
+		/// <param name="pxContext">Acumatica context.</param>
+		/// <param name="graphOrGraphExtInferredInfo">
+		/// The graph or graph extension inferred information obtained from resolving a hierarchy of chained graph extensions and base types.
+		/// </param>
+		/// <param name="modelCreationOptions">Options for controlling the semantic model creation.</param>
+		/// <param name="cancellation">Cancellation token.</param>
+		/// <returns>
+		/// A semantic model for a given graph or graph extension <paramref name="graphOrGraphExtInferredInfo"/>.<br/>
+		/// If <paramref name="graphOrGraphExtInferredInfo"/> is not graph or graph extension, then returns <see langword="null"/>.
+		/// </returns>
+		public static PXGraphSemanticModel? InferModel(PXContext pxContext, GraphOrGraphExtInfoBase graphOrGraphExtInferredInfo,
+													   GraphSemanticModelCreationOptions modelCreationOptions,
+													   CancellationToken cancellation)
+		{
+			cancellation.ThrowIfCancellationRequested();
+
+			if (graphOrGraphExtInferredInfo is not (GraphInfo or GraphExtensionInfo))
+				return null;
+
+			return new PXGraphSemanticModel(pxContext, graphOrGraphExtInferredInfo, modelCreationOptions, cancellation);
 		}
 
 		protected IsActiveMethodInfo? GetIsActiveMethodInfo() =>

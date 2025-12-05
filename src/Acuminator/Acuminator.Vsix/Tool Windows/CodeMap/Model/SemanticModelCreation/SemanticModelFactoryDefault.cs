@@ -33,7 +33,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		/// <returns>
 		/// True if it succeeds, false if it fails.
 		/// </returns>
-		public virtual bool TryToInferSemanticModel(INamedTypeSymbol rootSymbol, PXContext context, out ISemanticModel? semanticModel,
+		public virtual bool TryToInferSemanticModel(ITypeSymbol rootSymbol, PXContext context, out ISemanticModel? semanticModel,
 													int? declarationOrder = null, CancellationToken cancellationToken = default)
 		{
 			rootSymbol.ThrowOnNull();
@@ -55,7 +55,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			return false;
 		}
 
-		protected virtual bool TryToInferGraphOrGraphExtensionSemanticModel(INamedTypeSymbol graphSymbol, PXContext context, int? declarationOrder,
+		protected virtual bool TryToInferGraphOrGraphExtensionSemanticModel(ITypeSymbol graphSymbol, PXContext context, int? declarationOrder,
 																			GraphSemanticModelCreationOptions modelCreationOptions,
 																			out ISemanticModel? graphModelForCodeMap,
 																			CancellationToken cancellationToken = default)
@@ -72,7 +72,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			return true;
 		}
 
-		protected virtual bool TryToInferDacOrDacExtensionSemanticModel(INamedTypeSymbol dacSymbol, PXContext context, int? declarationOrder,
+		protected virtual bool TryToInferDacOrDacExtensionSemanticModel(ITypeSymbol dacSymbol, PXContext context, int? declarationOrder,
 																		out ISemanticModel? dacSemanticModel, 
 																		CancellationToken cancellationToken = default)
 		{

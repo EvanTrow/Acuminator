@@ -1,40 +1,40 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+
+using Acuminator.Utilities;
+using Acuminator.Utilities.Roslyn.Semantic;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-using Acuminator.Utilities;
-using Acuminator.Utilities.Roslyn.Semantic;
-using System.Diagnostics;
-
 namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 {
-    public abstract class SymbolAnalyzersAggregator<T> : PXDiagnosticAnalyzer
-        where T : ISymbolAnalyzer
-    {
-        protected readonly ImmutableArray<T> _innerAnalyzers;
+	public abstract class SymbolAnalyzersAggregator<T> : PXDiagnosticAnalyzer
+	where T : ISymbolAnalyzer
+	{
+		protected ImmutableArray<T> InnerAnalyzers { get; }
 
-        protected abstract SymbolKind SymbolKind { get; }
+		protected abstract SymbolKind SymbolKind { get; }
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
+		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
 
-        protected SymbolAnalyzersAggregator(CodeAnalysisSettings? settings, params T[] innerAnalyzers) : base(settings)
-        {
-            _innerAnalyzers = ImmutableArray.CreateRange(innerAnalyzers);
-            SupportedDiagnostics = ImmutableArray.CreateRange(innerAnalyzers.SelectMany(a => a.SupportedDiagnostics));
-        }
+		protected SymbolAnalyzersAggregator(CodeAnalysisSettings? settings, params T[] innerAnalyzers) : base(settings)
+		{
+			InnerAnalyzers = ImmutableArray.CreateRange(innerAnalyzers);
+			SupportedDiagnostics = ImmutableArray.CreateRange(innerAnalyzers.SelectMany(a => a.SupportedDiagnostics));
+		}
 
 		protected override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, PXContext pxContext)
-        {
-            compilationStartContext.RegisterSymbolAction(c => AnalyzeSymbolHandleAggregateException(c, pxContext), SymbolKind);
-            // TODO: Enable this operation action after migration to Roslyn v2
-            //compilationStartContext.RegisterOperationAction(c => AnalyzeLambda(c, pxContext, codeAnalysisSettings), OperationKind.LambdaExpression);
-        }
+		{
+			compilationStartContext.RegisterSymbolAction(c => AnalyzeSymbolHandleAggregateException(c, pxContext), SymbolKind);
+			// TODO: Enable this operation action after migration to Roslyn v2
+			//compilationStartContext.RegisterOperationAction(c => AnalyzeLambda(c, pxContext, codeAnalysisSettings), OperationKind.LambdaExpression);
+		}
 
 		private void AnalyzeSymbolHandleAggregateException(SymbolAnalysisContext context, PXContext pxContext)
 		{
@@ -59,7 +59,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 
 		protected abstract void AnalyzeSymbol(SymbolAnalysisContext context, PXContext pxContext);
 
-		protected virtual void RunAggregatedAnalyzersInParallel(List<T> effectiveAnalyzers, SymbolAnalysisContext context, 
+		protected virtual void RunAggregatedAnalyzersInParallel(List<T> effectiveAnalyzers, SymbolAnalysisContext context,
 																Action<int> aggregatedAnalyserAction, ParallelOptions? parallelOptions = null)
 		{
 			switch (effectiveAnalyzers.Count)
@@ -69,7 +69,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 				case 1:
 					aggregatedAnalyserAction(0);
 					return;
-				default:	
+				default:
 					if (Debugger.IsAttached)
 					{
 						for (int analyzerIndex = 0; analyzerIndex < effectiveAnalyzers.Count; analyzerIndex++)
@@ -79,15 +79,55 @@ namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 					}
 					else
 					{
-						parallelOptions = parallelOptions ?? new ParallelOptions
-						{
-							CancellationToken = context.CancellationToken
-						};
-
-						Parallel.For(0, effectiveAnalyzers.Count, parallelOptions, aggregatedAnalyserAction);
+						RunInParallel(effectiveAnalyzers, context, aggregatedAnalyserAction, parallelOptions);
 					}
 
 					return;
+			}
+		}
+
+		private void RunInParallel(List<T> effectiveAnalyzers, SymbolAnalysisContext context, Action<int> aggregatedAnalyserAction,
+								   ParallelOptions? parallelOptions)
+		{
+			parallelOptions = parallelOptions ?? new ParallelOptions
+			{
+				CancellationToken = context.CancellationToken
+			};
+
+			try
+			{
+				Parallel.For(0, effectiveAnalyzers.Count, parallelOptions, aggregatedAnalyserAction);
+			}
+			catch (AggregateException aggregateException)
+			{
+				var unwrappedException = UnwrapAggregatedException(aggregateException);
+
+				if (unwrappedException != null)
+					ExceptionDispatchInfo.Capture(unwrappedException).Throw();
+
+				throw;
+			}
+		}
+
+		private Exception? UnwrapAggregatedException(AggregateException aggregateException)
+		{
+			switch (aggregateException.InnerExceptions.Count)
+			{
+				case 0:
+					return null;
+
+				case 1
+				when aggregateException.InnerExceptions[0] is not AggregateException:	// Hot path
+					return aggregateException.InnerExceptions[0];
+
+				default:
+					var flattenedException = aggregateException.Flatten();
+					return flattenedException.InnerExceptions.Count switch
+					{
+						0 => null,
+						1 => flattenedException.InnerExceptions[0],
+						_ => flattenedException
+					};
 			}
 		}
 	}

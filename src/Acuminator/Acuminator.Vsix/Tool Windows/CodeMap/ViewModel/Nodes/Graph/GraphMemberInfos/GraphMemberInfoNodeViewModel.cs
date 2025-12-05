@@ -15,7 +15,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Vsix.ToolWindows.CodeMap
 {
-	public class GraphMemberInfoNodeViewModel : TreeNodeViewModel, INodeWithDeclarationOrder
+	public class GraphMemberInfoNodeViewModel : TreeNodeViewModel, IHaveDeclarationOrder
 	{
 		public override TreeNodeFilterBehavior FilterBehavior => TreeNodeFilterBehavior.DisplayedIfNodeOrChildrenMeetFilter;
 
@@ -55,7 +55,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 			graphMemberInfoType switch
 			{
 				GraphMemberInfoType.ViewDelegate  => Icon.ViewDelegate,
-				GraphMemberInfoType.ActionHandler => Icon.ActionHandler,
+				GraphMemberInfoType.ActionDelegate => Icon.ActionHandler,
 				_                                 => Icon.None,
 			};
 

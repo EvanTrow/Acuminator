@@ -21,16 +21,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.ActionHandlerAttributes
 
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel pxGraph)
 		{
-			foreach (var actionHandler in pxGraph.DeclaredActionHandlers)
+			foreach (var actionDelegate in pxGraph.DeclaredActionDelegates)
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
 
-				if (actionHandler.Symbol == null || actionHandler.Node == null)
+				if (actionDelegate.Symbol == null || actionDelegate.Node == null)
 				{
 					continue;
 				}
 
-				CheckActionHandler(context, pxContext, actionHandler.Symbol, actionHandler.Node, pxGraph.GraphType);
+				CheckActionHandler(context, pxContext, actionDelegate.Symbol, actionDelegate.Node, pxGraph.GraphType);
 			}
 		}
 

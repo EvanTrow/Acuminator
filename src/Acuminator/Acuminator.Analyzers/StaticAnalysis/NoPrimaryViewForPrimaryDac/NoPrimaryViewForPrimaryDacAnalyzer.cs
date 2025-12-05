@@ -21,7 +21,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoPrimaryViewForPrimaryDac
 
 		public override bool ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graph) =>
 			base.ShouldAnalyze(pxContext, graph) && graph.GraphType == GraphType.PXGraph &&
-			!graph.Symbol.IsAbstract && !graph.Symbol.IsUnboundGenericType;
+			!graph.Symbol.IsAbstract && !graph.Symbol.IsUnboundGenericType();
 
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, PXGraphEventSemanticModel graph)
 		{

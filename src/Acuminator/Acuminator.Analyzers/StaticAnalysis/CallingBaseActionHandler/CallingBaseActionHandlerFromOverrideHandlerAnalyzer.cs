@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -33,28 +32,28 @@ namespace Acuminator.Analyzers.StaticAnalysis.CallingBaseActionHandler
 				.Select(action => action.Symbol.Name)
 				.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-			var redeclaredHandlersWithoutActionsList = graphExtension.ActionHandlers
-				.Where(handler => graphExtension.Symbol.Equals(handler.Symbol?.ContainingSymbol, SymbolEqualityComparer.Default) && handler.Base != null &&
-								  !redeclaredActionNamesHashSet.Contains(handler.Symbol.Name))
+			var redeclaredDelegatesWithoutActionsList = graphExtension.ActionDelegates
+				.Where(actionDelegate => graphExtension.Symbol.Equals(actionDelegate.Symbol?.ContainingSymbol, SymbolEqualityComparer.Default) && 
+										 actionDelegate.Base != null && !redeclaredActionNamesHashSet.Contains(actionDelegate.Symbol.Name))
 				.ToList();
 
-			var baseHandlersHashSet = redeclaredHandlersWithoutActionsList
-				.SelectMany(handler => handler.JustOverridenItems()
-											  .Select(baseHandler => baseHandler.Symbol))
+			var baseDelegatesHashSet = redeclaredDelegatesWithoutActionsList
+				.SelectMany(aDelegate => aDelegate.JustOverriddenItems()
+												  .Select(baseDelegate => baseDelegate.Symbol))
 				.ToHashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
 
-			var baseActionsHashSet = redeclaredHandlersWithoutActionsList
-				.SelectMany(handler => graphExtension.ActionsByNames[handler.Symbol.Name]
-													 .ThisAndOverridenItems()
-													 .Select(action => action.Symbol))
+			var baseActionsHashSet = redeclaredDelegatesWithoutActionsList
+				.SelectMany(actionDelegate => graphExtension.ActionsByNames[actionDelegate.Symbol.Name]
+															.ThisAndOverriddenItems()
+															.Select(action => action.Symbol))
 				.ToHashSet(SymbolEqualityComparer.Default);
 
-			var walker = new Walker(context, pxContext, baseActionsHashSet, baseHandlersHashSet);
+			var walker = new Walker(context, pxContext, baseActionsHashSet, baseDelegatesHashSet);
 
-			foreach (ActionHandlerInfo actionHandler in redeclaredHandlersWithoutActionsList)
+			foreach (ActionDelegateInfo actionDelegate in redeclaredDelegatesWithoutActionsList)
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
-				walker.CheckActionHandler(actionHandler);
+				walker.CheckActionDelegate(actionDelegate);
 			}
 		}
 
@@ -62,28 +61,28 @@ namespace Acuminator.Analyzers.StaticAnalysis.CallingBaseActionHandler
 		{
 			private readonly SymbolAnalysisContext _context;
 			private readonly HashSet<ISymbol> _baseActions;
-			private readonly HashSet<IMethodSymbol> _baseHandlers;
+			private readonly HashSet<IMethodSymbol> _baseDelegates;
 
-			private ActionHandlerInfo? _currentActionHandler;
+			private ActionDelegateInfo? _currentActionDelegate;
 
-			public Walker(SymbolAnalysisContext context, PXContext pxContext, HashSet<ISymbol> baseActions, HashSet<IMethodSymbol> baseHandlers)
+			public Walker(SymbolAnalysisContext context, PXContext pxContext, HashSet<ISymbol> baseActions, HashSet<IMethodSymbol> baseDelegates)
 				: base(pxContext, context.CancellationToken)
 			{
 				_baseActions = baseActions.CheckIfNull();
-				_baseHandlers = baseHandlers.CheckIfNull();
+				_baseDelegates = baseDelegates.CheckIfNull();
 				_context = context;
 			}
 
-			public void CheckActionHandler(ActionHandlerInfo actionHandler)
+			public void CheckActionDelegate(ActionDelegateInfo actionDelegate)
 			{
 				try
 				{
-					_currentActionHandler = actionHandler;
-					Visit(_currentActionHandler.Node);
+					_currentActionDelegate = actionDelegate;
+					Visit(_currentActionDelegate.Node);
 				}
 				finally
 				{
-					_currentActionHandler = null;
+					_currentActionDelegate = null;
 				}
 			}
 
@@ -98,7 +97,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.CallingBaseActionHandler
 				}
 
 				// Case Base.someActionHandler(adapter)
-				if (IsDirectCallToBaseActionHandler(invocationNode, methodSymbol))
+				if (IsDirectCallToBaseActionDelegate(invocationNode, methodSymbol))
 				{
 					ReportDiagnostic(_context.ReportDiagnostic,
 						Descriptors.PX1091_CausingStackOverflowExceptionInBaseActionHandlerInvocation,
@@ -132,20 +131,20 @@ namespace Acuminator.Analyzers.StaticAnalysis.CallingBaseActionHandler
 			}
 
 			/// <summary>
-			/// Check if the call is a direct call to the base action handler that looks like this:<br/>
-			/// <c>Base.someActionHandler(adapter)</c>
+			/// Check if the call is a direct call to the base action delegate that looks like this:<br/>
+			/// <c>Base.someActionDelegate(adapter)</c>
 			/// </summary>
 			/// <param name="invocationNode">The invocation node.</param>
 			/// <param name="calledMethod">The called method.</param>
 			/// <returns>
-			/// True for a direct call to the base action handler.
+			/// True for a direct call to the base action delegate.
 			/// </returns>
-			private bool IsDirectCallToBaseActionHandler(InvocationExpressionSyntax invocationNode, IMethodSymbol calledMethod)
+			private bool IsDirectCallToBaseActionDelegate(InvocationExpressionSyntax invocationNode, IMethodSymbol calledMethod)
 			{
-				if (!_baseHandlers.Contains(calledMethod))
+				if (!_baseDelegates.Contains(calledMethod))
 					return false;
 
-				if (_currentActionHandler?.Symbol.IsOverride != true)
+				if (_currentActionDelegate?.Symbol.IsOverride != true)
 					return true;
 
 				// For action handler overrides we must check that this is not an access via base keyword like this:

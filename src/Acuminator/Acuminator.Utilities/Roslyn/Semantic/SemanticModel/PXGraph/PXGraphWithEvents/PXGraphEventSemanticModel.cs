@@ -7,7 +7,7 @@ using System.Threading;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
-using Acuminator.Utilities.Roslyn.Semantic.SharedInfo;
+using Acuminator.Utilities.Roslyn.Semantic.Shared;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -53,7 +53,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public ClassDeclarationSyntax? Node => BaseGraphModel.Node;
 
 		/// <inheritdoc cref="PXGraphSemanticModel.Symbol"/>
-		public INamedTypeSymbol Symbol => BaseGraphModel.Symbol;
+		public ITypeSymbol Symbol => BaseGraphModel.Symbol;
 
 		/// <inheritdoc cref="PXGraphSemanticModel.GraphSymbol"/>
 		public ITypeSymbol? GraphSymbol => BaseGraphModel.GraphSymbol;
@@ -85,11 +85,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <inheritdoc cref="PXGraphSemanticModel.Actions"/>
 		public IEnumerable<ActionInfo> Actions => BaseGraphModel.Actions;
 
-		/// <inheritdoc cref="PXGraphSemanticModel.ActionHandlersByNames"/>
-		public ImmutableDictionary<string, ActionHandlerInfo> ActionHandlersByNames => BaseGraphModel.ActionHandlersByNames;
+		/// <inheritdoc cref="PXGraphSemanticModel.ActionDelegateByNames"/>
+		public ImmutableDictionary<string, ActionDelegateInfo> ActionDelegateByNames => BaseGraphModel.ActionDelegateByNames;
 
-		/// <inheritdoc cref="PXGraphSemanticModel.ActionHandlers"/>
-		public IEnumerable<ActionHandlerInfo> ActionHandlers => BaseGraphModel.ActionHandlers;
+		/// <inheritdoc cref="PXGraphSemanticModel.ActionDelegates"/>
+		public IEnumerable<ActionDelegateInfo> ActionDelegates => BaseGraphModel.ActionDelegates;
 
 		/// <inheritdoc cref="PXGraphSemanticModel.IsActiveMethodInfo"/>
 		public IsActiveMethodInfo? IsActiveMethodInfo => BaseGraphModel.IsActiveMethodInfo;
@@ -115,8 +115,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// <inheritdoc cref="PXGraphSemanticModel.DeclaredActions"/>
 		public IEnumerable<ActionInfo> DeclaredActions => BaseGraphModel.DeclaredActions;
 
-		/// <inheritdoc cref="PXGraphSemanticModel.DeclaredActionHandlers"/>
-		public IEnumerable<ActionHandlerInfo> DeclaredActionHandlers => BaseGraphModel.DeclaredActionHandlers;
+		/// <inheritdoc cref="PXGraphSemanticModel.DeclaredActionDelegates"/>
+		public IEnumerable<ActionDelegateInfo> DeclaredActionDelegates => BaseGraphModel.DeclaredActionDelegates;
 
 		/// <inheritdoc cref="PXGraphSemanticModel.DeclaredViews"/>
 		public IEnumerable<DataViewInfo> DeclaredViews => BaseGraphModel.DeclaredViews;
@@ -150,7 +150,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		public IDeclaredGraphEventHandlerStorage DeclaredEventHandlers { get; }
 		#endregion
 
-		private PXGraphEventSemanticModel(PXGraphSemanticModel baseGraphModel, CancellationToken cancellation = default)
+		private PXGraphEventSemanticModel(PXGraphSemanticModel baseGraphModel, CancellationToken cancellation)
 		{
 			_cancellation = cancellation;
 			BaseGraphModel = baseGraphModel.CheckIfNull();
@@ -163,16 +163,50 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		}
 
 		public static PXGraphEventSemanticModel EnrichGraphModelWithEvents(PXGraphSemanticModel baseGraphModel, 
-																		   CancellationToken cancellationToken = default) =>
-			new PXGraphEventSemanticModel(baseGraphModel.CheckIfNull(), 
-										  cancellationToken);
+																		   CancellationToken cancellationToken) =>
+			new PXGraphEventSemanticModel(baseGraphModel.CheckIfNull(), cancellationToken);
 
-		public static PXGraphEventSemanticModel? InferModel(PXContext pxContext, INamedTypeSymbol typeSymbol, 
-															GraphSemanticModelCreationOptions modelCreationOptions,
-															int? declarationOrder = null, CancellationToken cancellation = default)
+		/// <summary>
+		/// Returns the semantic model enriched with collected Acumatica event handlers of graph or graph extension which is inferred from <paramref name="graphOrGraphExtensionTypeSymbol"/>.
+		/// </summary>
+		/// <param name="pxContext">Acumatica context.</param>
+		/// <param name="graphOrGraphExtensionTypeSymbol">The graph or graph extension type symbol.</param>
+		/// <param name="modelCreationOptions">Options for controlling the semantic model creation.</param>
+		/// <param name="customDeclarationOrder">(Optional) The declaration order.</param>
+		/// <param name="cancellation">(Optional) Cancellation token.</param>
+		/// <returns>
+		/// A semantic model for a given graph or graph extension type <paramref name="graphOrGraphExtensionTypeSymbol"/>.
+		/// </returns>
+		public static PXGraphEventSemanticModel? InferModel(PXContext pxContext, ITypeSymbol? graphOrGraphExtensionTypeSymbol,
+														GraphSemanticModelCreationOptions modelCreationOptions,
+														int? customDeclarationOrder = null, CancellationToken cancellation = default)
+		{
+			var baseGraphModel = PXGraphSemanticModel.InferModel(pxContext, graphOrGraphExtensionTypeSymbol, modelCreationOptions,
+																 customDeclarationOrder, cancellation);
+			return baseGraphModel != null
+				? new PXGraphEventSemanticModel(baseGraphModel, cancellation)
+				: null;
+		}
+
+		/// <summary>
+		/// Infer semantic model enriched with collected Acumatica event handlers for a given <paramref name="graphOrGraphExtInferredInfo"/>.
+		/// If <paramref name="graphOrGraphExtInferredInfo"/> is not a graph or graph extension, returns <see langword="null"/>.
+		/// </summary>
+		/// <param name="pxContext">Acumatica context.</param>
+		/// <param name="graphOrGraphExtInferredInfo">
+		/// The graph or graph extension inferred information obtained from resolving a hierarchy of chained graph extensions and base types.
+		/// </param>
+		/// <param name="modelCreationOptions">Options for controlling the semantic model creation.</param>
+		/// <param name="cancellation">Cancellation token.</param>
+		/// <returns>
+		/// A semantic model enriched with collected Acumatica event handlers for a given graph or graph extension <paramref name="graphOrGraphExtInferredInfo"/>.<br/>
+		/// If <paramref name="graphOrGraphExtInferredInfo"/> is not graph or graph extension, then returns <see langword="null"/>.
+		/// </returns>
+		public static PXGraphEventSemanticModel? InferModel(PXContext pxContext, GraphOrGraphExtInfoBase graphOrGraphExtInferredInfo,
+															GraphSemanticModelCreationOptions modelCreationOptions, CancellationToken cancellation)
 		{	
-			var baseGraphModel = PXGraphSemanticModel.InferModel(pxContext, typeSymbol, modelCreationOptions, declarationOrder, cancellation);
-
+			var baseGraphModel = PXGraphSemanticModel.InferModel(pxContext, graphOrGraphExtInferredInfo, modelCreationOptions, 
+																 cancellation);
 			return baseGraphModel != null 
 				? new PXGraphEventSemanticModel(baseGraphModel, cancellation)
 				: null;

@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -16,7 +14,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 {
-	public class DacPropertyInfo : OverridableNodeSymbolItem<DacPropertyInfo, PropertyDeclarationSyntax, IPropertySymbol>
+	public sealed class DacPropertyInfo : OverridableNodeSymbolItem<DacPropertyInfo, PropertyDeclarationSyntax, IPropertySymbol>
 	{
 		public ImmutableArray<DacFieldAttributeInfo> Attributes { get; }
 
@@ -47,7 +45,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 		/// <value>
 		/// The effective type of the property. For reference types and non nullable value types it is the same as <see cref="PropertyType"/>. 
-		/// For nulable value types it is the underlying type extracted from nullable. It is <c>T</c> for <see cref="Nullable{T}"/>.
+		/// For nullable value types it is the underlying type extracted from nullable. It is <c>T</c> for <see cref="Nullable{T}"/>.
 		/// </value>
 		public ITypeSymbol PropertyTypeUnwrappedNullable { get; }
 
@@ -57,7 +55,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		public DbBoundnessType DeclaredDbBoundness { get; }
 
 		/// <summary>
-		/// The effective bound type for this property obtained by the combination of <see cref="DeclaredDbBoundness"/>s of this propety's override chain. 
+		/// The effective bound type for this property obtained by the combination of <see cref="DeclaredDbBoundness"/>s of this property's override chain. 
 		/// </summary>
 		public DbBoundnessType EffectiveDbBoundness
 		{
@@ -90,18 +88,18 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// </summary>
 		public CompatibilityOfDacPropertyTypeAndTypeFromDataTypeAttributes EffectivePropertyAndDataTypeAttributeTypesCompatibility { get; private set; }
 
-		protected DacPropertyInfo(PropertyDeclarationSyntax? node, IPropertySymbol symbol, ITypeSymbol propertyTypeUnwrappedNullable,
-								  int declarationOrder, bool hasBqlField, IEnumerable<DacFieldAttributeInfo> attributeInfos, 
-								  DacPropertyInfo baseInfo) :
-							 this(node, symbol, propertyTypeUnwrappedNullable, declarationOrder, hasBqlField, attributeInfos)
+		private DacPropertyInfo(PropertyDeclarationSyntax? node, IPropertySymbol symbol, ITypeSymbol propertyTypeUnwrappedNullable,
+								int declarationOrder, bool hasBqlField, IEnumerable<DacFieldAttributeInfo> attributeInfos, 
+								DacPropertyInfo baseInfo) :
+						   this(node, symbol, propertyTypeUnwrappedNullable, declarationOrder, hasBqlField, attributeInfos)
 		{
 			_baseInfo = baseInfo.CheckIfNull();
-			CombineWithBaseInfo(baseInfo);
+			CombineWithBaseInfo();
 		}
 
-		protected DacPropertyInfo(PropertyDeclarationSyntax? node, IPropertySymbol symbol, ITypeSymbol propertyTypeUnwrappedNullable,
-								  int declarationOrder, bool hasBqlField, IEnumerable<DacFieldAttributeInfo> attributeInfos) :
-							 base(node, symbol, declarationOrder)
+		private DacPropertyInfo(PropertyDeclarationSyntax? node, IPropertySymbol symbol, ITypeSymbol propertyTypeUnwrappedNullable,
+								int declarationOrder, bool hasBqlField, IEnumerable<DacFieldAttributeInfo> attributeInfos) :
+						   base(node, symbol, declarationOrder)
 		{
 			Attributes 			 = attributeInfos.ToImmutableArray();
 			HasBqlFieldDeclared  = hasBqlField;
@@ -169,8 +167,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			}
 		}
 
-		protected override void CombineWithBaseInfo(DacPropertyInfo baseProperty)
+		protected override void CombineWithBaseInfo()
 		{
+			if (_baseInfo is not { } baseProperty)
+				return;
+			
 			// TODO - need to add support for PXMergeAttributesAttribute in the future
 			EffectiveDbBoundness 			= DeclaredDbBoundness.Combine(baseProperty.EffectiveDbBoundness);
 			HasBqlFieldEffective 			= HasBqlFieldDeclared || baseProperty.HasBqlFieldEffective;

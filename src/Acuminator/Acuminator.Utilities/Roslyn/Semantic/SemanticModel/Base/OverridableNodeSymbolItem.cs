@@ -1,12 +1,11 @@
-﻿#nullable enable
-using Acuminator.Utilities.Common;
+﻿using Acuminator.Utilities.Common;
 
 using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Roslyn.Semantic
 {
 	/// <summary>
-	/// Generic class for overridable semantic infos from a graph or DAC with node and symbol.
+	/// Generic class for overridable semantic info from a graph or DAC with node and symbol.
 	/// </summary>
 	/// <typeparam name="TInfo">Type of the information symbol.</typeparam>
 	/// <typeparam name="N">Type of the declaration node of the item.</typeparam>
@@ -22,33 +21,28 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 		TInfo? IWriteableBaseItem<TInfo>.Base
 		{
-			get => Base;
 			set 
 			{
 				_baseInfo = value;
 
 				if (value != null)
-					CombineWithBaseInfo(value);
+					CombineWithBaseInfo();
 			}
 		}
 
 		protected OverridableNodeSymbolItem(N? node, S symbol, int declarationOrder, TInfo baseInfo) : this(node, symbol, declarationOrder)
 		{
 			_baseInfo = baseInfo.CheckIfNull();
-			CombineWithBaseInfo(_baseInfo);
 		}
 
 		protected OverridableNodeSymbolItem(N? node, S symbol, int declarationOrder) : base(node, symbol, declarationOrder)
 		{
 		}
 
-		void IWriteableBaseItem<TInfo>.CombineWithBaseInfo(TInfo baseInfo) => 
-			CombineWithBaseInfo(baseInfo);
+		void IOverridableItem<TInfo>.CombineWithBaseInfo() => 
+			CombineWithBaseInfo();
 
-		/// <inheritdoc cref="IWriteableBaseItem{T}.CombineWithBaseInfo(T)"/>
-		protected virtual void CombineWithBaseInfo(TInfo baseInfo)
-		{
-
-		}
+		/// <inheritdoc cref="IOverridableItem{T}.CombineWithBaseInfo()"/>
+		protected abstract void CombineWithBaseInfo();
 	}
 }

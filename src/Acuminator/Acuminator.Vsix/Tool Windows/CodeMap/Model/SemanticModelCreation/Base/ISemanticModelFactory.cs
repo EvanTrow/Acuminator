@@ -26,7 +26,7 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 		/// <returns>
 		/// True if it succeeds, false if it fails.
 		/// </returns>
-		bool TryToInferSemanticModel(INamedTypeSymbol rootSymbol, PXContext context, out ISemanticModel? semanticModel,
+		bool TryToInferSemanticModel(ITypeSymbol rootSymbol, PXContext context, out ISemanticModel? semanticModel,
 									 int? declarationOrder = null, CancellationToken cancellationToken = default);
 	}
 }

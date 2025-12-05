@@ -198,14 +198,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		/// <returns>
 		/// The DAC from action.
 		/// </returns>
-		public static ITypeSymbol? GetDacFromAction(this INamedTypeSymbol pxAction)
+		public static ITypeSymbol? GetDacFromAction(this ITypeSymbol pxAction)
 		{
 			if (pxAction?.IsPXAction() != true)
 				return null;
 
-			ImmutableArray<ITypeSymbol> actionTypeArgs = pxAction.TypeArguments;
+			ImmutableArray<ITypeSymbol> actionTypeArgs = pxAction.TypeArguments();
 
-			if (actionTypeArgs.Length == 0)
+			if (actionTypeArgs.IsDefaultOrEmpty)
 				return null;
 
 			ITypeSymbol pxActionDacType = actionTypeArgs[0];
