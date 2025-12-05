@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -10,8 +8,9 @@ using System.Threading;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.PXFieldAttributes;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
-using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 using Acuminator.Utilities.Roslyn.Semantic.Shared;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Dac;
 using Acuminator.Utilities.Roslyn.Syntax;
 
 using Microsoft.CodeAnalysis;
@@ -112,7 +111,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		[MemberNotNullWhen(returnValue: true, nameof(AccumulatorAttribute))]
 		public bool HasAccumulatorAttribute => AccumulatorAttribute != null;
 
-		protected DacSemanticModel(PXContext pxContext, DacOrDacExtInfoBase dacOrDacExtInfo, int declarationOrder, CancellationToken cancellation)
+		protected DacSemanticModel(PXContext pxContext, DacOrDacExtInfoBase dacOrDacExtInfo, CancellationToken cancellation)
 		{
 			cancellation.ThrowIfCancellationRequested();
 
@@ -143,18 +142,41 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		}
 
 		/// <summary>
-		/// Returns the semantic model of DAC or DAC extension which is inferred from <paramref name="typeSymbol"/>.
+		/// Returns the semantic model of DAC or DAC extension which is inferred from <paramref name="dacOrDacExtTypeSymbol"/>.
+		/// </summary>
+		/// <param name="pxContext">Context instance.</param>
+		/// <param name="dacOrDacExtTypeSymbol">The DAC or DAC extension type symbol.</param>
+		/// <param name="customDeclarationOrder">(Optional) The custom declaration order.</param>
+		/// <param name="cancellation">(Optional)Cancellation token.</param>
+		/// <returns>
+		/// A semantic model for a given DAC or DAC extension type <paramref name="dacOrDacExtTypeSymbol"/>.
+		/// </returns>
+		public static DacSemanticModel? InferModel(PXContext pxContext, ITypeSymbol dacOrDacExtTypeSymbol, int? customDeclarationOrder = null,
+												   CancellationToken cancellation = default)
+		{
+			pxContext.ThrowOnNull();
+			dacOrDacExtTypeSymbol.ThrowOnNull();
+			cancellation.ThrowIfCancellationRequested();
+
+			var inferredInfo = DacAndDacExtInfoBuilder.Instance.InferTypeInfo(dacOrDacExtTypeSymbol, pxContext, customDeclarationOrder, cancellation);
+
+			if (inferredInfo?.GetResultKind() != InferResultKind.Success || inferredInfo.InferredInfo is not DacOrDacExtInfoBase dacExtInfoBase)
+				return null;
+
+			return InferModel(pxContext, dacExtInfoBase, cancellation);
+		}
+
+		/// <summary>
+		/// Returns the semantic model of DAC or DAC extension which is inferred from <paramref name="dacOrDacExtInfo"/>.
 		/// </summary>
 		/// <param name="pxContext">Context instance.</param>
 		/// <param name="dacOrDacExtInfo">The DAC or DAC extension inferred information obtained from resolving a hierarchy of chained DAC extensions and base types.</param>
-		/// <param name="customDeclarationOrder">(Optional) The custom declaration order.</param>
-		/// <param name="cancellation">(Optional)Cancellation token.</param>
+		/// <param name="cancellation">Cancellation token.</param>
 		/// <returns>
 		/// A semantic model for a given DAC or DAC extension <paramref name="dacOrDacExtInfo"/>.<br/>
 		/// If <paramref name="dacOrDacExtInfo"/> is not DAC or DAC extension, then returns <see langword="null"/>.
 		/// </returns>
-		public static DacSemanticModel? InferModel(PXContext pxContext, DacOrDacExtInfoBase dacOrDacExtInfo, int? customDeclarationOrder = null, 
-												   CancellationToken cancellation = default)
+		public static DacSemanticModel? InferModel(PXContext pxContext, DacOrDacExtInfoBase dacOrDacExtInfo, CancellationToken cancellation)
 		{		
 			pxContext.ThrowOnNull();
 			dacOrDacExtInfo.ThrowOnNull();
@@ -163,8 +185,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			if (dacOrDacExtInfo is not (DacInfo or DacExtensionInfo))
 				return null;
 
-			int declarationOrder = customDeclarationOrder ?? 0;
-			return new DacSemanticModel(pxContext, dacOrDacExtInfo, declarationOrder, cancellation);
+			return new DacSemanticModel(pxContext, dacOrDacExtInfo, cancellation);
 		}
 
 		/// <summary>
