@@ -64,7 +64,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 		public override IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromDerivedExtensionToBaseGraph(bool includeSelf)
 		{
-			var graphInfos = BaseGraph?.GetInfosFromDerivedExtensionToBaseGraph(includeSelf);
+			var graphInfos = BaseGraph?.GetInfosFromDerivedExtensionToBaseGraph(includeSelf: true);
 			var extensionInfos = GetExtensionInfosFromDerivedExtensionToBaseExtensions(includeSelf);
 
 			return graphInfos != null
@@ -74,7 +74,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 		public override IEnumerable<GraphOrGraphExtInfoBase> GetInfosFromBaseGraphToDerivedExtension(bool includeSelf)
 		{
-			var graphInfos = BaseGraph?.GetInfosFromBaseGraphToDerivedExtension(includeSelf);
+			var graphInfos = BaseGraph?.GetInfosFromBaseGraphToDerivedExtension(includeSelf: true);
 			var extensionInfos = GetExtensionInfosFromBaseExtensionsToDerivedExtension(includeSelf);
 
 			return graphInfos != null
