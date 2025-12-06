@@ -26,8 +26,17 @@ namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 		protected SymbolAnalyzersAggregator(CodeAnalysisSettings? settings, params T[] innerAnalyzers) : base(settings)
 		{
 			InnerAnalyzers = ImmutableArray.CreateRange(innerAnalyzers);
-			SupportedDiagnostics = ImmutableArray.CreateRange(innerAnalyzers.SelectMany(a => a.SupportedDiagnostics));
+
+			var aggregatedDiagnostics = innerAnalyzers.SelectMany(a => a.SupportedDiagnostics);
+			var supportedOwnDiagnostics = GetAggregatorOwnDiagnostics(settings) ?? [];
+			var allSupportedDiagnostics = supportedOwnDiagnostics.Count > 0
+				? supportedOwnDiagnostics.Concat(aggregatedDiagnostics)
+				: aggregatedDiagnostics;
+
+			SupportedDiagnostics = ImmutableArray.CreateRange(allSupportedDiagnostics);
 		}
+
+		protected abstract IReadOnlyCollection<DiagnosticDescriptor> GetAggregatorOwnDiagnostics(CodeAnalysisSettings? settings);
 
 		protected override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, PXContext pxContext)
 		{
@@ -60,33 +69,33 @@ namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 		protected abstract void AnalyzeSymbol(SymbolAnalysisContext context, PXContext pxContext);
 
 		protected virtual void RunAggregatedAnalyzersInParallel(List<T> effectiveAnalyzers, SymbolAnalysisContext context,
-																Action<int> aggregatedAnalyserAction, ParallelOptions? parallelOptions = null)
+																Action<int> aggregatedAnalyzerAction, ParallelOptions? parallelOptions = null)
 		{
 			switch (effectiveAnalyzers.Count)
 			{
 				case 0:
 					return;
 				case 1:
-					aggregatedAnalyserAction(0);
+					aggregatedAnalyzerAction(0);
 					return;
 				default:
 					if (Debugger.IsAttached)
 					{
 						for (int analyzerIndex = 0; analyzerIndex < effectiveAnalyzers.Count; analyzerIndex++)
 						{
-							aggregatedAnalyserAction(analyzerIndex);
+							aggregatedAnalyzerAction(analyzerIndex);
 						}
 					}
 					else
 					{
-						RunInParallel(effectiveAnalyzers, context, aggregatedAnalyserAction, parallelOptions);
+						RunInParallel(effectiveAnalyzers, context, aggregatedAnalyzerAction, parallelOptions);
 					}
 
 					return;
 			}
 		}
 
-		private void RunInParallel(List<T> effectiveAnalyzers, SymbolAnalysisContext context, Action<int> aggregatedAnalyserAction,
+		private void RunInParallel(List<T> effectiveAnalyzers, SymbolAnalysisContext context, Action<int> aggregatedAnalyzerAction,
 								   ParallelOptions? parallelOptions)
 		{
 			parallelOptions = parallelOptions ?? new ParallelOptions
@@ -96,7 +105,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator
 
 			try
 			{
-				Parallel.For(0, effectiveAnalyzers.Count, parallelOptions, aggregatedAnalyserAction);
+				Parallel.For(0, effectiveAnalyzers.Count, parallelOptions, aggregatedAnalyzerAction);
 			}
 			catch (AggregateException aggregateException)
 			{
