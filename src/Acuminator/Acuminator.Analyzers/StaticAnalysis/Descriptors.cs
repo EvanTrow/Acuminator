@@ -556,6 +556,26 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			Rule("PX1115", nameof(Resources.PX1115TitleDacExtension).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, 
 				DiagnosticsShortName.PX1115DacExtension);
 
+		public static DiagnosticDescriptor PX1116_CircularReferenceInTypeHierarchy_GraphExtension { get; } =
+			Rule("PX1116", nameof(Resources.PX1116TitleGraph).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1116,
+				 messageFormat: nameof(Resources.PX1116TitleGraph_Format).GetLocalized());
+
+		public static DiagnosticDescriptor PX1116_CircularReferenceInTypeHierarchy_DacExtension { get; } =
+			Rule("PX1116", nameof(Resources.PX1116TitleDAC).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1116,
+				 messageFormat: nameof(Resources.PX1116TitleDAC_Format).GetLocalized());
+
+		public static DiagnosticDescriptor PX1117_GraphExtensionExtendsMultipleGraphs { get; } =
+			Rule("PX1117", nameof(Resources.PX1117TitleGraph).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1117Graph,
+				 messageFormat: nameof(Resources.PX1117TitleGraph_Format).GetLocalized());
+
+		public static DiagnosticDescriptor PX1117_DacExtensionExtendsMultipleDacs { get; } =
+			Rule("PX1117", nameof(Resources.PX1117TitleDAC).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1117DAC,
+				 messageFormat: nameof(Resources.PX1117TitleDAC_Format).GetLocalized());
+
+		public static DiagnosticDescriptor PX1118_DacExtensionWithComplexTypeHierarchy { get; } =
+			Rule("PX1118", nameof(Resources.PX1118Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1118,
+				 messageFormat: nameof(Resources.PX1118Title_Format).GetLocalized());
+
 		public static DiagnosticDescriptor PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable { get; } =
 			Rule("PX1120", nameof(Resources.PX1120Title_StoreTaskInVariable).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, 
 				DiagnosticsShortName.PX1120_StoreTaskInVariable);

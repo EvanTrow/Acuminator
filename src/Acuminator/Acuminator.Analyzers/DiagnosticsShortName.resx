@@ -477,13 +477,25 @@
   <data name="PX1115GraphExtension" xml:space="preserve">
     <value>NonTerminalBaseGraphExtension</value>
   </data>
-  <data name="PX1120_StoreTaskInVariable" xml:space="preserve">
-    <value>StoreTaskInVariableOrParameter</value>
+  <data name="PX1116" xml:space="preserve">
+    <value>CircularReferenceInTypeHierarchy</value>
+  </data>
+  <data name="PX1117DAC" xml:space="preserve">
+    <value>ExtendMoreThanOneDAC</value>
+  </data>
+  <data name="PX1117Graph" xml:space="preserve">
+    <value>ExtendMoreThanOneGraph</value>
+  </data>
+  <data name="PX1118" xml:space="preserve">
+    <value>DacExtensionWithComplexTypeHierarchy</value>
   </data>
   <data name="PX1120_MethodReturnTypeIsNotTask" xml:space="preserve">
     <value>MethodReturnTypeIsNotTask</value>
   </data>
   <data name="PX1120_NotAwaitedTaskReturningExpression" xml:space="preserve">
     <value>NotAwaitedTaskReturningExpression</value>
+  </data>
+  <data name="PX1120_StoreTaskInVariable" xml:space="preserve">
+    <value>StoreTaskInVariableOrParameter</value>
   </data>
 </root>
