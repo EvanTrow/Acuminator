@@ -84,6 +84,12 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 		{
 		}
 
+		protected override IReadOnlyCollection<DiagnosticDescriptor> GetAggregatorOwnDiagnostics(CodeAnalysisSettings? settings) =>
+		[
+			Descriptors.PX1116_CircularReferenceInTypeHierarchy_GraphExtension,
+			Descriptors.PX1117_GraphExtensionExtendsMultipleGraphs
+		];
+
 		protected override void AnalyzeSymbol(SymbolAnalysisContext context, PXContext pxContext)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
@@ -106,7 +112,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 			var effectiveAnalyzers = InnerAnalyzers.Where(analyzer => analyzer.ShouldAnalyze(pxContext, graphOrGraphExtModel))
 												   .ToList(capacity: InnerAnalyzers.Length);
 
-			RunAggregatedAnalyzersInParallel(effectiveAnalyzers, context, aggregatedAnalyserAction: analyzerIndex =>
+			RunAggregatedAnalyzersInParallel(effectiveAnalyzers, context, aggregatedAnalyzerAction: analyzerIndex =>
 			{
 				context.CancellationToken.ThrowIfCancellationRequested();
 

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 using Acuminator.Analyzers.StaticAnalysis.AnalyzersAggregator;
 using Acuminator.Analyzers.StaticAnalysis.ChangesInPXCache;
@@ -55,8 +56,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 		/// <summary>
 		/// Constructor for the unit tests.
 		/// </summary>
-		public LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings? settings, params ILooseEventHandlerAggregatedAnalyzer[] innerAnalyzers)
-            : base(settings, innerAnalyzers)
+		public LooseEventHandlerAggregatorAnalyzer(CodeAnalysisSettings? settings, params ILooseEventHandlerAggregatedAnalyzer[] innerAnalyzers) : 
+											  base(settings, innerAnalyzers)
 		{
 		}
 
@@ -84,6 +85,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.EventHandlers
 				aggregatedAnalyzer.Analyze(context, pxContext, eventHandlerLooseInfo);
 			});
 		}
+
+		protected override IReadOnlyCollection<DiagnosticDescriptor> GetAggregatorOwnDiagnostics(CodeAnalysisSettings? settings) => [];
 
 		//private void AnalyzeLambda(OperationAnalysisContext context, PXContext pxContext)
 		//{

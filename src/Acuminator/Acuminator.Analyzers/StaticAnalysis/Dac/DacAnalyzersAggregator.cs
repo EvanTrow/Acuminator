@@ -77,6 +77,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 		{
 		}
 
+		protected override IReadOnlyCollection<DiagnosticDescriptor> GetAggregatorOwnDiagnostics(CodeAnalysisSettings? settings) =>
+		[
+			Descriptors.PX1116_CircularReferenceInTypeHierarchy_DacExtension,
+			Descriptors.PX1117_DacExtensionExtendsMultipleDacs,
+			Descriptors.PX1118_DacExtensionWithComplexTypeHierarchy
+		];
+
 		protected override void AnalyzeSymbol(SymbolAnalysisContext context, PXContext pxContext)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
