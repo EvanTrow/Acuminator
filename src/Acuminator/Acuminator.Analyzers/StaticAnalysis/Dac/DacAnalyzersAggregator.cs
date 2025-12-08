@@ -28,6 +28,7 @@ using Acuminator.Analyzers.StaticAnalysis.UnderscoresInDac;
 
 using Acuminator.Utilities;
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.Dac;
 using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
@@ -78,11 +79,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 		}
 
 		protected override IReadOnlyCollection<DiagnosticDescriptor> GetAggregatorOwnDiagnostics(CodeAnalysisSettings? settings) =>
-		[
+		new[]
+		{
 			Descriptors.PX1116_CircularReferenceInTypeHierarchy_DacExtension,
-			Descriptors.PX1117_DacExtensionExtendsMultipleDacs,
+			Descriptors.PX1117_DacExtensionExtendsTwoDacs,
+			Descriptors.PX1117_DacExtensionExtends_3_To_5_Dacs,
+			Descriptors.PX1117_DacExtensionExtendsMoreThanFiveDacs,
 			Descriptors.PX1118_DacExtensionWithComplexTypeHierarchy
-		];
+		}
+		.Distinct()
+		.ToList(capacity: 5);
 
 		protected override void AnalyzeSymbol(SymbolAnalysisContext context, PXContext pxContext)
 		{

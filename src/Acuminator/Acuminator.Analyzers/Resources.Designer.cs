@@ -2403,11 +2403,33 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The DAC extension &quot;{0}&quot; extends more than one DAC. The extended DACs are {1}..
+        ///   Looks up a localized string similar to The DAC extension &quot;{0}&quot; extends more than one DAC. The extended DACs are {1} and {2}..
         /// </summary>
-        public static string PX1117TitleDAC_Format {
+        public static string PX1117TitleDAC_Format_2_Dacs {
             get {
-                return ResourceManager.GetString("PX1117TitleDAC_Format", resourceCulture);
+                return ResourceManager.GetString("PX1117TitleDAC_Format_2_Dacs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The DAC extension &quot;{0}&quot; extends more than one DAC. The extended DACs are:
+        ///{1},
+        ///and {2}..
+        /// </summary>
+        public static string PX1117TitleDAC_Format_3_to_5_Dacs {
+            get {
+                return ResourceManager.GetString("PX1117TitleDAC_Format_3_to_5_Dacs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The DAC extension &quot;{0}&quot; extends more than one DAC. The extended DACs are:
+        ///{1},
+        ///and {2} more..
+        /// </summary>
+        public static string PX1117TitleDAC_Format_MoreThan_5_Dacs {
+            get {
+                return ResourceManager.GetString("PX1117TitleDAC_Format_MoreThan_5_Dacs", resourceCulture);
             }
         }
         
@@ -2430,30 +2452,33 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} and {1}..
+        ///   Looks up a localized string similar to The graph extension &quot;{0}&quot; extends more than one graph. The extended graphs are {1} and {2}..
         /// </summary>
-        public static string PX1117TitleGraph_FormatArg_2_Types {
+        public static string PX1117TitleGraph_Format_2_Graphs {
             get {
-                return ResourceManager.GetString("PX1117TitleGraph_FormatArg_2_Types", resourceCulture);
+                return ResourceManager.GetString("PX1117TitleGraph_Format_2_Graphs", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}, {1}, and {2}..
+        ///   Looks up a localized string similar to The graph extension &quot;{0}&quot; extends more than one graph. The extended graphs are:
+        ///{1},
+        ///and {2}..
         /// </summary>
-        public static string PX1117TitleGraph_FormatArg_From_3_To_5 {
+        public static string PX1117TitleGraph_Format_3_to_5_Graphs {
             get {
-                return ResourceManager.GetString("PX1117TitleGraph_FormatArg_From_3_To_5", resourceCulture);
+                return ResourceManager.GetString("PX1117TitleGraph_Format_3_to_5_Graphs", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0},
-        ///and {1} more..
+        ///   Looks up a localized string similar to The graph extension &quot;{0}&quot; extends more than one graph. The extended graphs are:
+        ///{1},
+        ///and {2} more..
         /// </summary>
-        public static string PX1117TitleGraph_FormatArg_MoreThan_5 {
+        public static string PX1117TitleGraph_Format_MoreThan_5_Graphs {
             get {
-                return ResourceManager.GetString("PX1117TitleGraph_FormatArg_MoreThan_5", resourceCulture);
+                return ResourceManager.GetString("PX1117TitleGraph_Format_MoreThan_5_Graphs", resourceCulture);
             }
         }
         

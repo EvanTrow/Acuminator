@@ -85,10 +85,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 		}
 
 		protected override IReadOnlyCollection<DiagnosticDescriptor> GetAggregatorOwnDiagnostics(CodeAnalysisSettings? settings) =>
-		[
+		new[]
+		{
 			Descriptors.PX1116_CircularReferenceInTypeHierarchy_GraphExtension,
-			Descriptors.PX1117_GraphExtensionExtendsMultipleGraphs
-		];
+			Descriptors.PX1117_GraphExtensionExtendsTwoGraphs,
+			Descriptors.PX1117_GraphExtensionExtends_3_To_5_Graphs,
+			Descriptors.PX1117_GraphExtensionExtendsMoreThanFiveGraphs,
+		}
+		.Distinct()
+		.ToList(capacity: 4);
 
 		protected override void AnalyzeSymbol(SymbolAnalysisContext context, PXContext pxContext)
 		{
