@@ -79,16 +79,16 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 		}
 
 		protected override IReadOnlyCollection<DiagnosticDescriptor> GetAggregatorOwnDiagnostics(CodeAnalysisSettings? settings) =>
-		new[]
-		{
-			Descriptors.PX1116_CircularReferenceInTypeHierarchy_DacExtension,
-			Descriptors.PX1117_DacExtensionExtendsTwoDacs,
-			Descriptors.PX1117_DacExtensionExtends_3_To_5_Dacs,
-			Descriptors.PX1117_DacExtensionExtendsMoreThanFiveDacs,
-			Descriptors.PX1118_DacExtensionWithComplexTypeHierarchy
-		}
-		.Distinct()
-		.ToList(capacity: 5);
+			new[]
+			{
+				Descriptors.PX1116_CircularReferenceInTypeHierarchy_DacExtension,
+				Descriptors.PX1117_DacExtensionExtendsTwoDacs,
+				Descriptors.PX1117_DacExtensionExtends_3_To_5_Dacs,
+				Descriptors.PX1117_DacExtensionExtendsMoreThanFiveDacs,
+				Descriptors.PX1118_DacExtensionWithComplexTypeHierarchy
+			}
+			.Distinct()
+			.ToList(capacity: 5);
 
 		protected override void AnalyzeSymbol(SymbolAnalysisContext context, PXContext pxContext)
 		{
@@ -155,18 +155,35 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 		private void ReportMultipleRoots(SymbolAnalysisContext context, PXContext pxContext, INamedTypeSymbol type,
 										 IReadOnlyCollection<ITypeSymbol> multipleRootTypes)
 		{
-			// TODO implement diagnostic for multiple root types
+			var diagnostic = MultipleDacsDiagnosticFactory.Instance.CreateDiagnosticForMultipleRootSymbols(type,
+																			multipleRootTypes.ToList(capacity: multipleRootTypes.Count));
+			if (diagnostic != null)
+			{
+				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
+			}
 		}
 
 		private void ReportCircularExtensions(SymbolAnalysisContext context, PXContext pxContext, INamedTypeSymbol type, ITypeSymbol circularExtension)
 		{
-			// TODO implement diagnostic for circular extensions
+			if (!type.IsInSourceCode())
+				return;
+
+			var location = type.Locations.FirstOrDefault();
+			var diagnostic = Diagnostic.Create(Descriptors.PX1116_CircularReferenceInTypeHierarchy_DacExtension, location,
+											   [type.ToString(), circularExtension.ToString()]);
+			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 
 		private void ReportBadBaseExtensions(SymbolAnalysisContext context, PXContext pxContext, INamedTypeSymbol type, 
 											 ITypeSymbol extensionWithBadBaseExtensions)
 		{
-			// TODO implement diagnostic for DAC extensions with bad base extensions
+			if (!type.IsInSourceCode())
+				return;
+
+			var location = type.Locations.FirstOrDefault();
+			var diagnostic = Diagnostic.Create(Descriptors.PX1118_DacExtensionWithComplexTypeHierarchy, location,
+											   [type.ToString(), extensionWithBadBaseExtensions.ToString()]);
+			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 	}
 }

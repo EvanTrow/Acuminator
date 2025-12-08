@@ -31,6 +31,7 @@ using Acuminator.Analyzers.StaticAnalysis.ViewDeclarationOrder;
 
 using Acuminator.Utilities;
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.DiagnosticSuppression;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
 using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
@@ -85,15 +86,15 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 		}
 
 		protected override IReadOnlyCollection<DiagnosticDescriptor> GetAggregatorOwnDiagnostics(CodeAnalysisSettings? settings) =>
-		new[]
-		{
-			Descriptors.PX1116_CircularReferenceInTypeHierarchy_GraphExtension,
-			Descriptors.PX1117_GraphExtensionExtendsTwoGraphs,
-			Descriptors.PX1117_GraphExtensionExtends_3_To_5_Graphs,
-			Descriptors.PX1117_GraphExtensionExtendsMoreThanFiveGraphs,
-		}
-		.Distinct()
-		.ToList(capacity: 4);
+			new[]
+			{
+				Descriptors.PX1116_CircularReferenceInTypeHierarchy_GraphExtension,
+				Descriptors.PX1117_GraphExtensionExtendsTwoGraphs,
+				Descriptors.PX1117_GraphExtensionExtends_3_To_5_Graphs,
+				Descriptors.PX1117_GraphExtensionExtendsMoreThanFiveGraphs,
+			}
+			.Distinct()
+			.ToList(capacity: 4);
 
 		protected override void AnalyzeSymbol(SymbolAnalysisContext context, PXContext pxContext)
 		{
@@ -158,12 +159,23 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 		private void ReportMultipleRoots(SymbolAnalysisContext context, PXContext pxContext, INamedTypeSymbol type, 
 										 IReadOnlyCollection<ITypeSymbol> multipleRootTypes)
 		{
-			// TODO implement diagnostic for multiple root types
+			var diagnostic = MultipleGraphsDiagnosticFactory.Instance.CreateDiagnosticForMultipleRootSymbols(type,
+																			multipleRootTypes.ToList(capacity: multipleRootTypes.Count));
+			if (diagnostic != null)
+			{
+				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
+			}
 		}
 
 		private void ReportCircularExtensions(SymbolAnalysisContext context, PXContext pxContext, INamedTypeSymbol type, ITypeSymbol circularExtension)
 		{
-			// TODO implement diagnostic for circular extensions
+			if (!type.IsInSourceCode())
+				return;
+
+			var location = type.Locations.FirstOrDefault();
+			var diagnostic = Diagnostic.Create(Descriptors.PX1116_CircularReferenceInTypeHierarchy_GraphExtension, location,
+											   [type.ToString(), circularExtension.ToString()]);
+			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 	}
 }
