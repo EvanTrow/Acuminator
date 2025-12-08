@@ -105,7 +105,8 @@ namespace Acuminator.Utilities.Common
 		/// </returns>
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static string? SurroundWithQuotes([NotNullIfNotNull(nameof(source))] this string? source, bool surroundEmptyString = true)
+		[return: NotNullIfNotNull(nameof(source))]
+		public static string? SurroundWithQuotes(this string? source, bool surroundEmptyString = true)
 		{
 			if (source == null)
 				return null;
