@@ -2430,6 +2430,34 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} and {1}..
+        /// </summary>
+        public static string PX1117TitleGraph_FormatArg_2_Types {
+            get {
+                return ResourceManager.GetString("PX1117TitleGraph_FormatArg_2_Types", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}, {1}, and {2}..
+        /// </summary>
+        public static string PX1117TitleGraph_FormatArg_From_3_To_5 {
+            get {
+                return ResourceManager.GetString("PX1117TitleGraph_FormatArg_From_3_To_5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0},
+        ///and {1} more..
+        /// </summary>
+        public static string PX1117TitleGraph_FormatArg_MoreThan_5 {
+            get {
+                return ResourceManager.GetString("PX1117TitleGraph_FormatArg_MoreThan_5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The type hierarchy contains DAC extension that extends multiple independent DAC extensions. Extending multiple independent extensions is forbidden for DAC extensions..
         /// </summary>
         public static string PX1118Title {
