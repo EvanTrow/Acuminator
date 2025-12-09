@@ -10,6 +10,8 @@ using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Graph;
 
 using FluentAssertions;
 
@@ -24,29 +26,44 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 	public class CircularGraphExtensionReferencesTests : SemanticModelTestsBase<PXGraphSemanticModel>
 	{
 		[Theory]
-		[EmbeddedFileData("GraphExtensionWIthCircularReference.cs")]
-		public async Task SecondLevel_Derived_GraphExtension_InfoCollection(string text)
+		[EmbeddedFileData("GraphExtensionWithTrivialCircularReference.cs")]
+		public async Task GraphExtension_WithCircularReference_Trivial(string text)
 		{
-			var graphSemanticModel = await PrepareSemanticModelAsync(text).ConfigureAwait(false);
-			graphSemanticModel.Should().BeNull();
+			var testContext = await PrepareTestContextForCodeAsync(text).ConfigureAwait(false);
+
+			var (inferredInfo, originalTypeSymbol) = GetInferredInfo(testContext, cancellation: default);
+
+			CheckInferredInfoForCircularReference(inferredInfo);
+
+			inferredInfo!.CircularReferenceExtension!.Should().Be(originalTypeSymbol);
 		}
 
-#pragma warning disable CS8609 // Nullability of reference types in return type doesn't match overridden member.
-		protected override Task<PXGraphSemanticModel?> PrepareSemanticModelAsync(RoslynTestContext context, CancellationToken cancellation)
+		private (InferredSymbolInfo? InferrefInfo, INamedTypeSymbol OriginalTypeSymbol) GetInferredInfo(RoslynTestContext context, CancellationToken cancellation)
 		{
 			var graphOrGraphExtDeclaration = context.Root.DescendantNodes()
 														 .OfType<ClassDeclarationSyntax>()
 														 .FirstOrDefault();
 			graphOrGraphExtDeclaration.Should().NotBeNull();
 
-			INamedTypeSymbol? graphOrGraphExtSymbol = context.SemanticModel.GetDeclaredSymbol(graphOrGraphExtDeclaration);
-			graphOrGraphExtSymbol.Should().NotBeNull();
+			INamedTypeSymbol? graphOrGraphExtSymbol = context.SemanticModel.GetDeclaredSymbol(graphOrGraphExtDeclaration, cancellation);
+			graphOrGraphExtDeclaration.Should().NotBeNull();
 
-			var graphSemanticModel = PXGraphSemanticModel.InferModel(context.PXContext, graphOrGraphExtSymbol!,
-																	 GraphSemanticModelCreationOptions.CollectGeneralGraphInfo,
-																	 cancellation: cancellation);
-			return Task.FromResult(graphSemanticModel);
+			var inferredInfo = GraphAndGraphExtInfoBuilder.Instance.InferTypeInfo(graphOrGraphExtSymbol!, context.PXContext, customDeclarationOrder: null,
+																				  cancellation);
+			return (inferredInfo, graphOrGraphExtSymbol!);
 		}
+
+		private void CheckInferredInfoForCircularReference(InferredSymbolInfo? inferredInfo)
+		{
+			inferredInfo.Should().NotBeNull();
+			inferredInfo!.InferredInfo.Should().BeNull();
+			inferredInfo.GetResultKind().Should().Be(InferResultKind.CircularReferences);
+			inferredInfo.CircularReferenceExtension.Should().NotBeNull();
+		}
+
+#pragma warning disable CS8609 // Nullability of reference types in return type doesn't match overridden member.
+		protected override Task<PXGraphSemanticModel?> PrepareSemanticModelAsync(RoslynTestContext context, CancellationToken cancellation) =>
+			Task.FromResult<PXGraphSemanticModel?>(null);
 #pragma warning restore CS8609 // Nullability of reference types in return type doesn't match overridden member.
 	}
 }

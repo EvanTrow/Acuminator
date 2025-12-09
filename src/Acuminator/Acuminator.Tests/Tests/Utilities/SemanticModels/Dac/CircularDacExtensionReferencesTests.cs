@@ -26,36 +26,44 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Dac
 	public class CircularDacExtensionReferencesTests : SemanticModelTestsBase<DacSemanticModel>
 	{
 		[Theory]
-		[EmbeddedFileData("DacExtensionWithCircularReference.cs")]
+		[EmbeddedFileData("DacExtensionWithTrivialCircularReference.cs")]
 		public async Task DacExtension_WithCircularReference_Trivial(string text)
 		{
 			var testContext = await PrepareTestContextForCodeAsync(text).ConfigureAwait(false);
 
-			var dacSemanticModel = await PrepareSemanticModelAsync(testContext, cancellation: default).ConfigureAwait(false);
-			dacSemanticModel.Should().BeNull();
+			var (inferredInfo, originalTypeSymbol) = GetInferredInfo(testContext, cancellation: default);
+
+			CheckInferredInfoForCircularReference(inferredInfo);
+
+			inferredInfo!.CircularReferenceExtension!.Should().Be(originalTypeSymbol);
 		}
 
-#pragma warning disable CS8609 // Nullability of reference types in return type doesn't match overridden member.
-		protected override Task<DacSemanticModel?> PrepareSemanticModelAsync(RoslynTestContext context, CancellationToken cancellation)
+		private (InferredSymbolInfo? InferrefInfo, INamedTypeSymbol OriginalTypeSymbol) GetInferredInfo(RoslynTestContext context, CancellationToken cancellation)
 		{
-			var dacOrDacExtDeclaration = context.Root.DescendantNodes()
-													 .OfType<ClassDeclarationSyntax>()
-													 .FirstOrDefault();
-			dacOrDacExtDeclaration.Should().NotBeNull();
+			var graphOrGraphExtDeclaration = context.Root.DescendantNodes()
+														 .OfType<ClassDeclarationSyntax>()
+														 .FirstOrDefault();
+			graphOrGraphExtDeclaration.Should().NotBeNull();
 
-			INamedTypeSymbol? dacOrDacExtSymbol = context.SemanticModel.GetDeclaredSymbol(dacOrDacExtDeclaration, cancellation);
-			dacOrDacExtDeclaration.Should().NotBeNull();
+			INamedTypeSymbol? graphOrGraphExtSymbol = context.SemanticModel.GetDeclaredSymbol(graphOrGraphExtDeclaration, cancellation);
+			graphOrGraphExtDeclaration.Should().NotBeNull();
 
-			var inferredInfo = DacAndDacExtInfoBuilder.Instance.InferTypeInfo(dacOrDacExtSymbol!, context.PXContext, customDeclarationOrder: null, 
-																			  cancellation);
+			var inferredInfo = DacAndDacExtInfoBuilder.Instance.InferTypeInfo(graphOrGraphExtSymbol!, context.PXContext, customDeclarationOrder: null,
+																				  cancellation);
+			return (inferredInfo, graphOrGraphExtSymbol!);
+		}
+
+		private void CheckInferredInfoForCircularReference(InferredSymbolInfo? inferredInfo)
+		{
 			inferredInfo.Should().NotBeNull();
 			inferredInfo!.InferredInfo.Should().BeNull();
 			inferredInfo.GetResultKind().Should().Be(InferResultKind.CircularReferences);
 			inferredInfo.CircularReferenceExtension.Should().NotBeNull();
-			inferredInfo.CircularReferenceExtension!.Should().Be(dacOrDacExtSymbol);
-
-			return Task.FromResult<DacSemanticModel?>(null);
 		}
+
+#pragma warning disable CS8609 // Nullability of reference types in return type doesn't match overridden member.
+		protected override Task<DacSemanticModel?> PrepareSemanticModelAsync(RoslynTestContext context, CancellationToken cancellation) =>
+			Task.FromResult<DacSemanticModel?>(null);
 #pragma warning restore CS8609
 	}
 }
