@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Acuminator.Utilities.Common;
-
 using Microsoft.CodeAnalysis;
 
 namespace Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
 
 public record InferredSymbolInfo
 {
-	public IInferredAcumaticaSymbolInfo InferredInfo { get; }
+	public IInferredAcumaticaSymbolInfo? InferredInfo { get; }
 
 	public IReadOnlyCollection<ITypeSymbol> CollectedRootTypes { get; }
 
@@ -19,9 +17,9 @@ public record InferredSymbolInfo
 
 	public bool FailedToCollectTypeHierarchy { get; init; }
 
-	public InferredSymbolInfo(IInferredAcumaticaSymbolInfo inferredInfo, IReadOnlyCollection<ITypeSymbol>? collectedRootTypes)
+	public InferredSymbolInfo(IInferredAcumaticaSymbolInfo? inferredInfo, IReadOnlyCollection<ITypeSymbol>? collectedRootTypes)
 	{
-		InferredInfo = inferredInfo.CheckIfNull();
+		InferredInfo = inferredInfo;
 		CollectedRootTypes = collectedRootTypes ?? Array.Empty<ITypeSymbol>();
 	}
 
