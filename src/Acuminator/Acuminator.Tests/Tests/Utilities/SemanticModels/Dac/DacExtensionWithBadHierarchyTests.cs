@@ -38,7 +38,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Dac
 			inferredInfo!.ExtensionWithBadBaseExtensions!.Should().Be(originalTypeSymbol);
 		}
 
-		private (InferredSymbolInfo? InferrefInfo, INamedTypeSymbol OriginalTypeSymbol) GetInferredInfo(RoslynTestContext context, CancellationToken cancellation)
+		private (InferredSymbolInfo? InferredInfo, INamedTypeSymbol OriginalTypeSymbol) GetInferredInfo(RoslynTestContext context, CancellationToken cancellation)
 		{
 			var graphOrGraphExtDeclaration = context.Root.DescendantNodes()
 														 .OfType<ClassDeclarationSyntax>()
