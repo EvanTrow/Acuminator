@@ -32,8 +32,15 @@ public class GraphExtensionTypeHierarchyTests : DiagnosticVerifier
 		VerifyCSharpDiagnosticAsync(actual);
 
 	[Theory]
+	[EmbeddedFileData(@"Graph\GraphExtensionWithCircularSelfReference.cs")]
+	public Task GraphExtension_WithCircularSelfReference_InTypeHierarchy(string actual) =>
+		VerifyCSharpDiagnosticAsync(actual,
+			Descriptors.PX1116_CircularReferenceInTypeHierarchy_GraphExtension.CreateFor(10, 15,
+											["ExtensionA", "Acuminator.Tests.Tests.StaticAnalysis.BadExtensionTypeHierarchy.Graph.Sources.ExtensionA"]));
+
+	[Theory]
 	[EmbeddedFileData(@"Graph\GraphExtensionWithComplexCircularReference.cs")]
-	public Task GraphExtension_WithCircularReferences_InTypeHierarchy(string actual) =>
+	public Task GraphExtension_WithComplexCircularReferences_InTypeHierarchy(string actual) =>
 		VerifyCSharpDiagnosticAsync(actual, 
 			Descriptors.PX1116_CircularReferenceInTypeHierarchy_GraphExtension.CreateFor(10, 15,
 											["ExtensionA", "Acuminator.Tests.Tests.StaticAnalysis.BadExtensionTypeHierarchy.Graph.Sources.ExtensionA"]),
