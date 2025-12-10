@@ -564,33 +564,9 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			Rule("PX1116", nameof(Resources.PX1116TitleDAC).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1116,
 				 messageFormat: nameof(Resources.PX1116TitleDAC_Format).GetLocalized());
 
-		public static DiagnosticDescriptor PX1117_GraphExtensionExtendsTwoGraphs { get; } =
-			Rule("PX1117", nameof(Resources.PX1117TitleGraph).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1117Graph,
-				 messageFormat: nameof(Resources.PX1117TitleGraph_Format_2_Graphs).GetLocalized());
-
-		public static DiagnosticDescriptor PX1117_GraphExtensionExtends_3_To_5_Graphs { get; } =
-			Rule("PX1117", nameof(Resources.PX1117TitleGraph).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1117Graph,
-				 messageFormat: nameof(Resources.PX1117TitleGraph_Format_3_to_5_Graphs).GetLocalized());
-
-		public static DiagnosticDescriptor PX1117_GraphExtensionExtendsMoreThanFiveGraphs { get; } =
-			Rule("PX1117", nameof(Resources.PX1117TitleGraph).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1117Graph,
-				 messageFormat: nameof(Resources.PX1117TitleGraph_Format_MoreThan_5_Graphs).GetLocalized());
-
-		public static DiagnosticDescriptor PX1117_DacExtensionExtendsTwoDacs { get; } =
-			Rule("PX1117", nameof(Resources.PX1117TitleDAC).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1117DAC,
-				 messageFormat: nameof(Resources.PX1117TitleDAC_Format_2_Dacs).GetLocalized());
-
-		public static DiagnosticDescriptor PX1117_DacExtensionExtends_3_To_5_Dacs { get; } =
-			Rule("PX1117", nameof(Resources.PX1117TitleDAC).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1117DAC,
-				 messageFormat: nameof(Resources.PX1117TitleDAC_Format_3_to_5_Dacs).GetLocalized());
-
-		public static DiagnosticDescriptor PX1117_DacExtensionExtendsMoreThanFiveDacs { get; } =
-			Rule("PX1117", nameof(Resources.PX1117TitleDAC).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1117DAC,
-				 messageFormat: nameof(Resources.PX1117TitleDAC_Format_MoreThan_5_Dacs).GetLocalized());
-
-		public static DiagnosticDescriptor PX1118_DacExtensionWithComplexTypeHierarchy { get; } =
-			Rule("PX1118", nameof(Resources.PX1118Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1118,
-				 messageFormat: nameof(Resources.PX1118Title_Format).GetLocalized());
+		public static DiagnosticDescriptor PX1117_DacExtensionWithComplexTypeHierarchy { get; } =
+			Rule("PX1117", nameof(Resources.PX1117Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1117,
+				 messageFormat: nameof(Resources.PX1117Title_Format).GetLocalized());
 
 		public static DiagnosticDescriptor PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable { get; } =
 			Rule("PX1120", nameof(Resources.PX1120Title_StoreTaskInVariable).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, 

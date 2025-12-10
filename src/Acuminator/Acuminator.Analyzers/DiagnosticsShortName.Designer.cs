@@ -1150,29 +1150,11 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ExtendMoreThanOneDAC.
-        /// </summary>
-        public static string PX1117DAC {
-            get {
-                return ResourceManager.GetString("PX1117DAC", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ExtendMoreThanOneGraph.
-        /// </summary>
-        public static string PX1117Graph {
-            get {
-                return ResourceManager.GetString("PX1117Graph", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to DacExtensionWithComplexTypeHierarchy.
         /// </summary>
-        public static string PX1118 {
+        public static string PX1117 {
             get {
-                return ResourceManager.GetString("PX1118", resourceCulture);
+                return ResourceManager.GetString("PX1117", resourceCulture);
             }
         }
         

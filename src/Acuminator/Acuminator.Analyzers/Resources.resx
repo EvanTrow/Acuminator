@@ -902,45 +902,10 @@ Reason: {2}</value>
   <data name="PX1116TitleGraph_Format" xml:space="preserve">
     <value>The graph extension "{0}" has a circular reference to the graph extension "{1}" in its type hierarchy</value>
   </data>
-  <data name="PX1117TitleDAC" xml:space="preserve">
-    <value>The DAC extension extends more than one DAC</value>
-  </data>
-  <data name="PX1117TitleDAC_Format_2_Dacs" xml:space="preserve">
-    <value>The DAC extension "{0}" extends more than one DAC. The extended DACs are {1} and {2}.</value>
-  </data>
-  <data name="PX1117TitleDAC_Format_3_to_5_Dacs" xml:space="preserve">
-    <value>The DAC extension "{0}" extends more than one DAC. The extended DACs are:
-{1},
-and {2}.</value>
-  </data>
-  <data name="PX1117TitleDAC_Format_MoreThan_5_Dacs" xml:space="preserve">
-    <value>The DAC extension "{0}" extends more than one DAC. The extended DACs are:
-{1},
-and {2} more.</value>
-  </data>
-  <data name="PX1117TitleGraph" xml:space="preserve">
-    <value>The graph extension extends more than one graph</value>
-  </data>
-  <data name="PX1117TitleGraph_Format" xml:space="preserve">
-    <value>The graph extension "{0}" extends more than one graph. The extended graphs are {1}.</value>
-  </data>
-  <data name="PX1117TitleGraph_Format_2_Graphs" xml:space="preserve">
-    <value>The graph extension "{0}" extends more than one graph. The extended graphs are {1} and {2}.</value>
-  </data>
-  <data name="PX1117TitleGraph_Format_3_to_5_Graphs" xml:space="preserve">
-    <value>The graph extension "{0}" extends more than one graph. The extended graphs are:
-{1},
-and {2}.</value>
-  </data>
-  <data name="PX1117TitleGraph_Format_MoreThan_5_Graphs" xml:space="preserve">
-    <value>The graph extension "{0}" extends more than one graph. The extended graphs are:
-{1},
-and {2} more.</value>
-  </data>
-  <data name="PX1118Title" xml:space="preserve">
+  <data name="PX1117Title" xml:space="preserve">
     <value>The type hierarchy contains DAC extension that extends multiple independent DAC extensions. Extending multiple independent extensions is forbidden for DAC extensions.</value>
   </data>
-  <data name="PX1118Title_Format" xml:space="preserve">
+  <data name="PX1117Title_Format" xml:space="preserve">
     <value>The type hierarchy of the DAC extension "{0}" contains DAC extension "{1}" that extends multiple independent DAC extensions. Extending multiple independent extensions is forbidden for DAC extensions.</value>
   </data>
   <data name="PX1120Title_MethodReturnTypeIsNotTask" xml:space="preserve">

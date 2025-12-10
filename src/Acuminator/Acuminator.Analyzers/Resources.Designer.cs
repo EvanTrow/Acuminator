@@ -2394,109 +2394,20 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The DAC extension extends more than one DAC.
-        /// </summary>
-        public static string PX1117TitleDAC {
-            get {
-                return ResourceManager.GetString("PX1117TitleDAC", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The DAC extension &quot;{0}&quot; extends more than one DAC. The extended DACs are {1} and {2}..
-        /// </summary>
-        public static string PX1117TitleDAC_Format_2_Dacs {
-            get {
-                return ResourceManager.GetString("PX1117TitleDAC_Format_2_Dacs", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The DAC extension &quot;{0}&quot; extends more than one DAC. The extended DACs are:
-        ///{1},
-        ///and {2}..
-        /// </summary>
-        public static string PX1117TitleDAC_Format_3_to_5_Dacs {
-            get {
-                return ResourceManager.GetString("PX1117TitleDAC_Format_3_to_5_Dacs", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The DAC extension &quot;{0}&quot; extends more than one DAC. The extended DACs are:
-        ///{1},
-        ///and {2} more..
-        /// </summary>
-        public static string PX1117TitleDAC_Format_MoreThan_5_Dacs {
-            get {
-                return ResourceManager.GetString("PX1117TitleDAC_Format_MoreThan_5_Dacs", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The graph extension extends more than one graph.
-        /// </summary>
-        public static string PX1117TitleGraph {
-            get {
-                return ResourceManager.GetString("PX1117TitleGraph", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The graph extension &quot;{0}&quot; extends more than one graph. The extended graphs are {1}..
-        /// </summary>
-        public static string PX1117TitleGraph_Format {
-            get {
-                return ResourceManager.GetString("PX1117TitleGraph_Format", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The graph extension &quot;{0}&quot; extends more than one graph. The extended graphs are {1} and {2}..
-        /// </summary>
-        public static string PX1117TitleGraph_Format_2_Graphs {
-            get {
-                return ResourceManager.GetString("PX1117TitleGraph_Format_2_Graphs", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The graph extension &quot;{0}&quot; extends more than one graph. The extended graphs are:
-        ///{1},
-        ///and {2}..
-        /// </summary>
-        public static string PX1117TitleGraph_Format_3_to_5_Graphs {
-            get {
-                return ResourceManager.GetString("PX1117TitleGraph_Format_3_to_5_Graphs", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The graph extension &quot;{0}&quot; extends more than one graph. The extended graphs are:
-        ///{1},
-        ///and {2} more..
-        /// </summary>
-        public static string PX1117TitleGraph_Format_MoreThan_5_Graphs {
-            get {
-                return ResourceManager.GetString("PX1117TitleGraph_Format_MoreThan_5_Graphs", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The type hierarchy contains DAC extension that extends multiple independent DAC extensions. Extending multiple independent extensions is forbidden for DAC extensions..
         /// </summary>
-        public static string PX1118Title {
+        public static string PX1117Title {
             get {
-                return ResourceManager.GetString("PX1118Title", resourceCulture);
+                return ResourceManager.GetString("PX1117Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The type hierarchy of the DAC extension &quot;{0}&quot; contains DAC extension &quot;{1}&quot; that extends multiple independent DAC extensions. Extending multiple independent extensions is forbidden for DAC extensions..
         /// </summary>
-        public static string PX1118Title_Format {
+        public static string PX1117Title_Format {
             get {
-                return ResourceManager.GetString("PX1118Title_Format", resourceCulture);
+                return ResourceManager.GetString("PX1117Title_Format", resourceCulture);
             }
         }
         
