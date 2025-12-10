@@ -38,6 +38,19 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			inferredInfo!.CircularReferenceExtension!.Should().Be(originalTypeSymbol);
 		}
 
+		[Theory]
+		[EmbeddedFileData("GraphExtensionWithComplexCircularReference.cs")]
+		public async Task GraphExtension_WithCircularReference_Complex(string text)
+		{
+			var testContext = await PrepareTestContextForCodeAsync(text).ConfigureAwait(false);
+
+			var (inferredInfo, originalTypeSymbol) = GetInferredInfo(testContext, cancellation: default);
+
+			CheckInferredInfoForCircularReference(inferredInfo);
+
+			inferredInfo!.CircularReferenceExtension!.Should().Be(originalTypeSymbol);
+		}
+
 		private (InferredSymbolInfo? InferrefInfo, INamedTypeSymbol OriginalTypeSymbol) GetInferredInfo(RoslynTestContext context, CancellationToken cancellation)
 		{
 			var graphOrGraphExtDeclaration = context.Root.DescendantNodes()
