@@ -30,7 +30,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 		if (IsRootFrameworkType(typeSymbol, pxContext))
 		{
 			var rootSymbolInfo = CreateRootSymbolInfo(typeSymbol, pxContext, customDeclarationOrder, cancellation);
-			return new InferredSymbolInfo(rootSymbolInfo, collectedRootTypes: [typeSymbol])
+			return new InferredSymbolInfo(rootSymbolInfo)
 			{
 				FailedToCollectTypeHierarchy = rootSymbolInfo == null
 			};
@@ -40,11 +40,11 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			var extensionTypeHierarchyCollector = GetExtensionTypeHierarchyCollector(pxContext, cancellation);
 			var inferredExtensionInfo = extensionTypeHierarchyCollector.InferExtensionInfo(typeSymbol, customDeclarationOrder);
 
-			return new InferredSymbolInfo(inferredExtensionInfo, extensionTypeHierarchyCollector.CollectedRootTypes)
+			return new InferredSymbolInfo(inferredExtensionInfo)
 			{
 				CircularReferenceExtension	   = extensionTypeHierarchyCollector.CircularReferenceExtension,
 				ExtensionWithBadBaseExtensions = extensionTypeHierarchyCollector.ExtensionWithBadBaseExtensions,
-				FailedToCollectTypeHierarchy   = extensionTypeHierarchyCollector.FailedToCollectTypeHierarchy
+				FailedToCollectTypeHierarchy   = extensionTypeHierarchyCollector.FailedToCollectTypeHierarchy || inferredExtensionInfo == null
 			};
 		}
 		else

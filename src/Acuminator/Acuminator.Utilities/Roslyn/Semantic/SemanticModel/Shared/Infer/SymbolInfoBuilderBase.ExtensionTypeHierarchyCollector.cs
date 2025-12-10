@@ -31,11 +31,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 		private readonly Dictionary<ITypeSymbol, TExtensionInfo?> _visitedExtensionInfos = new(SymbolEqualityComparer.Default);
 		private readonly Stack<ITypeSymbol> _currentPath = new();
 
-		private readonly Dictionary<ITypeSymbol, TRootInfo?> _collectedRootInfos = new(SymbolEqualityComparer.Default);
-
-		public IReadOnlyCollection<ITypeSymbol> CollectedRootTypes => _collectedRootInfos.Keys;
-
-		public IReadOnlyCollection<TRootInfo?> CollectedRootInfos => _collectedRootInfos.Values;
+		private TRootInfo? _rootInfo;
 
 		public ITypeSymbol? CircularReferenceExtension { get; private set; }
 
@@ -55,8 +51,6 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 		{
 			if (CircularReferenceExtension != null)
 				return InferResultKind.CircularReferences;
-			else if (_collectedRootInfos.Count > 1)
-				return InferResultKind.MultipleRootTypes;
 			else if (ExtensionWithBadBaseExtensions != null)
 				return InferResultKind.BadBaseExtensions;
 			else if (FailedToCollectTypeHierarchy)
@@ -71,13 +65,22 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			_cancellation.ThrowIfCancellationRequested();
 
 			ClearState();
-			var extensionInfo = VisitExtensionType(extensionTypeSymbol, isInSource: true, precalcedRootTypeSymbol: null, 
-													customDeclarationOrder);
+
+			// Here we rely on the fact that in Acumatica Framework it is impossible to have multiple root symbols in extension's type hierarchy
+			var rootTypeSymbol = _builder.GetRootTypeFromExtensionType(extensionTypeSymbol, _pxContext);
+
+			if (rootTypeSymbol == null)
+			{
+				FailedToCollectTypeHierarchy = true;
+				return null;
+			}
+
+			_rootInfo = _builder.CreateRootSymbolInfo(rootTypeSymbol, _pxContext, customDeclarationOrder: null, _cancellation);
+			var extensionInfo = VisitExtensionType(extensionTypeSymbol, isInSource: true, customDeclarationOrder);
 			return extensionInfo;
 		}
 
-		private TExtensionInfo? VisitExtensionType(ITypeSymbol extensionTypeSymbol, bool isInSource, 
-												   ITypeSymbol? precalcedRootTypeSymbol, int? extensionDeclarationOrder)
+		private TExtensionInfo? VisitExtensionType(ITypeSymbol extensionTypeSymbol, bool isInSource, int? extensionDeclarationOrder)
 		{
 			// Stop all infer operations early if the type hierarchy is already recognized as inconsistent 
 			if (GetResultKind() != InferResultKind.Success)
@@ -112,12 +115,11 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 				if (_builder.DoesExtensionExtendOnlyRootSymbol(extensionTypeSymbol, _pxContext))
 				{
 					inferredExtensionInfo = InferExtensionExtendingOnlyRootSymbol(extensionTypeSymbol, extensionNode,
-																				  precalcedRootTypeSymbol, declarationOrder);
+																				  declarationOrder);
 				}
 				else
 				{
-					inferredExtensionInfo = InferExtensionRecursively(extensionTypeSymbol, extensionNode, precalcedRootTypeSymbol, 
-																	  declarationOrder);
+					inferredExtensionInfo = InferExtensionRecursively(extensionTypeSymbol, extensionNode, declarationOrder);
 				}
 
 				_visitedExtensionInfos[extensionTypeSymbol] = inferredExtensionInfo;    // Cache infer failures and successes
@@ -130,38 +132,23 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 		}
 
 		private TExtensionInfo? InferExtensionExtendingOnlyRootSymbol(ITypeSymbol extensionTypeSymbol, ClassDeclarationSyntax? extensionNode,
-																	  ITypeSymbol? precalcedRootTypeSymbol, int declarationOrder)
+																	  int declarationOrder)
 		{
 			_cancellation.ThrowIfCancellationRequested();
-			var rootTypeSymbol = precalcedRootTypeSymbol ?? _builder.GetRootTypeFromExtensionType(extensionTypeSymbol, _pxContext);
 
-			if (rootTypeSymbol == null)
+			if (!_builder.CheckBaseExtensionsAreCorrect(Array.Empty<TExtensionInfo>()))
 			{
-				FailedToCollectTypeHierarchy = true;
+				ExtensionWithBadBaseExtensions = extensionTypeSymbol;
 				return null;
 			}
-			else
-			{
-				// Use cache of root symbols infos
-				if (!_collectedRootInfos.TryGetValue(rootTypeSymbol, out var rootInfo))
-				{
-					rootInfo = _builder.CreateRootSymbolInfo(rootTypeSymbol, _pxContext, customDeclarationOrder: null, _cancellation);
-					_collectedRootInfos[rootTypeSymbol] = rootInfo;
-				}
 
-				if (!_builder.CheckBaseExtensionsAreCorrect(Array.Empty<TExtensionInfo>()))
-				{
-					ExtensionWithBadBaseExtensions = extensionTypeSymbol;
-					return null;
-				}
-
-				var extensionInfo = _builder.ExtensionSymbolInfoConstructor(extensionNode, extensionTypeSymbol, rootInfo, declarationOrder);
-				return extensionInfo;
-			}
+			// Use cached root symbol info
+			var extensionInfo = _builder.ExtensionSymbolInfoConstructor(extensionNode, extensionTypeSymbol, _rootInfo, declarationOrder);
+			return extensionInfo;
 		}
 
 		private TExtensionInfo? InferExtensionRecursively(ITypeSymbol extensionTypeSymbol, ClassDeclarationSyntax? extensionNode,
-														  ITypeSymbol? precalcedRootTypeSymbol, int declarationOrder)
+														  int declarationOrder)
 		{
 			_cancellation.ThrowIfCancellationRequested();
 			INamedTypeSymbol? baseGenericExtensionType = _builder.GetBaseGenericExtensionType(extensionTypeSymbol, _pxContext);
@@ -172,32 +159,17 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 				return null;
 			}
 
-			var rootTypeSymbol = precalcedRootTypeSymbol ?? _builder.GetRootTypeFromExtensionType(extensionTypeSymbol, _pxContext);
-
-			if (rootTypeSymbol == null)
-			{
-				FailedToCollectTypeHierarchy = true;
-				return null;
-			}
-
-			// Use cache of root symbols infos
-			if (!_collectedRootInfos.TryGetValue(rootTypeSymbol, out var rootInfo))
-			{
-				rootInfo = _builder.CreateRootSymbolInfo(rootTypeSymbol, _pxContext, customDeclarationOrder: null, _cancellation);
-				_collectedRootInfos[rootTypeSymbol] = rootInfo;
-			}
-
 			_cancellation.ThrowIfCancellationRequested();
 			
 			// Extension base type is the base generic extension type, we need to calculate all chained base extensions
 			if (IsDerivedFromFromBaseGenericExtensionType(extensionTypeSymbol, baseGenericExtensionType))
 			{
 				return InferExtensionDerivedFromBaseGenericExtensionType(extensionTypeSymbol, extensionNode, baseGenericExtensionType,
-																		 rootTypeSymbol, rootInfo, declarationOrder);
+																		 declarationOrder);
 			}
 			else	// Extension is derived from some custom extension, we need to get only one base extension info
 			{
-				return InferExtensionDerivedFromCustomExtension(extensionTypeSymbol, extensionNode, rootTypeSymbol, rootInfo, declarationOrder);
+				return InferExtensionDerivedFromCustomExtension(extensionTypeSymbol, extensionNode, declarationOrder);
 			}
 		}
 
@@ -216,7 +188,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 		}
 
 		private TExtensionInfo? InferExtensionDerivedFromCustomExtension(ITypeSymbol extensionTypeSymbol, ClassDeclarationSyntax? extensionNode,
-																		 ITypeSymbol rootTypeSymbol, TRootInfo? rootInfo, int declarationOrder)
+																		 int declarationOrder)
 		{
 			if (extensionTypeSymbol.BaseType == null)
 			{
@@ -225,10 +197,8 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			}
 
 			bool isInSource = extensionNode != null;
+			var baseExtensionInfo = VisitExtensionType(extensionTypeSymbol.BaseType, isInSource, extensionDeclarationOrder: null);
 
-			// Small optimization - re-use calculation of root type symbol since it is the same for the base extension type
-			var baseExtensionInfo = VisitExtensionType(extensionTypeSymbol.BaseType, isInSource, precalcedRootTypeSymbol: rootTypeSymbol,
-													   extensionDeclarationOrder: null);
 			if (baseExtensionInfo == null)
 				return null;
 
@@ -238,7 +208,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 				return null;
 			}
 
-			var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
+			var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, _rootInfo,
 																					declarationOrder, baseExtensionInfo, 
 																					ExtensionMechanismType.Inheritance);
 			return extensionInfo;
@@ -246,24 +216,22 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 
 		private TExtensionInfo? InferExtensionDerivedFromBaseGenericExtensionType(ITypeSymbol extensionTypeSymbol, 
 																ClassDeclarationSyntax? extensionNode, INamedTypeSymbol baseGenericExtensionType,
-																ITypeSymbol rootTypeSymbol, TRootInfo? rootInfo, int declarationOrder)
+																int declarationOrder)
 		{
 			var baseChainedExtensionTypes = GetBaseChainedExtensionTypes(baseGenericExtensionType);
 
 			switch (baseChainedExtensionTypes?.Count)
 			{
 				case 0:
-					return InferExtensionExtendingOnlyRootSymbol(extensionTypeSymbol, extensionNode, rootTypeSymbol, declarationOrder);
+					return InferExtensionExtendingOnlyRootSymbol(extensionTypeSymbol, extensionNode, declarationOrder);
 
 				// Optimization - simple and popular case with only one base extension. No compaction of base extension is required in this case
 				case 1:
 				{
 					bool isInSource = extensionNode != null;
 					ITypeSymbol baseChainedExtensionType = baseChainedExtensionTypes[0];
+					var chainedExtensionInfo = VisitExtensionType(baseChainedExtensionType, isInSource, extensionDeclarationOrder: null);
 
-					// Deliberately do not use the precalcedRootTypeSymbol here since it can be different for chained extension
-					var chainedExtensionInfo = VisitExtensionType(baseChainedExtensionType, isInSource, precalcedRootTypeSymbol: null,
-																  extensionDeclarationOrder: null);
 					if (chainedExtensionInfo == null)
 						return null;
 
@@ -273,7 +241,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 						return null;
 					}
 
-					var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
+					var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, _rootInfo,
 																							declarationOrder, chainedExtensionInfo,
 																							ExtensionMechanismType.Chaining);
 					return extensionInfo;
@@ -282,7 +250,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 					FailedToCollectTypeHierarchy = true;
 					return null;
 				default:
-					return InferExtensionDerivedFromBaseGenericExtensionTypeWithMultipleChainedExtensions(extensionTypeSymbol, extensionNode, rootInfo,
+					return InferExtensionDerivedFromBaseGenericExtensionTypeWithMultipleChainedExtensions(extensionTypeSymbol, extensionNode,
 																										  declarationOrder, baseChainedExtensionTypes);
 			}
 		}
@@ -302,17 +270,16 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 		}
 
 		private TExtensionInfo? InferExtensionDerivedFromBaseGenericExtensionTypeWithMultipleChainedExtensions(ITypeSymbol extensionTypeSymbol,
-																					ClassDeclarationSyntax? extensionNode, TRootInfo? rootInfo, 
-																					int declarationOrder, IReadOnlyList<ITypeSymbol> baseChainedExtensionTypes)
+																					ClassDeclarationSyntax? extensionNode, int declarationOrder,
+																					IReadOnlyList<ITypeSymbol> baseChainedExtensionTypes)
 		{
 			bool isInSource = extensionNode != null;
 			var baseChainedExtensionInfos = new List<TExtensionInfo>(baseChainedExtensionTypes.Count);
 
 			foreach (ITypeSymbol chainedExtensionType in baseChainedExtensionTypes)
 			{
-				// Deliberately do not use the precalcedRootTypeSymbol here since it can be different for chained extensions
-				var chainedExtensionInfo = VisitExtensionType(chainedExtensionType, isInSource, precalcedRootTypeSymbol: null,
-															  extensionDeclarationOrder: null);
+				var chainedExtensionInfo = VisitExtensionType(chainedExtensionType, isInSource, extensionDeclarationOrder: null);
+
 				if (chainedExtensionInfo == null)
 					return null;
 
@@ -328,7 +295,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 				return null;
 			}
 
-			var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, rootInfo,
+			var extensionInfo = _builder.ExtensionSymbolInfoConstructorWithBaseInfo(extensionNode, extensionTypeSymbol, _rootInfo,
 																					declarationOrder, compactedBaseChainedExtensionInfos,
 																					ExtensionMechanismType.Chaining);
 			return extensionInfo;
@@ -401,9 +368,7 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 			if (_currentPath.Count > 0)
 				_currentPath.Clear();
 
-			if (_collectedRootInfos.Count > 0)
-				_collectedRootInfos.Clear();
-
+			_rootInfo = null;
 			FailedToCollectTypeHierarchy = false;
 			CircularReferenceExtension = null;
 			ExtensionWithBadBaseExtensions = null;
