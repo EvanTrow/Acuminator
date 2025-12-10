@@ -26,18 +26,6 @@ public enum InferResultKind : byte
 	UnrecognizedError,
 
 	/// <summary>
-	/// The type used to infer information has multiple root Acumatica Framework types in its type hierarchy.
-	/// </summary>
-	/// <remarks>
-	/// By <b>"root"</b> Acumatica Framework type we understand the most basic non-trivial type in the type hierarchy that is still an Acumatica Framework type.<br/>
-	/// <br/>
-	/// For example, for graphs and graph extensions the trivial symbols are <c>PXGraph</c> and <c>PXGraph&lt;TGraph&gt;</c> because every graph is derived from them.<br/>
-	/// The first graph in the type hierarchy that is not derived from these trivial symbols is considered a root graph type.<br/>
-	/// There is no other type in the type hierarchy it derives from ot customizes.
-	/// </remarks>
-	MultipleRootTypes,
-
-	/// <summary>
 	/// The type used to infer information has circular references in the type hierarchy.
 	/// </summary>
 	CircularReferences,
