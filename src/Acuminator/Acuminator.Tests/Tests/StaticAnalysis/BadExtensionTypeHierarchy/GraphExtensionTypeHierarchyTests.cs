@@ -41,6 +41,4 @@ public class GraphExtensionTypeHierarchyTests : DiagnosticVerifier
 											["ExtensionB", "Acuminator.Tests.Tests.StaticAnalysis.BadExtensionTypeHierarchy.Graph.Sources.ExtensionB"]),
 			Descriptors.PX1116_CircularReferenceInTypeHierarchy_GraphExtension.CreateFor(16, 15,
 											["ExtensionC", "Acuminator.Tests.Tests.StaticAnalysis.BadExtensionTypeHierarchy.Graph.Sources.ExtensionC"]));
-
-
 }

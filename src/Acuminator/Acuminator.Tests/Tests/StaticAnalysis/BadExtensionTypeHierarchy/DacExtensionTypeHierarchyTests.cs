@@ -37,5 +37,10 @@ public class DacExtensionTypeHierarchyTests : DiagnosticVerifier
 			Descriptors.PX1116_CircularReferenceInTypeHierarchy_DacExtension.CreateFor(19, 22,
 											["ExtensionC", "Acuminator.Tests.Tests.StaticAnalysis.BadExtensionTypeHierarchy.Dac.Sources.ExtensionC"]));
 
-
+	[Theory]
+	[EmbeddedFileData(@"Dac\DacExtensionWithForbiddenHierarchy.cs")]
+	public Task DacExtension_WithMultiple_Independent_BaseDacExtensions_InTypeHierarchy(string actual) =>
+		VerifyCSharpDiagnosticAsync(actual,
+			Descriptors.PX1117_DacExtensionWithComplexTypeHierarchy.CreateFor(11, 22,
+							["SecondLevelDacExtension", "Acuminator.Tests.Tests.StaticAnalysis.BadExtensionTypeHierarchy.Dac.Sources.SecondLevelDacExtension"]));
 }
