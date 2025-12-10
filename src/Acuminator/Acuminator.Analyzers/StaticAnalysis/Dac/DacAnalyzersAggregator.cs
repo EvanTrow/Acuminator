@@ -170,7 +170,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 
 			var location = type.Locations.FirstOrDefault();
 			var diagnostic = Diagnostic.Create(Descriptors.PX1116_CircularReferenceInTypeHierarchy_DacExtension, location,
-											   [type.ToString(), circularExtension.ToString()]);
+											   [type.Name, circularExtension.ToString()]);
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 
@@ -182,7 +182,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 
 			var location = type.Locations.FirstOrDefault();
 			var diagnostic = Diagnostic.Create(Descriptors.PX1118_DacExtensionWithComplexTypeHierarchy, location,
-											   [type.ToString(), extensionWithBadBaseExtensions.ToString()]);
+											   [type.Name, extensionWithBadBaseExtensions.ToString()]);
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 	}

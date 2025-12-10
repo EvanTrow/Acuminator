@@ -34,7 +34,7 @@ internal abstract class MultipleRootSymbolsDiagnosticFactoryBase
 			case 2:
 				string[] formatArg_2Roots =
 				[
-					extensionType.ToString(),
+					extensionType.Name,
 						multipleRootsList[0].ToString().SurroundWithQuotes(),
 						multipleRootsList[1].ToString().SurroundWithQuotes()
 				];
@@ -47,7 +47,7 @@ internal abstract class MultipleRootSymbolsDiagnosticFactoryBase
 															  .Join("," + Environment.NewLine);
 				string[] formatArg_From_3_To_5_Roots =
 				[
-					extensionType.ToString(),
+					extensionType.Name,
 						rootsExceptLastRoot,
 						multipleRootsList[^1].ToString().SurroundWithQuotes()
 				];
@@ -62,7 +62,7 @@ internal abstract class MultipleRootSymbolsDiagnosticFactoryBase
 				int numberOfRemainingRoots = multipleRootsList.Count - MaxDisplayedRootsCount;
 				string[] formatArg_MoreThan_5_Roots =
 				[
-					extensionType.ToString(),
+					extensionType.Name,
 					firstFiveRoots,
 					numberOfRemainingRoots.ToString()
 				];

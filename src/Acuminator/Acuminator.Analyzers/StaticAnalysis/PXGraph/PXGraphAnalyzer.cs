@@ -174,7 +174,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 
 			var location = type.Locations.FirstOrDefault();
 			var diagnostic = Diagnostic.Create(Descriptors.PX1116_CircularReferenceInTypeHierarchy_GraphExtension, location,
-											   [type.ToString(), circularExtension.ToString()]);
+											   [type.Name, circularExtension.ToString()]);
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 	}
