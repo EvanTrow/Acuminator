@@ -86,15 +86,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 		}
 
 		protected override IReadOnlyCollection<DiagnosticDescriptor> GetAggregatorOwnDiagnostics(CodeAnalysisSettings? settings) =>
-			new[]
-			{
-				Descriptors.PX1116_CircularReferenceInTypeHierarchy_GraphExtension,
-				Descriptors.PX1117_GraphExtensionExtendsTwoGraphs,
-				Descriptors.PX1117_GraphExtensionExtends_3_To_5_Graphs,
-				Descriptors.PX1117_GraphExtensionExtendsMoreThanFiveGraphs,
-			}
-			.Distinct()
-			.ToList(capacity: 4);
+			[
+				Descriptors.PX1116_CircularReferenceInTypeHierarchy_GraphExtension
+			];
 
 		protected override void AnalyzeSymbol(SymbolAnalysisContext context, PXContext pxContext)
 		{
@@ -138,9 +132,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 
 			switch (resultKind)
 			{
-				case InferResultKind.MultipleRootTypes:
-					ReportMultipleRoots(context, pxContext, type, inferredInfo.CollectedRootTypes);
-					return null;
 				case InferResultKind.CircularReferences:
 					ReportCircularExtensions(context, pxContext, type, inferredInfo.CircularReferenceExtension!);
 					return null;
@@ -153,17 +144,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraph
 				case InferResultKind.UnrecognizedError:
 				default:
 					return null;
-			}
-		}
-
-		private void ReportMultipleRoots(SymbolAnalysisContext context, PXContext pxContext, INamedTypeSymbol type, 
-										 IReadOnlyCollection<ITypeSymbol> multipleRootTypes)
-		{
-			var diagnostic = MultipleGraphsDiagnosticFactory.Instance.CreateDiagnosticForMultipleRootSymbols(type,
-																			multipleRootTypes.ToList(capacity: multipleRootTypes.Count));
-			if (diagnostic != null)
-			{
-				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 			}
 		}
 

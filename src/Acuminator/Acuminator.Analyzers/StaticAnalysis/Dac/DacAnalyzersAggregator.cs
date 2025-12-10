@@ -79,16 +79,10 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 		}
 
 		protected override IReadOnlyCollection<DiagnosticDescriptor> GetAggregatorOwnDiagnostics(CodeAnalysisSettings? settings) =>
-			new[]
-			{
+			[
 				Descriptors.PX1116_CircularReferenceInTypeHierarchy_DacExtension,
-				Descriptors.PX1117_DacExtensionExtendsTwoDacs,
-				Descriptors.PX1117_DacExtensionExtends_3_To_5_Dacs,
-				Descriptors.PX1117_DacExtensionExtendsMoreThanFiveDacs,
-				Descriptors.PX1118_DacExtensionWithComplexTypeHierarchy
-			}
-			.Distinct()
-			.ToList(capacity: 5);
+				Descriptors.PX1117_DacExtensionWithComplexTypeHierarchy
+			];
 
 		protected override void AnalyzeSymbol(SymbolAnalysisContext context, PXContext pxContext)
 		{
@@ -131,9 +125,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 
 			switch (resultKind)
 			{
-				case InferResultKind.MultipleRootTypes:
-					ReportMultipleRoots(context, pxContext, type, inferredInfo.CollectedRootTypes);
-					return null;
 				case InferResultKind.CircularReferences:
 					ReportCircularExtensions(context, pxContext, type, inferredInfo.CircularReferenceExtension!);
 					return null;
@@ -149,17 +140,6 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 				case InferResultKind.UnrecognizedError:
 				default:
 					return null;
-			}
-		}
-
-		private void ReportMultipleRoots(SymbolAnalysisContext context, PXContext pxContext, INamedTypeSymbol type,
-										 IReadOnlyCollection<ITypeSymbol> multipleRootTypes)
-		{
-			var diagnostic = MultipleDacsDiagnosticFactory.Instance.CreateDiagnosticForMultipleRootSymbols(type,
-																			multipleRootTypes.ToList(capacity: multipleRootTypes.Count));
-			if (diagnostic != null)
-			{
-				context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 			}
 		}
 
@@ -181,7 +161,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.Dac
 				return;
 
 			var location = type.Locations.FirstOrDefault();
-			var diagnostic = Diagnostic.Create(Descriptors.PX1118_DacExtensionWithComplexTypeHierarchy, location,
+			var diagnostic = Diagnostic.Create(Descriptors.PX1117_DacExtensionWithComplexTypeHierarchy, location,
 											   [type.Name, extensionWithBadBaseExtensions.ToString()]);
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
