@@ -12,7 +12,7 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | Code   | Short Description                                                                         | Type  | Code Fix  |
 | ------ | ----------------------------------------------------------------------------------------- | ----- | --------- |
 | [PX1000](diagnostics/PX1000.md) | The action delegate has incompatible return type and parameters. | Error | Available |
-| [PX1001](diagnostics/PX1001.md) | A `PXGraph` instance must be created with the `PXGraph.CreateInstance()` factory method. | Error | Available |
+| [PX1001](diagnostics/PX1001.md) | A `PXGraph` instance must be created with the `PXGraph.CreateInstance()` factory method. | Error/Warning | Available |
 | [PX1002](diagnostics/PX1002.md) | The field must have a type attribute that corresponds to the list attribute. | Error | Available |
 | [PX1003](diagnostics/PX1003.md) | Consider using a specific implementation of `PXGraph`. | Warning (ISV Level 2: Production Quality) | Unavailable |
 | [PX1004](diagnostics/PX1004.md) | The order of view declarations will cause the creation of two cache instances. | Message | Unavailable |
