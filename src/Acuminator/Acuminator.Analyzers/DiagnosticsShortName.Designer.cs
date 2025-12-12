@@ -1141,6 +1141,24 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CircularReferenceInTypeHierarchy.
+        /// </summary>
+        public static string PX1116 {
+            get {
+                return ResourceManager.GetString("PX1116", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DacExtensionWithComplexTypeHierarchy.
+        /// </summary>
+        public static string PX1117 {
+            get {
+                return ResourceManager.GetString("PX1117", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MethodReturnTypeIsNotTask.
         /// </summary>
         public static string PX1120_MethodReturnTypeIsNotTask {

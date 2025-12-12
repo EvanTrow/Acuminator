@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 using Acuminator.Tests.Helpers;
 using Acuminator.Tests.Verification;
 using Acuminator.Utilities.Common;
-using Acuminator.Utilities.Roslyn.Semantic.PXGraph;
+using Acuminator.Utilities.Roslyn.Semantic.Dac;
 using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer;
-using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Graph;
+using Acuminator.Utilities.Roslyn.Semantic.Shared.Infer.Dac;
 
 using FluentAssertions;
 
@@ -21,13 +21,13 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Xunit;
 
-namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
+namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Dac
 {
-	public class CircularGraphExtensionReferencesTests : SemanticModelTestsBase<PXGraphSemanticModel>
+	public class CircularDacExtensionReferencesTests : SemanticModelTestsBase<DacSemanticModel>
 	{
 		[Theory]
-		[EmbeddedFileData("GraphExtensionWithTrivialCircularReference.cs")]
-		public async Task GraphExtension_WithCircularReference_Trivial(string text)
+		[EmbeddedFileData("DacExtensionWithTrivialCircularReference.cs")]
+		public async Task DacExtension_WithCircularReference_Trivial(string text)
 		{
 			var testContext = await PrepareTestContextForCodeAsync(text).ConfigureAwait(false);
 
@@ -39,8 +39,8 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 		}
 
 		[Theory]
-		[EmbeddedFileData("GraphExtensionWithComplexCircularReference.cs")]
-		public async Task GraphExtension_WithCircularReference_Complex(string text)
+		[EmbeddedFileData("DacExtensionWithComplexCircularReference.cs")]
+		public async Task DacExtension_WithCircularReference_Complex(string text)
 		{
 			var testContext = await PrepareTestContextForCodeAsync(text).ConfigureAwait(false);
 
@@ -61,7 +61,7 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			INamedTypeSymbol? graphOrGraphExtSymbol = context.SemanticModel.GetDeclaredSymbol(graphOrGraphExtDeclaration, cancellation);
 			graphOrGraphExtDeclaration.Should().NotBeNull();
 
-			var inferredInfo = GraphAndGraphExtInfoBuilder.Instance.InferTypeInfo(graphOrGraphExtSymbol!, context.PXContext, customDeclarationOrder: null,
+			var inferredInfo = DacAndDacExtInfoBuilder.Instance.InferTypeInfo(graphOrGraphExtSymbol!, context.PXContext, customDeclarationOrder: null,
 																				  cancellation);
 			return (inferredInfo, graphOrGraphExtSymbol!);
 		}
@@ -75,8 +75,8 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 		}
 
 #pragma warning disable CS8609 // Nullability of reference types in return type doesn't match overridden member.
-		protected override Task<PXGraphSemanticModel?> PrepareSemanticModelAsync(RoslynTestContext context, CancellationToken cancellation) =>
-			Task.FromResult<PXGraphSemanticModel?>(null);
-#pragma warning restore CS8609 // Nullability of reference types in return type doesn't match overridden member.
+		protected override Task<DacSemanticModel?> PrepareSemanticModelAsync(RoslynTestContext context, CancellationToken cancellation) =>
+			Task.FromResult<DacSemanticModel?>(null);
+#pragma warning restore CS8609
 	}
 }

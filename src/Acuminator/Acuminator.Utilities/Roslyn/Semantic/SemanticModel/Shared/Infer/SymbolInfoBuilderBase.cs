@@ -30,23 +30,21 @@ where TExtensionInfo : NodeSymbolItem<ClassDeclarationSyntax, ITypeSymbol>, IExt
 		if (IsRootFrameworkType(typeSymbol, pxContext))
 		{
 			var rootSymbolInfo = CreateRootSymbolInfo(typeSymbol, pxContext, customDeclarationOrder, cancellation);
-			return rootSymbolInfo != null
-				? new InferredSymbolInfo(rootSymbolInfo, collectedRootTypes: [typeSymbol])
-				: null;
+			return new InferredSymbolInfo(rootSymbolInfo)
+			{
+				FailedToCollectTypeHierarchy = rootSymbolInfo == null
+			};
 		}
 		else if (IsExtensionType(typeSymbol, pxContext))
 		{
 			var extensionTypeHierarchyCollector = GetExtensionTypeHierarchyCollector(pxContext, cancellation);
 			var inferredExtensionInfo = extensionTypeHierarchyCollector.InferExtensionInfo(typeSymbol, customDeclarationOrder);
 
-			if (inferredExtensionInfo == null)
-				return null;
-
-			return new InferredSymbolInfo(inferredExtensionInfo, extensionTypeHierarchyCollector.CollectedRootTypes)
+			return new InferredSymbolInfo(inferredExtensionInfo)
 			{
 				CircularReferenceExtension	   = extensionTypeHierarchyCollector.CircularReferenceExtension,
 				ExtensionWithBadBaseExtensions = extensionTypeHierarchyCollector.ExtensionWithBadBaseExtensions,
-				FailedToCollectTypeHierarchy   = extensionTypeHierarchyCollector.FailedToCollectTypeHierarchy
+				FailedToCollectTypeHierarchy   = extensionTypeHierarchyCollector.FailedToCollectTypeHierarchy || inferredExtensionInfo == null
 			};
 		}
 		else

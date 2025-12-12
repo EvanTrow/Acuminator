@@ -2358,6 +2358,60 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The DAC extension has a circular reference in its type hierarchy.
+        /// </summary>
+        public static string PX1116TitleDAC {
+            get {
+                return ResourceManager.GetString("PX1116TitleDAC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The DAC extension &quot;{0}&quot; has a circular reference to the DAC extension &quot;{1}&quot; in its type hierarchy.
+        /// </summary>
+        public static string PX1116TitleDAC_Format {
+            get {
+                return ResourceManager.GetString("PX1116TitleDAC_Format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The graph extension has a circular reference in its type hierarchy.
+        /// </summary>
+        public static string PX1116TitleGraph {
+            get {
+                return ResourceManager.GetString("PX1116TitleGraph", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The graph extension &quot;{0}&quot; has a circular reference to the graph extension &quot;{1}&quot; in its type hierarchy.
+        /// </summary>
+        public static string PX1116TitleGraph_Format {
+            get {
+                return ResourceManager.GetString("PX1116TitleGraph_Format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type hierarchy contains DAC extension that extends multiple independent DAC extensions. Extending multiple independent extensions is forbidden for DAC extensions..
+        /// </summary>
+        public static string PX1117Title {
+            get {
+                return ResourceManager.GetString("PX1117Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type hierarchy of the DAC extension &quot;{0}&quot; contains DAC extension &quot;{1}&quot; that extends multiple independent DAC extensions. Extending multiple independent extensions is forbidden for DAC extensions..
+        /// </summary>
+        public static string PX1117Title_Format {
+            get {
+                return ResourceManager.GetString("PX1117Title_Format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Incorrect work with the Task types in the Acumatica asynchronous code. Method returning a Task-typed expression should have the Task type as its return type..
         /// </summary>
         public static string PX1120Title_MethodReturnTypeIsNotTask {

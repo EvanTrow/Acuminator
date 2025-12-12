@@ -96,6 +96,27 @@ namespace Acuminator.Utilities.Common
 				  .IndexOf(stringToSearch, stringComparison) >= 0;
 
 		/// <summary>
+		/// Surrounds the given string <paramref name="source"/> with quotes.
+		/// </summary>
+		/// <param name="source">The string to act on.</param>
+		/// <param name="surroundEmptyString">(Optional) True to surround empty strings with quotes.</param>
+		/// <returns>
+		/// The <paramref name="source"/> string surrounded with quotes.
+		/// </returns>
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[return: NotNullIfNotNull(nameof(source))]
+		public static string? SurroundWithQuotes(this string? source, bool surroundEmptyString = true)
+		{
+			if (source == null)
+				return null;
+			else if (source.IsEmpty() && !surroundEmptyString)
+				return source;
+			else
+				return $"\"{source}\"";
+		}
+
+		/// <summary>
 		/// Compute the distance between two strings.
 		/// </summary>
 		public static int LevenshteinDistance(string s, string t)

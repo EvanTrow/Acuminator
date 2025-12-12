@@ -65,6 +65,31 @@ namespace Acuminator.Tests.Tests.Utilities.SemanticModels.Graph
 			}
 		}
 
+		[Theory]
+		[EmbeddedFileData("GraphExtensionWithComplexHierarchy.cs")]
+		public async Task SecondLevel_GraphExtension_WithMultipleIndependentBaseExtensions(string text)
+		{
+			var graphSemanticModel = await PrepareSemanticModelAsync(text).ConfigureAwait(false);
+			var graphExtensionInfo = graphSemanticModel.GraphOrGraphExtInfo as GraphExtensionInfo;
+
+			graphExtensionInfo.Should().NotBeNull();
+			graphExtensionInfo!.BaseGraph.Should().NotBeNull();
+			graphExtensionInfo.BaseGraph!.Name.Should().Be("MyGraph");
+			graphExtensionInfo.BaseGraphExtensions.Should().HaveCount(2);
+
+			var baseExtension1 = graphExtensionInfo.BaseGraphExtensions[0];
+			baseExtension1.Name.Should().Be("SecondIndependentGraphExtension");
+			baseExtension1.BaseGraph.Should().NotBeNull();
+			baseExtension1.BaseGraph.Should().Be(graphExtensionInfo.BaseGraph);
+			baseExtension1.BaseGraphExtensions.Should().BeEmpty();
+
+			var baseExtension2 = graphExtensionInfo.BaseGraphExtensions[1];
+			baseExtension2.Name.Should().Be("FirstIndependentGraphExtension");
+			baseExtension2.BaseGraph.Should().NotBeNull();
+			baseExtension2.BaseGraph.Should().Be(graphExtensionInfo.BaseGraph);
+			baseExtension2.BaseGraphExtensions.Should().BeEmpty();
+		}
+
 		#region Initialize Method Tests
 		[Theory]
 		[EmbeddedFileData(@"InitializeMethod\GraphWithExplicitInitializeMethod.cs")]

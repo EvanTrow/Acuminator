@@ -703,7 +703,7 @@ public virtual int? SomeDacField{ get; set; }</value>
     <value>Event handlers should be protected and virtual</value>
   </data>
   <data name="PX1077TitleFormatWithReason" xml:space="preserve">
-	<value>Event handlers should be {0}</value>
+    <value>Event handlers should be {0}</value>
   </data>
   <data name="PX1077Title_EventHandlersShouldNotBePrivate" xml:space="preserve">
     <value>Event handlers should not be private</value>
@@ -889,6 +889,24 @@ Reason: {2}</value>
   </data>
   <data name="PX1115TitleGraphExtension" xml:space="preserve">
     <value>Only terminal graph extensions can be used as base graph extensions</value>
+  </data>
+  <data name="PX1116TitleDAC" xml:space="preserve">
+    <value>The DAC extension has a circular reference in its type hierarchy</value>
+  </data>
+  <data name="PX1116TitleDAC_Format" xml:space="preserve">
+    <value>The DAC extension "{0}" has a circular reference to the DAC extension "{1}" in its type hierarchy</value>
+  </data>
+  <data name="PX1116TitleGraph" xml:space="preserve">
+    <value>The graph extension has a circular reference in its type hierarchy</value>
+  </data>
+  <data name="PX1116TitleGraph_Format" xml:space="preserve">
+    <value>The graph extension "{0}" has a circular reference to the graph extension "{1}" in its type hierarchy</value>
+  </data>
+  <data name="PX1117Title" xml:space="preserve">
+    <value>The type hierarchy contains DAC extension that extends multiple independent DAC extensions. Extending multiple independent extensions is forbidden for DAC extensions.</value>
+  </data>
+  <data name="PX1117Title_Format" xml:space="preserve">
+    <value>The type hierarchy of the DAC extension "{0}" contains DAC extension "{1}" that extends multiple independent DAC extensions. Extending multiple independent extensions is forbidden for DAC extensions.</value>
   </data>
   <data name="PX1120Title_MethodReturnTypeIsNotTask" xml:space="preserve">
     <value>Incorrect work with the Task types in the Acumatica asynchronous code. Method returning a Task-typed expression should have the Task type as its return type.</value>

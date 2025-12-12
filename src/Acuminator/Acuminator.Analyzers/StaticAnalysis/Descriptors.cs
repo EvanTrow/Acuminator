@@ -15,7 +15,7 @@ namespace Acuminator.Analyzers.StaticAnalysis
 	public static class Descriptors
 	{
 		private const string DocumentationLinkPrefix = @"https://github.com/Acumatica/Acuminator/blob/master/docs/diagnostics";
-		private const string DocumentatonFileExtension = "md";
+		private const string DocumentationFileExtension = "md";
 
 		private static readonly ConcurrentDictionary<Category, string> _categoryMapping = new ConcurrentDictionary<Category, string>();
 
@@ -25,7 +25,7 @@ namespace Acuminator.Analyzers.StaticAnalysis
 		{
 			bool isEnabledByDefault = true;
 			messageFormat = messageFormat ?? title;
-			string diagnosticLink = $"{DocumentationLinkPrefix}/{id}.{DocumentatonFileExtension}";
+			string diagnosticLink = $"{DocumentationLinkPrefix}/{id}.{DocumentationFileExtension}";
 			string[] customTags = diagnosticDefaultJustification.IsNullOrWhiteSpace()
 				? [diagnosticShortName]
 				: [diagnosticShortName, diagnosticDefaultJustification];
@@ -198,11 +198,11 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			Rule("PX1029", nameof(Resources.PX1029Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error,
 				DiagnosticsShortName.PX1029);
 
-		public static DiagnosticDescriptor PX1030_DefaultAttibuteToExistingRecordsError { get; } =
+		public static DiagnosticDescriptor PX1030_DefaultAttributeToExistingRecordsError { get; } =
 			Rule("PX1030", nameof(Resources.PX1030TitleDefaultAttributeOnDacExtension).GetLocalized(), Category.Acuminator,
 				DiagnosticSeverity.Error, DiagnosticsShortName.PX1030);
 
-		public static DiagnosticDescriptor PX1030_DefaultAttibuteToExistingRecordsWarning { get; } =
+		public static DiagnosticDescriptor PX1030_DefaultAttributeToExistingRecordsWarning { get; } =
 			Rule("PX1030", nameof(Resources.PX1030TitleDefaultAttributeOnDacExtension).GetLocalized(), Category.Acuminator,
 				DiagnosticSeverity.Warning, DiagnosticsShortName.PX1030);
 
@@ -274,7 +274,7 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			Rule("PX1043", nameof(Resources.PX1043Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error,
 				DiagnosticsShortName.PX1043);
 
-		public static DiagnosticDescriptor PX1043_SavingChangesInRowPerstisting { get; } =
+		public static DiagnosticDescriptor PX1043_SavingChangesInRowPersisting { get; } =
 			Rule("PX1043", nameof(Resources.PX1043TitleRowPersisting).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1043);
 
 		public static DiagnosticDescriptor PX1043_SavingChangesInRowPerstistedNonISV { get; } =
@@ -555,6 +555,18 @@ namespace Acuminator.Analyzers.StaticAnalysis
 		public static DiagnosticDescriptor PX1115_NonTerminalBaseDacExtension { get; } =
 			Rule("PX1115", nameof(Resources.PX1115TitleDacExtension).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, 
 				DiagnosticsShortName.PX1115DacExtension);
+
+		public static DiagnosticDescriptor PX1116_CircularReferenceInTypeHierarchy_GraphExtension { get; } =
+			Rule("PX1116", nameof(Resources.PX1116TitleGraph).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1116,
+				 messageFormat: nameof(Resources.PX1116TitleGraph_Format).GetLocalized());
+
+		public static DiagnosticDescriptor PX1116_CircularReferenceInTypeHierarchy_DacExtension { get; } =
+			Rule("PX1116", nameof(Resources.PX1116TitleDAC).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1116,
+				 messageFormat: nameof(Resources.PX1116TitleDAC_Format).GetLocalized());
+
+		public static DiagnosticDescriptor PX1117_DacExtensionWithComplexTypeHierarchy { get; } =
+			Rule("PX1117", nameof(Resources.PX1117Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1117,
+				 messageFormat: nameof(Resources.PX1117Title_Format).GetLocalized());
 
 		public static DiagnosticDescriptor PX1120_IncorrectTaskUsageInAsyncCode_StoreTaskInVariable { get; } =
 			Rule("PX1120", nameof(Resources.PX1120Title_StoreTaskInVariable).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, 

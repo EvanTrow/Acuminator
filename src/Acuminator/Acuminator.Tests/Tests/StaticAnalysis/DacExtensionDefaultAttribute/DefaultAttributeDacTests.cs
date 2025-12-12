@@ -35,37 +35,37 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacExtensionDefaultAttribute
         [EmbeddedFileData("DacExtensionWithoutPersistingCheckNothingInvalid.cs")]
         public async Task InvalidDacExtensionWithoutPersistingcheckNothing(string source) =>
             await VerifyCSharpDiagnosticAsync(source,
-                Descriptors.PX1030_DefaultAttibuteToExistingRecordsWarning.CreateFor(8, 10));
+                Descriptors.PX1030_DefaultAttributeToExistingRecordsWarning.CreateFor(8, 10));
 
         [Theory]
 		[EmbeddedFileData("DacExtensionWithBoundFields.cs")]
 		public virtual Task DacExtensionWithBoundAttribute(string source) =>
 			VerifyCSharpDiagnosticAsync(new[] { source },
-				Descriptors.PX1030_DefaultAttibuteToExistingRecordsWarning.CreateFor(line: 23, column: 4),
-				Descriptors.PX1030_DefaultAttibuteToExistingRecordsWarning.CreateFor(line: 30, column: 4),
-				Descriptors.PX1030_DefaultAttibuteToExistingRecordsWarning.CreateFor(line: 44, column: 4),
-				Descriptors.PX1030_DefaultAttibuteToExistingRecordsWarning.CreateFor(line: 50, column: 13),
-				Descriptors.PX1030_DefaultAttibuteToExistingRecordsWarning.CreateFor(line: 56, column: 13),
-				Descriptors.PX1030_DefaultAttibuteToExistingRecordsWarning.CreateFor(line: 62, column: 4));
+				Descriptors.PX1030_DefaultAttributeToExistingRecordsWarning.CreateFor(line: 23, column: 4),
+				Descriptors.PX1030_DefaultAttributeToExistingRecordsWarning.CreateFor(line: 30, column: 4),
+				Descriptors.PX1030_DefaultAttributeToExistingRecordsWarning.CreateFor(line: 44, column: 4),
+				Descriptors.PX1030_DefaultAttributeToExistingRecordsWarning.CreateFor(line: 50, column: 13),
+				Descriptors.PX1030_DefaultAttributeToExistingRecordsWarning.CreateFor(line: 56, column: 13),
+				Descriptors.PX1030_DefaultAttributeToExistingRecordsWarning.CreateFor(line: 62, column: 4));
 
 		[Theory]
 		[EmbeddedFileData("DacExtensionWithUnboundFields.cs")]
 		public virtual Task DacExtensionWithUnboundFields(string source) =>
 			VerifyCSharpDiagnosticAsync(new[] { source },
-				Descriptors.PX1030_DefaultAttibuteToExistingRecordsError.CreateFor(line: 35, column: 4));
+				Descriptors.PX1030_DefaultAttributeToExistingRecordsError.CreateFor(line: 35, column: 4));
 
 		[Theory]
 		[EmbeddedFileData("DacExtensionWithBoundAndUnboundFields.cs", "SOOrder.cs")]
 		public virtual Task DacExtensionWithBoundAndUnboundAttribute(string source, string additionalSource) =>
 			VerifyCSharpDiagnosticAsync(new[] { source, additionalSource },
-				Descriptors.PX1030_DefaultAttibuteToExistingRecordsError.CreateFor(line: 16, column: 4),
-				Descriptors.PX1030_DefaultAttibuteToExistingRecordsWarning.CreateFor(line: 35, column: 4));
+				Descriptors.PX1030_DefaultAttributeToExistingRecordsError.CreateFor(line: 16, column: 4),
+				Descriptors.PX1030_DefaultAttributeToExistingRecordsWarning.CreateFor(line: 35, column: 4));
 
 		[Theory]
 		[EmbeddedFileData("DacExtensionWithAggregateAttributesOnFields.cs", "SOOrder.cs")]
 		public virtual Task DacExtensionWithAggregateAttributeFields(string source, string additionalSource) =>
 			VerifyCSharpDiagnosticAsync(new[] { source, additionalSource },
-				Descriptors.PX1030_DefaultAttibuteToExistingRecordsError.CreateFor(line: 36, column: 4));
+				Descriptors.PX1030_DefaultAttributeToExistingRecordsError.CreateFor(line: 36, column: 4));
 
 		[Theory]
 		[EmbeddedFileData("DacExtensionWithAggregateAttributesOnFields.cs",
