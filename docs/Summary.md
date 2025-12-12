@@ -116,6 +116,6 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | [PX1113](diagnostics/PX1113.md) | Graphs and graph extensions should not be `sealed` types. | Warning | Available |
 | [PX1114](diagnostics/PX1114.md) | A graph extension should not inherit from a terminal graph extension. | Warning | Unavailable |
 | [PX1115](diagnostics/PX1115.md) | Only a terminal graph extension and a non-abstract DAC extension can be used as a base extension. | Error | Unavailable |
-| [PX1116](diagnostics/PX1116.md) | The graph or DAC extension has a circular reference in its type hierarchy. | Error | Unavailable |
+| [PX1116](diagnostics/PX1116.md) | The graph or the DAC extension has a circular reference in its type hierarchy. | Error | Unavailable |
 | [PX1117](diagnostics/PX1117.md) | The type hierarchy of the DAC extension contains an extension that extends multiple independent DAC extensions. Extending multiple independent DAC extensions is forbidden for DAC extensions. | Error | Unavailable |
 | [PX1120](diagnostics/PX1120.md) | Incorrect work with the `Task` types in the Acumatica asynchronous code. You should not store the `Task` instance in a local variable or parameter. The `Task`-typed expressions should be awaited, and a method returning a `Task`-typed expression should have the `Task` type as its return type. | Warning | Unavailable |
