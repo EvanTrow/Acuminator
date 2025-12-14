@@ -43,7 +43,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreateInstance
 		[Theory]
 		[EmbeddedFileData("MethodWithNonSpecificPXGraph.cs")]
 		public Task CallTo_NonSpecificPXGraph_Constructor_In_Method(string actual) => 
-			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1003_NonSpecificPXGraphCreateInstance.CreateFor(14, 16));
+			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1003_BasePXGraphCreateInstance.CreateFor(14, 16));
 
 		[Theory]
 		[EmbeddedFileData("Method.cs", "Method_Expected.cs")]

@@ -46,7 +46,7 @@ namespace Acuminator.Analyzers.StaticAnalysis
 			Rule("PX1002", nameof(Resources.PX1002Title).GetLocalized(), Category.Acuminator,
 				DiagnosticSeverity.Error, DiagnosticsShortName.PX1002);
 
-		public static DiagnosticDescriptor PX1003_NonSpecificPXGraphCreateInstance { get; } =
+		public static DiagnosticDescriptor PX1003_BasePXGraphCreateInstance { get; } =
 			Rule("PX1003", nameof(Resources.PX1003Title).GetLocalized(), Category.Acuminator,
 				DiagnosticSeverity.Warning, DiagnosticsShortName.PX1003);
 
