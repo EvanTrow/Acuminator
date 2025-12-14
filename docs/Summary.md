@@ -12,9 +12,9 @@ Acuminator does not perform static analysis of projects whose names contain `Tes
 | Code   | Short Description                                                                         | Type  | Code Fix  |
 | ------ | ----------------------------------------------------------------------------------------- | ----- | --------- |
 | [PX1000](diagnostics/PX1000.md) | The action delegate has incompatible return type and parameters. | Error | Available |
-| [PX1001](diagnostics/PX1001.md) | A `PXGraph` instance must be created with the `PXGraph.CreateInstance()` factory method. | Error/Warning | Available |
+| [PX1001](diagnostics/PX1001.md) | An instance of the concrete graph type must be created with the `PXGraph.CreateInstance()` factory method. | Error | Available |
 | [PX1002](diagnostics/PX1002.md) | The field must have a type attribute that corresponds to the list attribute. | Error | Available |
-| [PX1003](diagnostics/PX1003.md) | Consider using a specific implementation of `PXGraph`. | Warning (ISV Level 2: Production Quality) | Unavailable |
+| [PX1003](diagnostics/PX1003.md) | An instance of the base graph type should be created with the `PXGraph.CreateInstance()` factory method. | Warning | Available |
 | [PX1004](diagnostics/PX1004.md) | The order of view declarations will cause the creation of two cache instances. | Message | Unavailable |
 | [PX1005](diagnostics/PX1005.md) | There is probably a typo in the name of the view delegate or the action delegate. | Warning (ISV Level 3: Informational) | Available |
 | [PX1006](diagnostics/PX1006.md) | The order of view declarations will cause the creation of one cache instance for multiple DACs | Message | Unavailable |
