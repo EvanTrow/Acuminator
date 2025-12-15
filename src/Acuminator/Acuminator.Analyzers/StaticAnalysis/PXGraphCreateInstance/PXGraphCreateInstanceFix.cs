@@ -20,14 +20,21 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 	[ExportCodeFixProvider(LanguageNames.CSharp), Shared]
 	public class PXGraphCreateInstanceFix : PXCodeFixProvider
 	{
+		private static readonly DiagnosticDescriptor _cachedPX1001Descriptor = Descriptors.PX1001_PXGraphCreateInstance;
+
 		public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-			ImmutableArray.Create(Descriptors.PX1001_PXGraphCreateInstance.Id);
+			[
+				_cachedPX1001Descriptor.Id,
+				Descriptors.PX1003_BasePXGraphCreateInstance.Id
+			];
 
 		protected override Task RegisterCodeFixesForDiagnosticAsync(CodeFixContext context, Diagnostic diagnostic)
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			string title = nameof(Resources.PX1001Fix).GetLocalized().ToString();
+			string title = diagnostic.Id == _cachedPX1001Descriptor.Id
+				? nameof(Resources.PX1001Fix).GetLocalized().ToString()
+				: nameof(Resources.PX1003Fix).GetLocalized().ToString();
 			var codeAction = CodeAction.Create(title, cancellation => RewriteGraphConstructionAsync(context.Document, context.Span, cancellation),
 											   equivalenceKey: title);
 
@@ -80,7 +87,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 				if (_generator == null) 
 					return base.VisitObjectCreationExpression(node);
 
-				var graphTypeSymbol		   = _semanticModel.GetSymbolInfo(node.Type, _cancellation).Symbol as ITypeSymbol;
+				var graphTypeSymbol		   = _semanticModel.GetSymbolOrFirstCandidate(node.Type, _cancellation) as ITypeSymbol;
 				var createInstanceCallNode = GeneratePXGraphCreateInstanceCall(graphTypeSymbol);
 
 				return createInstanceCallNode ?? base.VisitObjectCreationExpression(node);
@@ -93,7 +100,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 				if (_generator == null)
 					return base.VisitImplicitObjectCreationExpression(node);
 
-				var constructor = _semanticModel.GetSymbolInfo(node, _cancellation).Symbol as IMethodSymbol;
+				var constructor = _semanticModel.GetSymbolOrFirstCandidate(node, _cancellation) as IMethodSymbol;
 
 				if (constructor?.ContainingType == null || constructor.MethodKind != MethodKind.Constructor)
 					return base.VisitImplicitObjectCreationExpression(node);
