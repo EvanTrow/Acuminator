@@ -7,12 +7,13 @@ using PX.Data;
 
 namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreateInstance
 {
-    class PX1001ClassWithField
-    {
-        private readonly PXGraph _field = PXGraph.CreateInstance<PX1001FieldGraph>();
-    }
+	class PX1001ClassWithField
+	{
+		private readonly PXGraph _field = PXGraph.CreateInstance<PX1001FieldGraph>();
+		private readonly PXGraph _field2 = PXGraph.CreateInstance<PXGraph>();
+	}
 
-    class PX1001FieldGraph : PXGraph<PX1001FieldGraph>
-    {
-    }
+	class PX1001FieldGraph : PXGraph<PX1001FieldGraph>
+	{
+	}
 }

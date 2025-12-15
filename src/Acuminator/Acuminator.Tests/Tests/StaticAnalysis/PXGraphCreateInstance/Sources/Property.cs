@@ -13,9 +13,14 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreateInstance
 		{
 			get { return new PX1001PropertyGraph(); }
 		}
+
+		public PXGraph Graph2
+		{
+			get { return new(); }
+		}
 	}
 
-	class PX1001PropertyGraph : PXGraph<PX1001PropertyGraph>
+	public class PX1001PropertyGraph : PXGraph<PX1001PropertyGraph>
 	{
 	}
 }
