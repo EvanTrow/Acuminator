@@ -55,7 +55,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.SavingChanges
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\PressSaveInsideRowPersisting.cs")]
 		public Task PressSaveInsideRowPersisting(string actual) =>
-			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1043_SavingChangesInRowPerstisting.CreateFor(14, 4));
+			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1043_SavingChangesInRowPersisting.CreateFor(14, 4));
 
 		[Theory]
 		[EmbeddedFileData(@"EventHandlers\CachePersistInsideRowPersisting.cs")]

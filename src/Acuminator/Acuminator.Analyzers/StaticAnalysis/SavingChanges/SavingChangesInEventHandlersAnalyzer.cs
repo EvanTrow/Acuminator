@@ -20,7 +20,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.SavingChanges
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
 			Descriptors.PX1043_SavingChangesInEventHandlers,
-			Descriptors.PX1043_SavingChangesInRowPerstisting,
+			Descriptors.PX1043_SavingChangesInRowPersisting,
 			Descriptors.PX1043_SavingChangesInRowPerstistedNonISV);
 
 		public override void Analyze(SymbolAnalysisContext context, PXContext pxContext, EventHandlerLooseInfo eventHandlerLooseInfo)
@@ -109,7 +109,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.SavingChanges
 					{
 						if (saveOperationKind != SaveOperationKind.CachePersist)
 						{
-							ReportDiagnostic(_context.ReportDiagnostic, Descriptors.PX1043_SavingChangesInRowPerstisting, node);
+							ReportDiagnostic(_context.ReportDiagnostic, Descriptors.PX1043_SavingChangesInRowPersisting, node);
 							return true;
 						}
 					}

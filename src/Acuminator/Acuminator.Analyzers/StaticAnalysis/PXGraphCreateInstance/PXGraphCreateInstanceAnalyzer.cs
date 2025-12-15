@@ -15,7 +15,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
 				Descriptors.PX1001_PXGraphCreateInstance,
-				Descriptors.PX1003_NonSpecificPXGraphCreateInstance);
+				Descriptors.PX1003_BasePXGraphCreateInstance);
 
 		public PXGraphCreateInstanceAnalyzer() : this(null)
 		{ }
