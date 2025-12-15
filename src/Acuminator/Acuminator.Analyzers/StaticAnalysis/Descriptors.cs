@@ -39,16 +39,15 @@ namespace Acuminator.Analyzers.StaticAnalysis
 				DiagnosticSeverity.Error, DiagnosticsShortName.PX1000);
 
 		public static DiagnosticDescriptor PX1001_PXGraphCreateInstance { get; } =
-			Rule("PX1001", nameof(Resources.PX1001Title).GetLocalized(), Category.Acuminator,
-				DiagnosticSeverity.Error, DiagnosticsShortName.PX1001);
+			Rule("PX1001", nameof(Resources.PX1001Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Error, DiagnosticsShortName.PX1001);
 
 		public static DiagnosticDescriptor PX1002_MissingTypeListAttributeAnalyzer { get; } =
 			Rule("PX1002", nameof(Resources.PX1002Title).GetLocalized(), Category.Acuminator,
 				DiagnosticSeverity.Error, DiagnosticsShortName.PX1002);
 
 		public static DiagnosticDescriptor PX1003_BasePXGraphCreateInstance { get; } =
-			Rule("PX1003", nameof(Resources.PX1003Title).GetLocalized(), Category.Acuminator,
-				DiagnosticSeverity.Warning, DiagnosticsShortName.PX1003);
+			Rule("PX1003", nameof(Resources.PX1003Title).GetLocalized(), Category.Acuminator, DiagnosticSeverity.Warning, DiagnosticsShortName.PX1003,
+				 diagnosticDefaultJustification: DiagnosticsDefaultJustification.PX1003);
 
 		public static DiagnosticDescriptor PX1004_ViewDeclarationOrder { get; } =
 			Rule("PX1004", nameof(Resources.PX1004Title).GetLocalized(), Category.Acuminator,
