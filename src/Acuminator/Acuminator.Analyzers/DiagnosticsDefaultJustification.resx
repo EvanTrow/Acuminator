@@ -121,7 +121,7 @@
     <value>[Justification]</value>
   </data>
   <data name="PX1003" xml:space="preserve">
-    <value>graph is used only for data retrieval from the database</value>
+    <value>the graph is used only for data retrieval from the database</value>
   </data>
   <data name="PX1007" xml:space="preserve">
     <value>to be documented later</value>
