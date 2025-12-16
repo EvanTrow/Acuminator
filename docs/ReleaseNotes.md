@@ -16,26 +16,34 @@ The analysis of Acumatica source code has discovered that the `PXGraph.InstanceC
 #### New PX1099 Diagnostic
  - The [PX1099](diagnostics/PX1099.md) diagnostic was updated to ban specific async APIs (like Task.Run, Task.Wait, Parallel classes, and others), enforcing recommended patterns and preventing unsupported context loss.
 
-#### Other New Acuminator Diagnostics
-- The new [PX1067](diagnostics/PX1067.md) diagnostic reports BQL fields from derived DAC that are not redeclared.
-- The new [PX1068](diagnostics/PX1068.md) diagnostic checks whether the type of the DAC field property matches the type of the BQL field.
-- The new [PX1069](diagnostics/PX1069.md) diagnostic checks DACs for missing required fields such as audit fields and the `tstamp` field, auto-generating them via code fix where needed.
-- The [PX1077](diagnostics/PX1077.md) diagnostic now forbids private graph event handlers. 
+#### New Acuminator Diagnostics for DACs and DAC Extensions
+- The new [PX1065](diagnostics/PX1065.md) diagnostic reports DAC field properties that are missing their corresponding BQL field declarations. An accompanying code fix is available to automatically generate the required BQL field, ensuring DAC integrity and preventing potential runtime errors.
+- The new [PX1066](diagnostics/PX1066.md) diagnostic detects typos in names of DAC BQL fields. An accompanying code fix changes the name of the BQL field in the solution so that it matches the name of the DAC field property.
+- The new [PX1067](diagnostics/PX1067.md) diagnostic reports BQL fields from derived DAC that are not redeclared. The code fix for this diagnostic adds redeclarations of all BQL fields declared in base DACs to the derived DAC.
+- The new [PX1068](diagnostics/PX1068.md) diagnostic checks whether the type of the DAC field property matches the type of the BQL field. The diagnostic has two available code fixes:
+  - Change the property type so that it corresponds to the type of the BQL field.
+  - Change the type of the BQL field so that it corresponds to the property type.
+- The new [PX1069](diagnostics/PX1069.md) diagnostic checks DACs for missing required fields such as audit fields and the `tstamp` field. An accompanying code fix can automatically add the missing mandatory fields to the DAC.
 - The new [PX1078](diagnostics/PX1078.md) diagnostic checks for incompatible types and sizes between a local DAC field and a foreign DAC field referenced by the `PXSelector` attribute to prevent runtime truncation or mismatches.
-- The new [PX1097](diagnostics/PX1097.md) diagnostic forbids non-public or virtual PXOverride methods. The code fix that reuses a shared, extensible modifiers-rewriting engine originally introduced for PX1077.
+- The new [PX1110](diagnostics/PX1110.md) diagnostic enforces that DACs using `PXDBLocalizableString` attributes also declare a `NoteID` field, preventing related runtime issues.
 
-- The new [PX1110](diagnostics/PX1110.md) diagnostic enforces that DACs using PXDBLocalizableString attributes also declare a NoteID field, preventing related runtime issues.
-- The new [PX1111](diagnostics/PX1111.md) diagnostic detects processing views where main DACs do not declare NoteID field.
+#### New Acuminator Diagnostics for graphs and graph extensions
+- The [PX1077](diagnostics/PX1077.md) diagnostic now forbids private graph event handlers. The code fix for the diagnostic will attempt to change a private event handler into a `protected virtual` method.
+- The new [PX1111](diagnostics/PX1111.md) diagnostic detects processing views where main DACs do not declare `NoteID` field.
 
+#### New Acuminator Diagnostics for `PXOverride` methods
+The Acuminator 4.0.0 contains a new set of diagnostic to validate best practices for the work with `PXOverride` methods:
+- The new [PX1097](diagnostics/PX1097.md) diagnostic forbids non-public or virtual `PXOverride` methods. The code fix changes the accessibility of the `PXOverride` method to `public` and removes `virtual` modifier from the method declaration.
 
 #### Improvements in Existing Diagnostics
- - The [PX1031](diagnostics/PX1031.md) diagnostic now also checks for instance methods in DACs and DAC extensions.
- - The [PX1047](diagnostics/PX1047.md) and [PX1048](diagnostics/PX1048.md) diagnostics now support recursive pattern variables, broadening C# language compatibility and reducing false positives.
- - The [PX1048](diagnostics/PX1048.md) diagnostic has been updated to prohibit changes to other DACs from field updating event handlers, in line with limitations of Acumatica Framework.
- - The [PX1065](diagnostics/PX1065.md) and [PX1066](diagnostics/PX1066.md) diagnostics have been improved with typo detection and reporting of missing BQL fields for DAC field properties, with associated code fixes and improved support for DACs from external DLLs.
- - The [PX1073](diagnostics/PX1073.md) diagnostic now reports exceptions thrown in the `FieldUpdating` event handler.
- - The C# implicit object creation with a `new()` syntax is now supported by Acuminator code analysis.
- - The Acuminator analysis now better supports classic Acumatica event handlers (that use the old naming convention syntax), recognizing overrides and inheritance scenarios.
+- The [PX1002](diagnostics/PX1002.md) diagnostic has been enhanced for more precise analysis by adding support for aggregator attributes.
+- The [PX1031](diagnostics/PX1031.md) diagnostic now also checks for instance methods in DACs and DAC extensions.
+- The [PX1047](diagnostics/PX1047.md) and [PX1048](diagnostics/PX1048.md) diagnostics now support recursive pattern variables, broadening C# language compatibility and reducing false positives.
+- The [PX1048](diagnostics/PX1048.md) diagnostic has been updated to prohibit changes to other DACs from field updating event handlers, in line with limitations of Acumatica Framework.
+- The [PX1065](diagnostics/PX1065.md) and [PX1066](diagnostics/PX1066.md) diagnostics have been improved with typo detection and reporting of missing BQL fields for DAC field properties, with associated code fixes and improved support for DACs from external DLLs.
+- The [PX1073](diagnostics/PX1073.md) diagnostic now reports exceptions thrown in the `FieldUpdating` event handler.
+- The C# implicit object creation with a `new()` syntax is now supported by Acuminator code analysis.
+- The Acuminator analysis now better supports classic Acumatica event handlers (that use the old naming convention syntax), recognizing overrides and inheritance scenarios.
  
 
 ### Enhancements - Code Map
@@ -53,35 +61,54 @@ Acuminator now adds a new settings page for Code Map to Visual Studio options. T
 - Always expand all regular nodes (everything that is not root and not attribute). **True** by default.
 
 #### Other Code Map Enhancements
- - Code Map now better supports classic Acumatica event handlers (that use the old naming convention syntax), displaying overrides and inheritance scenarios.
- - Code Map now includes a visual indicator for projection DACs, helping you to quickly identify them.
- - The `IsActiveFor<TGraph>` method of a graph extension is now displayed in the Code Map.
- - The `Initialize` method of graphs and graph extensions is now displayed in the Code Map.
- - The `Configure` method of graphs and graph extensions is now displayed in the Code Map. 
- - Support for the `PXSetupOptional` and `PXSetupOptionalWhere` setup view types has been added.
+- Code Map now better supports classic Acumatica event handlers (that use the old naming convention syntax), displaying overrides and inheritance scenarios.
+- Code Map now includes a visual indicator for projection DACs, helping you to quickly identify them.
+- The `IsActiveFor<TGraph>` method of a graph extension is now displayed in the Code Map.
+- The `Initialize` method of graphs and graph extensions is now displayed in the Code Map.
+- The `Configure` method of graphs and graph extensions is now displayed in the Code Map. 
+- Support for the `PXSetupOptional` and `PXSetupOptionalWhere` setup view types has been added.
  
 ### Fixed Bugs 
 
 #### Acuminator Diagnostics
- - The [PX1015](diagnostics/PX1015.md)diagnostic had an issue that could cause a stack overflow and Visual Studio crash on certain code bases.
- - Small bugs in the [PX1077](diagnostics/PX1077.md) diagnostic have been fixed for better performance and readability, including support for diagnostic suppression.
- - Suppression of the [PX1016](diagnostics/PX1016.md) diagnostic in a comment is now correctly processed, and related Visual Studio settings display information more clearly.
- - Diagnostic suppression comments are now correctly generated in attribute lists like this:
-   ```C#
-   [PXDBInt, PXUIField]
-   public int? SomeField { get; set; }
-   ```
+- The [PX1015](diagnostics/PX1015.md)diagnostic had an issue that could cause a stack overflow and Visual Studio crash on certain code bases.
+- Small bugs in the [PX1077](diagnostics/PX1077.md) diagnostic have been fixed for better performance and readability, including support for diagnostic suppression.
+- Suppression of the [PX1016](diagnostics/PX1016.md) diagnostic in a comment is now correctly processed, and related Visual Studio settings display information more clearly.
+- Fixed mass code fixes for diagnostics [PX1012](diagnostics/PX1012.md), [PX1062](diagnostics/PX1062.md), and [PX1072](diagnostics/PX1072.md).
+- Diagnostic suppression comments are now correctly generated in attribute lists like this:
+  ```C#
+  [PXDBInt, PXUIField]
+  public int? SomeField { get; set; }
+  ```
 
 #### Code Map
- - A tooltip for processing an icon indicator for graph extensions has been fixed. The issue caused FBQL processing views to be displayed incorrectly.
- - An integration with the Visual Studio navigation journal was added to Code Map. Now, Code Map correctly supports `Navigate Backward` and `Navigate Forward` Visual Studio actions allowing developers to navigate somewhere with Code Map and return to the original location with the `Navigate Backward` action.
+- A tooltip for processing an icon indicator for graph extensions has been fixed. The issue caused FBQL processing views to be displayed incorrectly.
+- An integration with the Visual Studio navigation journal was added to Code Map. Now, Code Map correctly supports `Navigate Backward` and `Navigate Forward` Visual Studio actions allowing developers to navigate somewhere with Code Map and return to the original location with the `Navigate Backward` action.
 
 #### Other Bug Fixes
- - Installation problems caused by an expired certificate have been fixed to ensure smooth deployment even after certificate expiry.
+- Installation problems caused by an expired certificate have been fixed to ensure smooth deployment even after certificate expiry.
 
-### Minor Fixes
- - All occurrences of "whitelist" and "blacklist" were replaced with "allowed list" in source code and documentation, following inclusive language guidelines.
- - The nullable types feature from C# 8 has been integrated into Acuminator code base which improved the quality of the code and reduced a number of boilerplate null checks.
+### Other Fixes
+
+#### Enhancements in Acuminator Core
+Multiple improvements were introduced to Acuminator core mechanisms in this release:
+- A common base class `PXCodeFixProvider` with common boilerplate logic for code fix registration was added to Acuminator and integrated with Acuminator code fix providers. 
+
+#### Enhancements in Acuminator Test Infrastructure
+The Acuminator test infrastructure was improved with multiple features:
+- New tests for reading and writing Acuminator settings between processes including tests for serialization and deserialization of Acuminator settings. An additional console application `ExternalRunner` was added to the tests infrastructure to support the new tests. 
+- New unit tests to check the analysis of code with DLL dependencies. An additional DLL library `ExternalDependency` was added to the tests infrastructure to support the new tests.
+- Improved the reporting of failed unit tests in the test infrastructure.
+
+#### Enhancements in Acuminator Documentation
+Updated documentation for Acuminator diagnostics:
+- Reworked documentation for [PX1001](diagnostics/PX1001.md) and [PX1003](diagnostics/PX1003.md) diagnostics.
+- Updated code examples in diagnostics with changes from the Acumatica Framework.
+
+#### Other Enhancements
+- The nullable types feature from C# 8 has been integrated into Acuminator code base which improved the quality of the code and reduced a number of boilerplate null checks.
+- All occurrences of "whitelist" and "blacklist" were replaced with "allowed list" in source code and documentation, following inclusive language guidelines.
+- Other improvements and refactorings.
 
 ### Acknowledgements
 The Acuminator team would like to thank our open source contributor [Kemal Taskin](@taskinkemal). We are grateful for your input and hope you stay with us.
