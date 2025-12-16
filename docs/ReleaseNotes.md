@@ -74,6 +74,22 @@ The code fix for the diagnostic generates the correct XML documentation comment 
 - Added support of `PK`s with size more than **8** key fields to Acuminator `PK`/`FK` diagnostics. The maximum supported key size of `PK`s now is **12** fields
 - Other enhancements and optimizations in code analysis. 
 
+### Enhancements - Acuminator Console Runner
+A big part of the new Acuminator 4.0.0 release is a new **Acuminator Console Runner** tool. **Acuminator Console Runner** is a standalone command-line tool that serves as a command-line interface (CLI) for Acuminator code analysis and allows to run it outside of IDE. Such tool is useful for CI/CD pipelines and other automated scenarios. The name of the executable file is *Acuminator.Runner.NetFramework.exe*. The tool requires .NET Framework 4.8 runtime.
+
+Acuminator Console Runner supports analysis of .NET solutions (*.sln*) and projects (*.csproj*). It also provides several command line arguments to configure the code analysis and the format of the generated report. Run the tool with `--help` argument to see the documentation for all supported command line arguments in the console.
+
+All command line arguments can be divided into the following three groups:
+- **Code analysis arguments**: These arguments control how the code analysis is performed. All Acuminator code analysis settings can be configured through these command line arguments.
+- **Output arguments**: These arguments control how the results of the code analysis are reported. You can also configure the grouping of found Acuminator errors by source file and/or diagnostic ID.
+- **Other arguments**: These additional arguments control different aspects of the Acuminator Console Runner.
+
+Here is an example of how you can run Acuminator Console Runner from the command line:
+```powershell
+Acuminator.Runner.NetFramework.exe <path to the solution/project> --verbosity Debug --format json -f <path to output file> -g <grouping> --enable-PX1007 --disable-PX1099
+```
+You can find the description of the Acuminator Console Runner and all command line arguments available for it on the [documentation page for the tool](AcuminatorCLI.md). 
+
 ### Enhancements - Code Map
 
 #### New Filter Box
@@ -107,6 +123,7 @@ Acuminator now adds a new settings page for Code Map to Visual Studio options. T
 #### Acuminator Code Analysis
 - The [PX1015](diagnostics/PX1015.md) diagnostic had an issue that could cause a stack overflow and Visual Studio crash on certain code bases.
 - The [PX1015](diagnostics/PX1015.md) diagnostic displayed false alerts for FBQL queries about incorrect number of arguments passed to the query. The bugfix disables the [PX1015](diagnostics/PX1015.md) diagnostic for FBQL queries.
+- A null reference exception was fixed in the [PX1030](diagnostics/PX1030.md) diagnostic.
 - Small bugs in the [PX1077](diagnostics/PX1077.md) diagnostic have been fixed for better performance and readability, including support for diagnostic suppression.
 - Suppression of the [PX1016](diagnostics/PX1016.md) diagnostic in a comment is now correctly processed, and related Visual Studio settings display information more clearly.
 - Fixed mass code fixes for diagnostics [PX1012](diagnostics/PX1012.md), [PX1062](diagnostics/PX1062.md), and [PX1072](diagnostics/PX1072.md).
@@ -148,6 +165,7 @@ The new release brings many changes in the documentation for Acuminator diagnost
 
 #### Other Enhancements
 - The nullable types feature from C# 8 has been integrated into Acuminator code base which improved the quality of the code and reduced a number of boilerplate null checks.
+- A new work mode was added to Acuminator that allows to report all *not suppressed* errors with their accurate locations and generate or update the Acuminator global suppression file for the analyzed project at the same time.
 - The legacy strong signing process of .Net assemblies was removed from Acuminator.
 - All occurrences of "whitelist" and "blacklist" were replaced with "allowed list" in source code and documentation, following inclusive language guidelines.
 - Other improvements and refactorings.
