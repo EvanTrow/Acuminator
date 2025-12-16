@@ -63,7 +63,7 @@ In Acuminator 3.1.3, the following enhancements have been implemented:
 ### Fixed Bugs
 In this version of Acuminator, the following bugs have been fixed:
 - Visual Studio 17.7 crashed when the static code analysis was configured to be executed in the Visual Studio process (*in process mode*). 
-  The crashes were caused by the asynchonous code in old Acuminator analyzers. 
+  The crashes were caused by the asynchronous code in old Acuminator analyzers. 
 
 
 ## Acuminator 3.1.2: June 8, 2023
@@ -137,7 +137,7 @@ Aggregator attributes are attributes derived from the [PXAggregateAttribute](htt
     public override Int32? CustomerID { get; set; }
   }
   ``` 
-- Calculation of DB boundness has been improved to support hybrid data type attributes with mixed DB boundnesses. Such attributes can be placed on both bound and unbound DAC field properties. They usually have the `IsDBField` (or `NonDB` in case of `PXDBLocalizableStringAttribute`) flag which configures the attribute's DB boundness. The flag may have a default value, also it could be explicitly set on the attribute's declaration on a DAC field property or an aggregator attribute. Acumatica code includes a number of such attributes: `PeriodIDAttribute`, `PXEntityAttribute`, and attributes derived from them. They are supported in the new release.
+- Calculation of DB boundness has been improved to support hybrid data type attributes with mixed DB boundness. Such attributes can be placed on both bound and unbound DAC field properties. They usually have the `IsDBField` (or `NonDB` in case of `PXDBLocalizableStringAttribute`) flag which configures the attribute's DB boundness. The flag may have a default value, also it could be explicitly set on the attribute's declaration on a DAC field property or an aggregator attribute. Acumatica code includes a number of such attributes: `PeriodIDAttribute`, `PXEntityAttribute`, and attributes derived from them. They are supported in the new release.
 - The DB boundness calculation now supports combinations of hybrid and aggregator attributes and combines the default DB boundness with the DB boundness explicitly set on attribute's application on a DAC field property or an aggregator attribute.
 - The calculated attribute's DB boundness and information about the attribute's data type is now cached in the DAC semantic model and shared between Acuminator DAC analyzers.
 
@@ -385,7 +385,7 @@ In Acuminator 2.1.3, the following enhancements have been implemented:
 In this version of Acuminator, the following bugs have been fixed:
  - The [PX1007](diagnostics/PX1007.md) diagnostic was displayed for partial classes with XML comments on one of the declarations.
  - The [PX1094](diagnostics/PX1094.md) diagnostic was displayed for classes derived from `PXMappedCacheExtension`.
- - Acuminator failed on the Acuminator suppression file if the file had an incorrect XML structure. Now Acumatinator validates the XML structure of the suppression file.
+ - Acuminator failed on the Acuminator suppression file if the file had an incorrect XML structure. Now Acuminator validates the XML structure of the suppression file.
  - The Acuminator suppression file was not loaded correctly because Visual Studio prematurely loaded the Acuminator VSIX package.
  - The issues that were caused by the concurrent access of different analyzers to the same Acuminator suppression file have been fixed.
 
