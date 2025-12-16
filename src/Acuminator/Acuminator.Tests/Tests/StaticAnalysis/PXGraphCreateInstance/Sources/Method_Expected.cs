@@ -14,6 +14,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreateInstance
 		{
 			var graph = PXGraph.CreateInstance<PX1001MethodGraph>();
 			PX1001MethodGraph graph2 = PXGraph.CreateInstance<PX1001MethodGraph>();
+			var baseGraph = PXGraph.CreateInstance<PXGraph>();
 		}
 	}
 

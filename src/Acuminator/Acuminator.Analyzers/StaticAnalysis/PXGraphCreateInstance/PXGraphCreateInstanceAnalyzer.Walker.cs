@@ -17,7 +17,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXGraphCreateInstance
 			private readonly SemanticModel _semanticModel;
 
 			private static readonly DiagnosticDescriptor _px1001Descriptor = Descriptors.PX1001_PXGraphCreateInstance;
-			private static readonly DiagnosticDescriptor _px1003Descriptor = Descriptors.PX1003_NonSpecificPXGraphCreateInstance;
+			private static readonly DiagnosticDescriptor _px1003Descriptor = Descriptors.PX1003_BasePXGraphCreateInstance;
 
 			public Walker(SyntaxNodeAnalysisContext context, PXContext pxContext, SemanticModel semanticModel)
 			{

@@ -70,6 +70,15 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to graph is used only for data retrieval from the database.
+        /// </summary>
+        public static string PX1003 {
+            get {
+                return ResourceManager.GetString("PX1003", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to to be documented later.
         /// </summary>
         public static string PX1007 {

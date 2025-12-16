@@ -28,22 +28,27 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXGraphCreateInstance
 		public Task CallTo_Constructor_In_Method(string actual) =>
 			VerifyCSharpDiagnosticAsync(actual,
 				Descriptors.PX1001_PXGraphCreateInstance.CreateFor(15, 16),
-				Descriptors.PX1001_PXGraphCreateInstance.CreateFor(16, 31));
+				Descriptors.PX1001_PXGraphCreateInstance.CreateFor(16, 31),
+				Descriptors.PX1003_BasePXGraphCreateInstance.CreateFor(17, 20));
 
 		[Theory]
 		[EmbeddedFileData("Field.cs")]
-		public Task CallTo_Constructor_In_FieldInitializer(string actual) => 
-			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1001_PXGraphCreateInstance.CreateFor(12, 43));
+		public Task CallTo_Constructor_In_FieldInitializer(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
+				Descriptors.PX1001_PXGraphCreateInstance.CreateFor(12, 37),
+				Descriptors.PX1003_BasePXGraphCreateInstance.CreateFor(13, 38));
 
 		[Theory]
 		[EmbeddedFileData("Property.cs")]
-		public Task CallTo_Constructor_In_Property(string actual) => 
-			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1001_PXGraphCreateInstance.CreateFor(14, 17));
+		public Task CallTo_Constructor_In_Property(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
+				Descriptors.PX1001_PXGraphCreateInstance.CreateFor(14, 17),
+				Descriptors.PX1003_BasePXGraphCreateInstance.CreateFor(19, 17));
 
 		[Theory]
 		[EmbeddedFileData("MethodWithNonSpecificPXGraph.cs")]
 		public Task CallTo_NonSpecificPXGraph_Constructor_In_Method(string actual) => 
-			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1003_NonSpecificPXGraphCreateInstance.CreateFor(14, 16));
+			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1003_BasePXGraphCreateInstance.CreateFor(14, 16));
 
 		[Theory]
 		[EmbeddedFileData("Method.cs", "Method_Expected.cs")]

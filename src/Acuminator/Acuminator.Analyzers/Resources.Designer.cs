@@ -115,7 +115,16 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Consider using a specific implementation of PXGraph.
+        ///   Looks up a localized string similar to Create a base graph instance by using the factory method.
+        /// </summary>
+        public static string PX1003Fix {
+            get {
+                return ResourceManager.GetString("PX1003Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An instance of the base graph type should be created with the PXGraph.CreateInstance() factory method.
         /// </summary>
         public static string PX1003Title {
             get {
