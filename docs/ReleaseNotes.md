@@ -167,8 +167,8 @@ Acuminator now includes a new settings page for the Code Map in Visual Studio op
 - The Code Map now displays attributes declared on DACs and graphs. The attribute nodes are placed into a separate category.
 - The Code Map for DACs has been reworked to display a list of **DAC fields** instead of **DAC field properties**. 
   - The difference between a DAC field and DAC field property is that **DAC field** represents a complete information about the data field. A DAC field is a pair of a BQL field and C# property. On the other hand, the **DAC field property** is only the C# property part of the data field. 
-  - The Code Map now displays a list of DAC field nodes. Each DAC field node has one or two subnodes: one for the BQL field, and one for the C# property. The node representing the C# property has subnodes for all attributes declared on the property.
-  - The DAC field node and its subnodes support advanced tooltips:
+  - The Code Map now displays a list of DAC field nodes. Each DAC field node has one or two sub-nodes: one for the BQL field, and one for the C# property. The node representing the C# property has sub-nodes for all attributes declared on the property.
+  - The DAC field node and its sub-nodes support advanced tooltips:
     - The tooltip for the DAC field node displays the declaration of all attributes declared on the C# property. The same tooltip is displayed for the C# property node.
     - The tooltip for the attribute node displays the declaration of this attribute on the C# property.
     - The tooltip for the BQL field node displays the declaration of the BQL field class. 
@@ -201,6 +201,7 @@ Acuminator now includes a new settings page for the Code Map in Visual Studio op
 - The [PX1033](diagnostics/PX1033.md), [PX1034](diagnostics/PX1034.md), [PX1035](diagnostics/PX1035.md), [PX1036](diagnostics/PX1036.md), and [PX1037](diagnostics/PX1037.md) diagnostics incorrectly relied on the `PXPrimaryGraph` attribute to check whether a DAC supports default navigation. After bugfix the diagnostic uses the `PXPrimaryGraphBase` attribute instead.
 - The [PX1036](diagnostics/PX1036.md) diagnostic incorrectly reported dirty primary keys as having an incorrect name.
 - Code fixes for [PX1040](diagnostics/PX1040.md) and [PX1042](diagnostics/PX1042.md) diagnostics were fixed to support for methods and constructors with expression bodies.
+- The [PX1060](diagnostics/PX1060.md) diagnostic did not support the legacy `Attributes` DAC field previously. 
 - The [PX1063](diagnostics/PX1063.md) and [PX1064](diagnostics/PX1064.md) diagnostics failed when C# nullable context was enabled for a file.
 - Small bugs in the [PX1077](diagnostics/PX1077.md) diagnostic have been fixed for better performance and readability, including support for diagnostic suppression.
 - The [PX1095](diagnostics/PX1095.md) diagnostic displayed false alert for attributes with dynamic DB boundness inherited from `PXEntityAttribute` when their DB boundness was specified explicitly via the `IsDbField` property. A new recursive algorithm for calculation of the attribute's DB boundness from the attribute application in code and metadata was introduced in the new release. The new algorithm supports complex scenarios with aggregator attributes and attributes with the dynamic DB boundness.
