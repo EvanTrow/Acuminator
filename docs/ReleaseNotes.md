@@ -34,15 +34,22 @@ The following settings are available:
 - **Banned APIs File**: Specifies the path to the file with forbidden APIs.
 - **Allowed APIs File**: Specifies the path to the file with allowed APIs.
 
-Acuminator comes with default lists of forbidden and allowed APIs. These files are deployed by Acuminator on your machine in the `"My Documents Folder>\Acuminator\Acumatica Banned API"` folder. 
+Acuminator comes with default lists of forbidden and allowed APIs. They are deployed by Acuminator as files on your machine in the `"My Documents Folder>\Acuminator\Acumatica Banned API"` folder. 
 The **Banned APIs File** and **Allowed APIs File** settings are initially set to these files. You can modify these files to customize the list of banned and allowed APIs. The records in these files have the same API format. Each API record is represented by a single line in the file. You can find more about the format of API records from the diagnostic [documentation page](diagnostics/PX1099.md).
 
 Note, that clearing the **Banned APIs File** and **Allowed APIs File** settings in Visual Studio will not disable the [PX1099](diagnostics/PX1099.md) diagnostic. The diagnostic will use the default lists of forbidden and allowed APIs that are embedded into the Acuminator assemblies. To disable the [PX1099](diagnostics/PX1099.md) diagnostic, you need to set the **Enable PX1099 diagnostic for banned APIs** setting to **false**.
 
-##### Default Banned and Allowed APIs
+##### APIs Banned by PX1099
+The [PX1099](diagnostics/PX1099.md) diagnostic comes with a default list of forbidden APIs. These APIs can be roughly divided into several groups:
+- `System.Math.Round` overloads that do not specify the midpoint rounding mode.
+- APIs to perform asynchronous and concurrent operations such as `System.Threading.Tasks.Parallel`, `System.Threading.Tasks.Task.Run`, `System.Threading.Tasks.Task.ConfigureAwait(bool)`.
+- For ISVs and partner developers there are some additional groups of forbidden APIs:
+  - The APIs used to obtain the information about the working environment, such as `System.Environment` and `System.OperatingSystem`.
+  - The APIs used to access global web site parameters such as `PX.Common.WebConfig`.
+  - Some of the **Reflection** APIs such as `System.Reflection.MethodInfo`.
+  - Some IO APIs such as `System.Data.SqlClient` and `System.IO.File`.
 
-
-You can find the table with all APIs banned and allowed by the PX1099 diagnostic by default on the diagnostic [documentation page](diagnostics/PX1099.md).
+The list of forbidden APIs may grow in the future. You can find the table with all APIs banned and allowed by the PX1099 diagnostic by default on the diagnostic [documentation page](diagnostics/PX1099.md).
 
 #### New Acuminator Diagnostics for DACs and DAC Extensions
 - The new [PX1065](diagnostics/PX1065.md) diagnostic reports DAC field properties that are missing their corresponding BQL field declarations. An accompanying code fix is available to automatically generate the required BQL field, ensuring DAC integrity and preventing potential runtime errors.
