@@ -83,9 +83,24 @@ Acuminator 4.0.0 contains a new set of diagnostics to validate best practices fo
    ```
    The code fix for the diagnostic generates the correct XML documentation comment for the `PXOverride` method.
 
+#### Updates in Diagnostics for the Asynchronous Code
+- The new [PX1038](diagnostics/PX1038.md) diagnostic forbids `async void` methods, lambdas and anonymous methods.
+- The new [PX1099](diagnostics/PX1099.md) diagnostic forbids several .Net APIs used for writing the asynchronous and concurrent code.
+- The new [PX1120](diagnostics/PX1120.md) diagnostic reports incorrect work in the Acumatica asynchronous code with .Net `Task` types such as:
+  - `System.Threading.Tasks.Task` and `System.Threading.Tasks.Task<T>`,
+  - `System.Threading.Tasks.ValueTask` and `System.Threading.Tasks.ValueTask<T>`.
+  
+  The asynchronous code working with the Acumatica Framework should adhere the following best practice:
+  - The `Task` instance should not be stored in a local variable or a method parameter. 
+  - All `Task`-typed expressions should be either awaited or immediately returned. 
+  - A method returning a `Task`-typed expression should have the `Task` type as its return type. You cannot have method like this:
+    ```C#
+    public object GetDelayTaskAsync() => Task.Delay(100);
+    ```
+
 #### Other New Diagnostics
 - The new [PX1115](diagnostics/PX1115.md) diagnostic checks that higher-level DAC and graph extensions have only **terminal** extensions as their *base* extensions. **Terminal DAC extension** is simply a non-abstract DAC extension. **Terminal graph extensions** have been described above in the description of the new [PX1114](diagnostics/PX1114.md) diagnostic.
-- The new [PX1116](diagnostics/PX1116.md) diagnostic checks for circular references in the type hierarchy of graph and DAC extensions. 
+- The new [PX1116](diagnostics/PX1116.md) diagnostic checks for circular references in the type hierarchy of graph and DAC extensions.
 
 #### Improvements in Existing Diagnostics
 - The analysis in the [PX1001](diagnostics/PX1001.md) diagnostic has been optimized.
@@ -201,7 +216,7 @@ Acuminator now includes a new settings page for the Code Map in Visual Studio op
 - The [PX1033](diagnostics/PX1033.md), [PX1034](diagnostics/PX1034.md), [PX1035](diagnostics/PX1035.md), [PX1036](diagnostics/PX1036.md), and [PX1037](diagnostics/PX1037.md) diagnostics incorrectly relied on the `PXPrimaryGraph` attribute to check whether a DAC supports default navigation. After bugfix the diagnostic uses the `PXPrimaryGraphBase` attribute instead.
 - The [PX1036](diagnostics/PX1036.md) diagnostic incorrectly reported dirty primary keys as having an incorrect name.
 - Code fixes for [PX1040](diagnostics/PX1040.md) and [PX1042](diagnostics/PX1042.md) diagnostics were fixed to support for methods and constructors with expression bodies.
-- The [PX1060](diagnostics/PX1060.md) diagnostic did not support the legacy `Attributes` DAC field previously. 
+- The [PX1060](diagnostics/PX1060.md) diagnostic and code fix did not support the special `Attributes` DAC field from the legacy **Attributes** Acumatica mechanism. 
 - The [PX1063](diagnostics/PX1063.md) and [PX1064](diagnostics/PX1064.md) diagnostics failed when C# nullable context was enabled for a file.
 - Small bugs in the [PX1077](diagnostics/PX1077.md) diagnostic have been fixed for better performance and readability, including support for diagnostic suppression.
 - The [PX1095](diagnostics/PX1095.md) diagnostic displayed false alert for attributes with dynamic DB boundness inherited from `PXEntityAttribute` when their DB boundness was specified explicitly via the `IsDbField` property. A new recursive algorithm for calculation of the attribute's DB boundness from the attribute application in code and metadata was introduced in the new release. The new algorithm supports complex scenarios with aggregator attributes and attributes with the dynamic DB boundness.
