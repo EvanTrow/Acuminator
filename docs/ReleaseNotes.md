@@ -13,10 +13,36 @@ Analysis of calls to `PXGraph.InstanceCreatedEvents.AddHandler` calls has been d
 The `PXGraph.InstanceCreatedEvents.AddHandler` API adds event handlers to an Acumatica Framework event that is triggered when a new graph instance is created. Previously, the Acuminator analysis tried to check the correctness of such event handlers.
 Analysis of Acumatica source code has discovered that the `PXGraph.InstanceCreatedEvents.AddHandler` API is extremely rarely used. At the same time, the required Acuminator analysis for this feature involves expensive operations and is executed in many scenarios. Therefore, the analysis of `PXGraph.InstanceCreatedEvents.AddHandler` calls has been dropped and the performance of Acuminator has been improved as the result.
 
-### Enhancements in Acuminator Code Analysis
+#### New PX1099 Diagnostic
+A new [PX1099](diagnostics/PX1099.md) diagnostic has been introduced to Acuminator to flag the calls to APIs deemed as incompatible with the Acumatica Framework. Using these forbidden APIs can lead to unexpected behavior, application instability, data inconsistencies, and issues in the asynchronous code. Each forbidden API comes with its own specific reason to be banned from usage together with Acumatica Framework.
 
-#### The New PX1099 Diagnostic to Ban Async APIs
- - The [PX1099](diagnostics/PX1099.md) diagnostic was updated to ban specific async APIs (like `Task.Run`, `Task.Wait`, the `Parallel` classes, and others), enforcing recommended patterns and preventing unsupported context loss.
+##### How PX1099 Reports API Calls 
+The [PX1099](diagnostics/PX1099.md) diagnostic validates all API calls in the code against a configurable **list of forbidden APIs**. The API call is reported if any of the following criteria is met:
+- The API itself is in the list of forbidden APIs.
+- The namespace containing the checked API is in the list of forbidden APIs.
+- One of the types containing the API is in the list of forbidden APIs. In case of nested types, the API is banned if any of the containing types is in the list of banned APIs.
+- The API is a type and one of its base types is in the list of banned APIs.
+- The API is a method, property or event; also it is an override of a base type member, and one of the overridden members is in the list of banned APIs.
+
+The [PX1099](diagnostics/PX1099.md) diagnostic also supports a configurable **list of allowed APIs**. A call to the API from the allowed list is not reported by the diagnostic even if the API is recognized as forbidden according to the rules above. The combination of lists of forbidden and allowed APIs allows a flexible, granular and concise configuration of the PX1099 analysis.
+
+##### PX1099 Diagnostic Settings
+The [PX1099](diagnostics/PX1099.md) diagnostic provides advanced configuration options that you can use to customize the diagnostic behavior. You can disable the diagnostic or configure custom files with forbidden and allowed APIs. You can find the PX1099 settings in the following Acuminator section of Visual Studio settings: `Tools -> Options -> Acuminator -> Banned API`:
+![Banned API settings](diagnostics/images/BannedApiSettings.png)
+The following settings are available:
+- **Enable PX1099 diagnostic for banned APIs**: Enables or disables the [PX1099](diagnostics/PX1099.md) diagnostic. By default, the diagnostic is enabled.
+- **Banned APIs File**: Specifies the path to the file with forbidden APIs.
+- **Allowed APIs File**: Specifies the path to the file with allowed APIs.
+
+Acuminator comes with default lists of forbidden and allowed APIs. These files are deployed by Acuminator on your machine in the `"My Documents Folder>\Acuminator\Acumatica Banned API"` folder. 
+The **Banned APIs File** and **Allowed APIs File** settings are initially set to these files. You can modify these files to customize the list of banned and allowed APIs. The records in these files have the same API format. Each API record is represented by a single line in the file. You can find more about the format of API records from the diagnostic [documentation page](diagnostics/PX1099.md).
+
+Note, that clearing the **Banned APIs File** and **Allowed APIs File** settings in Visual Studio will not disable the [PX1099](diagnostics/PX1099.md) diagnostic. The diagnostic will use the default lists of forbidden and allowed APIs that are embedded into the Acuminator assemblies. To disable the [PX1099](diagnostics/PX1099.md) diagnostic, you need to set the **Enable PX1099 diagnostic for banned APIs** setting to **false**.
+
+##### Default Banned and Allowed APIs
+
+
+You can find the table with all APIs banned and allowed by the PX1099 diagnostic by default on the diagnostic [documentation page](diagnostics/PX1099.md).
 
 #### New Acuminator Diagnostics for DACs and DAC Extensions
 - The new [PX1065](diagnostics/PX1065.md) diagnostic reports DAC field properties that are missing their corresponding BQL field declarations. An accompanying code fix is available to automatically generate the required BQL field, ensuring DAC integrity and preventing potential runtime errors.
@@ -198,7 +224,6 @@ The new release brings many changes in the documentation for Acuminator diagnost
 - The nullable types feature from C# 8 has been integrated into Acuminator code base which improved the quality of the code and reduced a number of boilerplate null checks.
 - A new work mode has been added to Acuminator. It enables reporting of all *not suppressed* errors with their accurate locations and generates or updates the Acuminator global suppression file for the analyzed project at the same time.
 - The legacy strong signing process of .NET assemblies has been removed from Acuminator.
-- All occurrences of "whitelist" and "blacklist" have been replaced with "allowed list" in source code and documentation, following inclusive language guidelines.
 - The Acumatica logo has been updated.
 - Deployment of Acuminator Code Snippets has been reworked.
 - Other improvements and refactorings.
