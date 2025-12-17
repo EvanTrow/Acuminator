@@ -6,15 +6,17 @@ Acuminator 4.0.0 includes the bug fixes and enhancements described in this secti
 
 ### Announcements
 
-#### Analysis of `PXGraph.InstanceCreatedEvents.AddHandler` Calls is Dropped
-The `PXGraph.InstanceCreatedEvents.AddHandler` Acumatica API adds event handlers to the Acumatica event triggered on the creation of a new graph instance. Previously, the Acuminator analysis tried to check the correctness of such event handlers.
+#### Analysis of `PXGraph.InstanceCreatedEvents.AddHandler` Calls Dropped
 
-The analysis of Acumatica source code has discovered that the `PXGraph.InstanceCreatedEvents.AddHandler` API is extremely rarely used. At the same time, the required Acuminator analysis involves expensive operations and is executed in many scenarios. Thus, the analysis of `PXGraph.InstanceCreatedEvents.AddHandler` calls was dropped to significantly improve Acuminator's performance.
+Analysis of calls to `PXGraph.InstanceCreatedEvents.AddHandler` calls has been dropped to significantly improve Acuminator's performance.
 
-### Enhancements - Acuminator Code Analysis
+The `PXGraph.InstanceCreatedEvents.AddHandler` API adds event handlers to an Acumatica Framework event that is triggered when a new graph instance is created. Previously, the Acuminator analysis tried to check the correctness of such event handlers.
+Analysis of Acumatica source code has discovered that the `PXGraph.InstanceCreatedEvents.AddHandler` API is extremely rarely used. At the same time, the required Acuminator analysis for this feature involves expensive operations and is executed in many scenarios. Therefore, the analysis of `PXGraph.InstanceCreatedEvents.AddHandler` calls has been dropped and the performance of Acuminator has been improved as the result.
 
-#### New PX1099 Diagnostic
- - The [PX1099](diagnostics/PX1099.md) diagnostic was updated to ban specific async APIs (like Task.Run, Task.Wait, Parallel classes, and others), enforcing recommended patterns and preventing unsupported context loss.
+### Enhancements in Acuminator Code Analysis
+
+#### The New PX1099 Diagnostic to Ban Async APIs
+ - The [PX1099](diagnostics/PX1099.md) diagnostic was updated to ban specific async APIs (like `Task.Run`, `Task.Wait`, the `Parallel` classes, and others), enforcing recommended patterns and preventing unsupported context loss.
 
 #### New Acuminator Diagnostics for DACs and DAC Extensions
 - The new [PX1065](diagnostics/PX1065.md) diagnostic reports DAC field properties that are missing their corresponding BQL field declarations. An accompanying code fix is available to automatically generate the required BQL field, ensuring DAC integrity and preventing potential runtime errors.
@@ -25,10 +27,10 @@ The analysis of Acumatica source code has discovered that the `PXGraph.InstanceC
   - Change the type of the BQL field so that it corresponds to the property type.
 - The new [PX1069](diagnostics/PX1069.md) diagnostic checks DACs for missing required fields such as audit fields and the `tstamp` field. An accompanying code fix can automatically add the missing mandatory fields to the DAC.
 - The new [PX1078](diagnostics/PX1078.md) diagnostic checks for incompatible types and sizes between a local DAC field and a foreign DAC field referenced by the `PXSelector` attribute to prevent runtime truncation or mismatches.
-- The new [PX1110](diagnostics/PX1110.md) diagnostic enforces that DACs using `PXDBLocalizableString` attributes also declare a `NoteID` field, preventing related runtime issues. An accompanying code fix will automatically add the missing `NoteID` field to the DAC.
+- The new [PX1110](diagnostics/PX1110.md) diagnostic enforces that DACs with `PXDBLocalizableString` attributes also declare a `NoteID` field, preventing related runtime issues. An accompanying code fix adds the missing `NoteID` field to the DAC.
 
 #### New Acuminator Diagnostics for graphs and graph extensions
-- The [PX1077](diagnostics/PX1077.md) diagnostic forbids private graph event handlers. The code fix for the diagnostic will attempt to change a private event handler into a `protected virtual` method. The diagnostic was implemented by the external contributor [Kemal Taskin](@taskinkemal). Many thanks to him.
+- The [PX1077](diagnostics/PX1077.md) diagnostic forbids private graph event handlers. The code fix for the diagnostic will attempt to change a private event handler into a `protected virtual` method. The diagnostic has been implemented by the external contributor [Kemal Taskin](@taskinkemal). His contribution is much appreciated.
 - The new [PX1111](diagnostics/PX1111.md) diagnostic detects processing views with main DACs that do not declare a `NoteID` field.
 - The new [PX1112](diagnostics/PX1112.md) diagnostic requires that graphs and graph extensions with generic type parameters are marked as abstract classes. An accompanying code fix adds the `abstract` modifier to the graph or graph extension declaration.
 - The new [PX1113](diagnostics/PX1113.md) diagnostic checks that graphs and graph extensions are not marked as `sealed` types. An accompanying code fix removes the `sealed` modifier from graphs and graph extensions.
@@ -36,54 +38,53 @@ The analysis of Acumatica source code has discovered that the `PXGraph.InstanceC
   - **Non-abstract and non-generic graph extension**: A concrete graph extension without generic type parameters.
   - **Abstract graph extension with the `PXProtectedAccess` attribute**: An abstract graph extension decorated with the `PXProtectedAccess` attribute.
 
-#### New Acuminator Diagnostics for `PXOverride` methods
-The Acuminator 4.0.0 contains a new set of diagnostic to validate best practices for the work with `PXOverride` methods:
+#### New Acuminator Diagnostics for the `PXOverride` methods
+Acuminator 4.0.0 contains a new set of diagnostics to validate best practices for the work with the `PXOverride` methods:
 - The new [PX1097](diagnostics/PX1097.md) diagnostic forbids non-public or virtual `PXOverride` methods. The code fix changes the accessibility of the `PXOverride` method to `public` and removes `virtual` modifier from the method declaration.
-- The new [PX1098](diagnostics/PX1098.md) diagnostic requires from the `PXOverride` method to have an XML documentation comment with a reference to its base method. The XML documentation comment should have format 
-```C#
-/// Overrides <seealso cref="{Base method}">
-```
-The code fix for the diagnostic generates the correct XML documentation comment for the `PXOverride` method.
+- The new [PX1098](diagnostics/PX1098.md) diagnostic requires from the `PXOverride` method to have an XML documentation comment with a reference to its base method. The XML documentation comment should have the following format 
+   ```C#
+   /// Overrides <seealso cref="{Base method}">
+   ```
+   The code fix for the diagnostic generates the correct XML documentation comment for the `PXOverride` method.
 
 #### Other New Diagnostics
-- The new [PX1115](diagnostics/PX1115.md) diagnostic checks that higher-level DAC and graph extensions have only **terminal** extensions as their *base* extensions. **Terminal DAC extension** is simply a non-abstract DAC extension. **Terminal graph extensions** were described above in the description of the new [PX1114](diagnostics/PX1114.md) diagnostic.
+- The new [PX1115](diagnostics/PX1115.md) diagnostic checks that higher-level DAC and graph extensions have only **terminal** extensions as their *base* extensions. **Terminal DAC extension** is simply a non-abstract DAC extension. **Terminal graph extensions** have been described above in the description of the new [PX1114](diagnostics/PX1114.md) diagnostic.
 
 #### Improvements in Existing Diagnostics
-- The analysis in the [PX1001](diagnostics/PX1001.md) diagnostic was optimized.
+- The analysis in the [PX1001](diagnostics/PX1001.md) diagnostic has been optimized.
 - The [PX1002](diagnostics/PX1002.md) diagnostic has been enhanced for more precise analysis by improving support for Acumatica Framework's aggregator attributes.
-- The [PX1003](diagnostics/PX1003.md) diagnostic was improved in several ways:
-  - The text of the diagnostic message for the [PX1003](diagnostics/PX1003.md) diagnostic was change to have a clear meaning.
-  - The [PX1003](diagnostics/PX1003.md) diagnostic now has an accompanying code fix that will replace the `new PXGraph()` expression with a call to the factory method 
-  `PXGraph.CreateInstance<PXGraph>()`. 
+- The [PX1003](diagnostics/PX1003.md) diagnostic has been improved in the following ways:
+  - The text of the diagnostic message for the [PX1003](diagnostics/PX1003.md) diagnostic has been changed to have a clearer meaning.
+  - The [PX1003](diagnostics/PX1003.md) diagnostic now has an accompanying code fix that will replace the `new PXGraph()` expression with a call to the factory method `PXGraph.CreateInstance<PXGraph>()`. 
   - Acuminator will now provide a default justification for suppression comments generated for the [PX1003](diagnostics/PX1003.md) diagnostic.
-- The [PX1012](diagnostics/PX1012.md) diagnostic was optimized to use pre-calculated semantic information for graph.
-- The [PX1016](diagnostics/PX1016.md) diagnostic received several enhancements:
-  - The severity of the [PX1016](diagnostics/PX1016.md) diagnostic was changed from **Error** to **Warning** to indicate that the absence of the `IsActive` method does not lead to runtime errors.
-  - The [PX1016](diagnostics/PX1016.md) diagnostic now reports workflow graph extensions without the `IsActive` method if they contain business logic - event handlers, graph actions, graph views, graph action and view delegates, `PXOverride` methods.
-  - The [PX1016](diagnostics/PX1016.md) diagnostic now will report the missing `IsActive` method for abstract graph extensions with `PXProtectedAccessAttribute`. Previously, this diagnostic did not analyze abstract graph extensions.
-- The [PX1022](diagnostics/PX1022.md) diagnostic was extended to report non-public DACs and graphs.
-- The [PX1027](diagnostics/PX1027.md) diagnostic for forbidden words in names of DACs and DAC fields was extended with new checks:
-  - The [PX1027](diagnostics/PX1027.md) diagnostic now checks that DAC field names do not start with a "**Company**" prefix.
-  - The [PX1027](diagnostics/PX1027.md) diagnostic now reports forbidden DAC field names "**Notes**", "**Files**", and "**DatabaseRecordStatus**".
-- The [PX1031](diagnostics/PX1031.md) diagnostic now allows the `ToString` method override in DACs and DAC extensions.
+- The [PX1012](diagnostics/PX1012.md) diagnostic has been optimized to use pre-calculated semantic information for graph.
+- The [PX1016](diagnostics/PX1016.md) diagnostic has received the following enhancements:
+  - The severity of the [PX1016](diagnostics/PX1016.md) diagnostic has been changed from **Error** to **Warning** to indicate that the absence of the `IsActive` method does not lead to runtime errors.
+  - The [PX1016](diagnostics/PX1016.md) diagnostic now reports workflow graph extensions without the `IsActive` method if they contain business logic such as event handlers, graph actions, graph views, graph action and view delegates, and the `PXOverride` methods.
+  - The [PX1016](diagnostics/PX1016.md) diagnostic now reports the missing `IsActive` method for abstract graph extensions with `PXProtectedAccessAttribute`. Previously, this diagnostic did not analyze abstract graph extensions.
+- The [PX1022](diagnostics/PX1022.md) diagnostic has been extended to report non-public DACs and graphs.
+- The [PX1027](diagnostics/PX1027.md) diagnostic for forbidden words in names of DACs and DAC fields has been extended with new checks:
+  - The [PX1027](diagnostics/PX1027.md) diagnostic now checks that DAC field names do not start with the "**Company**" prefix.
+  - The [PX1027](diagnostics/PX1027.md) diagnostic now reports forbidden DAC field names: "**Notes**", "**Files**", and "**DatabaseRecordStatus**".
+- The [PX1031](diagnostics/PX1031.md) diagnostic now allows the `ToString` method to be overridden in DACs and DAC extensions.
 - The [PX1047](diagnostics/PX1047.md) and [PX1048](diagnostics/PX1048.md) diagnostics now support recursive pattern variables, broadening C# language compatibility and reducing false positives.
-- The [PX1048](diagnostics/PX1048.md) diagnostic has been updated to prohibit changes to other DACs from `FieldUpdating` event handlers, in line with new established best practices of Acumatica Framework.
+- The [PX1048](diagnostics/PX1048.md) diagnostic has been updated to prohibit changes to other DACs from the `FieldUpdating` event handlers, in line with new established best practices of Acumatica Framework.
 - The [PX1073](diagnostics/PX1073.md) diagnostic now reports exceptions thrown in the `FieldUpdating` event handler.
-- The diagnostics for graph initialization [PX1054](diagnostics/PX1054.md), [PX1057](diagnostics/PX1057.md), [PX1058](diagnostics/PX1058.md), [PX1059](diagnostics/PX1059.md), [PX1081](diagnostics/PX1081.md), [PX1082](diagnostics/PX1082.md), [PX1085](diagnostics/PX1085.md) were extended to consider `Configure` and `Initialize` methods of graphs and graph extensions as part of the graph initialization.
-- The [PX1093](diagnostics/PX1093.md) diagnostic was reworked and significantly optimized thanks to the re-use of the already collected graph semantic information in its analysis.
-- The support of the typed `PXCache<TNode>` APIs was added to [PX1044](diagnostics/PX1044.md), [PX1059](diagnostics/PX1059.md), and [PX1075](diagnostics/PX1075.md) diagnostics.
+- The diagnostics for graph initialization [PX1054](diagnostics/PX1054.md), [PX1057](diagnostics/PX1057.md), [PX1058](diagnostics/PX1058.md), [PX1059](diagnostics/PX1059.md), [PX1081](diagnostics/PX1081.md), [PX1082](diagnostics/PX1082.md), [PX1085](diagnostics/PX1085.md) have been extended to consider the `Configure` and `Initialize` methods of graphs and graph extensions as part of the graph initialization.
+- The [PX1093](diagnostics/PX1093.md) diagnostic has been reworked and significantly optimized thanks to the re-use of the already collected graph semantic information in its analysis.
+- The support of the typed `PXCache<TNode>` APIs has been added to the [PX1044](diagnostics/PX1044.md), [PX1059](diagnostics/PX1059.md), and [PX1075](diagnostics/PX1075.md) diagnostics.
 
-- The semantic information collection for graphs, DACs, and their extensions was completely reworked to be more accurate and performant.
+- The semantic information collection for graphs, DACs, and their extensions has been completely reworked to be more accurate and performant.
 - The Acuminator analysis now better supports classic Acumatica event handlers (that use the old naming convention syntax), recognizing overrides and inheritance scenarios.
-- The support for the `PXBqlTable` base DAC type was added to the Acuminator code analysis.
-- A common base class `PXCodeFixProvider` with common boilerplate logic for code fix registration was added to Acuminator and integrated with Acuminator code fix providers.
-- Added support of `PK`s with size more than **8** key fields to Acuminator `PK`/`FK` diagnostics. The maximum supported key size of `PK`s now is **12** fields
-- The C# implicit object creation with a `new()` syntax is now supported by Acuminator code analysis.
-- A lot of different optimizations in the code analysis.
+- The support for the `PXBqlTable` base DAC type has been added to the Acuminator code analysis.
+- A common base class `PXCodeFixProvider` with common boilerplate logic for code fix registration has been added to Acuminator and integrated with the Acuminator code fix providers.
+- Support of `PK`s with size more than **8** key fields has been added to the `PK`/`FK` diagnostics. The maximum supported key size of `PK`s now is **12** fields.
+- The C# implicit object creation with the `new()` syntax is now supported by Acuminator code analysis.
+- A number of various optimizations in the code analysis have been implemented.
 - Other enhancements. 
 
 ### Enhancements - Acuminator Console Runner
-A big part of the new Acuminator 4.0.0 release is a new **Acuminator Console Runner** tool. **Acuminator Console Runner** is a standalone command-line tool that serves as a command-line interface (CLI) for Acuminator code analysis and allows to run it outside of IDE. Such tool is useful for CI/CD pipelines and other automated scenarios. The name of the executable file is *Acuminator.Runner.NetFramework.exe*. The tool requires .NET Framework 4.8 runtime.
+A big part of the new Acuminator 4.0.0 release is the new **Acuminator Console Runner** tool. **Acuminator Console Runner** is a standalone command-line tool that serves as a command-line interface (CLI) for Acuminator code analysis and allows to run it outside of IDE. Such tool is useful for CI/CD pipelines and other automated scenarios. The name of the executable file is *Acuminator.Runner.NetFramework.exe*. The tool requires .NET Framework 4.8 runtime.
 
 Acuminator Console Runner supports analysis of .NET solutions (*.sln*) and projects (*.csproj*). It also provides several command line arguments to configure the code analysis and the format of the generated report. Run the tool with `--help` argument to see the documentation for all supported command line arguments in the console.
 
@@ -96,12 +97,12 @@ Here is an example of how you can run Acuminator Console Runner from the command
 ```powershell
 Acuminator.Runner.NetFramework.exe <path to the solution/project> --verbosity Debug --format json -f <path to output file> -g <grouping> --enable-PX1007 --disable-PX1099
 ```
-You can find the description of the Acuminator Console Runner and all command line arguments available for it on the [documentation page for the tool](AcuminatorCLI.md). 
+You can find the description of the Acuminator Console Runner and all available command line arguments on the [documentation page for the tool](AcuminatorCLI.md). 
 
 ### Enhancements - Code Map
 
 #### New Filter Box
-Code Map now has a new filter box that allows developers to filter tree nodes by input string and quickly find neccessary info in complex DACs and graphs:
+Code Map now has a new filter box that gives you an ability to filter tree nodes by input string and quickly find necessary info in complex DACs and graphs:
 
 ![Code Map Filter Box](images/CodeMap_FilterBox.png)
 
@@ -111,55 +112,55 @@ The filtering of the Code Map tree works with both regular Code Map nodes and at
 - There is a particular attribute on a DAC field property or a cache attached event handler. 
 
 #### Display of Base Types and Advanced Navigation
-The Code Map now better integrates with Visual Studio and relies on Visual Studio to navigate into metadata and decompiled source code.
+The Code Map integration with Visual Studio has been improved. Now the Code Map relies on Visual Studio to navigate into metadata and decompiled source code.
 
 #### New Settings Page and Code Map Expansion Options
-Acuminator now adds a new settings page for Code Map to Visual Studio options. The new settings page allows you to configure new Code Map expansion options: 
+Acuminator now includes a new settings page for the Code Map in Visual Studio options. The new settings page gives you an ability to configure the new Code Map expansion options: 
 - Always expand all root nodes (DACs, graphs, and extensions). **True** by default.
 - Always expand all attribute nodes. **False** by default.
 - Always expand all regular nodes (everything that is not root and not attribute). **True** by default.
 
 #### New Information Displayed in Code Map
 - The Code Map now displays attributes declared on DACs and graphs. The attribute nodes are placed into a separate category.
-- The Code Map for DACs was reworked to display a list of **DAC fields** instead of **DAC field properties**. 
-  - The difference between a DAC field and DAC field property is that **DAC field** represents a complete information about the data field. It is a pair of a BQL field and C# property. On the other hand, the **DAC field property** is only the C# property part of the data field. 
-  - The Code Map now displays a list of DAC field nodes. Each DAC field node has one or two subnodes - one for the BQL field, and one for the C# property. The node representing the C# property has subnodes for all attributes declared on the property.
+- The Code Map for DACs has been reworked to display a list of **DAC fields** instead of **DAC field properties**. 
+  - The difference between a DAC field and DAC field property is that **DAC field** represents a complete information about the data field. A DAC field is a pair of a BQL field and C# property. On the other hand, the **DAC field property** is only the C# property part of the data field. 
+  - The Code Map now displays a list of DAC field nodes. Each DAC field node has one or two subnodes: one for the BQL field, and one for the C# property. The node representing the C# property has subnodes for all attributes declared on the property.
   - The DAC field node and its subnodes support advanced tooltips:
     - The tooltip for the DAC field node displays the declaration of all attributes declared on the C# property. The same tooltip is displayed for the C# property node.
     - The tooltip for the attribute node displays the declaration of this attribute on the C# property.
     - The tooltip for the BQL field node displays the declaration of the BQL field class. 
-  - The DAC field node supports cycling navigation. You can navigate between BQL field node and C# property node by double-clicking on the DAC field node multiple times.   
+  - The DAC field node supports cycling navigation. You can navigate between a BQL field node and a C# property node by double-clicking on the DAC field node multiple times.   
 - The `IsActiveFor<TGraph>` method of a graph extension is now displayed in the Code Map in the **Initialization & Activation** category.
 - The `Initialize` method of graph extensions and graphs implementing the `IGraphWithInitialization` interface is now displayed in the Code Map in the **Initialization & Activation** category.
 - The `Configure` method of graphs and graph extensions is now displayed in the Code Map in the **Initialization & Activation** category.
-- Code Map now includes a visual indicator for projection DACs and projection attributes, helping you to quickly identify them.
-- Code Map now better supports classic Acumatica event handlers (that use the old naming convention syntax). Now, Code Map can display overrides of event handlers.
-- Added display of the user-friendly DAC name from the `PXCacheNameAttribute` attribute to the Code Map node representing DAC and to the Code Map node representing the `PXCacheNameAttribute` attribute.
+- The Code Map now includes a visual indicator for projection DACs and projection attributes, helping you to quickly identify them.
+- Support of classic Acumatica Framework event handlers (that use the old naming convention syntax) has been improved. Now, the Code Map can display overrides of such event handlers.
+- The user-friendly DAC name from the `PXCacheNameAttribute` attribute is now displayed in the Code Map node for the DAC and in the Code Map node for the `PXCacheNameAttribute` attribute.
 
 #### Other Code Map Enhancements
-- The text of the indicator of readonly graph views was changed from "**Uncached**" to "**ReadOnly**" to use a term more familiar to Acumatica developers.
-- Icons were added for attribute nodes and attribute group nodes.
+- The text for the indicator of read-only graph views has been changed from "**Uncached**" to "**ReadOnly**" to use a term more familiar to Acumatica developers.
+- Icons have been added to attribute nodes and attribute group nodes.
 - The Code Map tree is now refreshed on Visual Studio theme changes.
 - The Code Map now supports separate icons for light and dark Visual Studio themes.
  
 ### Fixed Bugs 
 
 #### Acuminator Code Analysis
-- The [PX1007](diagnostics/PX1007.md) diagnostic incorrectly determined the mapped DAC field of the projection DAC in cases when projection DAC was derived from one of the DACs in its projection query. The projection DACs derived from other DACs have implicit mappings for DAC fields inherited from base DACs. This is frequently used by developers to simplify the code and avoid explicit declaration of multiple `BqlField`/`BqlTable` mappings. The bugfix adds the recognition of this pattern to the [PX1007](diagnostics/PX1007.md) diagnostic.
-- The [PX1012](diagnostics/PX1012.md) diagnostic got minor bug fixes.
-- Fixed mass code fixes for diagnostics [PX1012](diagnostics/PX1012.md), [PX1062](diagnostics/PX1062.md), and [PX1072](diagnostics/PX1072.md).
+- The [PX1007](diagnostics/PX1007.md) diagnostic incorrectly determined the mapped DAC field of the projection DAC in cases when projection DAC was derived from one of the DACs in its projection query. The projection DACs derived from other DACs have implicit mappings for DAC fields inherited from base DACs. This distinction is frequently used by developers to simplify the code and avoid explicit declaration of multiple `BqlField`/`BqlTable` mappings. The bugfix adds the recognition of this pattern to the [PX1007](diagnostics/PX1007.md) diagnostic.
+- The [PX1012](diagnostics/PX1012.md) diagnostic received minor bug fixes.
+- In the [PX1012](diagnostics/PX1012.md), [PX1062](diagnostics/PX1062.md), and [PX1072](diagnostics/PX1072.md) diagnostics, mass code fixes have been improved.
 - The [PX1015](diagnostics/PX1015.md) diagnostic had an issue that could cause a stack overflow and Visual Studio crash on certain code bases.
-- The [PX1015](diagnostics/PX1015.md) diagnostic displayed false alerts for FBQL queries about incorrect number of arguments passed to the query. The bugfix disables the [PX1015](diagnostics/PX1015.md) diagnostic for FBQL queries.
+- The [PX1015](diagnostics/PX1015.md) diagnostic displayed false alerts for fluent BQL queries about incorrect number of arguments passed to the query. The bugfix disables the [PX1015](diagnostics/PX1015.md) diagnostic for fluent BQL queries.
 - Suppression of the [PX1016](diagnostics/PX1016.md) diagnostic in a comment is now correctly processed, and related Visual Studio settings display information more clearly.
 - The [PX1022](diagnostics/PX1022.md) diagnostic did not support `partial` types and non-standard order of access modifiers.
-- A null reference exception was fixed in the [PX1030](diagnostics/PX1030.md) diagnostic.
+- A null reference exception has been fixed in the [PX1030](diagnostics/PX1030.md) diagnostic.
 - In DACs with both regular and dirty primary keys, the [PX1035](diagnostics/PX1035.md) diagnostic incorrectly considered dirty primary key to be a duplicate of the regular key.
-- The [PX1033](diagnostics/PX1033.md), [PX1034](diagnostics/PX1034.md), [PX1035](diagnostics/PX1035.md), [PX1036](diagnostics/PX1036.md), and [PX1037](diagnostics/PX1037.md) diagnostics incorrectly relied on the `PXPrimaryGraph` attribute to check whether a DAC supports default navigation. After bugfix the diagnostic use the `PXPrimaryGraphBase` attribute instead.
-- The [PX1036](diagnostics/PX1036.md) diagnostic incorrectly reported dirty primary keys as having incorrect name.
+- The [PX1033](diagnostics/PX1033.md), [PX1034](diagnostics/PX1034.md), [PX1035](diagnostics/PX1035.md), [PX1036](diagnostics/PX1036.md), and [PX1037](diagnostics/PX1037.md) diagnostics incorrectly relied on the `PXPrimaryGraph` attribute to check whether a DAC supports default navigation. After bugfix the diagnostic uses the `PXPrimaryGraphBase` attribute instead.
+- The [PX1036](diagnostics/PX1036.md) diagnostic incorrectly reported dirty primary keys as having an incorrect name.
 - The [PX1063](diagnostics/PX1063.md) and [PX1064](diagnostics/PX1064.md) diagnostics failed when C# nullable context was enabled for a file.
 - Small bugs in the [PX1077](diagnostics/PX1077.md) diagnostic have been fixed for better performance and readability, including support for diagnostic suppression.
 - The [PX1095](diagnostics/PX1095.md) diagnostic displayed false alert for attributes with dynamic DB boundness inherited from `PXEntityAttribute` when their DB boundness was specified explicitly via the `IsDbField` property. A new recursive algorithm for calculation of the attribute's DB boundness from the attribute application in code and metadata was introduced in the new release. The new algorithm supports complex scenarios with aggregator attributes and attributes with the dynamic DB boundness.
-- Fixed bug in [PX1096](diagnostics/PX1096.md) in the collection of base types of a graph extensions. The bug caused some of the base extension types to be skipped during the search for a suitable base method which led to a false alert. 
+- In the [PX1096](diagnostics/PX1096.md) diagnostic, collection of base types of a graph extensions has been fixed: Some of the base extension types were skipped during the search for a suitable base method which led to a false alert. 
 - The generation of Acuminator diagnostic suppression comments received several fixes:
   - The suppression comments now can be generated in attribute lists like this:
     ```C#
@@ -170,8 +171,8 @@ Acuminator now adds a new settings page for Code Map to Visual Studio options. T
   - The suppression comments now can be generated in the parameters list of a method, constructor, or an indexer.
 
 #### Code Map
-- A tooltip for processing an icon indicator for graph extensions has been fixed. The issue caused FBQL processing views to be displayed incorrectly.
-- An integration with the Visual Studio navigation journal was added to Code Map. Now, Code Map correctly supports `Navigate Backward` and `Navigate Forward` Visual Studio actions allowing developers to navigate somewhere with Code Map and return to the original location with the `Navigate Backward` action.
+- A tooltip for processing an icon indicator for graph extensions has been fixed. The issue caused processing views constructed with fluent BQL to be displayed incorrectly.
+- An integration with the Visual Studio navigation journal has been added to the Code Map. Now, the Code Map correctly supports the `Navigate Backward` and `Navigate Forward` Visual Studio actions. As a result, you can navigate in the Code Map and return to the original location by using the `Navigate Backward` action.
 - The `PXSetupOptional` and `PXSetupOptionalWhere` setup view types were not displayed as setup views in the Code Map.
 
 #### Other Bug Fixes
@@ -179,27 +180,27 @@ Acuminator now adds a new settings page for Code Map to Visual Studio options. T
 ### Other Changes
 
 #### Enhancements in Acuminator Test Infrastructure
-The Acuminator test infrastructure was improved with multiple features:
-- The Acumatica DLLs used by Acuminator unit test infrastructure were updated. New Acumatica DLLs are taken from **Acumatica 2026 R1 Preview 1**. The test sources were updated to work with new Acumatica DLLs for the majority of the unit tests.
-- New tests for reading and writing Acuminator settings between processes including tests for serialization and deserialization of Acuminator settings. An additional console application `ExternalRunner` was added to the tests infrastructure to support the new tests. 
-- New unit tests to check the analysis of code with DLL dependencies. An additional DLL library `ExternalDependency` was added to the tests infrastructure to support the new tests.
-- Improved the reporting of failed unit tests in the test infrastructure.
-- Added a new prompt file **`UnitTests.prompt.md`** with AI guidelines for generation of Acuminator unit tests to the repository. 
+The Acuminator test infrastructure has been improved with multiple features:
+- The Acumatica DLLs used by Acuminator unit test infrastructure have been updated. New Acumatica DLLs are retrieved from **Acumatica 2026 R1 Preview 1**. The test sources have been updated to work with new Acumatica DLLs for the majority of the unit tests.
+- New tests for reading and writing Acuminator settings between processes have been added. The new tests include tests for serialization and deserialization of Acuminator settings. An additional console application `ExternalRunner` has been added to the test infrastructure to support the new tests. 
+- New unit tests that check the analysis of code with DLL dependencies have been added. An additional DLL library `ExternalDependency` has been added to the tests infrastructure to support the new tests.
+- Reporting of failed unit tests in the test infrastructure has been improved.
+- A new prompt file **`UnitTests.prompt.md`** has been added. The file contains AI guidelines for generation of Acuminator unit tests in the repository. 
 
 #### Enhancements in Acuminator Documentation
 The new release brings many changes in the documentation for Acuminator diagnostics:
-- The documentation for [PX1001](diagnostics/PX1001.md) and [PX1003](diagnostics/PX1003.md) diagnostics was rewritten.
+- The documentation for the [PX1001](diagnostics/PX1001.md) and [PX1003](diagnostics/PX1003.md) diagnostics has been rewritten.
 - The documentation pages were added for all new diagnostics.
-- The documentation for updated diagnostics was extended.
-- The code examples in the existing documentation were updated with changes from the Acumatica Framework.
+- The documentation for updated diagnostics has been extended.
+- The code examples in the existing documentation have been updated with changes from the Acumatica Framework.
 
 #### Other Enhancements
 - The nullable types feature from C# 8 has been integrated into Acuminator code base which improved the quality of the code and reduced a number of boilerplate null checks.
-- A new work mode was added to Acuminator that allows to report all *not suppressed* errors with their accurate locations and generate or update the Acuminator global suppression file for the analyzed project at the same time.
-- The legacy strong signing process of .Net assemblies was removed from Acuminator.
-- All occurrences of "whitelist" and "blacklist" were replaced with "allowed list" in source code and documentation, following inclusive language guidelines.
-- Acumatica logo was updated.
-- The deployment of Acuminator Code Snippets was reworked.
+- A new work mode has been added to Acuminator. It enables reporting of all *not suppressed* errors with their accurate locations and generates or updates the Acuminator global suppression file for the analyzed project at the same time.
+- The legacy strong signing process of .NET assemblies has been removed from Acuminator.
+- All occurrences of "whitelist" and "blacklist" have been replaced with "allowed list" in source code and documentation, following inclusive language guidelines.
+- The Acumatica logo has been updated.
+- Deployment of Acuminator Code Snippets has been reworked.
 - Other improvements and refactorings.
 
 ### Acknowledgements
