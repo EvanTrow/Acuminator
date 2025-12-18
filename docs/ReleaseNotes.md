@@ -301,7 +301,7 @@ The new release brings many changes in the documentation for Acuminator diagnost
 
 #### Enhancements in Acumatica Code Snippets
 - The `PXBqlTable` DAC base type has been integrated into Acumatica Code Snippets for DACs.
-- The `inheritdoc` XML documentation tag referecing the C# property was added to DAC BQL fields in Acumatica Code Snippets for DACs. 
+- The `inheritdoc` XML documentation tag referencing the C# property was added to DAC BQL fields in Acumatica Code Snippets for DACs. 
 - In the code snippet for the string DAC field the `string` property type of the C# property was made nullable. 
 - Deployment of Acuminator Code Snippets has been reworked.
 
