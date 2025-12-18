@@ -62,6 +62,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 			public override void VisitDocumentationCommentTrivia(DocumentationCommentTriviaSyntax node) { }
 
 			public override void VisitXmlComment(XmlCommentSyntax node) { }
+
+			public override void VisitAttributeList(AttributeListSyntax node) { }
 			#endregion
 
 			public override void VisitLocalFunctionStatement(LocalFunctionStatementSyntax localFunctionDeclaration)
