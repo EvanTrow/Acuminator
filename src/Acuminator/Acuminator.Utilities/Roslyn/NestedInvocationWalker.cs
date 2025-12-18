@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Xml.Linq;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression;
@@ -306,10 +307,18 @@ namespace Acuminator.Utilities.Roslyn
 				base.VisitLocalFunctionStatement(localFunctionStatement);   //Process recursive call as usual
 				return;
 			}
-			
+
 			// When we visit local function declaration during the normal syntax walking it is like we start visiting another method at the top of call stack
 			// No previous recursive context applies to the local function declaration itself because it is a declaration, not a call. 
 			// In fact, the method can be never called. Thus, we need to save previous recursive context, reset it, visit local function and then restore saved context
+			var semanticModel = GetSemanticModel(localFunctionStatement.SyntaxTree);
+			var localMethodSymbol = semanticModel?.GetDeclaredSymbol(localFunctionStatement, CancellationToken) as IMethodSymbol;
+
+			// When we are visiting the local method via the normal syntax walking, we need to check that we haven't already visited it recursively.
+			// This can happen in a scenario when a method declares a local function that calls the containing method recursively.
+			if (localMethodSymbol == null || IsMethodInStack(localMethodSymbol))
+				return;
+
 			var oldNodesStack                      = NodesStack;
 			var oldMethodsInStack                  = MethodsInStack;
 			var oldOriginalNode                    = OriginalNode;
@@ -317,9 +326,16 @@ namespace Acuminator.Utilities.Roslyn
 
 			try
 			{
-				NodesStack                      = new Stack<SyntaxNode>();
-				MethodsInStack                  = new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
-				OriginalNode                    = null;
+				// We need to initialize a new context and call stack for local function. The new call stack should start with the local function at the top.
+				NodesStack = new Stack<SyntaxNode>(capacity: 1);
+				NodesStack.Push(localFunctionStatement);
+
+				MethodsInStack = new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default)
+				{
+					localMethodSymbol
+				};
+
+				OriginalNode                    = localFunctionStatement;
 				NodeCurrentlyVisitedRecursively = null;
 
 				base.VisitLocalFunctionStatement(localFunctionStatement);
