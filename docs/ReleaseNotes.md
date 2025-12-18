@@ -136,8 +136,10 @@ Acuminator 4.0.0 contains a new set of diagnostics to validate best practices fo
 - The [PX1047](diagnostics/PX1047.md) and [PX1048](diagnostics/PX1048.md) diagnostics now support variables declared with C# recursive patterns and variables declared with with C# `is not`, `is var`, and positional patterns.
 - The [PX1048](diagnostics/PX1048.md) diagnostic has been updated to prohibit changes to other DACs from the `FieldUpdating` event handlers, in line with new established best practices of Acumatica Framework.
 - The diagnostics for graph initialization [PX1054](diagnostics/PX1054.md), [PX1057](diagnostics/PX1057.md), [PX1058](diagnostics/PX1058.md), [PX1059](diagnostics/PX1059.md), [PX1081](diagnostics/PX1081.md), [PX1082](diagnostics/PX1082.md), [PX1085](diagnostics/PX1085.md) have been extended to consider the `Configure` and `Initialize` methods of graphs and graph extensions as part of the graph initialization.
+- The severity of [PX1060](diagnostics/PX1060.md) and [PX1061](diagnostics/PX1061.md) diagnostics was changed from **Information** to **Warning** to indicate that DAC fields should support FBQL queries.
 - The [PX1073](diagnostics/PX1073.md) diagnostic now reports exceptions thrown in the `FieldUpdating` event handler. The only allowed exceptions in `FieldUpdating` event handlers are `NotImplementedException`, `NotSupportedException`, and `ArgumentException` (including its descendants `ArgumentNullException` and `ArgumentOutOfRangeException`).
 - The [PX1075](diagnostics/PX1075.md) diagnostic was extended to forbid `PXCache.RaiseExceptionHandling` calls in `FieldUpdating` event handlers. The analysis of the diagnostic was also optimized.
+- The [PX1086](diagnostics/PX1086.md) diagnostic was reworked to detect `PXSetupNotEnteredException` exceptions thrown by the calls to external helpers via the inter-procedural analysis.
 - The [PX1093](diagnostics/PX1093.md) diagnostic has been reworked and significantly optimized thanks to the re-use of the already collected graph semantic information in its analysis.
 - The support of the typed `PXCache<TNode>` APIs has been added to the [PX1044](diagnostics/PX1044.md), [PX1059](diagnostics/PX1059.md), and [PX1075](diagnostics/PX1075.md) diagnostics.
 - Collection of semantic information has been improved:
@@ -222,8 +224,9 @@ Acuminator now includes a new settings page for the Code Map in Visual Studio op
 - The `IsActiveFor<TGraph>` method of a graph extension is now displayed in the Code Map in the **Initialization & Activation** category.
 - The `Initialize` method of graph extensions and graphs implementing the `IGraphWithInitialization` interface is now displayed in the Code Map in the **Initialization & Activation** category.
 - The `Configure` method of graphs and graph extensions is now displayed in the Code Map in the **Initialization & Activation** category.
-- The Code Map now includes a visual indicator for projection DACs and projection attributes, helping you to quickly identify them.
-- Support of classic Acumatica Framework event handlers (that use the old naming convention syntax) has been improved. Now, the Code Map can display overrides of such event handlers.
+- The Code Map now includes a new visual indicator icon for projection DACs and projection attributes, helping you to quickly identify them.
+- The Code Map now includes a new visual indicator icon for `PXAccumulator` attributes and DACs with the `PXAccumulator` attribute declared on them. The term `PXAccumulator` attribute here includes attributes derived from the `PXAccumulatorAttribute` type.
+- The collection of information about Acumatica event handlers was completely reworked to collect more details and be much more accurate. As a result, Acuminator now can recognize overrides of event handlers and display them in the Code Map.
 - The user-friendly DAC name from the `PXCacheNameAttribute` attribute is now displayed in the Code Map node for the DAC and in the Code Map node for the `PXCacheNameAttribute` attribute.
 
 #### Other Code Map Enhancements
@@ -272,6 +275,7 @@ Acuminator now includes a new settings page for the Code Map in Visual Studio op
 - A tooltip for the indicator of a processing graph extension (graph extension with a processing graph view) has been fixed.
 - An integration with the Visual Studio navigation journal has been added to the Code Map. Now, the Code Map correctly supports the `Navigate Backward` and `Navigate Forward` Visual Studio actions. As a result, you can navigate in the Code Map and return to the original location by using the `Navigate Backward` action.
 - The `PXSetupOptional` and `PXSetupOptionalWhere` setup view types were not displayed as setup views in the Code Map.
+- Code Map icons were very poorly scaled on monitors with DPI resolution higher than **Full HD**.
 
 #### Other Bug Fixes
 - The name and description of the Acuminator suppression mechanism setting in Visual Studio Options have been improved for clarity.
