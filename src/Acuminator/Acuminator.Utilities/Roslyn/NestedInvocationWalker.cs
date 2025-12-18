@@ -71,6 +71,8 @@ namespace Acuminator.Utilities.Roslyn
 
         private HashSet<IMethodSymbol> MethodsInStack { get; set; } = new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
 
+		private Stack<IMethodSymbol> LocalFunctionsStack { get; set; } = new Stack<IMethodSymbol>();
+
 		private readonly Lazy<HashSet<INamedTypeSymbol>> _typesToBypass;
 		private readonly Func<IMethodSymbol, bool>? _extraBypassCheck;
 
@@ -308,17 +310,21 @@ namespace Acuminator.Utilities.Roslyn
 				return;
 			}
 
-			// When we visit local function declaration during the normal syntax walking it is like we start visiting another method at the top of call stack
-			// No previous recursive context applies to the local function declaration itself because it is a declaration, not a call. 
-			// In fact, the method can be never called. Thus, we need to save previous recursive context, reset it, visit local function and then restore saved context
+			// Visit of a local function as a declaration during the normal syntax walking.
 			var semanticModel = GetSemanticModel(localFunctionStatement.SyntaxTree);
 			var localMethodSymbol = semanticModel?.GetDeclaredSymbol(localFunctionStatement, CancellationToken) as IMethodSymbol;
 
 			// When we are visiting the local method via the normal syntax walking, we need to check that we haven't already visited it recursively.
 			// This can happen in a scenario when a method declares a local function that calls the containing method recursively.
-			if (localMethodSymbol == null || IsMethodInStack(localMethodSymbol))
+			// 
+			// We use a separate stack for this purpose to not mix local function declarations with the logic of normal method calls.
+			// The logic analyzing normal method calls relies on the context whether the analyzer currently is inside a recursive call or not. 
+			if (localMethodSymbol == null || IsMethodInLocalFunctionsStack(localMethodSymbol))
 				return;
 
+			// When we visit local function declaration during the normal syntax walking it is like we start visiting another method at the top of call stack
+			// No previous recursive context applies to the local function declaration itself because it is a declaration, not a call. 
+			// In fact, the method can be never called. Thus, we need to save previous recursive context, reset it, visit local function and then restore saved context
 			var oldNodesStack                      = NodesStack;
 			var oldMethodsInStack                  = MethodsInStack;
 			var oldOriginalNode                    = OriginalNode;
@@ -326,22 +332,22 @@ namespace Acuminator.Utilities.Roslyn
 
 			try
 			{
-				// We need to initialize a new context and call stack for local function. The new call stack should start with the local function at the top.
-				NodesStack = new Stack<SyntaxNode>(capacity: 1);
-				NodesStack.Push(localFunctionStatement);
-
-				MethodsInStack = new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default)
-				{
-					localMethodSymbol
-				};
-
-				OriginalNode                    = localFunctionStatement;
+				// We need to initialize a new empty context and method call stack to imitate a situation where we start the analysis 
+				// with the local function as a top function.
+				NodesStack	   					= new Stack<SyntaxNode>();
+				MethodsInStack 					= new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
+				OriginalNode 					= null;
 				NodeCurrentlyVisitedRecursively = null;
+
+				// Push the local function to the local functions stack to avoid re-visiting it recursively
+				LocalFunctionsStack.Push(localMethodSymbol);
 
 				base.VisitLocalFunctionStatement(localFunctionStatement);
 			}
 			finally
 			{
+				LocalFunctionsStack.Pop();
+
 				NodesStack                      = oldNodesStack;
 				MethodsInStack                  = oldMethodsInStack;
 				OriginalNode                    = oldOriginalNode;
@@ -381,8 +387,11 @@ namespace Acuminator.Utilities.Roslyn
 			AfterRecursiveVisit(calledMethod, calledMethodNode, callSite, wasVisited);
 		}
 
-        private bool IsMethodInStack(IMethodSymbol calledMethod) =>
-			MethodsInStack.Contains(calledMethod);
+		private bool IsMethodInStack(IMethodSymbol calledMethod) => MethodsInStack.Contains(calledMethod);
+
+		private bool IsMethodInLocalFunctionsStack(IMethodSymbol localFunction) => 
+			localFunction.MethodKind == MethodKind.LocalFunction && 
+			LocalFunctionsStack.Contains(localFunction, SymbolEqualityComparer.Default);
 
 		/// <summary>
 		/// Extensibility point that allows to add some logic executed before <paramref name="calledMethod"/> is checked by the bypass check <see cref="BypassMethod(IMethodSymbol)"/>.
