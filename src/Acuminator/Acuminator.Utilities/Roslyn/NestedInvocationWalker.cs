@@ -295,7 +295,7 @@ namespace Acuminator.Utilities.Roslyn
 		public override void VisitLocalFunctionStatement(LocalFunctionStatementSyntax localFunctionStatement)
 		{
 			// There are two ways to get into local function statement with the nested invocation walker:
-			// 1. Visit it during the recursive visit of a local function call. In such case it can be processesd as usual
+			// 1. Visit it during the recursive visit of a local function call. In such case it can be processed as usual
 			// 2. Visit the declaration during the normal syntax walking.
 
 			// We are visiting local function declaration currently from a recursive call only if the currently visited node equals to the localFunctionStatement
@@ -409,7 +409,7 @@ namespace Acuminator.Utilities.Roslyn
 		/// The default implementation will check <paramref name="calledMethod"/>.ContainingType and bypass all types obtained from the extendable <see cref="GetTypesToBypass"/> method.<br/>
 		/// If the method containing type is one of bypassed types then the code will immediately return <see langword="true"/> and <paramref name="calledMethod"/> will be bypassed. If custom
 		/// extraBypassCheck delegate was specified in the <see cref=" NestedInvocationWalker"/> constructor then it will be called after the check for bypassed types.<br/>
-		/// The method be overriden for custom skip logic.
+		/// The method be overridden for custom skip logic.
 		/// </remarks>
 		/// <param name="calledMethod">The called method symbol to check.</param>
 		/// <param name="calledMethodNode">The called method node.</param>
