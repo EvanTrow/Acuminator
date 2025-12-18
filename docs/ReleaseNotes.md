@@ -121,7 +121,11 @@ Acuminator 4.0.0 contains a new set of diagnostics to validate best practices fo
   - The [PX1003](diagnostics/PX1003.md) diagnostic now has an accompanying code fix that will replace the `new PXGraph()` expression with a call to the factory method `PXGraph.CreateInstance<PXGraph>()`. 
   - Acuminator will now provide a default justification for suppression comments generated for the [PX1003](diagnostics/PX1003.md) diagnostic.
 - The [PX1005](diagnostics/PX1005.md) diagnostic has been reworked to look for typos both in view and action delegates. The diagnostic now supports the scenario when a view or an action is declared in base types of a graph or a graph extension. The accompanying code fix has been extended to fix action delegate names. 
-- The existing [PX1008](diagnostics/PX1008.md) diagnostic that reports captures of screen graph by a delegate closure was enhanced to support `ILongOperationManager` and `IGraphLongOperationManager` interfaces. It now also performs the analysis of process delegates set via the `SetAsyncProcessDelegate` method. The diagnostic now also analyzes record types.
+- The existing [PX1008](diagnostics/PX1008.md) diagnostic was enhanced in several ways: 
+  - The diagnostic now reports captures of screen graph by a delegate closure was enhanced to support `ILongOperationManager` and `IGraphLongOperationManager` interfaces.
+  - The diagnostic now performs the analysis of process delegates set via the `SetAsyncProcessDelegate` method. 
+  - The diagnostic was updated to check record types.
+  - The diagnostic was optimized.
 - The [PX1012](diagnostics/PX1012.md) diagnostic has been optimized to use pre-calculated semantic information for graph.
 - The [PX1016](diagnostics/PX1016.md) diagnostic has received the following enhancements:
   - The severity of the [PX1016](diagnostics/PX1016.md) diagnostic has been changed from **Error** to **Warning** to indicate that the absence of the `IsActive` method does not lead to runtime errors.
@@ -243,6 +247,7 @@ Acuminator now includes a new settings page for the Code Map in Visual Studio op
 - Code fixes for [PX1000](diagnostics/PX1000.md), [PX1013](diagnostics/PX1013.md), [PX1040](diagnostics/PX1040.md), and [PX1042](diagnostics/PX1042.md) diagnostics were fixed to support methods and constructors with expression bodies.
 - The support for parameters in action delegates was fixed in code fixes for diagnostics [PX1000](diagnostics/PX1000.md) and [PX1013](diagnostics/PX1013.md).
 - The [PX1007](diagnostics/PX1007.md) diagnostic incorrectly determined the mapped DAC field of the projection DAC in cases when projection DAC was derived from one of the DACs in its projection query. The projection DACs derived from other DACs have implicit mappings for DAC fields inherited from base DACs. This distinction is frequently used by developers to simplify the code and avoid explicit declaration of multiple `BqlField`/`BqlTable` mappings. The bugfix adds the recognition of this pattern to the [PX1007](diagnostics/PX1007.md) diagnostic.
+- The [PX1008](diagnostics/PX1008.md) diagnostic threw a stack overflow exception during the analysis of a specific code containing local functions. During the analysis of a local function that calls its containing method the [PX1008](diagnostics/PX1008.md) diagnostic would go into an endless loop until a stack overflow exception was thrown. 
 - The [PX1012](diagnostics/PX1012.md) diagnostic received minor bug fixes.
 - In the [PX1012](diagnostics/PX1012.md), [PX1062](diagnostics/PX1062.md), and [PX1072](diagnostics/PX1072.md) diagnostics, mass code fixes have been improved.
 - The [PX1015](diagnostics/PX1015.md) diagnostic had an issue that could cause a stack overflow and Visual Studio crash on certain code bases that contained code working with generic type arguments with specific constraints.
