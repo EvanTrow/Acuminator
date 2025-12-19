@@ -62,12 +62,14 @@ namespace Acuminator.Analyzers.StaticAnalysis.LongOperationDelegateClosures
 			public override void VisitDocumentationCommentTrivia(DocumentationCommentTriviaSyntax node) { }
 
 			public override void VisitXmlComment(XmlCommentSyntax node) { }
+
+			public override void VisitAttributeList(AttributeListSyntax node) { }
 			#endregion
 
 			public override void VisitLocalFunctionStatement(LocalFunctionStatementSyntax localFunctionDeclaration)
 			{
 				// There are two ways to get into local function statement with the nested invocation walker:
-				// 1. Visit it during the recursive visit of a local function call. In such case it can be processesd as usual
+				// 1. Visit it during the recursive visit of a local function call. In such case it can be processed as usual
 				// 2. Visit the declaration during the normal syntax walking.
 				
 				if (localFunctionDeclaration.Equals(NodeCurrentlyVisitedRecursively))

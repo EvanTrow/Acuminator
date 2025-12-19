@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -69,6 +67,8 @@ namespace Acuminator.Utilities.Roslyn
 		private Stack<SyntaxNode> NodesStack { get; set; } = new Stack<SyntaxNode>();
 
         private HashSet<IMethodSymbol> MethodsInStack { get; set; } = new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
+
+		private Stack<IMethodSymbol> LocalFunctionsStack { get; set; } = new Stack<IMethodSymbol>();
 
 		private readonly Lazy<HashSet<INamedTypeSymbol>> _typesToBypass;
 		private readonly Func<IMethodSymbol, bool>? _extraBypassCheck;
@@ -295,7 +295,7 @@ namespace Acuminator.Utilities.Roslyn
 		public override void VisitLocalFunctionStatement(LocalFunctionStatementSyntax localFunctionStatement)
 		{
 			// There are two ways to get into local function statement with the nested invocation walker:
-			// 1. Visit it during the recursive visit of a local function call. In such case it can be processesd as usual
+			// 1. Visit it during the recursive visit of a local function call. In such case it can be processed as usual
 			// 2. Visit the declaration during the normal syntax walking.
 
 			// We are visiting local function declaration currently from a recursive call only if the currently visited node equals to the localFunctionStatement
@@ -306,7 +306,19 @@ namespace Acuminator.Utilities.Roslyn
 				base.VisitLocalFunctionStatement(localFunctionStatement);   //Process recursive call as usual
 				return;
 			}
-			
+
+			// Visit of a local function as a declaration during the normal syntax walking.
+			var semanticModel = GetSemanticModel(localFunctionStatement.SyntaxTree);
+			var localMethodSymbol = semanticModel?.GetDeclaredSymbol(localFunctionStatement, CancellationToken) as IMethodSymbol;
+
+			// When we are visiting the local method via the normal syntax walking, we need to check that we haven't already visited it recursively.
+			// This can happen in a scenario when a method declares a local function that calls the containing method recursively.
+			// 
+			// We use a separate stack for this purpose to not mix local function declarations with the logic of normal method calls.
+			// The logic analyzing normal method calls relies on the context whether the analyzer currently is inside a recursive call or not. 
+			if (localMethodSymbol == null || IsMethodInLocalFunctionsStack(localMethodSymbol))
+				return;
+
 			// When we visit local function declaration during the normal syntax walking it is like we start visiting another method at the top of call stack
 			// No previous recursive context applies to the local function declaration itself because it is a declaration, not a call. 
 			// In fact, the method can be never called. Thus, we need to save previous recursive context, reset it, visit local function and then restore saved context
@@ -317,15 +329,22 @@ namespace Acuminator.Utilities.Roslyn
 
 			try
 			{
-				NodesStack                      = new Stack<SyntaxNode>();
-				MethodsInStack                  = new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
-				OriginalNode                    = null;
+				// We need to initialize a new empty context and method call stack to imitate a situation where we start the analysis 
+				// with the local function as a top function.
+				NodesStack	   					= new Stack<SyntaxNode>();
+				MethodsInStack 					= new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
+				OriginalNode 					= null;
 				NodeCurrentlyVisitedRecursively = null;
+
+				// Push the local function to the local functions stack to avoid re-visiting it recursively
+				LocalFunctionsStack.Push(localMethodSymbol);
 
 				base.VisitLocalFunctionStatement(localFunctionStatement);
 			}
 			finally
 			{
+				LocalFunctionsStack.Pop();
+
 				NodesStack                      = oldNodesStack;
 				MethodsInStack                  = oldMethodsInStack;
 				OriginalNode                    = oldOriginalNode;
@@ -365,8 +384,11 @@ namespace Acuminator.Utilities.Roslyn
 			AfterRecursiveVisit(calledMethod, calledMethodNode, callSite, wasVisited);
 		}
 
-        private bool IsMethodInStack(IMethodSymbol calledMethod) =>
-			MethodsInStack.Contains(calledMethod);
+		private bool IsMethodInStack(IMethodSymbol calledMethod) => MethodsInStack.Contains(calledMethod);
+
+		private bool IsMethodInLocalFunctionsStack(IMethodSymbol localFunction) => 
+			localFunction.MethodKind == MethodKind.LocalFunction && 
+			LocalFunctionsStack.Contains(localFunction, SymbolEqualityComparer.Default);
 
 		/// <summary>
 		/// Extensibility point that allows to add some logic executed before <paramref name="calledMethod"/> is checked by the bypass check <see cref="BypassMethod(IMethodSymbol)"/>.
@@ -409,7 +431,7 @@ namespace Acuminator.Utilities.Roslyn
 		/// The default implementation will check <paramref name="calledMethod"/>.ContainingType and bypass all types obtained from the extendable <see cref="GetTypesToBypass"/> method.<br/>
 		/// If the method containing type is one of bypassed types then the code will immediately return <see langword="true"/> and <paramref name="calledMethod"/> will be bypassed. If custom
 		/// extraBypassCheck delegate was specified in the <see cref=" NestedInvocationWalker"/> constructor then it will be called after the check for bypassed types.<br/>
-		/// The method be overriden for custom skip logic.
+		/// The method be overridden for custom skip logic.
 		/// </remarks>
 		/// <param name="calledMethod">The called method symbol to check.</param>
 		/// <param name="calledMethodNode">The called method node.</param>

@@ -234,6 +234,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.LongOperationDelegateClosures
 				Descriptors.PX1008_LongOperationDelegateClosures.CreateFor(line: 20, column: 24, formatArgs));
 		}
 
+		[Theory]
+		[EmbeddedFileData("CircularReferenceInCalls.cs")]
+		public Task InterProcedureAnalysis_WithCircularReferences_NoDiagnostic(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual);
 
 		[Theory(Skip = "Recursive analysis of passed delegates currently is not supported for this diagnostic and is skipped for now")]
 		[EmbeddedFileData("LongRunDelegateClosures_Delegates.cs")]
