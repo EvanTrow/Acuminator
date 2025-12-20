@@ -7,7 +7,7 @@ Acuminator 4.0.0 includes the bug fixes and enhancements described in this secti
 ### Announcements
 
 #### Support of Visual Studio 2017 Dropped
-Starting from Acuminator 4.0.0 the support of **Visual Studio 2017** is dropped. The last Acuminator version supporting Visual Studio 2017 is **Acuminator 3.1.3**.
+Starting from Acuminator 4.0.0, **Visual Studio 2017** is no longer supported. The last Acuminator version supporting Visual Studio 2017 is **Acuminator 3.1.3**.
 
 #### Acuminator Supports ARM Platform
 The Acuminator extension can now be used on machines with ARM64 processors, enabling development and code analysis on ARM-based devices. An example of such an environment is a MacBook with an ARM CPU that runs Windows and Visual Studio in a virtual machine. While this is not a commonly encountered working environment, you can now develop Acumatica code with Acuminator on these systems.
@@ -69,7 +69,7 @@ The list of forbidden APIs may grow in the future. You can find the table with a
 - The new [PX1110](diagnostics/PX1110.md) diagnostic enforces that DACs with `PXDBLocalizableString` attributes also declare a `NoteID` field, preventing related runtime issues. An accompanying code fix adds the missing `NoteID` field to the DAC.
 - The new [PX1117](diagnostics/PX1117.md) diagnostic detects DAC extensions with complex non-linear type hierarchies. Extending multiple independent DAC extensions is forbidden for DAC extensions and the diagnostic reports such DAC extensions.
 
-#### New Acuminator Diagnostics for graphs and graph extensions
+#### New Acuminator Diagnostics for Graphs and Graph Extensions
 - The [PX1077](diagnostics/PX1077.md) diagnostic forbids private graph event handlers. The code fix for the diagnostic will attempt to change a private event handler into a `protected virtual` method. The diagnostic has been implemented by the external contributor [Kemal Taskin](https://github.com/taskinkemal). His contribution is much appreciated.
 - The new [PX1111](diagnostics/PX1111.md) diagnostic detects processing views with main DACs that do not declare a `NoteID` field.
 - The new [PX1112](diagnostics/PX1112.md) diagnostic requires that graphs and graph extensions with generic type parameters are marked as abstract classes. An accompanying code fix adds the `abstract` modifier to the graph or graph extension declaration.
@@ -78,7 +78,7 @@ The list of forbidden APIs may grow in the future. You can find the table with a
   - **Non-abstract and non-generic graph extension**: A concrete graph extension without generic type parameters.
   - **Abstract graph extension with the `PXProtectedAccess` attribute**: An abstract graph extension decorated with the `PXProtectedAccess` attribute.
 
-#### New Acuminator Diagnostics for the `PXOverride` methods
+#### New Acuminator Diagnostics for the `PXOverride` Methods
 Acuminator 4.0.0 contains a new set of diagnostics to validate best practices for the work with the `PXOverride` methods:
 - The new [PX1079](diagnostics/PX1079.md) diagnostic prohibits `PXOverride` methods without an additional delegate parameter for calling the base method. An accompanying code fix adds an additional delegate parameter to the `PXOverride` method. The type of the generated parameter matches the signature of the base method and the name of the delegate parameter is generated according to the naming conventions of Acumatica Framework.
 - The new [PX1097](diagnostics/PX1097.md) diagnostic forbids non-public or virtual `PXOverride` methods. The code fix changes the accessibility of the `PXOverride` method to `public` and removes `virtual` modifier from the method declaration.
@@ -140,7 +140,7 @@ Acuminator 4.0.0 contains a new set of diagnostics to validate best practices fo
 - The [PX1047](diagnostics/PX1047.md) and [PX1048](diagnostics/PX1048.md) diagnostics now support variables declared with C# recursive patterns and variables declared with with C# `is not`, `is var`, and positional patterns.
 - The [PX1048](diagnostics/PX1048.md) diagnostic has been updated to prohibit changes to other DACs from the `FieldUpdating` event handlers, in line with new established best practices of Acumatica Framework.
 - The diagnostics for graph initialization [PX1054](diagnostics/PX1054.md), [PX1057](diagnostics/PX1057.md), [PX1058](diagnostics/PX1058.md), [PX1059](diagnostics/PX1059.md), [PX1081](diagnostics/PX1081.md), [PX1082](diagnostics/PX1082.md), [PX1085](diagnostics/PX1085.md) have been extended to consider the `Configure` and `Initialize` methods of graphs and graph extensions as part of the graph initialization.
-- The severity of [PX1060](diagnostics/PX1060.md) and [PX1061](diagnostics/PX1061.md) diagnostics was changed from **Information** to **Warning** to indicate that DAC fields should support FBQL queries.
+- The severity of [PX1060](diagnostics/PX1060.md) and [PX1061](diagnostics/PX1061.md) diagnostics was changed from **Information** to **Warning** to indicate that DAC fields should support fluent BQL queries.
 - The [PX1073](diagnostics/PX1073.md) diagnostic now reports exceptions thrown in the `FieldUpdating` event handler. The only allowed exceptions in `FieldUpdating` event handlers are `NotImplementedException`, `NotSupportedException`, and `ArgumentException` (including its descendants `ArgumentNullException` and `ArgumentOutOfRangeException`).
 - The [PX1075](diagnostics/PX1075.md) diagnostic was extended to forbid `PXCache.RaiseExceptionHandling` calls in `FieldUpdating` event handlers. The analysis of the diagnostic was also optimized.
 - The [PX1086](diagnostics/PX1086.md) diagnostic was reworked to detect `PXSetupNotEnteredException` exceptions thrown by the calls to external helpers via the inter-procedural analysis.
@@ -166,11 +166,11 @@ Acuminator 4.0.0 contains a new set of diagnostics to validate best practices fo
 - The support for the `PXBqlTable` base DAC type has been added to the Acuminator code analysis.
 - A common base class `PXCodeFixProvider` with common boilerplate logic for code fix registration has been added to Acuminator and integrated with the Acuminator code fix providers.
 - Support of `PK`s with size more than **8** key fields has been added to the `PK`/`FK` diagnostics. The maximum supported key size of `PK`s now is **12** fields.
-- The C# implicit object creation with the `new()` syntax is now supported by Acuminator code analysis.
+- The implicit object creation with the `new()` syntax in C# is now supported by Acuminator code analysis.
 - A number of various optimizations in the code analysis have been implemented.
 - Other enhancements. 
 
-### Enhancements - Acuminator Console Runner
+### Enhancements: Acuminator Console Runner
 A big part of the new Acuminator 4.0.0 release is the new **Acuminator Console Runner** tool. **Acuminator Console Runner** is a standalone command-line tool that serves as a command-line interface (CLI) for Acuminator code analysis and allows to run it outside of IDE. Such tool is useful for CI/CD pipelines and other automated scenarios. The name of the executable file is *Acuminator.Runner.NetFramework.exe*. The tool requires .NET Framework 4.8 runtime.
 
 Acuminator Console Runner supports analysis of .NET solutions (*.sln*) and projects (*.csproj*). It also provides several command line arguments to configure the code analysis and the format of the generated report. Run the tool with `--help` argument to see the documentation for all supported command line arguments in the console.
@@ -186,7 +186,7 @@ Acuminator.Runner.NetFramework.exe <path to the solution/project> --verbosity De
 ```
 You can find the description of the Acuminator Console Runner and all available command line arguments on the [documentation page for the tool](AcuminatorCLI.md). 
 
-### Enhancements - Code Map
+### Enhancements: Code Map
 
 #### New Filter Box
 Code Map now has a new filter box that gives you an ability to filter tree nodes by input string and quickly find necessary info in complex DACs and graphs:
