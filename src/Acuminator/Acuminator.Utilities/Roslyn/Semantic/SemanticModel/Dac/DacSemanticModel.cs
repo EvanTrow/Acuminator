@@ -256,6 +256,10 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		protected bool IsFullyUnboundDac()
 		{
 			if (DacFieldsByNames.Count == 0)
+				return true;
+
+			// Heuristic - Accumulator and Projection DACs should be DB bound.
+			if (HasAccumulatorAttribute || IsProjectionDac)
 				return false;
 
 			if (!Attributes.IsDefaultOrEmpty)
