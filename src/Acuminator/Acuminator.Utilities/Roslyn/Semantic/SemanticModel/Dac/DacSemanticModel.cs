@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 
 using Acuminator.Utilities.Common;
+using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.PXFieldAttributes;
 using Acuminator.Utilities.Roslyn.Semantic.Attribute;
 using Acuminator.Utilities.Roslyn.Semantic.Shared;
@@ -265,13 +266,31 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 					return true;
 			}
 
-			bool allFieldsAreUnbound = DacFieldPropertiesWithAcumaticaAttributes.All(p => p.EffectiveDbBoundness is DbBoundnessType.Unbound or 
-																													DbBoundnessType.NotDefined);
-			if (allFieldsAreUnbound)
-				return true;
+			int unboundFieldsCount = 0;
+			int boundFieldsCount = 0;
 
+			foreach (DacPropertyInfo property in DacFieldPropertiesWithAcumaticaAttributes)
+			{
+				if (property.EffectiveDbBoundness is DbBoundnessType.Unbound or DbBoundnessType.NotDefined)
+					unboundFieldsCount++;
+				else
+					boundFieldsCount++;
+			}
 
-			return allFieldsAreUnbound;
+			switch (boundFieldsCount)
+			{
+				case 0:
+					return true;
+				case 1:
+					// Heuristic for NoteID - if NoteID is the only bound field and there is more than one field, then consider the DAC as fully unbound.
+					// This is required because there is no good way to configure an unbound NoteID field.
+					if (unboundFieldsCount == 0 || !PropertiesByNames.TryGetValue(DacFieldNames.System.NoteID, out var noteIdProperty))
+						return false;
+
+					return noteIdProperty.EffectiveDbBoundness == DbBoundnessType.DbBound;
+				default:
+					return false;
+			}
 		}
 	}
 }
