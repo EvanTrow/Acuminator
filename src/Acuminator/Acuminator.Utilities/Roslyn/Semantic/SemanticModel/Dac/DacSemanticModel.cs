@@ -136,9 +136,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 																								 BqlFieldsByNames, PropertiesByNames);
 			IsActiveMethodInfo = GetIsActiveMethodInfo();
 
-			IsFullyUnbound  = DacFieldPropertiesWithAcumaticaAttributes.All(p => p.EffectiveDbBoundness is DbBoundnessType.Unbound or DbBoundnessType.NotDefined);
 			IsProjectionDac = CheckIfDacIsProjection();
 			AccumulatorAttribute = GetPXAccumulatorAttribute();
+			IsFullyUnbound = IsFullyUnboundDac();
 		}
 
 		/// <summary>
@@ -250,6 +250,28 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 				return null;
 
 			return Attributes.FirstOrDefault(attr => attr.IsPXAccumulatorAttribute);
+		}
+
+		protected bool IsFullyUnboundDac()
+		{
+			if (DacFieldsByNames.Count == 0)
+				return false;
+
+			if (!Attributes.IsDefaultOrEmpty)
+			{
+				var pxVirtualAttribute = PXContext.AttributeTypes.PXVirtualAttribute;
+
+				if (Attributes.Any(aInfo => pxVirtualAttribute.Equals(aInfo.AttributeType, SymbolEqualityComparer.Default)))
+					return true;
+			}
+
+			bool allFieldsAreUnbound = DacFieldPropertiesWithAcumaticaAttributes.All(p => p.EffectiveDbBoundness is DbBoundnessType.Unbound or 
+																													DbBoundnessType.NotDefined);
+			if (allFieldsAreUnbound)
+				return true;
+
+
+			return allFieldsAreUnbound;
 		}
 	}
 }
