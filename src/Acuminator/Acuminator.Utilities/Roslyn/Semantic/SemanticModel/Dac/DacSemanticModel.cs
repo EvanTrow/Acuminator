@@ -105,6 +105,11 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 		public ImmutableArray<DacAttributeInfo> Attributes { get; }
 
 		/// <summary>
+		/// The PXDBInterceptorAttribute attributes declared on a DAC or a DAC extension.
+		/// </summary>
+		public ImmutableArray<DacAttributeInfo> DBInterceptorAttributes { get; }
+
+		/// <summary>
 		/// The PXAccumulator-derived attribute if there is any declared on a DAC.
 		/// </summary>
 		public DacAttributeInfo? AccumulatorAttribute { get; }
@@ -130,11 +135,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			_cancellation = cancellation;
 			IsMappedCacheExtension = Symbol.InheritsFromOrEquals(PXContext.PXMappedCacheExtensionType);
 
-			Attributes		  = GetDacAttributes();
-			BqlFieldsByNames  = GetDacBqlFields();
-			PropertiesByNames = GetDacProperties(BqlFieldsByNames);
-			DacFieldsByNames  = DacFieldsCollector.CollectDacFieldsFromDacPropertiesAndBqlFields(DacOrDacExtInfo, PXContext,
-																								 BqlFieldsByNames, PropertiesByNames);
+			Attributes		  		= GetDacAttributes();
+			DBInterceptorAttributes = Attributes.Where(attr => attr.IsDbInterceptorAttribute).ToImmutableArray();
+			BqlFieldsByNames  		= GetDacBqlFields();
+			PropertiesByNames 		= GetDacProperties(BqlFieldsByNames);
+			DacFieldsByNames  		= DacFieldsCollector.CollectDacFieldsFromDacPropertiesAndBqlFields(DacOrDacExtInfo, PXContext,
+																									   BqlFieldsByNames, PropertiesByNames);
 			IsActiveMethodInfo = GetIsActiveMethodInfo();
 
 			IsProjectionDac = CheckIfDacIsProjection();
@@ -239,18 +245,18 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 
 		protected bool CheckIfDacIsProjection()
 		{
-			if (DacType != DacType.Dac || Attributes.IsDefaultOrEmpty)
+			if (DacType != DacType.Dac || DBInterceptorAttributes.IsDefaultOrEmpty)
 				return false;
 
-			return Attributes.Any(attrInfo => attrInfo.IsPXProjection);
+			return DBInterceptorAttributes.Any(attrInfo => attrInfo.IsPXProjection);
 		}
 
 		protected DacAttributeInfo? GetPXAccumulatorAttribute()
 		{
-			if (DacType != DacType.Dac || Attributes.IsDefaultOrEmpty)
+			if (DacType != DacType.Dac || DBInterceptorAttributes.IsDefaultOrEmpty)
 				return null;
 
-			return Attributes.FirstOrDefault(attr => attr.IsPXAccumulatorAttribute);
+			return DBInterceptorAttributes.FirstOrDefault(attr => attr.IsPXAccumulatorAttribute);
 		}
 
 		protected bool IsFullyUnboundDac()
@@ -258,8 +264,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Dac
 			if (DacFieldsByNames.Count == 0)
 				return true;
 
-			// Heuristic - Accumulator and Projection DACs should be DB bound.
-			if (HasAccumulatorAttribute || IsProjectionDac)
+			// Heuristic - DACs with PXDBInterceptorAttribute should be DB bound.
+			if (!DBInterceptorAttributes.IsDefaultOrEmpty)
 				return false;
 
 			if (!Attributes.IsDefaultOrEmpty)
