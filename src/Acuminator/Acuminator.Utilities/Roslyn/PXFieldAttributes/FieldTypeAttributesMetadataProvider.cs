@@ -298,6 +298,11 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			wellKnownNonDataTypeAttributes.Add(pxContext.AttributeTypes.PXIntListAttribute.Type);
 			wellKnownNonDataTypeAttributes.Add(pxContext.AttributeTypes.PXSelectorAttribute.Type);
 			wellKnownNonDataTypeAttributes.Add(pxContext.AttributeTypes.PXForeignReferenceAttribute);
+			wellKnownNonDataTypeAttributes.Add(pxContext.AttributeTypes.PXParentAttribute);
+			wellKnownNonDataTypeAttributes.Add(pxContext.AttributeTypes.PXDBDefaultAttribute);
+
+			if (pxContext.AttributeTypes.AutoNumberAttribute.IsDefined)
+				wellKnownNonDataTypeAttributes.Add(pxContext.AttributeTypes.AutoNumberAttribute.Type!);
 
 			return wellKnownNonDataTypeAttributes.ToImmutable();
 		}
