@@ -86,7 +86,12 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.DacPropertyAttributes
 
 		[Theory]
 		[EmbeddedFileData("DacWithValidAggregatorAttributes.cs")]
-		public virtual Task DacWithValidAggregatorAttributes(string source) =>
+		public virtual Task Dac_WithValid_AggregatorAttributes(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
+
+		[Theory]
+		[EmbeddedFileData("DacWithPXDBPackedIntegerArrayAttribute.cs")]
+		public virtual Task Dac_WithPXDBPackedIntegerArrayAttribute(string source) =>
 			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
