@@ -30,6 +30,8 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 		public ImmutableArray<ITypeSymbol> WellKnownNonDataTypeAttributes { get; }
 
+		public ImmutableDictionary<ITypeSymbol, DataTypeAttributeInfo> MetadataForWellKnownSpecialDataTypeAttributes { get; }
+
 		private readonly INamedTypeSymbol _pxDBCalcedAttribute;
 		private readonly INamedTypeSymbol _pxDBScalarAttribute;
 		private readonly INamedTypeSymbol _pxDBFieldAttribute;
@@ -59,6 +61,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 																.ToImmutableArray();
 
 			WellKnownNonDataTypeAttributes = GetWellKnownNonDataTypeAttributes(_pxContext);
+			MetadataForWellKnownSpecialDataTypeAttributes = GetMetadataForWellKnownSpecialDataTypeAttributes(_pxContext);
 		}
 
 		public bool IsWellKnownNonDataTypeAttribute(ITypeSymbol attribute)
@@ -290,7 +293,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 		private static ImmutableArray<ITypeSymbol> GetWellKnownNonDataTypeAttributes(PXContext pxContext)
 		{
-			var wellKnownNonDataTypeAttributes = ImmutableArray.CreateBuilder<ITypeSymbol>(initialCapacity: 6);
+			var wellKnownNonDataTypeAttributes = ImmutableArray.CreateBuilder<ITypeSymbol>(initialCapacity: 9);
 
 			wellKnownNonDataTypeAttributes.Add(pxContext.AttributeTypes.PXUIFieldAttribute.Type);
 			wellKnownNonDataTypeAttributes.Add(pxContext.AttributeTypes.PXDefaultAttribute);
@@ -305,6 +308,27 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 				wellKnownNonDataTypeAttributes.Add(pxContext.AttributeTypes.AutoNumberAttribute.Type!);
 
 			return wellKnownNonDataTypeAttributes.ToImmutable();
+		}
+
+		private static ImmutableDictionary<ITypeSymbol, DataTypeAttributeInfo> GetMetadataForWellKnownSpecialDataTypeAttributes(PXContext pxContext)
+		{
+			ImmutableDictionary<ITypeSymbol, DataTypeAttributeInfo>? metadataForWellKnownSpecialDataTypeAttributes = null;
+			var packagedIntegerAttribute = pxContext.FieldAttributes.PXDBPackedIntegerArrayAttribute;
+
+			if (packagedIntegerAttribute != null)
+			{
+				// PXDBPackedIntegerArrayAttribute is a special attribute wrote in a very hacky way.
+				// It derives from PXDBBinaryAttribute which works with byte[] but in reality PXDBPackedIntegerArrayAttribute works with ushort[].
+				// This breaks Acumatica design principle where derived attribute work on properties with the same property type as their base attribute.
+				// Thus, the attribute needs special handling in Acuminator.
+				var packedIntegerMetadata = new DataTypeAttributeInfo(FieldTypeAttributeKind.BoundTypeAttribute, packagedIntegerAttribute,
+																	  pxContext.SystemTypes.UInt16Array);
+				metadataForWellKnownSpecialDataTypeAttributes = 
+					ImmutableDictionary.CreateRange(SymbolEqualityComparer.Default,
+													new[] { KeyValuePair.Create(packagedIntegerAttribute as ITypeSymbol, packedIntegerMetadata) });
+			}
+
+			return metadataForWellKnownSpecialDataTypeAttributes ?? ImmutableDictionary<ITypeSymbol, DataTypeAttributeInfo>.Empty;
 		}
 	}
 }
