@@ -342,7 +342,7 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 
 			if (packedIntegerAttribute != null)
 			{
-				// PXDBPackedIntegerArrayAttribute is a special attribute wrote in a very hacky way.
+				// PXDBPackedIntegerArrayAttribute is a special attribute written in a very hacky way.
 				// It derives from PXDBBinaryAttribute which works with byte[] but in reality PXDBPackedIntegerArrayAttribute works with ushort[].
 				// This breaks Acumatica design principle where derived attribute work on properties with the same property type as their base attribute.
 				// Thus, the attribute needs special handling in Acuminator.
