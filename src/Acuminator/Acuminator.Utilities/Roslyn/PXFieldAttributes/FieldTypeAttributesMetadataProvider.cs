@@ -283,11 +283,11 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 				{ pxContext.FieldAttributes.PXDBDataLengthAttribute,   pxContext.SystemTypes.Int64 },
 			};
 
-			var packagedIntegerAttribute = pxContext.FieldAttributes.PXDBPackedIntegerArrayAttribute;
+			var packedIntegerAttribute = pxContext.FieldAttributes.PXDBPackedIntegerArrayAttribute;
 
-			if (packagedIntegerAttribute != null)
+			if (packedIntegerAttribute != null)
 			{
-				types.Add(packagedIntegerAttribute, pxContext.SystemTypes.UInt16Array);
+				types.Add(packedIntegerAttribute, pxContext.SystemTypes.UInt16Array);
 			}
 
 			return types;
@@ -338,19 +338,19 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 		private static ImmutableDictionary<ITypeSymbol, DataTypeAttributeInfo> GetMetadataForWellKnownSpecialDataTypeAttributes(PXContext pxContext)
 		{
 			ImmutableDictionary<ITypeSymbol, DataTypeAttributeInfo>? metadataForWellKnownSpecialDataTypeAttributes = null;
-			var packagedIntegerAttribute = pxContext.FieldAttributes.PXDBPackedIntegerArrayAttribute;
+			var packedIntegerAttribute = pxContext.FieldAttributes.PXDBPackedIntegerArrayAttribute;
 
-			if (packagedIntegerAttribute != null)
+			if (packedIntegerAttribute != null)
 			{
 				// PXDBPackedIntegerArrayAttribute is a special attribute wrote in a very hacky way.
 				// It derives from PXDBBinaryAttribute which works with byte[] but in reality PXDBPackedIntegerArrayAttribute works with ushort[].
 				// This breaks Acumatica design principle where derived attribute work on properties with the same property type as their base attribute.
 				// Thus, the attribute needs special handling in Acuminator.
-				var packedIntegerMetadata = new DataTypeAttributeInfo(FieldTypeAttributeKind.BoundTypeAttribute, packagedIntegerAttribute,
+				var packedIntegerMetadata = new DataTypeAttributeInfo(FieldTypeAttributeKind.BoundTypeAttribute, packedIntegerAttribute,
 																	  pxContext.SystemTypes.UInt16Array);
 				metadataForWellKnownSpecialDataTypeAttributes = 
 					ImmutableDictionary.CreateRange(SymbolEqualityComparer.Default,
-													new[] { KeyValuePair.Create(packagedIntegerAttribute as ITypeSymbol, packedIntegerMetadata) });
+													new[] { KeyValuePair.Create(packedIntegerAttribute as ITypeSymbol, packedIntegerMetadata) });
 			}
 
 			return metadataForWellKnownSpecialDataTypeAttributes ?? ImmutableDictionary<ITypeSymbol, DataTypeAttributeInfo>.Empty;
