@@ -5,7 +5,6 @@ using System.Linq;
 
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.Roslyn.Semantic;
-using Acuminator.Utilities.Roslyn.Semantic.Attribute;
 
 using Microsoft.CodeAnalysis;
 
@@ -93,6 +92,11 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			if (flattenedAttributes.Count == 0)
 				return [];
 
+			var metadataForWellKnownSpecialDataTypeAttribute = TryGetMetadataForWellKnownSpecialDataTypeAttribute(originalAttribute);
+			
+			if (metadataForWellKnownSpecialDataTypeAttribute != null)
+				return [metadataForWellKnownSpecialDataTypeAttribute];
+
 			var mixedDbBoundnessAttributeInfos = GetMixedDbBoundnessAttributeInfosInFlattenedSet(originalAttribute, flattenedAttributes);
 			bool hasMixedBoundnessAttributes = mixedDbBoundnessAttributeInfos?.Count > 0;
 			var typeAttributeInfos = hasMixedBoundnessAttributes
@@ -128,6 +132,27 @@ namespace Acuminator.Utilities.Roslyn.PXFieldAttributes
 			}
 
 			return typeAttributeInfos as IReadOnlyCollection<DataTypeAttributeInfo> ?? [];
+		}
+
+		private DataTypeAttributeInfo? TryGetMetadataForWellKnownSpecialDataTypeAttribute(ITypeSymbol attribute) 
+		{
+			if (MetadataForWellKnownSpecialDataTypeAttributes.Count == 0)
+				return null;
+			else if (MetadataForWellKnownSpecialDataTypeAttributes.TryGetValue(attribute, out var metadata))
+				return metadata;
+
+			var baseAttributeTypes = attribute.GetBaseTypes();
+
+			foreach (ITypeSymbol baseAttributeType in baseAttributeTypes)
+			{
+				if (baseAttributeType.SpecialType == SpecialType.System_Object)
+					return null;
+
+				if (MetadataForWellKnownSpecialDataTypeAttributes.TryGetValue(baseAttributeType, out var metadata))
+					return metadata;
+			}
+
+			return null;
 		}
 
 		/// <summary>
