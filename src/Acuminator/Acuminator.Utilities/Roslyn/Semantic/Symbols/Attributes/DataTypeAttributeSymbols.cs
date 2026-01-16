@@ -50,7 +50,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic.Symbols
 		public INamedTypeSymbol PXDBBinaryAttribute => Compilation.GetTypeByMetadataName(TypeFullNames.PXDBBinaryAttribute)!;
 
 		public INamedTypeSymbol? PXDBPackedIntegerArrayAttribute =>
-			Compilation.GetTypeByMetadataName(TypeFullNames.PXDBPackedIntegerArrayAttributeFullName_Acumatica2018R2)!;
+			Compilation.GetTypeByMetadataName(TypeFullNames.PXDBPackedIntegerArrayAttributeFullName_Acumatica2018R2);
 
 		public INamedTypeSymbol PXDBUserPasswordAttribute => Compilation.GetTypeByMetadataName(TypeFullNames.PXDBUserPasswordAttribute)!;
 
