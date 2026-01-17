@@ -218,7 +218,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 			var location = patchMethodNode.Identifier.GetLocation().NullIfLocationKindIsNone() ?? 
 						   pxOverrideInfo.Symbol.Locations.FirstOrDefault();
-			var baseMethodDocCommentID = GetPreparedReferenceToMethodText(pxOverrideInfo.BaseMethod);
+			var baseMethodDocCommentID = GetPreparedTextWithReferenceToBaseAPI(pxOverrideInfo.BaseMethod);
 			var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
 			{
 				{ PXOverrideDiagnosticProperties.BaseMethodDocCommentId, baseMethodDocCommentID }
@@ -230,15 +230,23 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 
-		private static string? GetPreparedReferenceToMethodText(IMethodSymbol method)
+		private static string? GetPreparedTextWithReferenceToBaseAPI(IMethodSymbol method)
 		{
-			string? methodDocCommentID = method.GetDocumentationCommentId().NullIfWhiteSpace();
-			methodDocCommentID = methodDocCommentID?.Length > 2
-				? methodDocCommentID.Substring(2)						 // Remove "M:" prefix
+			ISymbol? symbolToGetDocID = method.MethodKind switch
+			{
+				MethodKind.ReducedExtension 					 					   => method.ReducedFrom,
+				MethodKind.PropertyGet or MethodKind.PropertySet 					   => method.AssociatedSymbol,
+				MethodKind.EventAdd or MethodKind.EventRemove or MethodKind.EventRaise => method.AssociatedSymbol,
+				_ 																	   => method
+			};
+
+			string? docCommentID = symbolToGetDocID?.GetDocumentationCommentId().NullIfWhiteSpace();
+			docCommentID = docCommentID?.Length > 2
+				? docCommentID.Substring(2)				// Remove "M:" and other API type prefixes
 				: null;
 
-			return methodDocCommentID != null
-				? methodDocCommentID.Replace(",", ", ")		// make parameters list more readable and look like the one VS inserts
+			return docCommentID != null
+				? docCommentID.Replace(",", ", ")		// make parameters list more readable and look like the one VS inserts
 				: null;
 		}
 	}
