@@ -47,9 +47,20 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
+		[EmbeddedFileData(@"XmlComment\PXOverrideOfPropertyFromBasePXGraphWithoutXmlComment_Expected.cs")]
+		public Task PXOverride_Property_WithoutXmlDocComment_AfterCodeFix(string source) =>
+			VerifyCSharpDiagnosticAsync(source);
+
+		[Theory]
 		[EmbeddedFileData(@"XmlComment\PXOverrideWithoutXmlComment.cs",
 						  @"XmlComment\PXOverrideWithoutXmlComment_Expected.cs")]
-		public Task PXOverrides_WithoutXmlDocComment_CodeFix(string actual, string expected) =>
+		public Task PXOverride_Methods_WithoutXmlDocComment_CodeFix(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected);
+
+		[Theory]
+		[EmbeddedFileData(@"XmlComment\PXOverrideOfPropertyFromBasePXGraphWithoutXmlComment.cs",
+						  @"XmlComment\PXOverrideOfPropertyFromBasePXGraphWithoutXmlComment_Expected.cs")]
+		public Task PXOverride_Property_WithoutXmlDocComment_CodeFix(string actual, string expected) =>
 			VerifyCSharpFixAsync(actual, expected);
 
 		private sealed class PXOverrideAnalyzerForMissingXmlCommentTests : PXOverrideAnalyzer
