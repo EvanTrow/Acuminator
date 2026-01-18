@@ -259,11 +259,17 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 			for (var i = rangeStart; i < rangeEnd; i++)
 			{
-				if (!sourceParameters[i].Type.Equals(parametersToCheck[i].Type, SymbolEqualityComparer.Default))
+				if (!AreParametersEqual(sourceParameters[i], parametersToCheck[i]))
 					return false;
 			}
-
+			
 			return true;
+
+			//---------------------------------------Local Function-----------------------------------------------------------------
+			static bool AreParametersEqual(IParameterSymbol paramX, IParameterSymbol paramY) =>
+				paramX.RefKind == paramY.RefKind && paramX.IsOptional == paramY.IsOptional &&
+				(paramX.Type.Equals(paramY.Type, SymbolEqualityComparer.Default) ||
+				 paramX.OriginalDefinition.Type.Equals(paramY.OriginalDefinition.Type, SymbolEqualityComparer.Default));
 		}
 
 		/// <summary>
