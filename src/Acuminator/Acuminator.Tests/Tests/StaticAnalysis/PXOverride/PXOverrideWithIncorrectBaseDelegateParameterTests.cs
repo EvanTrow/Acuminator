@@ -31,6 +31,13 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		protected override CodeFixProvider GetCSharpCodeFixProvider() => new AddOrReplaceOrRenameBaseDelegateParameterFix();
 
 		[Theory]
+		[EmbeddedFileData(@"BaseDelegateParameter\IncorrectParameter\PXOverrideRefAndOutParametersMismatch.cs")]
+		public Task PXOverrides_With_BaseDelegate_Parameter_WithIncorrect_RefModifiers(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
+				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.CreateFor(15, 86),
+				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.CreateFor(24, 86));
+
+		[Theory]
 		[EmbeddedFileData(@"BaseDelegateParameter\IncorrectParameter\PXOverrideWithIncorrectBaseDelegateParameter.cs")]
 		public Task PXOverrides_With_Incorrect_BaseDelegate_Parameter(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
