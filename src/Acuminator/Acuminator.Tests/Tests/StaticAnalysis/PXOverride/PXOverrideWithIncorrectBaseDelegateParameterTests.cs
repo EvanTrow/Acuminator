@@ -32,7 +32,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 
 		[Theory]
 		[EmbeddedFileData(@"BaseDelegateParameter\IncorrectParameter\PXOverrideRefAndOutParametersMismatch.cs")]
-		public Task PXOverrides_With_BaseDelegate_Parameter_WithIncorrect_RefModifiers(string source) =>
+		public Task PXOverrides_With_BaseDelegateParameter_WithIncorrect_RefModifiers(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.CreateFor(15, 86),
 				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.CreateFor(24, 86),
@@ -40,7 +40,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 
 		[Theory]
 		[EmbeddedFileData(@"BaseDelegateParameter\IncorrectParameter\PXOverrideWithIncorrectBaseDelegateParameter.cs")]
-		public Task PXOverrides_With_Incorrect_BaseDelegate_Parameter(string source) =>
+		public Task PXOverrides_With_Incorrect_BaseDelegateParameter(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.CreateFor(14, 63),
 				Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter.CreateFor(18, 9),
@@ -49,7 +49,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 
 		[Theory]
 		[EmbeddedFileData(@"BaseDelegateParameter\IncorrectParameter\PXOverrideWithIncorrectBaseDelegateParameter_Expected.cs")]
-		public Task PXOverrides_With_Incorrect_BaseDelegate_Parameter_AfterCodeFix(string source) =>
+		public Task PXOverrides_With_Incorrect_BaseDelegateParameter_AfterCodeFix(string source) =>
 			VerifyCSharpDiagnosticAsync(source);
 
 		[Theory]
