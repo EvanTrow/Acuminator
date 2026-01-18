@@ -219,14 +219,20 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			var location = patchMethodNode.Identifier.GetLocation().NullIfLocationKindIsNone() ?? 
 						   pxOverrideInfo.Symbol.Locations.FirstOrDefault();
 			var baseMethodDocCommentID = GetPreparedTextWithReferenceToBaseAPI(pxOverrideInfo.BaseMethod);
-			var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+			ImmutableDictionary<string, string?> diagnosticProperties;
+
+			if (baseMethodDocCommentID != null)
 			{
-				{ PXOverrideDiagnosticProperties.BaseMethodDocCommentId, baseMethodDocCommentID }
+				diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+				{
+					{ PXOverrideDiagnosticProperties.BaseMethodDocCommentId, baseMethodDocCommentID }
+				}
+				.ToImmutableDictionary();
 			}
-			.ToImmutableDictionary();
+			else
+				diagnosticProperties = ImmutableDictionary<string, string?>.Empty;
 
 			var diagnostic = Diagnostic.Create(Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment, location, diagnosticProperties);
-
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 
