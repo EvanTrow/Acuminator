@@ -206,8 +206,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		/// </remarks>
 		public static bool SignatureEquals(this IMethodSymbol method, [NotNullWhen(returnValue: true)] IMethodSymbol? methodToCheck)
 		{
-			if (!method.AreParametersEqual(methodToCheck) || !method.ReturnType.Equals(methodToCheck.ReturnType, SymbolEqualityComparer.Default) ||
-				method.IsGenericMethod != methodToCheck.IsGenericMethod)
+			if (!method.AreParametersEqual(methodToCheck) || method.IsGenericMethod != methodToCheck.IsGenericMethod ||
+				 method.RefKind != methodToCheck.RefKind || !SymbolEqualityComparer.Default.Equals(method.ReturnType, methodToCheck.ReturnType))
 			{
 				return false;
 			}
