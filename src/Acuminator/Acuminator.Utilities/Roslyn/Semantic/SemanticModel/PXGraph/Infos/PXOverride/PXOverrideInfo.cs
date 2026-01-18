@@ -42,8 +42,8 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		}
 
 		private static bool DoesSignatureHaveNonTrivialRefKind(IMethodSymbol patchMethod) =>
-			patchMethod.RefKind == RefKind.None &&
-			(patchMethod.Parameters.IsDefaultOrEmpty || patchMethod.Parameters.All(param => param.RefKind == RefKind.None));
+			patchMethod.RefKind != RefKind.None ||
+			(!patchMethod.Parameters.IsDefaultOrEmpty && patchMethod.Parameters.Any(param => param.RefKind != RefKind.None));
 
 		internal static IEnumerable<PXOverrideInfo> GetDeclaredPXOverrides(GraphExtensionInfo graphExtensionInfo, PXContext context, 
 																		   CancellationToken cancellation)
