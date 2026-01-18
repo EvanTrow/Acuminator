@@ -112,6 +112,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			DiagnosticDescriptor descriptor;
 			Location? location;
 			BaseDelegateParameterFixMode fixMode;
+			bool registerDiagnostic;
 
 			switch (pxOverrideInfo.OverrideType)
 			{
@@ -119,12 +120,14 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 					descriptor = Descriptors.PX1079_PXOverrideWithoutDelegateParameter;
 					location = pxOverrideInfo.Symbol.Locations.FirstOrDefault();
 					fixMode = BaseDelegateParameterFixMode.AddDelegateParameter;
+					registerDiagnostic = !pxOverrideInfo.SignatureHasNonTrivialRefKind;
 					break;
 
 				case PXOverrideType.WithInvalidBaseDelegate:
 					descriptor = Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter;
 					location = GetLocationForIncorrectDelegateParameter(pxOverrideInfo.Symbol, context.CancellationToken);
 					fixMode = BaseDelegateParameterFixMode.ReplaceDelegateParameter;
+					registerDiagnostic = !pxOverrideInfo.SignatureHasNonTrivialRefKind;
 					break;
 
 				case PXOverrideType.WithValidBaseDelegate
@@ -132,6 +135,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 					descriptor = Descriptors.PX1102_PXOverrideInvalidNameOfDelegateParameter;
 					location = GetLocationForDelegateParameterWithIncorrectName(pxOverrideInfo.Symbol, context.CancellationToken);
 					fixMode = BaseDelegateParameterFixMode.RenameDelegateParameter;
+					registerDiagnostic = true;
 					break;
 
 				default:
@@ -140,11 +144,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 			var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
 			{
+				{ DiagnosticProperty.RegisterCodeFix, registerDiagnostic.ToString() },
 				{ PXOverrideDiagnosticProperties.PatchMethodName, pxOverrideInfo.Symbol.Name },
 				{ PXOverrideDiagnosticProperties.DelegateParameterFixMode, fixMode.ToString() }
 			}
 			.ToImmutableDictionary();
-
 
 			var diagnostic = Diagnostic.Create(descriptor, location, diagnosticProperties);
 
