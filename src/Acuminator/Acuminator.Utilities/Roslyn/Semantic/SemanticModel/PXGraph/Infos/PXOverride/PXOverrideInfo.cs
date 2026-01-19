@@ -21,6 +21,15 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 		/// </summary>
 		public IMethodSymbol? BaseMethod { get; }
 
+		/// <summary>
+		/// Indicates whether the PXOverride method signature has a non-trivial ref kind:
+		/// <list type="bullet">
+		/// <item><see langword="ref"/>, <see langword="out"/>, <see langword="in"/>, or <see langword="ref readonly"/> parameters</item>
+		/// <item><see langword="ref"/> or <see langword="ref readonly"/> return type</item>
+		/// </list>
+		/// </summary>
+		public bool SignatureHasNonTrivialRefKind { get; }
+
 		public PXOverrideInfo(IMethodSymbol symbol, PXOverrideType pxOverrideType, IMethodSymbol? baseMethod, int declarationOrder) : 
 						base(symbol, declarationOrder)
 		{
@@ -29,7 +38,12 @@ namespace Acuminator.Utilities.Roslyn.Semantic.PXGraph
 
 			OverrideType = pxOverrideType;
 			BaseMethod = baseMethod;
+			SignatureHasNonTrivialRefKind = DoesSignatureHaveNonTrivialRefKind(symbol);
 		}
+
+		private static bool DoesSignatureHaveNonTrivialRefKind(IMethodSymbol patchMethod) =>
+			patchMethod.RefKind != RefKind.None ||
+			(!patchMethod.Parameters.IsDefaultOrEmpty && patchMethod.Parameters.Any(param => param.RefKind != RefKind.None));
 
 		internal static IEnumerable<PXOverrideInfo> GetDeclaredPXOverrides(GraphExtensionInfo graphExtensionInfo, PXContext context, 
 																		   CancellationToken cancellation)

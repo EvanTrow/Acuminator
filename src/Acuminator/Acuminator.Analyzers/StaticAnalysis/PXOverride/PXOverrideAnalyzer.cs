@@ -112,6 +112,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			DiagnosticDescriptor descriptor;
 			Location? location;
 			BaseDelegateParameterFixMode fixMode;
+			bool registerCodeFix;
 
 			switch (pxOverrideInfo.OverrideType)
 			{
@@ -119,12 +120,14 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 					descriptor = Descriptors.PX1079_PXOverrideWithoutDelegateParameter;
 					location = pxOverrideInfo.Symbol.Locations.FirstOrDefault();
 					fixMode = BaseDelegateParameterFixMode.AddDelegateParameter;
+					registerCodeFix = !pxOverrideInfo.SignatureHasNonTrivialRefKind;
 					break;
 
 				case PXOverrideType.WithInvalidBaseDelegate:
 					descriptor = Descriptors.PX1101_PXOverrideWithInvalidDelegateParameter;
 					location = GetLocationForIncorrectDelegateParameter(pxOverrideInfo.Symbol, context.CancellationToken);
 					fixMode = BaseDelegateParameterFixMode.ReplaceDelegateParameter;
+					registerCodeFix = !pxOverrideInfo.SignatureHasNonTrivialRefKind;
 					break;
 
 				case PXOverrideType.WithValidBaseDelegate
@@ -132,6 +135,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 					descriptor = Descriptors.PX1102_PXOverrideInvalidNameOfDelegateParameter;
 					location = GetLocationForDelegateParameterWithIncorrectName(pxOverrideInfo.Symbol, context.CancellationToken);
 					fixMode = BaseDelegateParameterFixMode.RenameDelegateParameter;
+					registerCodeFix = true;
 					break;
 
 				default:
@@ -140,11 +144,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 			var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
 			{
+				{ DiagnosticProperty.RegisterCodeFix, registerCodeFix.ToString() },
 				{ PXOverrideDiagnosticProperties.PatchMethodName, pxOverrideInfo.Symbol.Name },
 				{ PXOverrideDiagnosticProperties.DelegateParameterFixMode, fixMode.ToString() }
 			}
 			.ToImmutableDictionary();
-
 
 			var diagnostic = Diagnostic.Create(descriptor, location, diagnosticProperties);
 
@@ -219,14 +223,20 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			var location = patchMethodNode.Identifier.GetLocation().NullIfLocationKindIsNone() ?? 
 						   pxOverrideInfo.Symbol.Locations.FirstOrDefault();
 			var baseMethodDocCommentID = GetPreparedTextWithReferenceToBaseAPI(pxOverrideInfo.BaseMethod);
-			var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+			ImmutableDictionary<string, string?> diagnosticProperties;
+
+			if (baseMethodDocCommentID != null)
 			{
-				{ PXOverrideDiagnosticProperties.BaseMethodDocCommentId, baseMethodDocCommentID }
+				diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+				{
+					{ PXOverrideDiagnosticProperties.BaseMethodDocCommentId, baseMethodDocCommentID }
+				}
+				.ToImmutableDictionary();
 			}
-			.ToImmutableDictionary();
+			else
+				diagnosticProperties = ImmutableDictionary<string, string?>.Empty;
 
 			var diagnostic = Diagnostic.Create(Descriptors.PX1098_PXOverrideMethodWithoutXmlDocComment, location, diagnosticProperties);
-
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 
