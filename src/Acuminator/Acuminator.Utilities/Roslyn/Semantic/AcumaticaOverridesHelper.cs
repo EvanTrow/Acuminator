@@ -86,15 +86,16 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 			IMethodSymbol baseDelegateMethod = delegateType.DelegateInvokeMethod;
 
-			if (!baseDelegateMethod.ReturnType.Equals(methodWithBaseDelegate.ReturnType, SymbolEqualityComparer.Default) ||
-				baseDelegateMethod.Parameters.Length != (methodWithBaseDelegate.Parameters.Length - 1) ||
-				baseDelegateMethod.IsGenericMethod != methodWithBaseDelegate.IsGenericMethod)
+			if (baseDelegateMethod.Parameters.Length != (methodWithBaseDelegate.Parameters.Length - 1) ||
+				baseDelegateMethod.IsGenericMethod != methodWithBaseDelegate.IsGenericMethod ||
+				baseDelegateMethod.RefKind != methodWithBaseDelegate.RefKind ||
+			   !baseDelegateMethod.ReturnType.Equals(methodWithBaseDelegate.ReturnType, SymbolEqualityComparer.Default))
 			{
 				return false;
 			}
 
 			if (methodWithBaseDelegate.IsGenericMethod)
-				return methodWithBaseDelegate.TypeParameters.Length == baseDelegateMethod.TypeParameters.Length;     // TODO no constraints check on type parameters currently
+				return methodWithBaseDelegate.TypeParameters.Length == baseDelegateMethod.TypeParameters.Length;		// TODO no constraints check on type parameters currently
 
 			return baseDelegateMethod.Parameters.EqualsParameterRange(methodWithBaseDelegate.Parameters, 
 																	  rangeStart: 0, rangeEnd: baseDelegateMethod.Parameters.Length);

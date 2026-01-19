@@ -166,6 +166,13 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		}
 
 		[Theory]
+		[EmbeddedFileData(@"SignatureMismatch\PXOverrideRefAndOutParametersMismatch.cs")]
+		public Task PXOverride_RefAndOutParameters_Mismatch_WithBaseMethod(string source) =>
+			VerifyCSharpDiagnosticAsync(source,
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(15, 15)
+			);
+
+		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\BaseTypeDefinedAsExtension.cs")]
 		public Task BaseTypeDefinedAsExtension(string source)
 		{
