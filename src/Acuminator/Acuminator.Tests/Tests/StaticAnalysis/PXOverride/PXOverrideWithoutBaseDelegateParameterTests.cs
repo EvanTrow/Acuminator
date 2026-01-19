@@ -31,8 +31,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		protected override CodeFixProvider GetCSharpCodeFixProvider() => new AddOrReplaceOrRenameBaseDelegateParameterFix();
 
 		[Theory]
-		[EmbeddedFileData(@"BaseDelegateParameter\WithoutParameter\PXOverrideWithoutBaseDelegateParameter.cs")]
-		public Task PXOverrides_With_BaseDelegateParameter_WithIncorrect_RefModifiers(string source) =>
+		[EmbeddedFileData(@"BaseDelegateParameter\WithoutParameter\PXOverrideRefAndOutParametersWithoutBaseDelegateParameter.cs")]
+		public Task PXOverrides_WithRefAndOutParameters_Without_BaseDelegateParameter(string source) =>
 			VerifyCSharpDiagnosticAsync(source,
 				Descriptors.PX1079_PXOverrideWithoutDelegateParameter.CreateFor(15, 15),
 				Descriptors.PX1079_PXOverrideWithoutDelegateParameter.CreateFor(21, 15),
@@ -65,8 +65,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 
 		// This test checks that code fix in fact is not registered and applied for the cases when method signature has non-trivial ref kinds.
 		[Theory]
-		[EmbeddedFileData(@"BaseDelegateParameter\WithoutParameter\PXOverrideRefAndOutParametersMismatch.cs",
-						  @"BaseDelegateParameter\WithoutParameter\PXOverrideRefAndOutParametersMismatch_Expected.cs")]
+		[EmbeddedFileData(@"BaseDelegateParameter\WithoutParameter\PXOverrideRefAndOutParametersWithoutBaseDelegateParameter.cs",
+						  @"BaseDelegateParameter\WithoutParameter\PXOverrideRefAndOutParametersWithoutBaseDelegateParameter_Expected.cs")]
 		public Task PXOverrides_WithRefAndOutParameters_Without_BaseDelegateParameter_CodeFix(string actual, string expected) =>
 			VerifyCSharpFixAsync(actual, expected);
 
