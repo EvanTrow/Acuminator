@@ -222,7 +222,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 
 			var location = patchMethodNode.Identifier.GetLocation().NullIfLocationKindIsNone() ?? 
 						   pxOverrideInfo.Symbol.Locations.FirstOrDefault();
-			var baseMethodDocCommentID = GetPreparedTextWithReferenceToBaseAPI(pxOverrideInfo.BaseMethod);
+			var baseMethodDocCommentID = GetPreparedTextWithReferenceToBaseAPI(pxOverrideInfo.BaseMethod, pxOverrideInfo);
 			ImmutableDictionary<string, string?> diagnosticProperties;
 
 			if (baseMethodDocCommentID != null)
@@ -240,24 +240,96 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			context.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 
-		private static string? GetPreparedTextWithReferenceToBaseAPI(IMethodSymbol method)
+		private static string? GetPreparedTextWithReferenceToBaseAPI(IMethodSymbol baseMethod, PXOverrideInfo pxOverrideInfo)
 		{
-			ISymbol? symbolToGetDocID = method.MethodKind switch
+			ISymbol? symbolToGetDocID = baseMethod.MethodKind switch
 			{
-				MethodKind.ReducedExtension 					 					   => method.ReducedFrom,
-				MethodKind.PropertyGet or MethodKind.PropertySet 					   => method.AssociatedSymbol,
-				MethodKind.EventAdd or MethodKind.EventRemove or MethodKind.EventRaise => method.AssociatedSymbol,
-				_ 																	   => method
+				MethodKind.ReducedExtension 					 					   => baseMethod.ReducedFrom,
+				MethodKind.PropertyGet or MethodKind.PropertySet 					   => baseMethod.AssociatedSymbol,
+				MethodKind.EventAdd or MethodKind.EventRemove or MethodKind.EventRaise => baseMethod.AssociatedSymbol,
+				_ 																	   => baseMethod
 			};
 
 			string? docCommentID = symbolToGetDocID?.GetDocumentationCommentId().NullIfWhiteSpace();
 			docCommentID = docCommentID?.Length > 2
-				? docCommentID.Substring(2)				// Remove "M:" and other API type prefixes
+				? docCommentID.Substring(2)							// Remove "M:" and other API type prefixes
 				: null;
 
-			return docCommentID != null
-				? docCommentID.Replace(",", ", ")		// make parameters list more readable and look like the one VS inserts
-				: null;
+			if (docCommentID == null)
+				return null;
+
+			if (pxOverrideInfo.SignatureHasNonTrivialRefKind)
+				docCommentID = ProcessParametersWithNonTrivialRefKindInText(baseMethod, docCommentID);
+
+			docCommentID = docCommentID.Replace(",", ", ");			// make parameters list more readable and look like the one VS inserts
+			return docCommentID;
+		}
+
+		private static string ProcessParametersWithNonTrivialRefKindInText(IMethodSymbol baseMethod, string docCommentID)
+		{
+			var patchMethodParameters = baseMethod.Parameters;
+			docCommentID = docCommentID.Replace("@", "");			// replace ref kind indicators for parameters
+
+			if (patchMethodParameters.IsDefaultOrEmpty)
+				return docCommentID;
+
+			int openBraceIndex  = docCommentID.IndexOf('(');
+			int closeBraceIndex = docCommentID.LastIndexOf(')');
+
+			if (openBraceIndex < 0 || closeBraceIndex < openBraceIndex)
+				return docCommentID;
+
+			int parameterIndex = patchMethodParameters.Length - 1;
+			IParameterSymbol? currentParameter = patchMethodParameters[parameterIndex];
+
+			// Go from the last parameter to first for the simplicity of docCommentID modification
+			for (int i = closeBraceIndex - 1; i >= openBraceIndex; i--)
+			{
+				char c = docCommentID[i];
+
+				switch (c)
+				{
+					case '(':
+						docCommentID = InsertParameterModifierText(i + 1);
+						continue;
+
+					case ',':
+						docCommentID = InsertParameterModifierText(i + 1);
+						parameterIndex--;
+						currentParameter = parameterIndex >= 0
+							? patchMethodParameters[parameterIndex]
+							: null;
+
+						continue;
+					default:
+						continue;
+				}
+			}
+
+			return docCommentID;
+
+			//------------------------------------------------Local Function------------------------------------------------------------------
+			string InsertParameterModifierText(int indexToInsertAt)
+			{
+				const int RefReadOnlyParameterValue = 4;
+				string? parameterModifierText = currentParameter?.RefKind switch
+				{
+					RefKind.Ref => "ref ",
+					RefKind.Out => "out ",
+					RefKind.In 	=> "in ",
+					null 		=> null,
+
+					// TODO RefReadOnlyParameter enum is present in the newer versions of Roslyn but not in 3.11.
+					// Therefore, we define its value here manually. In the future after migration to a newer Roslyn version this should be removed
+					_ 			=> ((int)currentParameter.RefKind) == RefReadOnlyParameterValue
+										? "ref readonly "
+										: null
+				};
+
+				return parameterModifierText != null
+					? docCommentID.Insert(indexToInsertAt, parameterModifierText)
+					: docCommentID;
+			}
 		}
 	}
 }

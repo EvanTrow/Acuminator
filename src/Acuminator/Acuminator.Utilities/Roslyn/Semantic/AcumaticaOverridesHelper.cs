@@ -31,7 +31,7 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 			var methodsCompatibility = GetMethodsCompatibility(baseMethod.Parameters.Length, pxOverrideMethod.Parameters.Length);
 
 			if (methodsCompatibility == MethodsCompatibility.NotCompatible ||
-				!baseMethod.CanBeOverriden() || !baseMethod.IsAccessibleOutsideOfAssembly())
+				!baseMethod.CanBeOverridden() || !baseMethod.IsAccessibleOutsideOfAssembly())
 			{
 				return false;
 			}
