@@ -15,7 +15,7 @@ namespace Acuminator.Tests.Sources
 		public Type get_PrimaryItemType(Func<Type> baseProperty) => typeof(MyDac);
 	}
 
-	public class MyGraph : PXGraph<MyGraph> 
+	public class MyGraph : PXGraph<MyGraph>
 	{
 	}
 
