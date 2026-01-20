@@ -113,13 +113,14 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			Location? location;
 			BaseDelegateParameterFixMode fixMode;
 			bool registerCodeFix;
+			string properNameOfDelegateParameter = GetProperNameOfDelegateParameter(pxOverrideInfo);
 
 			switch (pxOverrideInfo.OverrideType)
 			{
 				case PXOverrideType.WithoutBaseDelegate:
-					descriptor = Descriptors.PX1079_PXOverrideWithoutDelegateParameter;
-					location = pxOverrideInfo.Symbol.Locations.FirstOrDefault();
-					fixMode = BaseDelegateParameterFixMode.AddDelegateParameter;
+					descriptor 		= Descriptors.PX1079_PXOverrideWithoutDelegateParameter;
+					location 		= pxOverrideInfo.Symbol.Locations.FirstOrDefault();
+					fixMode 		= BaseDelegateParameterFixMode.AddDelegateParameter;
 					registerCodeFix = !pxOverrideInfo.SignatureHasNonTrivialRefKind;
 					break;
 
@@ -131,7 +132,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 					break;
 
 				case PXOverrideType.WithValidBaseDelegate
-				when !IsCorrectDelegateParameterName(pxOverrideInfo.Symbol):
+				when !IsCorrectDelegateParameterName(pxOverrideInfo.Symbol, properNameOfDelegateParameter):
 					descriptor = Descriptors.PX1102_PXOverrideInvalidNameOfDelegateParameter;
 					location = GetLocationForDelegateParameterWithIncorrectName(pxOverrideInfo.Symbol, context.CancellationToken);
 					fixMode = BaseDelegateParameterFixMode.RenameDelegateParameter;
@@ -145,7 +146,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 			var diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
 			{
 				{ DiagnosticProperty.RegisterCodeFix, registerCodeFix.ToString() },
-				{ PXOverrideDiagnosticProperties.PatchMethodName, pxOverrideInfo.Symbol.Name },
+				{ PXOverrideDiagnosticProperties.PatchMethodName, properNameOfDelegateParameter },
 				{ PXOverrideDiagnosticProperties.DelegateParameterFixMode, fixMode.ToString() }
 			}
 			.ToImmutableDictionary();
@@ -171,15 +172,43 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 				   patchMethodWithPXOverride.Locations.FirstOrDefault();
 		}
 
-		private bool IsCorrectDelegateParameterName(IMethodSymbol patchMethodWithPXOverride)
+		private bool IsCorrectDelegateParameterName(IMethodSymbol patchMethod, string properMethodName)
 		{
-			if (patchMethodWithPXOverride.Parameters.IsDefaultOrEmpty)
+			var patchMethodParameters = patchMethod.Parameters;
+
+			if (patchMethodParameters.IsDefaultOrEmpty)
 				return true;
 
-			var lastParameter = patchMethodWithPXOverride.Parameters[^1];
-			string properName = $"base_{patchMethodWithPXOverride.Name}";
+			var lastParameter = patchMethodParameters[^1];
+			string properParameterName = $"base_{properMethodName}";
 
-			return lastParameter.Name.Equals(properName, StringComparison.OrdinalIgnoreCase);
+			return lastParameter.Name.Equals(properParameterName, StringComparison.OrdinalIgnoreCase);
+		}
+
+		private static string GetProperNameOfDelegateParameter(PXOverrideInfo pxOverrideInfo)
+		{
+			if (pxOverrideInfo.BaseMethod is IMethodSymbol baseMethod)
+			{
+				string baseMethodName = baseMethod.AssociatedSymbol?.Name.NullIfWhiteSpace() ?? baseMethod.Name;
+				return baseMethodName;
+			}
+			else
+			{
+				string methodName = pxOverrideInfo.Symbol.Name;
+
+				if (methodName.StartsWith("get_", StringComparison.OrdinalIgnoreCase) ||
+					methodName.StartsWith("set_", StringComparison.OrdinalIgnoreCase) ||
+					methodName.StartsWith("add_", StringComparison.OrdinalIgnoreCase))
+				{
+					methodName = methodName.Substring(4);
+				}
+				else if (methodName.StartsWith("remove_", StringComparison.OrdinalIgnoreCase))
+				{
+					methodName = methodName.Substring(7);
+				}
+
+				return methodName;
+			}
 		}
 
 		private Location? GetLocationForDelegateParameterWithIncorrectName(IMethodSymbol patchMethodWithPXOverride, CancellationToken cancellation)
@@ -244,10 +273,13 @@ namespace Acuminator.Analyzers.StaticAnalysis.PXOverride
 		{
 			ISymbol? symbolToGetDocID = baseMethod.MethodKind switch
 			{
-				MethodKind.ReducedExtension 					 					   => baseMethod.ReducedFrom,
-				MethodKind.PropertyGet or MethodKind.PropertySet 					   => baseMethod.AssociatedSymbol,
-				MethodKind.EventAdd or MethodKind.EventRemove or MethodKind.EventRaise => baseMethod.AssociatedSymbol,
-				_ 																	   => baseMethod
+				MethodKind.PropertyGet or
+				MethodKind.PropertySet or
+				MethodKind.EventAdd    or
+				MethodKind.EventRemove or
+				MethodKind.EventRaise		=> baseMethod.AssociatedSymbol,
+				MethodKind.ReducedExtension => baseMethod.ReducedFrom,
+				_							=> baseMethod
 			};
 
 			string? docCommentID = symbolToGetDocID?.GetDocumentationCommentId().NullIfWhiteSpace();
