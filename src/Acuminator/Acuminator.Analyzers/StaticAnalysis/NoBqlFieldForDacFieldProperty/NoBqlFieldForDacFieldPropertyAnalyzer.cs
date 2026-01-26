@@ -184,21 +184,19 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoBqlFieldForDacFieldProperty
 			if (location == null)
 				return;
 
-			var properties = ImmutableDictionary<string, string?>.Empty;
 			string? propertyTypeName = dacFieldWithoutBqlField.PropertyTypeUnwrappedNullable?.GetSimplifiedName();
+			var properties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+			{
+				{ DiagnosticProperty.RegisterCodeFix, registerCodeFix.ToString() },
+				{ DiagnosticProperty.DacFieldName,	  dacFieldWithoutBqlField.Name }
+			};
 
 			if (registerCodeFix && propertyTypeName != null)
-			{
-				properties = new Dictionary<string, string?>
-				{
-					{ DiagnosticProperty.RegisterCodeFix, bool.TrueString },
-					{ DiagnosticProperty.DacFieldName,	  dacFieldWithoutBqlField.Name },
-					{ DiagnosticProperty.PropertyType,	  propertyTypeName }
-				}
-				.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase);
-			}
+				properties.Add(DiagnosticProperty.PropertyType, propertyTypeName);
 
-			var diagnostic = Diagnostic.Create(Descriptors.PX1065_NoBqlFieldForDacFieldProperty, location, properties, dacFieldWithoutBqlField.Name);
+			var diagnostic = Diagnostic.Create(Descriptors.PX1065_NoBqlFieldForDacFieldProperty, location, 
+											   properties.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase), 
+											   dacFieldWithoutBqlField.Name);
 			symbolContext.ReportDiagnosticWithSuppressionCheck(diagnostic, pxContext.CodeAnalysisSettings);
 		}
 
@@ -207,10 +205,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.NoBqlFieldForDacFieldProperty
 			if (dacField.PropertyInfo?.IsInSource == true && dacField.IsDeclaredInType(dac.Symbol))
 			{
 				var location = dacField.PropertyInfo.Node.Identifier.GetLocation().NullIfLocationKindIsNone() ??
-							   dacField.PropertyInfo.Node.GetLocation() ??
-							   dac.Node!.Identifier.GetLocation().NullIfLocationKindIsNone();
+							   dacField.PropertyInfo.Node.GetLocation();
 
-				return (location, RegisterCodeFix: true);
+				return (location, RegisterCodeFix: location != null);
 			}
 
 			// Node is not null because aggregated DAC analysis runs only on DACs from the source code
