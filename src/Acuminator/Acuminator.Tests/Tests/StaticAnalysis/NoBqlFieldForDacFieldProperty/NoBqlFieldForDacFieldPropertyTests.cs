@@ -60,13 +60,13 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.NoBqlFieldForDacFieldProperty
 		[Theory]
 		[EmbeddedFileData(@"MissingBqlField\DacWithBqlFieldMissingInExternalBaseDac.cs")]
 		public async Task DerivedDac_BasedDacInExternalDll_WithoutBqlFields(string actual) => await VerifyCSharpDiagnosticAsync(actual,
-			Descriptors.PX1065_NoBqlFieldForDacFieldProperty.CreateFor(8, 15, "ShipmentNbr"),
-			Descriptors.PX1065_NoBqlFieldForDacFieldProperty.CreateFor(12, 25, "OrderNbr"));
+			Descriptors.PX1065_NoBqlFieldForDacFieldProperty.CreateFor(13, 25, "OrderNbr"),
+			Descriptors.PX1065_NoBqlFieldForDacFieldProperty.CreateFor(22, 19, "Amount"));
 
 		[Theory]
 		[EmbeddedFileData(@"MissingBqlField\DacExtensionWithBqlFieldMissingInExternalBaseDac.cs")]
 		public async Task DacExtension_BasedDacInExternalDll_WithoutBqlFields(string actual) => await VerifyCSharpDiagnosticAsync(actual,
-			Descriptors.PX1065_NoBqlFieldForDacFieldProperty.CreateFor(11, 22, "ShipmentNbr"));
+			Descriptors.PX1065_NoBqlFieldForDacFieldProperty.CreateFor(21, 19, "Amount"));
 
 		[Theory]
 		[EmbeddedFileData(@"MissingBqlField\DacWithoutBqlFields.cs", @"MissingBqlField\DacWithoutBqlFields_Expected.cs")]
