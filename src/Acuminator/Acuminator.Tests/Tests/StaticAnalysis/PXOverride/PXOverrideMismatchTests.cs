@@ -190,6 +190,10 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 		public Task OverriddenMethodIsInTheBaseOfTheBaseExtension(string source) => VerifyCSharpDiagnosticAsync(source);
 
 
+		[Theory]
+		[EmbeddedFileData(@"SignatureMismatch\InvalidPXActionSignature_WithPXOverride.cs")]
+		public Task Overridden_ActionDelegate_With_SignatureMismatch(string source) => VerifyCSharpDiagnosticAsync(source);
+
 		private sealed class PXOverrideAnalyzerForSignatureMismatchTests : PXOverrideAnalyzer
 		{
 			public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
