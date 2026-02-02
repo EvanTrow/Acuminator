@@ -1,9 +1,12 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 using Acuminator.Utilities;
 using Acuminator.Utilities.Common;
 using Acuminator.Utilities.DiagnosticSuppression;
+using Acuminator.Utilities.Roslyn.Constants;
 using Acuminator.Utilities.Roslyn.Semantic;
 using Acuminator.Utilities.Roslyn.Syntax;
 
@@ -47,10 +50,16 @@ public class UseOfNamespaceReservedByAcumaticaAnalyzer : PXDiagnosticAnalyzer
 	{
 		syntaxContext.CancellationToken.ThrowIfCancellationRequested();
 		
-		if (IsAcumaticaNamespaceUsed(pxContext, syntaxContext.Node))
+		var namespaceNameNode = GetNamespaceNameNodeToCheck(syntaxContext.Node);
+		string? namespaceName = namespaceNameNode?.ToString().NullIfWhiteSpace();
+
+		if (namespaceName.IsNullOrWhiteSpace())
+			return;
+
+		if (namespaceName.Equals(NamespaceNames.AcumaticaRootNamespace, StringComparison.OrdinalIgnoreCase) ||
+			namespaceName.StartsWith(NamespaceNames.AcumaticaRootNamespaceWithDot, StringComparison.OrdinalIgnoreCase))
 		{
-			var identifier = syntaxContext.Node.ChildNodes().OfType<QualifiedNameSyntax>().FirstOrDefault<SyntaxNode>() ??
-							 syntaxContext.Node.ChildNodes().OfType<IdentifierNameSyntax>().FirstOrDefault<SyntaxNode>();
+			var identifier = syntaxContext.Node.ChildNodes().OfType<NameSyntax>().FirstOrDefault();
 			var location = identifier?.GetLocation();
 
 			syntaxContext.ReportDiagnosticWithSuppressionCheck(
@@ -59,17 +68,31 @@ public class UseOfNamespaceReservedByAcumaticaAnalyzer : PXDiagnosticAnalyzer
 		}
 	}
 
-	private bool IsAcumaticaNamespaceUsed(PXContext pxContext, SyntaxNode nodeToCheck)
+	private NameSyntax? GetNamespaceNameNodeToCheck(SyntaxNode nodeToCheck)
 	{
 		if (nodeToCheck is NamespaceDeclarationSyntax namespaceDeclaration)
 		{
-			bool hasContainingNamespaces = namespaceDeclaration.Con
+			var containingNamespaces = namespaceDeclaration.GetContainingNamespaces()
+														   .ToList(capacity: 4);
+			if (containingNamespaces.Count == 0)
+				return namespaceDeclaration.Name;
+			else
+			{
+				var outmostNamespace = containingNamespaces[^1];
+				return outmostNamespace is NamespaceDeclarationSyntax outmostNamespaceDeclaration
+					? outmostNamespaceDeclaration.Name
+					: outmostNamespace.ChildNodes()
+									  .OfType<NameSyntax>()
+									  .FirstOrDefault();
+			}
 		}
 		else if (nodeToCheck.RawKind == SharedConstants.FileScopedNamespaceDeclarationKind)
 		{
-
+			return nodeToCheck.ChildNodes()
+							  .OfType<NameSyntax>()
+							  .FirstOrDefault();
 		}
 		else
-			return false;
+			return null;
 	}
 }
