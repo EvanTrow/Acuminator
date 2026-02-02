@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -23,9 +22,9 @@ namespace Acuminator.Analyzers.StaticAnalysis.InvalidPXActionSignature
 			symbolContext.CancellationToken.ThrowIfCancellationRequested();
 
 			var actionHandlerWithBadSignature = from method in pxGraph.Symbol.GetMethods()
-												where pxGraph.Symbol.Equals(method.ContainingType, SymbolEqualityComparer.Default) &&
-													  CheckIfDiagnosticShouldBeRegisteredForMethod(method, pxContext) &&
-													  pxGraph.ActionsByNames.ContainsKey(method.Name)
+												where method.IsDeclaredInType(pxGraph.Symbol) &&
+													  pxGraph.ActionsByNames.ContainsKey(method.Name) &&
+													  IsActionDelegateWithBadSignature(method, pxContext, pxGraph)
 												select method;
 
 			foreach (IMethodSymbol method in actionHandlerWithBadSignature)
@@ -42,13 +41,45 @@ namespace Acuminator.Analyzers.StaticAnalysis.InvalidPXActionSignature
 			}
 		}
 
-		private static bool CheckIfDiagnosticShouldBeRegisteredForMethod(IMethodSymbol method, PXContext pxContext)
+		private static bool IsActionDelegateWithBadSignature(IMethodSymbol method, PXContext pxContext, PXGraphEventSemanticModel pxGraph)
 		{
-			if (method.ReturnsVoid && method.Parameters.Length > 0)
-				return true;
+			var parameters = method.Parameters;
+			var pxOverrideInfoForActionDelegate = 
+				pxGraph.DeclaredPXOverrides
+					   .FirstOrDefault(pxOverrideInfo => pxOverrideInfo.Symbol.Equals(method, SymbolEqualityComparer.Default) ||
+														 pxOverrideInfo.Symbol.OriginalDefinition.Equals(method.OriginalDefinition, 
+																										 SymbolEqualityComparer.Default));
+			bool hasBaseDelegateParameter = pxOverrideInfoForActionDelegate != null && 
+											pxOverrideInfoForActionDelegate.OverrideType != PXOverrideType.WithoutBaseDelegate;
+			if (method.ReturnsVoid)
+			{
+				return hasBaseDelegateParameter
+					? parameters.Length != 1
+					: !parameters.IsDefaultOrEmpty;
+			}
 
-			return method.ReturnType.SpecialType == SpecialType.System_Collections_IEnumerable &&
-				(method.Parameters.Length == 0 || !method.Parameters[0].Type.Equals(pxContext.PXAdapterType, SymbolEqualityComparer.Default));
+			switch (method.ReturnType.SpecialType)
+			{
+				case SpecialType.System_Array:
+				case SpecialType.System_Collections_IEnumerable:
+				case SpecialType.System_Collections_Generic_IEnumerable_T:
+				case SpecialType.System_Collections_Generic_IList_T:
+				case SpecialType.System_Collections_Generic_ICollection_T:
+				case SpecialType.System_Collections_Generic_IReadOnlyList_T:
+				case SpecialType.System_Collections_Generic_IReadOnlyCollection_T:
+				case SpecialType.System_Collections_IEnumerator:
+				case SpecialType.System_Collections_Generic_IEnumerator_T:
+					if (parameters.IsDefaultOrEmpty || !parameters[0].Type.Equals(pxContext.PXAdapterType, SymbolEqualityComparer.Default))
+						return true;
+					else
+					{
+						return hasBaseDelegateParameter
+							? parameters.Length < 2
+							: false;
+					}
+				default:
+					return true;
+			}
 		}
 	}
 }
