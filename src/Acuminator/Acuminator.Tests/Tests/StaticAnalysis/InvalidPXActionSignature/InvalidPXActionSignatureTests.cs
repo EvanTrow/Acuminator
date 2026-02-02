@@ -31,11 +31,24 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.InvalidPXActionSignature
 		[Theory]
 		[EmbeddedFileData("InvalidPXActionSignatureGraphExtension.cs")]
 		public Task Invalid_ActionSignature_InPXGraphExtension(string actual) =>
-			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1000_InvalidPXActionHandlerSignature.CreateFor(line: 36, column: 15));
+			VerifyCSharpDiagnosticAsync(actual, 
+				Descriptors.PX1000_InvalidPXActionHandlerSignature.CreateFor(line: 36, column: 15));
+
+		[Theory]
+		[EmbeddedFileData("InvalidPXActionSignature_WithPXOverride.cs")]
+		public Task Invalid_ActionSignature_WithPXOverride(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual,
+				Descriptors.PX1000_InvalidPXActionHandlerSignature.CreateFor(line: 20, column: 22),
+				Descriptors.PX1000_InvalidPXActionHandlerSignature.CreateFor(line: 24, column: 15));
 
 		[Theory]
 		[EmbeddedFileData("ValidPXActionSignature_WithParameters.cs")]
 		public Task Valid_ActionSignature_WithParameters_NoDiagnostic(string actual) =>
+			VerifyCSharpDiagnosticAsync(actual);
+
+		[Theory]
+		[EmbeddedFileData("ValidPXActionSignature_WithPXOverride.cs")]
+		public Task Valid_ActionSignature_WithPXOverride_NoDiagnostic(string actual) =>
 			VerifyCSharpDiagnosticAsync(actual);
 
 		[Theory]

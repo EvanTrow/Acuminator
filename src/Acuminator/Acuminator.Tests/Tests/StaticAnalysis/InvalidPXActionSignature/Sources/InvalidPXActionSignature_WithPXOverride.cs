@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using PX.Common;
 using PX.Data;
@@ -8,16 +9,19 @@ using PX.Data.BQL;
 namespace Acuminator.Tests.Tests.StaticAnalysis.InvalidPXActionSignature.Sources
 {
 	// Acuminator disable once PX1016 ExtensionDoesNotDeclareIsActiveMethod extension should be constantly active
+	[SuppressMessage("Acuminator", "PX1096:The signature of a method with the PXOverride attribute must match the overridden method", Justification = "Tests")]
+	[SuppressMessage("Acuminator", "PX1101:The additional delegate parameter for calling the base method of the PXOverride method has incorrect signature that does not match the base method", 
+					 Justification = "Tests")]
 	public class BaseGraphExtension : PXGraphExtension<BaseGraph>
 	{
 
 		/// Overrides <seealso cref="BaseGraph.TestTest1"/>
 		[PXOverride]
-		public void TestTest1(Action base_TestTest1) { }
+		public IEnumerable TestTest1(Action base_TestTest1) => Array.Empty<object>();
 
 		/// Overrides <seealso cref="BaseGraph.TestTest2"/>
 		[PXOverride]
-		public IEnumerable TestTest2(PXAdapter adapter, Func<PXAdapter, IEnumerable> base_TestTest2) => base_TestTest2(adapter);
+		public void TestTest2(PXAdapter adapter, Func<PXAdapter, IEnumerable> base_TestTest2) => base_TestTest2(adapter);
 	}
 
 	public class BaseGraph : PXGraph<BaseGraph>
