@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -21,27 +22,45 @@ namespace Acuminator.Analyzers.StaticAnalysis.InvalidPXActionSignature
 		{
 			symbolContext.CancellationToken.ThrowIfCancellationRequested();
 
-			var actionHandlerWithBadSignature = from method in pxGraph.Symbol.GetMethods()
-												where method.IsDeclaredInType(pxGraph.Symbol) &&
-													  pxGraph.ActionsByNames.ContainsKey(method.Name) &&
-													  IsActionDelegateWithBadSignature(method, pxContext, pxGraph)
-												select method;
+			var actionDelegateCandidates = from method in pxGraph.Symbol.GetMethods()
+										   where method.IsDeclaredInType(pxGraph.Symbol) &&
+												 pxGraph.ActionsByNames.ContainsKey(method.Name)
+										   select method;
 
-			foreach (IMethodSymbol method in actionHandlerWithBadSignature)
+			foreach (IMethodSymbol actionDelegate in actionDelegateCandidates)
 			{
 				symbolContext.CancellationToken.ThrowIfCancellationRequested();
-				Location? methodLocation = method.Locations.FirstOrDefault();
+				var (hasBadSignature, pxOverrideInfoForActionDelegate) = GetActionDelegateSignatureInfo(actionDelegate, pxContext, pxGraph);
 
-				if (methodLocation != null)
+				if (!hasBadSignature)
+					continue;
+
+				Location? location = actionDelegate.Locations.FirstOrDefault();
+
+				if (location == null)
+					continue;
+
+				ImmutableDictionary<string, string?> diagnosticProperties;
+
+				if (pxOverrideInfoForActionDelegate != null)
 				{
-					symbolContext.ReportDiagnosticWithSuppressionCheck(
-						Diagnostic.Create(Descriptors.PX1000_InvalidPXActionHandlerSignature, methodLocation),
-						pxContext.CodeAnalysisSettings);
+					diagnosticProperties = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+					{
+						{ DiagnosticProperty.RegisterCodeFix, bool.FalseString }
+					}
+					.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase);
 				}
+				else
+					diagnosticProperties = ImmutableDictionary<string, string?>.Empty;
+
+				symbolContext.ReportDiagnosticWithSuppressionCheck(
+						Diagnostic.Create(Descriptors.PX1000_InvalidPXActionHandlerSignature, location, diagnosticProperties),
+						pxContext.CodeAnalysisSettings);
 			}
 		}
 
-		private static bool IsActionDelegateWithBadSignature(IMethodSymbol method, PXContext pxContext, PXGraphEventSemanticModel pxGraph)
+		private static (bool HasBadSignature, PXOverrideInfo? PXOverrideInfo) GetActionDelegateSignatureInfo(IMethodSymbol method, 
+																					PXContext pxContext, PXGraphEventSemanticModel pxGraph)
 		{
 			var parameters = method.Parameters;
 			var pxOverrideInfoForActionDelegate = 
@@ -53,9 +72,11 @@ namespace Acuminator.Analyzers.StaticAnalysis.InvalidPXActionSignature
 											pxOverrideInfoForActionDelegate.OverrideType != PXOverrideType.WithoutBaseDelegate;
 			if (method.ReturnsVoid)
 			{
-				return hasBaseDelegateParameter
+				bool hasBadSignature = hasBaseDelegateParameter
 					? parameters.Length != 1
 					: !parameters.IsDefaultOrEmpty;
+
+				return (hasBadSignature, pxOverrideInfoForActionDelegate);
 			}
 
 			switch (method.ReturnType.SpecialType)
@@ -70,15 +91,17 @@ namespace Acuminator.Analyzers.StaticAnalysis.InvalidPXActionSignature
 				case SpecialType.System_Collections_IEnumerator:
 				case SpecialType.System_Collections_Generic_IEnumerator_T:
 					if (parameters.IsDefaultOrEmpty || !parameters[0].Type.Equals(pxContext.PXAdapterType, SymbolEqualityComparer.Default))
-						return true;
+						return (HasBadSignature: true, pxOverrideInfoForActionDelegate);
 					else
 					{
-						return hasBaseDelegateParameter
+						bool hasBadSignature = hasBaseDelegateParameter
 							? parameters.Length < 2
 							: false;
+
+						return (hasBadSignature, pxOverrideInfoForActionDelegate);
 					}
 				default:
-					return true;
+					return (HasBadSignature: true, pxOverrideInfoForActionDelegate);
 			}
 		}
 	}
