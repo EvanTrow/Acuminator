@@ -31,7 +31,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.InvalidPXActionSignature
 		[Theory]
 		[EmbeddedFileData("InvalidPXActionSignatureGraphExtension.cs")]
 		public Task Invalid_ActionSignature_InPXGraphExtension(string actual) =>
-			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1000_InvalidPXActionHandlerSignature.CreateFor(line: 35, column: 15));
+			VerifyCSharpDiagnosticAsync(actual, Descriptors.PX1000_InvalidPXActionHandlerSignature.CreateFor(line: 36, column: 15));
 
 		[Theory]
 		[EmbeddedFileData("ValidPXActionSignature_WithParameters.cs")]

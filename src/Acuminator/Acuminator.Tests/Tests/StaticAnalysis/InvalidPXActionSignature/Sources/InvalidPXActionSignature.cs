@@ -30,7 +30,7 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.InvalidPXActionSignature.Sources
 		[PXDefault]
 		public string? OrderType { get; set; }
 
-		public abstract class orderNbr : BqlString.Field<orderType> { }
+		public abstract class orderNbr : BqlString.Field<orderNbr> { }
 
 		[PXDBString(IsKey = true, InputMask = "")]
 		[PXDefault]
