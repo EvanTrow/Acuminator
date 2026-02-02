@@ -40,9 +40,14 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 			if (methodsCompatibility == MethodsCompatibility.ParametersMatch)
 				return pxOverrideMethod.SignatureEquals(baseMethod);
-
-			if (methodsCompatibility == MethodsCompatibility.ParametersMatchWithDelegate)
+			else if (methodsCompatibility == MethodsCompatibility.ParametersMatchWithDelegate)
 			{
+				if (pxOverrideMethod.IsGenericMethod != baseMethod.IsGenericMethod || pxOverrideMethod.RefKind != baseMethod.RefKind ||
+					!SymbolEqualityComparer.Default.Equals(pxOverrideMethod.ReturnType, baseMethod.ReturnType))
+				{
+					return false;
+				}
+
 				if (pxOverrideMethodParameters[pxOverrideMethodParameters.Length - 1].Type is not INamedTypeSymbol @delegate ||
 					@delegate.TypeKind != TypeKind.Delegate)
 				{
