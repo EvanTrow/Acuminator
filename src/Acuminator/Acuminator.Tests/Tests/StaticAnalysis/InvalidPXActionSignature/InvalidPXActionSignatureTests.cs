@@ -72,5 +72,13 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.InvalidPXActionSignature
 						  "InvalidPXActionSignatureGraphExtension_Expected.cs")]
 		public Task Invalid_ActionSignature_InPXGraphExtension_CodeFix(string actual, string expected) =>
 			VerifyCSharpFixAsync(actual, expected);
+
+
+		// Check that no code fix is registered for action delegates with PXOverrides
+		[Theory]
+		[EmbeddedFileData("InvalidPXActionSignature_WithPXOverride.cs",
+						  "InvalidPXActionSignature_WithPXOverride_Expected.cs")]
+		public Task Invalid_ActionSignature_WithPXOverride_CodeFix(string actual, string expected) =>
+			VerifyCSharpFixAsync(actual, expected);
 	}
 }
