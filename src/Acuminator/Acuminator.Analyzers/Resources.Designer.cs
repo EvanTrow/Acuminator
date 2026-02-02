@@ -1042,7 +1042,7 @@ namespace Acuminator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The use of the PX namespace is prohibited. This namespace is reserved for use only by Acumatica..
+        ///   Looks up a localized string similar to The use of the PX namespace is prohibited. This namespace is reserved for use by Acumatica..
         /// </summary>
         public static string PX1039Title {
             get {

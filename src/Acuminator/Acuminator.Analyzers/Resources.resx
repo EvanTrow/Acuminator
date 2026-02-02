@@ -451,7 +451,7 @@ public virtual int? SomeDacField{ get; set; }</value>
     <value>Async void methods are forbidden in Acumatica Framework</value>
   </data>
   <data name="PX1039Title" xml:space="preserve">
-    <value>The use of the PX namespace is prohibited. This namespace is reserved for use only by Acumatica.</value>
+    <value>The use of the PX namespace is prohibited. This namespace is reserved for use by Acumatica.</value>
   </data>
   <data name="PX1040Fix" xml:space="preserve">
     <value>Move the code to the Initialize() method</value>
