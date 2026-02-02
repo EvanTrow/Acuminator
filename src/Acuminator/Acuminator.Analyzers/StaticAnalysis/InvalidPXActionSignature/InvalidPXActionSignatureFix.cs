@@ -31,7 +31,7 @@ namespace Acuminator.Analyzers.StaticAnalysis.InvalidPXActionSignature
 		{
 			context.CancellationToken.ThrowIfCancellationRequested();
 
-			if (!diagnostic.IsRegisteredForCodeFix(considerRegisteredByDefault: false))
+			if (!diagnostic.IsRegisteredForCodeFix())
 				return Task.CompletedTask;
 
 			string codeActionName = nameof(Resources.PX1000Fix).GetLocalized().ToString();
