@@ -192,7 +192,9 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.PXOverride
 
 		[Theory]
 		[EmbeddedFileData(@"SignatureMismatch\InvalidPXActionSignature_WithPXOverride.cs")]
-		public Task Overridden_ActionDelegate_With_SignatureMismatch(string source) => VerifyCSharpDiagnosticAsync(source);
+		public Task Overridden_ActionDelegate_With_SignatureMismatch(string source) => 
+			VerifyCSharpDiagnosticAsync(source,
+				Descriptors.PX1096_PXOverrideMustMatchSignature.CreateFor(15, 15));
 
 		private sealed class PXOverrideAnalyzerForSignatureMismatchTests : PXOverrideAnalyzer
 		{
