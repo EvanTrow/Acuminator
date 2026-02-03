@@ -28,7 +28,9 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 		{
 			pxOverrideMethod.ThrowOnNull();
 
-			var methodsCompatibility = GetMethodsCompatibility(baseMethod.Parameters.Length, pxOverrideMethod.Parameters.Length);
+			var baseMethodParameters = baseMethod.Parameters;
+			var pxOverrideMethodParameters = pxOverrideMethod.Parameters;
+			var methodsCompatibility = GetMethodsCompatibility(baseMethodParameters.Length, pxOverrideMethodParameters.Length);
 
 			if (methodsCompatibility == MethodsCompatibility.NotCompatible ||
 				!baseMethod.CanBeOverridden() || !baseMethod.IsAccessibleOutsideOfAssembly())
@@ -38,16 +40,21 @@ namespace Acuminator.Utilities.Roslyn.Semantic
 
 			if (methodsCompatibility == MethodsCompatibility.ParametersMatch)
 				return pxOverrideMethod.SignatureEquals(baseMethod);
-
-			if (methodsCompatibility == MethodsCompatibility.ParametersMatchWithDelegate)
+			else if (methodsCompatibility == MethodsCompatibility.ParametersMatchWithDelegate)
 			{
-				if (pxOverrideMethod.Parameters[pxOverrideMethod.Parameters.Length - 1].Type is not INamedTypeSymbol @delegate ||
+				if (pxOverrideMethod.IsGenericMethod != baseMethod.IsGenericMethod || pxOverrideMethod.RefKind != baseMethod.RefKind ||
+					!SymbolEqualityComparer.Default.Equals(pxOverrideMethod.ReturnType, baseMethod.ReturnType))
+				{
+					return false;
+				}
+
+				if (pxOverrideMethodParameters[pxOverrideMethodParameters.Length - 1].Type is not INamedTypeSymbol @delegate ||
 					@delegate.TypeKind != TypeKind.Delegate)
 				{
 					return false;
 				}
 
-				return baseMethod.Parameters.EqualsParameterRange(pxOverrideMethod.Parameters, rangeStart: 0, rangeEnd: baseMethod.Parameters.Length) &&
+				return baseMethodParameters.EqualsParameterRange(pxOverrideMethodParameters, rangeStart: 0, rangeEnd: baseMethodParameters.Length) &&
 					   baseMethod.SignatureEquals(@delegate.DelegateInvokeMethod);
 			}
 

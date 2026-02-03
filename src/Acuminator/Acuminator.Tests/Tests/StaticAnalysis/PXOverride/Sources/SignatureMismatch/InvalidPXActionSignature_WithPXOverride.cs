@@ -1,22 +1,29 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
-using System.Text;
 using PX.Common;
 using PX.Data;
 using PX.Data.BQL;
 
-namespace Acuminator.Tests.Tests.StaticAnalysis.InvalidPXActionSignature.Sources
+namespace Acuminator.Tests.Sources
 {
-	public class SOEntry : PXGraph<SOEntry>
+	// Acuminator disable once PX1016 ExtensionDoesNotDeclareIsActiveMethod extension should be constantly active
+	public class BaseGraphExtension : PXGraphExtension<BaseGraph>
 	{
-		public PXSelect<SOOrder> Documents = null!;
+		/// Overrides <seealso cref="BaseGraph.Test"/>
+		[PXOverride]
+		public void Test(PXAdapter adapter, Func<PXAdapter, IEnumerable> base_Test) => base_Test(adapter);
+	}
 
-		public PXAction<SOOrder> Release = null!;
+	public class BaseGraph : PXGraph<BaseGraph>
+	{
+		public PXAction<SOOrder> test = null!;
 
-		public void release(PXAdapter adapter)
+		[PXButton]
+		[PXUIField]
+		public virtual IEnumerable Test(PXAdapter adapter) 
 		{
-			string s = "blabla";
+			return adapter.Get();
 		}
 	}
 
