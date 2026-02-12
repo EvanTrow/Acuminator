@@ -1,7 +1,7 @@
 # Acuminator Release Notes
 This document provides information about fixes, enhancements, and key features that are available in Acuminator.
 
-## Acuminator 4.0.1: February 11, 2026
+## Acuminator 4.0.1: February 12, 2026
 Acuminator 4.0.1 includes the bug fixes and enhancements described in this section, as well as the features that have been implemented in previous versions. This is a hotfix release that addresses issues discovered in Acuminator 4.0.0.
 
 ### New PX1039 Diagnostic
@@ -9,37 +9,37 @@ The new [PX1039](diagnostics/PX1039.md) diagnostic forbids the use of the `PX` n
 (`Tools -> Options -> Acuminator -> General -> Enable additional diagnostics for ISV Solution Certification`).
 
 ### Improvements in Existing Diagnostics
-- The [PX1065](diagnostics/PX1065.md) diagnostic was improved in the new release to reduce the amount of redundant alerts. The diagnostic reports missing BQL fields in DACs. Previously, it always displayed errors for a DAC extension or a derived DAC when its base DAC had a DAC field with a missing BQL field. For DAC extensions customizing DACs with multiple incorrect DAC fields Acuminator displayed a lot redundant alerts. After the improvement, the [PX1065](diagnostics/PX1065.md) diagnostic will report DAC fields from the base DAC only if they are customized by the DAC extension or overridden by the derived DAC.
-- The algorithm to determine whether a DAC is fully-unbound from the database was enhanced with several heuristics. Now the DAC is considered fully-unbound by Acuminator if one of the following is true:
-  - A DAC without any DAC fields or with only unbound DAC fields is considered fully unbound.
+- The [PX1065](diagnostics/PX1065.md) diagnostic has been improved to reduce the amount of redundant alerts. The diagnostic reports missing BQL fields in DACs. Previously, it always displayed errors for a DAC extension or a derived DAC when its base DAC had a DAC field with a missing BQL field. For DAC extensions that customize DACs with multiple incorrect DAC fields, Acuminator displayed a lot of redundant alerts. After the improvement, the [PX1065](diagnostics/PX1065.md) diagnostic reports DAC fields from the base DAC only if they are customized by the DAC extension or overridden by the derived DAC.
+- The algorithm that determines whether a DAC is fully unbound from the database has been enhanced with several heuristics. Now Acuminator determines whether a DAC is fully unbound according to the following rules:
+  - A DAC with no DAC fields or with only unbound DAC fields is always considered fully unbound.
   - A DAC marked with `PX.Data.PXVirtualAttribute` is always considered fully unbound even if it has DB bound fields.
-  - A DAC marked with `PX.Data.PXProjectionAttribute`, `PX.Data.PXAccumulatorAttribute` or any other attribute derived from `PX.Data.PXDBInterceptorAttribute` is always considered DB bound even if it has only unbound fields.
+  - A DAC marked with `PX.Data.PXProjectionAttribute`, `PX.Data.PXAccumulatorAttribute` or any other attribute derived from `PX.Data.PXDBInterceptorAttribute` is always considered *DB bound* even if it has only unbound fields.
   - A DAC with a DB bound `NoteID` field is considered fully unbound if `NoteID` is the only DB bound field in the DAC and all other fields in the DAC are unbound.
 
   These changes reduced the amount of false alerts for the [PX1036](diagnostics/PX1036.md), [PX1069](diagnostics/PX1069.md), and [PX1110](diagnostics/PX1110.md) diagnostics. 
-- The detection of view delegates in graphs and graph extensions was fixed to correctly recognize view delegates in rare scenarios.
-- The documentation for the [PX1079](diagnostics/PX1079.md), [PX1080](diagnostics/PX1080.md), and [PX1101](diagnostics/PX1101.md) diagnostics was improved.
+- The detection of view delegates in graphs and graph extensions has been fixed to correctly recognize view delegates in rare scenarios.
+- The documentation for the [PX1079](diagnostics/PX1079.md), [PX1080](diagnostics/PX1080.md), and [PX1101](diagnostics/PX1101.md) diagnostics has been improved.
 
 
 ### Improvements in Acuminator Console Runner
-- A new `--non-interactive` command-line flag was added to the Acuminator Console Runner. By default, the Acuminator Console Runner supports interactive cancellation via `Ctrl + C` keyboard shortcut. The `--non-interactive` flag disables the interactive cancellation during the run. This allows the Acuminator Console Runner to be used in non-interactive CI/CD environments such as Azure Pipelines.
-- Fixed issue with a potential redistribution of MSBuild DLLs with the Acuminator Console Runner. 
+- The new `--non-interactive` command-line flag has been added to Acuminator Console Runner. By default, Acuminator Console Runner supports interactive cancellation via `Ctrl + C` keyboard shortcut. The `--non-interactive` flag disables the interactive cancellation during the run. This allows Acuminator Console Runner to be used in non-interactive CI/CD environments such as Azure Pipelines.
+- The issue with potential redistribution of MSBuild DLLs with the Acuminator Console Runner has been fixed. 
 
 ### Fixed Bugs
 - The [PX1000](diagnostics/PX1000.md) diagnostic displayed false alert for `PXOverride` methods that override action delegates of graph actions.
 - The [PX1023](diagnostics/PX1023.md) diagnostic displayed false alert for DAC fields with the `PX.Data.PXDBPackedIntegerArrayAttribute` attribute.
-- The [PX1096](diagnostics/PX1096.md) diagnostic did not report `PXOverride` methods that are incompatible with their base methods only by return types, and the signatures of their delegate parameters are fully-compatible with their base methods.
-- The [PX1096](diagnostics/PX1096.md) diagnostic did not detect an incompatibility in `ref`, `out`, `in`, and `ref readonly` parameters and return types between `PXOverride` method and its base method.
-- The [PX1096](diagnostics/PX1096.md) diagnostic displayed false alerts for `PXOverride` methods that override methods from the `PXGraph` type, such as `Persist` method.
+- The [PX1096](diagnostics/PX1096.md) diagnostic did not report `PXOverride` methods that were incompatible with their base methods only by return types, and the signatures of their delegate parameters were fully compatible with their base methods.
+- The [PX1096](diagnostics/PX1096.md) diagnostic did not detect an incompatibility in the `ref`, `out`, `in`, and `ref readonly` parameters and return types between a `PXOverride` method and its base method.
+- The [PX1096](diagnostics/PX1096.md) diagnostic displayed false alerts for `PXOverride` methods that override methods from the `PXGraph` type, such as the `Persist` method.
 - The [PX1098](diagnostics/PX1098.md) diagnostic displayed false alert for `PXOverride` methods that override C# properties with a correct XML comment.
 - The code fix for the [PX1098](diagnostics/PX1098.md) diagnostic did not correctly generate XML doc comment for the `PXOverride` methods that override C# properties.
-- The code fix for the [PX1098](diagnostics/PX1098.md) diagnostic did not correctly handle `PXOverride` methods with `ref`, `out`, `in`, and `ref readonly` parameters.
-- The code fixes for the [PX1079](diagnostics/PX1079.md) and [PX1101](diagnostics/PX1101.md) diagnostics did not correctly handle `PXOverride` methods with `ref`, `out`, `in`, and `ref readonly` parameters and/or
-`ref` and `ref readonly` return types. After the bugfix, code fixes are not provided for such methods.
-- The [PX1102](diagnostics/PX1102.md) diagnostic displayed false alerts for `PXOverride` methods that override C# properties.
+- The code fix for the [PX1098](diagnostics/PX1098.md) diagnostic did not correctly handle the `PXOverride` methods with the `ref`, `out`, `in`, and `ref readonly` parameters.
+- The code fixes for the [PX1079](diagnostics/PX1079.md) and [PX1101](diagnostics/PX1101.md) diagnostics did not correctly handle the `PXOverride` methods with the `ref`, `out`, `in`, and `ref readonly` parameters and/or
+`ref` and `ref readonly` return types. After the bugfix, the diagnostics do no provide code fixes for such methods.
+- The [PX1102](diagnostics/PX1102.md) diagnostic displayed false alerts for the `PXOverride` methods that override C# properties.
 
 ### Other Changes
-- Updated Acuminator dependencies.
+- Acuminator dependencies have been updated.
 
 
 
