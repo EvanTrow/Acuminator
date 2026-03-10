@@ -55,7 +55,7 @@ namespace Acuminator.Runner.Output.Grouping
 																		   Location: GetPrettyLocation(d, projectDirectory, analysisContext)));
 
 			var sortedDiagnosticInfos = GetSortedDiagnosticInfos(sortByDiagnosticId, sortBySourceFile, unsortedDiagnosticInfos);
-			var reportLines	= sortedDiagnosticInfos.Select(d  => new Line(d.Diagnostic.Id, d.Message, d.Location));
+			var reportLines	= sortedDiagnosticInfos.Select(d  => new Line(d.Diagnostic.Severity.ToString(), d.Diagnostic.Id, d.Message, d.Location));
 
 			return reportLines;
 		}

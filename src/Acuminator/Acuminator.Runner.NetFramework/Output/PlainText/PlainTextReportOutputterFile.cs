@@ -88,9 +88,9 @@ namespace Acuminator.Runner.Output.PlainText
 
 			if (line.Spans.Length == 3)
 			{
-				var (diagnosticId, diagnosticMessage, location) = 
-					(line.Spans[0].ToString(), line.Spans[1].ToString(), line.Spans[2].ToString());
-				WriteLine($"{padding}{diagnosticId}{LinePartsSeparator}{diagnosticMessage}{LinePartsSeparator}{location}");
+				var (severity, diagnosticId, diagnosticMessage, location) = 
+					(line.Spans[0].ToString(), line.Spans[1].ToString(), line.Spans[2].ToString(), line.Spans[3].ToString());
+				WriteLine($"{padding}{severity} - {diagnosticId}{LinePartsSeparator}{diagnosticMessage}{LinePartsSeparator}{location}");
 			}
 			else
 				WriteLine(padding + line.ToString());
