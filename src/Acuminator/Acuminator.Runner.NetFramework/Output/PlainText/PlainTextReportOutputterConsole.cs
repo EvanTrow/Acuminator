@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using Acuminator.Utilities.Common;
 using Acuminator.Runner.Output.Data;
 using Acuminator.Runner.Resources;
 
@@ -58,7 +58,8 @@ namespace Acuminator.Runner.Output.PlainText
 				case 3:
 					WriteDiagnosticWithLocation(indentationLevel, diagnosticId: line.Spans[0].ToString(), 
 												diagnosticMessage: line.Spans[1].ToString(),
-												location: line.Spans[2].ToString());
+												location: line.Spans[2].ToString(),
+												severity: null);
 					return;
 				case 4:
 					WriteDiagnosticWithLocation(indentationLevel, diagnosticId: line.Spans[1].ToString(),
@@ -74,15 +75,15 @@ namespace Acuminator.Runner.Output.PlainText
 			}
 		}
 
-		private void WriteDiagnosticWithLocation(int indentationLevel, string diagnosticId, string diagnosticMessage, string location, string? severity = null)
+		private void WriteDiagnosticWithLocation(int indentationLevel, string diagnosticId, string diagnosticMessage, string location, string? severity)
 		{ 
 			string padding = GetPadding(indentationLevel);
 			var oldColor   = Console.ForegroundColor;
 
 			Console.Write(padding);
-			if (!string.IsNullOrEmpty(severity))
+			if (!severity.IsNullOrEmpty())
 			{
-				WriteStringPartWithColor(String.Format(SeverityTemplate, severity), GetSeverityColor(severity!));
+				WriteStringPartWithColor(String.Format(SeverityTemplate, severity), GetSeverityColor(severity));
 			}
 
 			WriteStringPartWithColor(diagnosticId, ConsoleColor.White);
