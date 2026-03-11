@@ -60,7 +60,12 @@ namespace Acuminator.Runner.Output.PlainText
 												diagnosticMessage: line.Spans[1].ToString(),
 												location: line.Spans[2].ToString());
 					return;
-					
+				case 4:
+					WriteDiagnosticWithLocation(indentationLevel, diagnosticId: line.Spans[1].ToString(),
+												diagnosticMessage: line.Spans[2].ToString(),
+												location: line.Spans[3].ToString(),
+												severity: line.Spans[0].ToString());
+					return;
 				case 1:
 				default:
 					string padding = GetPadding(indentationLevel);
@@ -69,12 +74,18 @@ namespace Acuminator.Runner.Output.PlainText
 			}
 		}
 
-		private void WriteDiagnosticWithLocation(int indentationLevel, string diagnosticId, string diagnosticMessage, string location)
+		private void WriteDiagnosticWithLocation(int indentationLevel, string diagnosticId, string diagnosticMessage, string location, string? severity = null)
 		{ 
 			string padding = GetPadding(indentationLevel);
 			var oldColor   = Console.ForegroundColor;
 
-			WriteStringPartWithColor(padding + diagnosticId, ConsoleColor.White);
+			Console.Write(padding);
+			if (!string.IsNullOrEmpty(severity))
+			{
+				WriteStringPartWithColor(String.Format(SeverityTemplate, severity), GetSeverityColor(severity!));
+			}
+
+			WriteStringPartWithColor(diagnosticId, ConsoleColor.White);
 			Console.Write(LinePartsSeparator);
 			Console.Write(diagnosticMessage + LinePartsSeparator);
 			WriteStringPartWithColor(location, ConsoleColor.Yellow);
@@ -92,6 +103,21 @@ namespace Acuminator.Runner.Output.PlainText
 				finally
 				{
 					Console.ForegroundColor = oldColor;
+				}
+			}
+
+			static ConsoleColor GetSeverityColor(string severity)
+			{
+				switch(severity)
+				{
+					case SeverityError:
+						return ConsoleColor.Red;
+					case SeverityWarning:
+						return ConsoleColor.Yellow;
+					case SeverityInfo:
+						return ConsoleColor.Cyan;
+					default:
+						return Console.ForegroundColor;
 				}
 			}
 		}
