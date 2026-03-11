@@ -78,7 +78,6 @@ namespace Acuminator.Runner.Output.PlainText
 		private void WriteDiagnosticWithLocation(int indentationLevel, string diagnosticId, string diagnosticMessage, string location, string? severity)
 		{ 
 			string padding = GetPadding(indentationLevel);
-			var oldColor   = Console.ForegroundColor;
 
 			Console.Write(padding);
 			if (!severity.IsNullOrEmpty())
@@ -107,20 +106,13 @@ namespace Acuminator.Runner.Output.PlainText
 				}
 			}
 
-			static ConsoleColor GetSeverityColor(string severity)
+			static ConsoleColor GetSeverityColor(string severity) => severity switch
 			{
-				switch(severity)
-				{
-					case SeverityError:
-						return ConsoleColor.Red;
-					case SeverityWarning:
-						return ConsoleColor.Yellow;
-					case SeverityInfo:
-						return ConsoleColor.Cyan;
-					default:
-						return Console.ForegroundColor;
-				}
-			}
+				SeverityError => ConsoleColor.Red,
+				SeverityWarning => ConsoleColor.Yellow,
+				SeverityInfo => ConsoleColor.Cyan,
+				_ => Console.ForegroundColor
+			};
 		}
 
 		protected override void WriteCodeSourceTitle(string codeSourceTitle) =>
