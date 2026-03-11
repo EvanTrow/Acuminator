@@ -14,6 +14,8 @@ namespace Acuminator.Runner.Output.Json
 	/// </summary>
 	internal class LineConverter : JsonConverter<Line>
 	{
+		protected const string LinePartsSeparator = ": ";
+		protected const string SeverityTemplate = "[{0}] ";
 		public override Line Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
 			throw new NotSupportedException();
 
@@ -35,7 +37,15 @@ namespace Acuminator.Runner.Output.Json
 					{
 						var (diagnosticId, diagnosticMessage, location) = (line.Spans[0].ToString(), line.Spans[1].ToString(), line.Spans[2].ToString());
 
-						writer.WriteStringValue($"{diagnosticId}: {diagnosticMessage}: {location}");
+						writer.WriteStringValue($"{diagnosticId}{LinePartsSeparator}{diagnosticMessage}{LinePartsSeparator}{location}");
+						return;
+					}
+
+				case 4:
+					{
+						var (severity, diagnosticId, diagnosticMessage, location) = (line.Spans[0].ToString(), line.Spans[1].ToString(), line.Spans[2].ToString(), line.Spans[3].ToString());
+
+						writer.WriteStringValue($"{string.Format(SeverityTemplate,severity)}{diagnosticId}{LinePartsSeparator}{diagnosticMessage}{LinePartsSeparator}{location}");
 						return;
 					}
 
