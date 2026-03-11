@@ -85,15 +85,23 @@ namespace Acuminator.Runner.Output.PlainText
 			}
 
 			string padding = GetPadding(indentationLevel);
-
-			if (line.Spans.Length == 4)
+			if (line.Spans.Length == 3)
 			{
+				var (diagnosticId, diagnosticMessage, location) =
+					(line.Spans[0].ToString(), line.Spans[1].ToString(), line.Spans[2].ToString());
+				WriteLine($"{padding}{diagnosticId}{LinePartsSeparator}{diagnosticMessage}{LinePartsSeparator}{location}");
+			}
+			else if(line.Spans.Length == 4)
+			{ 
 				var (severity, diagnosticId, diagnosticMessage, location) = 
 					(line.Spans[0].ToString(), line.Spans[1].ToString(), line.Spans[2].ToString(), line.Spans[3].ToString());
-				WriteLine($"{padding}{severity} - {diagnosticId}{LinePartsSeparator}{diagnosticMessage}{LinePartsSeparator}{location}");
+				WriteLine($"{padding}{string.Format(SeverityTemplate, severity)}{diagnosticId}{LinePartsSeparator}{diagnosticMessage}{LinePartsSeparator}{location}");
+				return;			
 			}
 			else
+			{
 				WriteLine(padding + line.ToString());
+			}
 		}
 
 		protected override void WriteLine() => _streamWriter?.WriteLine();
