@@ -19,9 +19,9 @@ namespace Acuminator.Runner.Output.PlainText
 	{
 		protected const string LinePartsSeparator = ": ";
 		protected const string SeverityTemplate = "[{0}] ";
-		protected const string SeverityError = "Error";
-		protected const string SeverityWarning = "Warning";
-		protected const string SeverityInfo = "Info";
+		protected const string SeverityError = "ERROR";
+		protected const string SeverityWarning = "WARNING";
+		protected const string SeverityInfo = "INFO";
 
 		public abstract void Dispose();
 

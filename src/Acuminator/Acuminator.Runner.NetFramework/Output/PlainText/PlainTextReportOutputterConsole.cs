@@ -106,7 +106,7 @@ namespace Acuminator.Runner.Output.PlainText
 				}
 			}
 
-			static ConsoleColor GetSeverityColor(string severity) => severity switch
+			static ConsoleColor GetSeverityColor(string severity) => severity.ToUpperInvariant() switch
 			{
 				SeverityError => ConsoleColor.Red,
 				SeverityWarning => ConsoleColor.Yellow,
