@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using Acuminator.Utilities.Common;
 using Acuminator.Runner.Output.Data;
 using Acuminator.Runner.Resources;
 
@@ -58,9 +58,15 @@ namespace Acuminator.Runner.Output.PlainText
 				case 3:
 					WriteDiagnosticWithLocation(indentationLevel, diagnosticId: line.Spans[0].ToString(), 
 												diagnosticMessage: line.Spans[1].ToString(),
-												location: line.Spans[2].ToString());
+												location: line.Spans[2].ToString(),
+												severity: null);
 					return;
-					
+				case 4:
+					WriteDiagnosticWithLocation(indentationLevel, diagnosticId: line.Spans[1].ToString(),
+												diagnosticMessage: line.Spans[2].ToString(),
+												location: line.Spans[3].ToString(),
+												severity: line.Spans[0].ToString());
+					return;
 				case 1:
 				default:
 					string padding = GetPadding(indentationLevel);
@@ -69,12 +75,17 @@ namespace Acuminator.Runner.Output.PlainText
 			}
 		}
 
-		private void WriteDiagnosticWithLocation(int indentationLevel, string diagnosticId, string diagnosticMessage, string location)
+		private void WriteDiagnosticWithLocation(int indentationLevel, string diagnosticId, string diagnosticMessage, string location, string? severity)
 		{ 
 			string padding = GetPadding(indentationLevel);
-			var oldColor   = Console.ForegroundColor;
 
-			WriteStringPartWithColor(padding + diagnosticId, ConsoleColor.White);
+			Console.Write(padding);
+			if (!severity.IsNullOrEmpty())
+			{
+				WriteStringPartWithColor(String.Format(SeverityTemplate, severity), GetSeverityColor(severity));
+			}
+
+			WriteStringPartWithColor(diagnosticId, ConsoleColor.White);
 			Console.Write(LinePartsSeparator);
 			Console.Write(diagnosticMessage + LinePartsSeparator);
 			WriteStringPartWithColor(location, ConsoleColor.Yellow);
@@ -94,6 +105,14 @@ namespace Acuminator.Runner.Output.PlainText
 					Console.ForegroundColor = oldColor;
 				}
 			}
+
+			static ConsoleColor GetSeverityColor(string severity) => severity.ToUpperInvariant() switch
+			{
+				SeverityError => ConsoleColor.Red,
+				SeverityWarning => ConsoleColor.Yellow,
+				SeverityInfo => ConsoleColor.Cyan,
+				_ => Console.ForegroundColor
+			};
 		}
 
 		protected override void WriteCodeSourceTitle(string codeSourceTitle) =>

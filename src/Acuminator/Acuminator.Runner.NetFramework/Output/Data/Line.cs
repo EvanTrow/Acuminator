@@ -28,6 +28,15 @@ namespace Acuminator.Runner.Output.Data
 			Spans = [span1, span2, span3];
 		}
 
+		public Line(string severity, string idPart1, string messagePart, string locationPart)
+		{
+			var span1 = new LineSpan(severity.CheckIfNull());
+			var span2 = new LineSpan(idPart1.CheckIfNull());
+			var span3 = new LineSpan(messagePart.CheckIfNull());
+			var span4 = new LineSpan(locationPart.CheckIfNull());
+			Spans = [span1, span2, span3, span4];
+		}
+
 		public Line(IReadOnlyCollection<string> spans)
         {
 			Spans = spans.CheckIfNull()
@@ -41,6 +50,7 @@ namespace Acuminator.Runner.Output.Data
 			1 => Spans[0].ToString(),
 			2 => $"{Spans[0].ToString()} {Spans[1].ToString()}",
 			3 => $"{Spans[0].ToString()} {Spans[1].ToString()} {Spans[2].ToString()}",
+			4 => $"{Spans[0].ToString()} {Spans[1].ToString()} {Spans[2].ToString()} {Spans[3].ToString()}",
 			_ => string.Join(" ", Spans)
 		};
 
