@@ -67,8 +67,8 @@ namespace Acuminator.Runner.Input
 
 			return extension switch
 			{
-				CommonConstants.ProjectFileExtension  => new ProjectCodeSource(codeSourceLocation),
-				CommonConstants.SolutionFileExtension => new SolutionCodeSource(codeSourceLocation),
+				Constant.Common.ProjectFileExtension  => new ProjectCodeSource(codeSourceLocation),
+				Constant.Common.SolutionFileExtension => new SolutionCodeSource(codeSourceLocation),
 				_									  => throw new NotSupportedException(
 															string.Format(Messages.NotSupportedCodeSourceType, codeSourceLocation))
 			};
