@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Acuminator.Utilities.Common;
+using Acuminator.Runner.Constants;
 using Acuminator.Runner.Output.Data;
 using Acuminator.Runner.Resources;
 
@@ -82,12 +83,12 @@ namespace Acuminator.Runner.Output.PlainText
 			Console.Write(padding);
 			if (!severity.IsNullOrEmpty())
 			{
-				WriteStringPartWithColor(String.Format(SeverityTemplate, severity), GetSeverityColor(severity));
+				WriteStringPartWithColor(String.Format(Constant.Output.SeverityTemplate, severity), GetSeverityColor(severity));
 			}
 
 			WriteStringPartWithColor(diagnosticId, ConsoleColor.White);
-			Console.Write(LinePartsSeparator);
-			Console.Write(diagnosticMessage + LinePartsSeparator);
+			Console.Write(Constant.Output.LinePartsSeparator);
+			Console.Write(diagnosticMessage + Constant.Output.LinePartsSeparator);
 			WriteStringPartWithColor(location, ConsoleColor.Yellow);
 			Console.Write(Environment.NewLine);
 			
@@ -108,10 +109,10 @@ namespace Acuminator.Runner.Output.PlainText
 
 			static ConsoleColor GetSeverityColor(string severity) => severity.ToUpperInvariant() switch
 			{
-				SeverityError => ConsoleColor.Red,
-				SeverityWarning => ConsoleColor.Yellow,
-				SeverityInfo => ConsoleColor.Cyan,
-				_ => Console.ForegroundColor
+				Constant.Output.SeverityError 	=> ConsoleColor.Red,
+				Constant.Output.SeverityWarning => ConsoleColor.Yellow,
+				Constant.Output.SeverityInfo 	=> ConsoleColor.Cyan,
+				_ 								=> Console.ForegroundColor
 			};
 		}
 
