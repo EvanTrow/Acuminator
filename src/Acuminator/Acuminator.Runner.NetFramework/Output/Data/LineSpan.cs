@@ -10,9 +10,12 @@ namespace Acuminator.Runner.Output.Data
 	{
 		public string? Text { get; }
 
-        public LineSpan(string text)
+		public ConsoleColor? ForegroundColor { get; }
+
+        public LineSpan(string text, ConsoleColor? foregroundColor = null)
         {
 			Text = text.CheckIfNullOrWhiteSpace();
+			ForegroundColor = foregroundColor;
         }
 
 		public override bool Equals(object obj) =>
@@ -20,6 +23,9 @@ namespace Acuminator.Runner.Output.Data
 
 		public bool Equals(LineSpan other)
 		{
+			if (ForegroundColor != other.ForegroundColor)
+				return false;
+
 			if (Text == null)
 				return other.Text == null;
 			else
@@ -38,7 +44,18 @@ namespace Acuminator.Runner.Output.Data
 				return string.Compare(Text, other.Text, StringComparison.Ordinal);
 		}
 
-		public override int GetHashCode() => Text?.GetHashCode() ?? 0;
+		public override int GetHashCode()
+		{
+			int hash = 17;
+
+			unchecked
+			{
+				hash = 23 * hash + (Text?.GetHashCode() ?? 0);
+				hash = 23 * hash + ForegroundColor.GetHashCode();
+			}
+
+			return hash;
+		}
 
 		public override string ToString() => Text ?? string.Empty;
 	}
