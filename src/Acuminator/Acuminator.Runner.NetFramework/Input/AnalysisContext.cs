@@ -46,9 +46,6 @@ namespace Acuminator.Runner.Input
 		/// </summary>
 		public GroupingMode GroupingMode { get; }
 
-		/// <inheritdoc cref="CommandLineOptions.EnableInformationalDiagnostics"/>
-		public bool EnableInformationalDiagnostics { get; }
-
 		/// <summary>
 		/// Are file paths on the unnderlying OS case sensitive or not.
 		/// </summary>
@@ -56,7 +53,7 @@ namespace Acuminator.Runner.Input
 
 		public AnalysisContext(ICodeSource codeSource, CodeAnalysisSettings codeAnalysisSettings, BannedApiSettings bannedApiSettings, 
 							   string? msBuildPath, string? outputFileName, bool outputAbsolutePathsToUsages, OutputFormat outputFormat,
-							   AcuminatorWorkMode workMode, GroupingMode groupingMode, bool enableInformationalDiagnostics)
+							   AcuminatorWorkMode workMode, GroupingMode groupingMode)
 		{
 			CodeSource 					   = codeSource.CheckIfNull();
 			CodeAnalysisSettings		   = codeAnalysisSettings.CheckIfNull();
@@ -67,7 +64,6 @@ namespace Acuminator.Runner.Input
 			OutputFormat				   = outputFormat;
 			WorkMode					   = workMode;
 			GroupingMode				   = groupingMode;
-			EnableInformationalDiagnostics = enableInformationalDiagnostics;
 			CaseSensitiveFilePaths		   = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 		}
 	}

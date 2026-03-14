@@ -41,7 +41,7 @@ namespace Acuminator.Runner.Input
 			AcuminatorWorkMode workMode = GetAcuminatorWorkMode(commandLineOptions.AcuminatorWorkMode);
 			var input = new AnalysisContext(codeSource, codeAnalysisSettings, bannedApiSettings, commandLineOptions.MSBuildPath, 
 											commandLineOptions.OutputFileName, commandLineOptions.OutputAbsolutePathsToUsages, outputFormat,
-											workMode, groupingMode, commandLineOptions.EnableInformationalDiagnostics);
+											workMode, groupingMode);
 			return input;
 		}
 

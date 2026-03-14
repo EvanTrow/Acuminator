@@ -108,8 +108,7 @@ namespace Acuminator.Runner.Analysis.Initialization
 		{
 			var acuminatorSuppressionFiles = project.AdditionalDocuments
 													.Where(d => d.FilePath.IsSuppressionFile(checkFileExists: true))
-													.Select(d => new GlobalSuppressionFileInitInfo(d.FilePath!, _analysisContext.WorkMode, 
-																		suppressInformationalDiagnostics: !_analysisContext.EnableInformationalDiagnostics))
+													.Select(d => new GlobalSuppressionFileInitInfo(d.FilePath!, _analysisContext.WorkMode))
 													.ToList(capacity: 1);
 
 			if (_analysisContext.WorkMode.HasFlag(AcuminatorWorkMode.GenerateSuppressionFile) && acuminatorSuppressionFiles.Count == 0)
@@ -154,8 +153,7 @@ namespace Acuminator.Runner.Analysis.Initialization
 			var acuminatorSuppressionFiles = solution.Projects
 													 .SelectMany(project => project.AdditionalDocuments)
 													 .Where(d => d.FilePath.IsSuppressionFile(checkFileExists: true))
-													 .Select(d => new GlobalSuppressionFileInitInfo(d.FilePath!, _analysisContext.WorkMode,
-																		suppressInformationalDiagnostics: !_analysisContext.EnableInformationalDiagnostics))
+													 .Select(d => new GlobalSuppressionFileInitInfo(d.FilePath!, _analysisContext.WorkMode))
 													 .ToList(capacity: 1);
 
 			if (_analysisContext.WorkMode.HasFlag(AcuminatorWorkMode.GenerateSuppressionFile) && acuminatorSuppressionFiles.Count == 0)
