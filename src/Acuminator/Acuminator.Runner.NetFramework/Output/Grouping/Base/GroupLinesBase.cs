@@ -43,30 +43,38 @@ namespace Acuminator.Runner.Output.Grouping
 		/// <param name="projectDirectory">Pathname of the project directory.</param>
 		/// <param name="analysisContext">Context for the analysis.</param>
 		/// <param name="sortBySourceFile">True to sort by source file. This sorting is always applied first.</param>
-		/// <param name="sortByDiagnosticId">True to sort by diagnostic identifier. This sorting is applied after sorting by source file.</param>
+		/// <param name="sortBySeverity">True to sort by diagnostic severity. This sorting is applied after sorting by source file.</param>
+		/// <param name="sortByDiagnosticId">True to sort by diagnostic identifier. This sorting is applied after sortings by source file and diagnostic severity.</param>
 		/// <returns>
 		/// The ordered diagnostics with location report lines for given <paramref name="unsortedDiagnostics"/>.
 		/// </returns>
 		protected IEnumerable<Line> GetOrderedDiagnosticsWithLocationLines(IEnumerable<Diagnostic> unsortedDiagnostics, string? projectDirectory, 
-																		   AnalysisContext analysisContext, bool sortBySourceFile, bool sortByDiagnosticId)
+																		   AnalysisContext analysisContext, 
+																		   bool sortBySourceFile, bool sortBySeverity, bool sortByDiagnosticId)
 		{
 			var unsortedDiagnosticInfos = unsortedDiagnostics.Select(d => (Diagnostic: d,
 																		   Message: GetDiagnosticMessage(d),
 																		   Location: GetPrettyLocation(d, projectDirectory, analysisContext)));
 
-			var sortedDiagnosticInfos = GetSortedDiagnosticInfos(sortByDiagnosticId, sortBySourceFile, unsortedDiagnosticInfos);
+			var sortedDiagnosticInfos = GetSortedDiagnosticInfos(sortByDiagnosticId, sortBySeverity, sortBySourceFile, unsortedDiagnosticInfos);
 			var reportLines	= sortedDiagnosticInfos.Select(d  => new Line(d.Diagnostic.Severity.ToString(), d.Diagnostic.Id, d.Message, d.Location));
 
 			return reportLines;
 		}
 
-		private IEnumerable<DiagnosticInfo> GetSortedDiagnosticInfos(bool sortBySourceFile, bool sortByDiagnosticId, 
+		private IEnumerable<DiagnosticInfo> GetSortedDiagnosticInfos(bool sortBySourceFile, bool sortBySeverity, bool sortByDiagnosticId, 
 																	 IEnumerable<DiagnosticInfo> unsortedDiagnosticInfos)
 		{
 			IOrderedEnumerable<DiagnosticInfo>? sortedDiagnosticInfos = null;
 
 			if (sortBySourceFile)
 				sortedDiagnosticInfos = unsortedDiagnosticInfos.OrderBy(d => d.Diagnostic.Location.SourceTree?.FilePath ?? string.Empty);
+			
+			if (sortBySeverity)
+			{
+				sortedDiagnosticInfos = sortedDiagnosticInfos?.ThenByDescending(d => d.Diagnostic.Severity) ?? 
+										unsortedDiagnosticInfos.OrderByDescending(d => d.Diagnostic.Severity);
+			}
 			
 			if (sortByDiagnosticId)
 			{
