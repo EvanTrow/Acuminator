@@ -19,7 +19,8 @@ namespace Acuminator.Tests.Tests.StaticAnalysis.ViewDeclarationOrder
     {
 	    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() =>  
 			new PXGraphAnalyzer(CodeAnalysisSettings.Default.WithStaticAnalysisEnabled()
-															.WithSuppressionMechanismDisabled(), 
+															.WithSuppressionMechanismDisabled()
+															.WithInfoDiagnosticsEnabled(), 
 								new ViewDeclarationOrderAnalyzerForTests());
 
 		[Theory]
