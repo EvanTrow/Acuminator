@@ -225,10 +225,6 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 															   DiagnosticSeverity defaultDiagnosticSeverity, CancellationToken cancellation = default)
 		{
 			CheckIfInstanceIsInitialized(throwOnNotInitialized: true);
-
-			if (!IsSuppressableSeverity(defaultDiagnosticSeverity))
-				return false;
-
 			var (fileAssemblyName, suppressMessage) = SuppressMessage.GetSuppressionInfo(semanticModel, diagnosticID,
 																						 diagnosticSpan, cancellation);
 			if (fileAssemblyName.IsNullOrWhiteSpace() || !suppressMessage.IsValid)
@@ -391,8 +387,8 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			// - The suppressed diagnostic has suppressable Severity, we don't suppress minor informational diagnostics currently.
 			// - There is no Acuminator suppression comment for the suppressed diagnostic, we don't want to allow creation of suppressions
 			//   for diagnostics suppressed with a comment.
-			bool addSuppressionToSuppressionFile = file.WorkMode.HasFlag(AcuminatorWorkMode.GenerateSuppressionFile) && 
-												   !hasSuppressionComment && IsSuppressableSeverity(diagnostic.Descriptor.DefaultSeverity);
+			bool addSuppressionToSuppressionFile = file.WorkMode.HasFlag(AcuminatorWorkMode.GenerateSuppressionFile) && !hasSuppressionComment;
+
 			if (addSuppressionToSuppressionFile)
 			{
 				file.AddGeneratedSuppressionMessage(message);   // The check for presence in loaded suppressions will be done by the called method 
@@ -420,8 +416,5 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				return true;
 			}
 		}
-
-		private static bool IsSuppressableSeverity(DiagnosticSeverity? diagnosticSeverity) =>
-			diagnosticSeverity == DiagnosticSeverity.Error || diagnosticSeverity == DiagnosticSeverity.Warning;
 	}
 }
