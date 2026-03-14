@@ -58,7 +58,7 @@ internal class Program
 
 	private static (CodeAnalysisSettings AnalysisSettings, BannedApiSettings BannedApiSettings) GetExpectedSettings(string[] args)
 	{
-		if (args.Length < 6 || args.Length > 8)
+		if (args.Length < 7 || args.Length > 9)
 			throw new InvalidOperationException("Invalid amount of arguments");
 
 		if (!bool.TryParse(args[0], out bool recursiveAnalysisEnabled))
@@ -76,25 +76,28 @@ internal class Program
 		if (!bool.TryParse(args[4], out bool px1007DocumentationDiagnosticEnabled))
 			throw new InvalidOperationException($"Invalid argument \"{nameof(px1007DocumentationDiagnosticEnabled)}\"");
 
-		if (!bool.TryParse(args[5], out bool bannedApiAnalysisEnabled))
+		if (!bool.TryParse(args[5], out bool infoDiagnosticsEnabled))
+			throw new InvalidOperationException($"Invalid argument \"{nameof(infoDiagnosticsEnabled)}\"");
+
+		if (!bool.TryParse(args[6], out bool bannedApiAnalysisEnabled))
 			throw new InvalidOperationException($"Invalid argument \"{nameof(bannedApiAnalysisEnabled)}\"");
 
-		string? bannedApiFilePath = args.Length > 6
-			? args[6]
+		string? bannedApiFilePath = args.Length > 7
+			? args[7]
 			: null;
 
 		if (bannedApiFilePath == EmptyStringPlaceHolder)
 			bannedApiFilePath = null;
 
-		string? allowedApiFilePath = args.Length > 7
-			? args[7]
+		string? allowedApiFilePath = args.Length > 8
+			? args[8]
 			: null;
 
 		if (allowedApiFilePath == EmptyStringPlaceHolder)
 			allowedApiFilePath = null;
 
 		var analysisSettings = new CodeAnalysisSettings(recursiveAnalysisEnabled, isvSpecificAnalyzersEnabled, staticAnalysisEnabled, 
-														suppressionMechanismEnabled, px1007DocumentationDiagnosticEnabled);
+														suppressionMechanismEnabled, px1007DocumentationDiagnosticEnabled, infoDiagnosticsEnabled);
 		var bannedApiSettings = new BannedApiSettings(bannedApiAnalysisEnabled, bannedApiFilePath, allowedApiFilePath);
 
 		return (analysisSettings, bannedApiSettings);
