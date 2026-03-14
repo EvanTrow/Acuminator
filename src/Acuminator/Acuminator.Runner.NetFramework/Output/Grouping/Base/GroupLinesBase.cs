@@ -56,7 +56,7 @@ namespace Acuminator.Runner.Output.Grouping
 																		   Message: GetDiagnosticMessage(d),
 																		   Location: GetPrettyLocation(d, projectDirectory, analysisContext)));
 
-			var sortedDiagnosticInfos = GetSortedDiagnosticInfos(sortByDiagnosticId, sortBySeverity, sortBySourceFile, unsortedDiagnosticInfos);
+			var sortedDiagnosticInfos = GetSortedDiagnosticInfos(sortBySourceFile, sortBySeverity, sortByDiagnosticId, unsortedDiagnosticInfos);
 			var reportLines	= sortedDiagnosticInfos.Select(d  => new Line(GetSeverityLineSpan(d.Diagnostic.Severity), 
 																		  new LineSpan(d.Diagnostic.Id),
 																		  new LineSpan(d.Message), 
