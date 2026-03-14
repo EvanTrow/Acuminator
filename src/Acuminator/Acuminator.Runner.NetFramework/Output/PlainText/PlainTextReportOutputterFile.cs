@@ -11,6 +11,8 @@ using Acuminator.Utilities.Common;
 
 using Serilog;
 
+using static Acuminator.Runner.Constants.Constant.Output;
+
 namespace Acuminator.Runner.Output.PlainText
 {
 	/// <summary>

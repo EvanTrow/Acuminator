@@ -57,10 +57,26 @@ namespace Acuminator.Runner.Output.Grouping
 																		   Location: GetPrettyLocation(d, projectDirectory, analysisContext)));
 
 			var sortedDiagnosticInfos = GetSortedDiagnosticInfos(sortByDiagnosticId, sortBySeverity, sortBySourceFile, unsortedDiagnosticInfos);
-			var reportLines	= sortedDiagnosticInfos.Select(d  => new Line(d.Diagnostic.Severity.ToString(), d.Diagnostic.Id, d.Message, d.Location));
-
+			var reportLines	= sortedDiagnosticInfos.Select(d  => new Line(GetSeverityLineSpan(d.Diagnostic.Severity), 
+																		  new LineSpan(d.Diagnostic.Id),
+																		  new LineSpan(d.Message), 
+																		  new LineSpan(d.Location)));
 			return reportLines;
 		}
+
+		private LineSpan GetSeverityLineSpan(DiagnosticSeverity severity)
+		{
+			var color = GetColorForSeverity(severity);
+			return new LineSpan(severity.ToString(), color);
+		}
+
+		private ConsoleColor? GetColorForSeverity(DiagnosticSeverity severity) => severity switch
+		{
+			DiagnosticSeverity.Error   => ConsoleColor.Red,
+			DiagnosticSeverity.Warning => ConsoleColor.DarkYellow,
+			DiagnosticSeverity.Info    => ConsoleColor.Cyan,
+			_ 						   => null
+		};
 
 		private IEnumerable<DiagnosticInfo> GetSortedDiagnosticInfos(bool sortBySourceFile, bool sortBySeverity, bool sortByDiagnosticId, 
 																	 IEnumerable<DiagnosticInfo> unsortedDiagnosticInfos)
@@ -69,7 +85,7 @@ namespace Acuminator.Runner.Output.Grouping
 
 			if (sortBySourceFile)
 				sortedDiagnosticInfos = unsortedDiagnosticInfos.OrderBy(d => d.Diagnostic.Location.SourceTree?.FilePath ?? string.Empty);
-			
+
 			if (sortBySeverity)
 			{
 				sortedDiagnosticInfos = sortedDiagnosticInfos?.ThenByDescending(d => d.Diagnostic.Severity) ?? 

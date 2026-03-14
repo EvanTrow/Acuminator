@@ -16,9 +16,6 @@ namespace Acuminator.Runner.Constants
 		{
 			public const string LinePartsSeparator = ": ";
 			public const string SeverityTemplate   = "[{0}] ";
-			public const string SeverityError 	   = "ERROR";
-			public const string SeverityWarning    = "WARNING";
-			public const string SeverityInfo 	   = "INFO";
 		}
 	}
 }
