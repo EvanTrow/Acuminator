@@ -219,7 +219,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				: null;
 
 		public static bool SuppressDiagnosticInSuppressionFile(SemanticModel semanticModel, string diagnosticID, TextSpan diagnosticSpan,
-															   DiagnosticSeverity defaultDiagnosticSeverity, CancellationToken cancellation = default)
+															   CancellationToken cancellation = default)
 		{
 			CheckIfInstanceIsInitialized(throwOnNotInitialized: true);
 			var (fileAssemblyName, suppressMessage) = SuppressMessage.GetSuppressionInfo(semanticModel, diagnosticID,
