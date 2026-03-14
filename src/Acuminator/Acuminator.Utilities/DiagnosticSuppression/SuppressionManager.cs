@@ -56,17 +56,17 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 									   Func<ICustomBuildActionSetter>? buildActionSetterFabric = null) =>
 			InitOrReset(additionalFiles, fileSystemServiceFabric: null, errorProcessorFabric, buildActionSetterFabric);
 
-		public static void InitOrReset(Workspace? workspace, AcuminatorWorkMode workMode, bool suppressInformationalDiagnostics,
+		public static void InitOrReset(Workspace? workspace, AcuminatorWorkMode workMode,
 									   Func<ISuppressionFileSystemService>? fileSystemServiceFabric = null,
 									   Func<ICustomBuildActionSetter>? buildActionSetterFabric = null) =>
-			InitOrReset(workspace?.CurrentSolution?.GetSuppressionInfo(workMode, suppressInformationalDiagnostics),
+			InitOrReset(workspace?.CurrentSolution?.GetSuppressionInfo(workMode),
 						fileSystemServiceFabric, errorProcessorFabric: null, buildActionSetterFabric);
 
-		public static void InitOrReset(Workspace? workspace, AcuminatorWorkMode workMode, bool suppressInformationalDiagnostics,
+		public static void InitOrReset(Workspace? workspace, AcuminatorWorkMode workMode,
 									   Func<IIOErrorProcessor>? errorProcessorFabric = null,
 									   Func<ICustomBuildActionSetter>? buildActionSetterFabric = null)
 		{
-			var suppressionFileInfos = workspace?.CurrentSolution?.GetSuppressionInfo(workMode, suppressInformationalDiagnostics);
+			var suppressionFileInfos = workspace?.CurrentSolution?.GetSuppressionInfo(workMode);
 			InitOrReset(suppressionFileInfos, fileSystemServiceFabric: null, errorProcessorFabric, buildActionSetterFabric);
 		}
 
@@ -125,7 +125,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 					throw new ArgumentException($"File {fileInfo.Path} is not a suppression file");
 				}
 
-				var file = LoadFileAndTrackItsChanges(fileInfo.Path, fileInfo.WorkMode, fileInfo.SuppressInformationalDiagnostics);
+				var file = LoadFileAndTrackItsChanges(fileInfo.Path, fileInfo.WorkMode);
 
 				if (!_fileByAssembly.TryAdd(file.AssemblyName, file))
 				{
@@ -134,13 +134,11 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			}
 		}
 
-		private SuppressionFile LoadFileAndTrackItsChanges(string suppressionFilePath, AcuminatorWorkMode workMode, 
-														   bool suppressInformationalDiagnostics)
+		private SuppressionFile LoadFileAndTrackItsChanges(string suppressionFilePath, AcuminatorWorkMode workMode)
 		{
 			lock (_fileSystemService)
 			{
-				SuppressionFile suppressionFile = SuppressionFile.Load(_fileSystemService, suppressionFilePath, workMode,
-																		suppressInformationalDiagnostics);
+				SuppressionFile suppressionFile = SuppressionFile.Load(_fileSystemService, suppressionFilePath, workMode);
 				suppressionFile.Changed += ReloadFile;
 				return suppressionFile;
 			}
@@ -162,8 +160,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			}
 
 			var workMode = oldFile?.WorkMode ?? AcuminatorWorkMode.ReportUnsuppressedErrors;
-			bool suppressInformationalDiagnostics = oldFile?.SuppressInformationalDiagnostics ?? true;
-			var newFile = LoadFileAndTrackItsChanges(suppressionFilePath: e.FullPath, workMode, suppressInformationalDiagnostics);
+			var newFile = LoadFileAndTrackItsChanges(suppressionFilePath: e.FullPath, workMode);
 			
 			if (newMessagesInOldFile?.Count > 0)
 			{
@@ -198,9 +195,9 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			}
 		}
 
-		internal SuppressionFile LoadSuppressionFileFrom(string filePath, AcuminatorWorkMode workMode, bool suppressInformationalDiagnostics)
+		internal SuppressionFile LoadSuppressionFileFrom(string filePath, AcuminatorWorkMode workMode)
 		{
-			SuppressionFile suppressionFile = LoadFileAndTrackItsChanges(filePath, workMode, suppressInformationalDiagnostics);
+			SuppressionFile suppressionFile = LoadFileAndTrackItsChanges(filePath, workMode);
 			_fileByAssembly[suppressionFile.AssemblyName] = suppressionFile;
 			return suppressionFile;
 		}
@@ -274,8 +271,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				foreach (SuppressionFile currentFile in Instance._fileByAssembly.Files)
 				{
 					var oldFile = SuppressionFile.Load(Instance._fileSystemService, suppressionFilePath: currentFile.Path,
-													   AcuminatorWorkMode.ReportUnsuppressedErrors, 
-													   currentFile.SuppressInformationalDiagnostics);
+													   AcuminatorWorkMode.ReportUnsuppressedErrors);
 
 					diffList.Add(CompareFiles(oldFile, currentFile));
 				}
@@ -389,9 +385,8 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			if (file == null)
 				return false;
 
-			// Add new suppression info in suppression file generation mode to the suppression file only if it satisfies several conditions:
+			// Add new suppression info in suppression file generation mode to the suppression file only if it satisfies two conditions:
 			// - New info isn't already present among the loaded suppressions, we don't want duplicates
-			// - The suppressed diagnostic has suppressable Severity, we don't suppress minor informational diagnostics currently.
 			// - There is no Acuminator suppression comment for the suppressed diagnostic, we don't want to allow creation of suppressions
 			//   for diagnostics suppressed with a comment.
 			bool addSuppressionToSuppressionFile = file.WorkMode.HasFlag(AcuminatorWorkMode.GenerateSuppressionFile) && !hasSuppressionComment;
@@ -403,12 +398,6 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 
 			if (file.WorkMode.HasFlag(AcuminatorWorkMode.ReportUnsuppressedErrors))
 			{
-				// First check whether the diagnostic has informational severity and should be reported.
-				bool isSuppressedInformationalDiagnostic = file.SuppressInformationalDiagnostics &&
-														   diagnostic.Severity is DiagnosticSeverity.Info or DiagnosticSeverity.Hidden;
-				if (isSuppressedInformationalDiagnostic)
-					return true;
-
 				// Check whether the diagnostic is suppressed by checking if the suppression is enabled.
 				// If it is enabled, check if the suppression file contains the suppressed message.
 				// Also to be consistent with the algorithm and allow to call this method from anywhere,

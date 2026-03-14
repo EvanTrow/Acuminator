@@ -19,14 +19,13 @@ namespace Acuminator.Utilities.Roslyn.ProjectSystem
     public static class WorkspaceUtils
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<GlobalSuppressionFileInitInfo> GetSuppressionInfo(this Solution solution, AcuminatorWorkMode workMode,
-																					bool suppressInformationalDiagnostics)
+		public static IEnumerable<GlobalSuppressionFileInitInfo> GetSuppressionInfo(this Solution solution, AcuminatorWorkMode workMode)
 		{
 			var suppressionFiles = solution.GetAllAdditionalDocuments()
 										   .Where(additionalDoc => !additionalDoc.FilePath.IsNullOrWhiteSpace() &&
 																	additionalDoc.FilePath.IsSuppressionFile(checkFileExists: false));
 			return suppressionFiles.Where(file => !file.FilePath.IsNullOrWhiteSpace())
-								   .Select(file => new GlobalSuppressionFileInitInfo(file.FilePath!, workMode, suppressInformationalDiagnostics));
+								   .Select(file => new GlobalSuppressionFileInitInfo(file.FilePath!, workMode));
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
