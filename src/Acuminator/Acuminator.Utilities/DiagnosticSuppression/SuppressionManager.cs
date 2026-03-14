@@ -308,6 +308,13 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 			cancellation.ThrowIfCancellationRequested();
 			reportDiagnostic.ThrowOnNull();
 
+			// Do not report or generate suppression for info diagnostics if the InfoDiagnosticsEnabled flag is disabled
+			if (!settings.InfoDiagnosticsEnabled &&
+				(diagnostic.Severity is DiagnosticSeverity.Info or DiagnosticSeverity.Hidden))
+			{
+				return;
+			}
+
 			bool isSuppressionEnabled  = settings.SuppressionMechanismEnabled;
 			bool hasSuppressionComment = CheckSuppressedComment(diagnostic, cancellation);
 
