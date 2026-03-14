@@ -41,10 +41,11 @@ namespace Acuminator.Utilities.Settings.OutOfProcess
 			bool staticAnalysisEnabled 				  = _reader.ReadBoolean();
 			bool suppressionMechanismEnabled 		  = _reader.ReadBoolean();
 			bool px1007DocumentationDiagnosticEnabled = _reader.ReadBoolean();
+			bool infoDiagnosticsEnabled 			  = _reader.ReadBoolean();
 
 			return new CodeAnalysisSettings(recursiveAnalysisEnabled, isvSpecificAnalyzersEnabled,
 											staticAnalysisEnabled, suppressionMechanismEnabled,
-											px1007DocumentationDiagnosticEnabled);
+											px1007DocumentationDiagnosticEnabled, infoDiagnosticsEnabled);
 		}
 
 		private BannedApiSettings ReadBannedApiSettings()
