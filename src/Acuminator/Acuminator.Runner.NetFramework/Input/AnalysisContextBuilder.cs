@@ -29,7 +29,8 @@ namespace Acuminator.Runner.Input
 																commandLineOptions.IsvSpecificAnalysisIsEnabled,
 																staticAnalysisEnabled: true,                   // no sense to run the tool with disabled static analysis
 																suppressionMechanismEnabled: !commandLineOptions.DisableSuppressionMechanism,
-																commandLineOptions.PX1007DiagnosticIsEnabled);
+																commandLineOptions.PX1007DiagnosticIsEnabled,
+																commandLineOptions.EnableInformationalDiagnostics);
 
 			var bannedApiSettings = new BannedApiSettings(bannedApiAnalysisEnabled: !commandLineOptions.DisablePX1099Diagnostic,
 														  commandLineOptions.BannedApiFilePath, 
