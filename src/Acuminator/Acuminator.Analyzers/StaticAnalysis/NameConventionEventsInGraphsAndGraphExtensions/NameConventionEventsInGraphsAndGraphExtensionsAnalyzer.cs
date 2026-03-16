@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -23,7 +22,8 @@ namespace Acuminator.Analyzers.StaticAnalysis.NameConventionEventsInGraphsAndGra
 			ImmutableArray.Create(Descriptors.PX1041_NameConventionEventsInGraphsAndGraphExtensions);
 
 		public override bool ShouldAnalyze(PXContext pxContext, PXGraphEventSemanticModel graph) => 
-			base.ShouldAnalyze(pxContext, graph) && graph.DeclaredEventHandlers.AllEventHandlersCount > 0;
+			base.ShouldAnalyze(pxContext, graph) && pxContext.CodeAnalysisSettings.InfoDiagnosticsEnabled && 
+			graph.DeclaredEventHandlers.AllEventHandlersCount > 0;
 
 		public override void Analyze(SymbolAnalysisContext symbolContext, PXContext pxContext, PXGraphEventSemanticModel graphOrExtensionWithEvents)
 		{

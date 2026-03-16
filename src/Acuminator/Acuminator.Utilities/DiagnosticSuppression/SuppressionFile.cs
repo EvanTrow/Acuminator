@@ -27,11 +27,6 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 		internal AcuminatorWorkMode WorkMode { get; }
 
 		/// <summary>
-		/// A flag indicating whether informational diagnostics should be suppressed by default.
-		/// </summary>
-		internal bool SuppressInformationalDiagnostics { get; }
-
-		/// <summary>
 		/// The suppression messages loaded from existing suppression file. These suppressions are checked against diagnostics.
 		/// </summary>
 		private readonly ConcurrentDictionary<SuppressMessage, object?> _loadedExistingMessages = new();
@@ -80,13 +75,12 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 
 		internal ICollection<SuppressMessage> GetNewSuppressions() => _addedGeneratedMessages.Keys;
 
-		private SuppressionFile(string assemblyName, string path, AcuminatorWorkMode workMode, bool suppressInformationalDiagnostics,
+		private SuppressionFile(string assemblyName, string path, AcuminatorWorkMode workMode,
 								IReadOnlyCollection<SuppressMessage> loadedMessages, ISuppressionFileWatcherService? watcher)
 		{
 			AssemblyName = assemblyName;
 			Path = path;
 			WorkMode = workMode;
-			SuppressInformationalDiagnostics = suppressInformationalDiagnostics;
 
 			if (loadedMessages.Count > 0)
 			{
@@ -102,7 +96,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 		internal bool ContainsLoadedSuppressedMessage(in SuppressMessage message) => _loadedExistingMessages.ContainsKey(message);
 
 		internal static SuppressionFile Load(ISuppressionFileSystemService fileSystemService, string suppressionFilePath,
-											 AcuminatorWorkMode workMode, bool suppressInformationalDiagnostics)
+											 AcuminatorWorkMode workMode)
 		{
 			fileSystemService.ThrowOnNull();
 			suppressionFilePath.ThrowOnNullOrWhiteSpace();
@@ -121,7 +115,7 @@ namespace Acuminator.Utilities.DiagnosticSuppression
 				fileWatcher = fileSystemService.CreateWatcher(suppressionFilePath);
 			}
 			
-			return new SuppressionFile(assemblyName, suppressionFilePath, workMode, suppressInformationalDiagnostics, loadedMessages, fileWatcher);
+			return new SuppressionFile(assemblyName, suppressionFilePath, workMode, loadedMessages, fileWatcher);
 		}
 
 		public void Dispose() => _fileWatcher?.Dispose();

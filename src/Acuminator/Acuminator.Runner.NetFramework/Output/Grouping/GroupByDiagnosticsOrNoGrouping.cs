@@ -32,28 +32,29 @@ namespace Acuminator.Runner.Output.Grouping
 		public override IEnumerable<ReportGroup> GetGroupedDiagnostics(AnalysisContext analysisContext, IEnumerable<Diagnostic> diagnostics,
 																		string? projectDirectory, CancellationToken cancellation) =>
 			GroupDiagnosticsByDiagnosticIdOrNothing(analysisContext, diagnostics, projectDirectory, 
-													sortBySourceFile: null, sortByDiagnosticId: null,
+													sortBySourceFile: null, sortBySeverity: null, sortByDiagnosticId: null,
 													cancellation);
 
 		protected IReadOnlyCollection<ReportGroup> GroupDiagnosticsByDiagnosticIdOrNothing(AnalysisContext analysisContext, 
-																						   IEnumerable<Diagnostic> unsortedDiagnostics,
-																						   string? projectDirectory, bool? sortBySourceFile, 
-																						   bool? sortByDiagnosticId, CancellationToken cancellation)
+																				IEnumerable<Diagnostic> unsortedDiagnostics, string? projectDirectory, 
+																				bool? sortBySourceFile, bool? sortBySeverity, bool? sortByDiagnosticId, 
+																				CancellationToken cancellation)
 		{
 			return analysisContext.GroupingMode.HasGrouping(GroupingMode.DiagnosticIDs)
-				? GroupDiagnosticsByDiagnosticId(unsortedDiagnostics, projectDirectory, analysisContext, sortBySourceFile, sortByDiagnosticId, 
-												 cancellation).ToList()
-				: GetNotGroupedDiagnostics(analysisContext, unsortedDiagnostics, projectDirectory, sortBySourceFile, sortByDiagnosticId,
-										   cancellation);
+				? GroupDiagnosticsByDiagnosticId(unsortedDiagnostics, projectDirectory, analysisContext, 
+												 sortBySourceFile, sortBySeverity, sortByDiagnosticId, cancellation).ToList()
+				: GetNotGroupedDiagnostics(analysisContext, unsortedDiagnostics, projectDirectory, 
+										   sortBySourceFile, sortBySeverity, sortByDiagnosticId, cancellation);
 		}
 
 		private IEnumerable<ReportGroup> GroupDiagnosticsByDiagnosticId(IEnumerable<Diagnostic> unsortedDiagnostics, string? projectDirectory,
-																		AnalysisContext analysisContext, bool? sortBySourceFile, bool? sortByDiagnosticId,
-																		CancellationToken cancellation)
+																		AnalysisContext analysisContext, bool? sortBySourceFile, bool? sortBySeverity,
+																		bool? sortByDiagnosticId, CancellationToken cancellation)
 		{
 			cancellation.ThrowIfCancellationRequested();
 
 			sortBySourceFile   ??= true;
+			sortBySeverity 	   ??= false;
 			sortByDiagnosticId ??= false;
 			var diagnosticsGroupedById = unsortedDiagnostics.GroupBy(d => d.Id)
 															.OrderBy(d => d.Key);
@@ -64,7 +65,7 @@ namespace Acuminator.Runner.Output.Grouping
 
 				string diagnosticId	= diagnosticsWithSameId.Key;
 				var diagnosticsWithLocations = GetOrderedDiagnosticsWithLocationLines(diagnosticsWithSameId, projectDirectory, analysisContext, 
-																					  sortBySourceFile.Value, sortByDiagnosticId.Value)
+																					  sortBySourceFile.Value, sortBySeverity.Value, sortByDiagnosticId.Value)
 																		.ToList();
 				var diagnosticIdGroup = new ReportGroup
 				{
@@ -78,19 +79,20 @@ namespace Acuminator.Runner.Output.Grouping
 		}
 
 		private IReadOnlyCollection<ReportGroup> GetNotGroupedDiagnostics(AnalysisContext analysisContext, IEnumerable<Diagnostic> unsortedDiagnostics,
-																		  string? projectDirectory, bool? sortBySourceFile, bool? sortByDiagnosticId, 
-																		  CancellationToken cancellation)
+																		  string? projectDirectory, bool? sortBySourceFile, bool? sortBySeverity, 
+																		  bool? sortByDiagnosticId, CancellationToken cancellation)
 		{
 			cancellation.ThrowIfCancellationRequested();
 
 			sortBySourceFile   ??= true;
+			sortBySeverity	   ??= false;
 			sortByDiagnosticId ??= true;
 			IReadOnlyCollection<Diagnostic> diagnosticsMaterializedCollection = (unsortedDiagnostics as IReadOnlyCollection<Diagnostic>) ?? 
 																				 unsortedDiagnostics.ToList();
 			var distinctDiagnosticsCount = diagnosticsMaterializedCollection.GroupBy(d => d.Id)
 																			.Count();
 			var sortedNotGroupedDiagnostics = GetOrderedDiagnosticsWithLocationLines(diagnosticsMaterializedCollection, projectDirectory, analysisContext,
-																					 sortBySourceFile.Value, sortByDiagnosticId.Value)
+																					 sortBySourceFile.Value, sortBySeverity.Value, sortByDiagnosticId.Value)
 												.ToList(capacity: diagnosticsMaterializedCollection.Count);
 
 			cancellation.ThrowIfCancellationRequested();

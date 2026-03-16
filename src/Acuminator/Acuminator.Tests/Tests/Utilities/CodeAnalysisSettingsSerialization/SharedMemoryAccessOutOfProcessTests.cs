@@ -25,15 +25,15 @@ namespace Acuminator.Tests.Tests.Utilities.CodeAnalysisSettingsSerialization
 		private const int Timeout_ThreeMinutes = 3 * 60_000;
 
 		[Theory]
-		[InlineData(true, true, true, true, true, false, null, null)]
-		[InlineData(false, false, false, false, false, true, "", "    ")]
-		[InlineData(false, true, false, false, true, true, @"C:\bannedApiPath.txt", @"C:\allowedApisPath.txt")]
-		[InlineData(true, false, false, true, true, false, null, @"C:\allowedApisPath.txt")]
-		[InlineData(true, false, false, true, true, true, @"C:\bannedApiPath.txt", null)]
+		[InlineData(true, true, true, true, true, true, false, null, null)]
+		[InlineData(false, false, false, false, false, false, true, "", "    ")]
+		[InlineData(false, true, false, false, true, false, true, @"C:\bannedApiPath.txt", @"C:\allowedApisPath.txt")]
+		[InlineData(true, false, false, true, true, false, false, null, @"C:\allowedApisPath.txt")]
+		[InlineData(true, false, false, true, true, true, true, @"C:\bannedApiPath.txt", null)]
 		public void CheckAnalyzerReadSettingsCorrectly(bool recursiveAnalysisEnabled, bool isvSpecificAnalyzersEnabled,
 													   bool staticAnalysisEnabled, bool suppressionMechanismEnabled, 
-													   bool px1007DocumentationDiagnosticEnabled, bool bannedApiAnalysisEnabled,
-													   string? bannedApiFilePath, string? allowedApisFilePath)
+													   bool px1007DocumentationDiagnosticEnabled, bool infoDiagnosticEnabled,
+													   bool bannedApiAnalysisEnabled, string? bannedApiFilePath, string? allowedApisFilePath)
 		{
 			string externalExecutorPath = Path.GetFullPath(ExternalExecutorFilePath);
 
@@ -42,11 +42,11 @@ namespace Acuminator.Tests.Tests.Utilities.CodeAnalysisSettingsSerialization
 			string externalExecutorDir = Path.GetDirectoryName(externalExecutorPath);
 			var commandLineArgs = CreateCommandLineArgs(recursiveAnalysisEnabled, isvSpecificAnalyzersEnabled, 
 														staticAnalysisEnabled, suppressionMechanismEnabled,
-														px1007DocumentationDiagnosticEnabled, bannedApiAnalysisEnabled,
-														bannedApiFilePath, allowedApisFilePath);
+														px1007DocumentationDiagnosticEnabled, infoDiagnosticEnabled, 
+														bannedApiAnalysisEnabled, bannedApiFilePath, allowedApisFilePath);
 			var expectedCodeAnalysisSettings = new CodeAnalysisSettings(recursiveAnalysisEnabled, isvSpecificAnalyzersEnabled,
 																		staticAnalysisEnabled, suppressionMechanismEnabled, 
-																		px1007DocumentationDiagnosticEnabled);
+																		px1007DocumentationDiagnosticEnabled, infoDiagnosticEnabled);
 			var expectedBannedApiSettings = new BannedApiSettings(bannedApiAnalysisEnabled, bannedApiFilePath, allowedApisFilePath);
 			var mockSettingsEvents = new MockSettingsEvents();
 
@@ -70,8 +70,8 @@ namespace Acuminator.Tests.Tests.Utilities.CodeAnalysisSettingsSerialization
 
 		private static string CreateCommandLineArgs(bool recursiveAnalysisEnabled, bool isvSpecificAnalyzersEnabled,
 													bool staticAnalysisEnabled, bool suppressionMechanismEnabled,
-													bool px1007DocumentationDiagnosticEnabled, bool bannedApiAnalysisEnabled,
-													string? bannedApiFilePath, string? allowedApisFilePath)
+													bool px1007DocumentationDiagnosticEnabled, bool infoDiagnosticEnabled,
+													bool bannedApiAnalysisEnabled, string? bannedApiFilePath, string? allowedApisFilePath)
 		{
 			string[] commandLineArgsList =
 			[
@@ -80,6 +80,7 @@ namespace Acuminator.Tests.Tests.Utilities.CodeAnalysisSettingsSerialization
 				staticAnalysisEnabled.ToString(),
 				suppressionMechanismEnabled.ToString(),
 				px1007DocumentationDiagnosticEnabled.ToString(),
+				infoDiagnosticEnabled.ToString(),
 				bannedApiAnalysisEnabled.ToString(),
 				bannedApiFilePath.NullIfWhiteSpace()?.Trim() ?? EmptyStringPlaceHolder,
 				allowedApisFilePath.NullIfWhiteSpace()?.Trim() ?? EmptyStringPlaceHolder

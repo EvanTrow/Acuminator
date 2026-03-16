@@ -14,35 +14,22 @@ namespace Acuminator.Runner.Output.Data
 	{
 		public ImmutableArray<LineSpan> Spans { get; }
 
-		public Line(string line)
-		{
-			var span = new LineSpan(line.CheckIfNull());
-			Spans	 = [span];
-		}
+		public Line(LineSpan line) =>
+			Spans = [line];
 
-		public Line(string idPart1, string messagePart, string locationPart)
-		{
-			var span1 = new LineSpan(idPart1.CheckIfNull());
-			var span2 = new LineSpan(messagePart.CheckIfNull());
-			var span3 = new LineSpan(locationPart.CheckIfNull());
-			Spans = [span1, span2, span3];
-		}
+		public Line(LineSpan idPart1, LineSpan messagePart, LineSpan locationPart) =>
+			Spans = [idPart1, messagePart, locationPart];
 
-		public Line(string severity, string idPart1, string messagePart, string locationPart)
-		{
-			var span1 = new LineSpan(severity.CheckIfNull());
-			var span2 = new LineSpan(idPart1.CheckIfNull());
-			var span3 = new LineSpan(messagePart.CheckIfNull());
-			var span4 = new LineSpan(locationPart.CheckIfNull());
-			Spans = [span1, span2, span3, span4];
-		}
+		public Line(LineSpan severity, LineSpan idPart1, LineSpan messagePart, LineSpan locationPart) =>
+			Spans = [severity, idPart1, messagePart, locationPart];
 
-		public Line(IReadOnlyCollection<string> spans)
-        {
+		public Line(IEnumerable<string> spans) =>
 			Spans = spans.CheckIfNull()
 						 .Select(s => new LineSpan(s))
 						 .ToImmutableArray();
-        }
+
+		public Line(IEnumerable<LineSpan> spans) =>
+			Spans = spans.CheckIfNull().ToImmutableArray();
 
 		public override string ToString() => Spans.Length switch
 		{

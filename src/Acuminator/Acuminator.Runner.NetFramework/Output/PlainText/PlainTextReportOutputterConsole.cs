@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Acuminator.Utilities.Common;
+
+using Acuminator.Runner.Constants;
 using Acuminator.Runner.Output.Data;
 using Acuminator.Runner.Resources;
 
@@ -56,16 +57,16 @@ namespace Acuminator.Runner.Output.PlainText
 					return;
 
 				case 3:
-					WriteDiagnosticWithLocation(indentationLevel, diagnosticId: line.Spans[0].ToString(), 
-												diagnosticMessage: line.Spans[1].ToString(),
-												location: line.Spans[2].ToString(),
+					WriteDiagnosticWithLocation(indentationLevel, diagnosticId: line.Spans[0], 
+												diagnosticMessage: line.Spans[1],
+												location: line.Spans[2],
 												severity: null);
 					return;
 				case 4:
-					WriteDiagnosticWithLocation(indentationLevel, diagnosticId: line.Spans[1].ToString(),
-												diagnosticMessage: line.Spans[2].ToString(),
-												location: line.Spans[3].ToString(),
-												severity: line.Spans[0].ToString());
+					WriteDiagnosticWithLocation(indentationLevel, diagnosticId: line.Spans[1],
+												diagnosticMessage: line.Spans[2],
+												location: line.Spans[3],
+												severity: line.Spans[0]);
 					return;
 				case 1:
 				default:
@@ -75,20 +76,25 @@ namespace Acuminator.Runner.Output.PlainText
 			}
 		}
 
-		private void WriteDiagnosticWithLocation(int indentationLevel, string diagnosticId, string diagnosticMessage, string location, string? severity)
+		private void WriteDiagnosticWithLocation(int indentationLevel, LineSpan diagnosticId, LineSpan diagnosticMessage, 
+												 LineSpan location, LineSpan? severity)
 		{ 
 			string padding = GetPadding(indentationLevel);
 
 			Console.Write(padding);
-			if (!severity.IsNullOrEmpty())
+			if (severity.HasValue)
 			{
-				WriteStringPartWithColor(String.Format(SeverityTemplate, severity), GetSeverityColor(severity));
+				string formattedSeverity = String.Format(Constant.Output.SeverityTemplate, severity);
+				WriteStringPartWithColor(formattedSeverity, severity.Value.ForegroundColor ?? Console.ForegroundColor);
 			}
 
-			WriteStringPartWithColor(diagnosticId, ConsoleColor.White);
-			Console.Write(LinePartsSeparator);
-			Console.Write(diagnosticMessage + LinePartsSeparator);
-			WriteStringPartWithColor(location, ConsoleColor.Yellow);
+			WriteStringPartWithColor(diagnosticId.ToString(), diagnosticId.ForegroundColor ?? ConsoleColor.White);
+			Console.Write(Constant.Output.LinePartsSeparator);
+
+			WriteStringPartWithColor(diagnosticMessage.ToString(), diagnosticMessage.ForegroundColor ?? Console.ForegroundColor);
+			Console.Write(Constant.Output.LinePartsSeparator);
+
+			WriteStringPartWithColor(location.ToString(), location.ForegroundColor ?? ConsoleColor.Yellow);
 			Console.Write(Environment.NewLine);
 			
 			//-----------------------------------------Local Function---------------------------------------------------
@@ -105,14 +111,6 @@ namespace Acuminator.Runner.Output.PlainText
 					Console.ForegroundColor = oldColor;
 				}
 			}
-
-			static ConsoleColor GetSeverityColor(string severity) => severity.ToUpperInvariant() switch
-			{
-				SeverityError => ConsoleColor.Red,
-				SeverityWarning => ConsoleColor.Yellow,
-				SeverityInfo => ConsoleColor.Cyan,
-				_ => Console.ForegroundColor
-			};
 		}
 
 		protected override void WriteCodeSourceTitle(string codeSourceTitle) =>

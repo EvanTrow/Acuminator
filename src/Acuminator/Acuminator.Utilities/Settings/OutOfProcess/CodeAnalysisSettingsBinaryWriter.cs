@@ -36,6 +36,7 @@ namespace Acuminator.Utilities.Settings.OutOfProcess
 			_writer.Write(codeAnalysisSettings.StaticAnalysisEnabled);
 			_writer.Write(codeAnalysisSettings.SuppressionMechanismEnabled);
 			_writer.Write(codeAnalysisSettings.PX1007DocumentationDiagnosticEnabled);
+			_writer.Write(codeAnalysisSettings.InfoDiagnosticsEnabled);
 		}
 
 		private void WriteBannedApiSettings(BannedApiSettings bannedApiSettings)

@@ -29,7 +29,8 @@ namespace Acuminator.Runner.Input
 																commandLineOptions.IsvSpecificAnalysisIsEnabled,
 																staticAnalysisEnabled: true,                   // no sense to run the tool with disabled static analysis
 																suppressionMechanismEnabled: !commandLineOptions.DisableSuppressionMechanism,
-																commandLineOptions.PX1007DiagnosticIsEnabled);
+																commandLineOptions.PX1007DiagnosticIsEnabled,
+																commandLineOptions.EnableInformationalDiagnostics);
 
 			var bannedApiSettings = new BannedApiSettings(bannedApiAnalysisEnabled: !commandLineOptions.DisablePX1099Diagnostic,
 														  commandLineOptions.BannedApiFilePath, 
@@ -40,7 +41,7 @@ namespace Acuminator.Runner.Input
 			AcuminatorWorkMode workMode = GetAcuminatorWorkMode(commandLineOptions.AcuminatorWorkMode);
 			var input = new AnalysisContext(codeSource, codeAnalysisSettings, bannedApiSettings, commandLineOptions.MSBuildPath, 
 											commandLineOptions.OutputFileName, commandLineOptions.OutputAbsolutePathsToUsages, outputFormat,
-											workMode, groupingMode, commandLineOptions.EnableInformationalDiagnostics);
+											workMode, groupingMode);
 			return input;
 		}
 
@@ -67,8 +68,8 @@ namespace Acuminator.Runner.Input
 
 			return extension switch
 			{
-				CommonConstants.ProjectFileExtension  => new ProjectCodeSource(codeSourceLocation),
-				CommonConstants.SolutionFileExtension => new SolutionCodeSource(codeSourceLocation),
+				Constant.Common.ProjectFileExtension  => new ProjectCodeSource(codeSourceLocation),
+				Constant.Common.SolutionFileExtension => new SolutionCodeSource(codeSourceLocation),
 				_									  => throw new NotSupportedException(
 															string.Format(Messages.NotSupportedCodeSourceType, codeSourceLocation))
 			};

@@ -17,12 +17,6 @@ namespace Acuminator.Runner.Output.PlainText
 	/// </summary>
 	internal abstract class PlainTextReportOutputterBase : IReportOutputter
 	{
-		protected const string LinePartsSeparator = ": ";
-		protected const string SeverityTemplate = "[{0}] ";
-		protected const string SeverityError = "ERROR";
-		protected const string SeverityWarning = "WARNING";
-		protected const string SeverityInfo = "INFO";
-
 		public abstract void Dispose();
 
 		public virtual void OutputReport(CodeSourceReport codeSourceReport, AnalysisContext analysisContext, CancellationToken cancellation)

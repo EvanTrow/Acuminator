@@ -77,7 +77,7 @@ namespace Acuminator.Runner.Output.Grouping
 																			string? projectDirectory, CancellationToken cancellation)
 		{
 			var subGroups = GroupDiagnosticsByDiagnosticIdOrNothing(analysisContext, diagnostics, projectDirectory, 
-																	sortBySourceFile: false, sortByDiagnosticId: true, cancellation);
+																	sortBySourceFile: false, sortBySeverity: false, sortByDiagnosticId: true, cancellation);
 			return subGroups;
 		}
 
@@ -86,7 +86,7 @@ namespace Acuminator.Runner.Output.Grouping
 			int distinctDiagnosticsCount = diagnostics.GroupBy(d => d.Id)
 													  .Count();
 			var lines = GetOrderedDiagnosticsWithLocationLines(diagnostics, projectDirectory, analysisContext,
-															   sortBySourceFile: false, sortByDiagnosticId: true)
+															   sortBySourceFile: false, sortBySeverity: false, sortByDiagnosticId: true)
 													   .ToList(diagnostics.Count);
 			var fileGroup = new ReportGroup
 			{
