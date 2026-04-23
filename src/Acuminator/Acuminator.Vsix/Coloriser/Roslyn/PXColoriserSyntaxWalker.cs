@@ -454,17 +454,11 @@ namespace Acuminator.Vsix.Coloriser
 
 			private string? GetAttributeName(AttributeSyntax attribute)
 			{
-				foreach (SyntaxNode childNode in attribute.ChildNodes())
-				{
-					if (_cancellationToken.IsCancellationRequested)
-						return null;
-
-					switch (childNode)
+				switch (attribute.Name)
 					{
 						case IdentifierNameSyntax attributeName:
-							{
 								return $"[{attributeName.Identifier.ValueText}]";
-							}
+
 						case QualifiedNameSyntax qualifiedName:
 							{
 								string? identifierText = _tagger.Snapshot?.GetText(qualifiedName.Span);
@@ -472,10 +466,10 @@ namespace Acuminator.Vsix.Coloriser
 									? $"[{identifierText}]"
 									: null;
 							}
-					}
-				}
 
+					default:
 				return null;
+			}
 			}
 
 			private void UpdateCodeEditorIfNecessary()
