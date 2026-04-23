@@ -12,7 +12,6 @@ using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Text;
 
 using Path = System.IO.Path;
-using ThreadHelper = Microsoft.VisualStudio.Shell.ThreadHelper;
 
 namespace Acuminator.Vsix.Coloriser
 {
@@ -33,11 +32,6 @@ namespace Acuminator.Vsix.Coloriser
 		public SemanticModel SemanticModel { get; } = semanticModel.CheckIfNull();
 
 		public ITextSnapshot Snapshot { get; } = snapshot.CheckIfNull();
-
-		public SemanticModel? GetSemanticModel(CancellationToken cancellationToken = default) =>
-			Document.TryGetSemanticModel(out var semanticModel)
-				? semanticModel
-				: ThreadHelper.JoinableTaskFactory.Run(() => Document.GetSemanticModelAsync(cancellationToken));
 
 		public static async Task<ParsedDocument?> ResolveAsync(ITextSnapshot snapshot, CancellationToken cancellationToken)
 		{

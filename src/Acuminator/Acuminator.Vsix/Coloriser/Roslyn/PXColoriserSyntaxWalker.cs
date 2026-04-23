@@ -103,8 +103,7 @@ namespace Acuminator.Vsix.Coloriser
 				if (_cancellationToken.IsCancellationRequested)
 					return;
 
-				SemanticModel? semanticModel = _document.GetSemanticModel(_cancellationToken);
-				ITypeSymbol? typeSymbol = semanticModel?.GetSymbolInfo(genericNode).Symbol as ITypeSymbol;
+				ITypeSymbol? typeSymbol = _document.SemanticModel.GetSymbolInfo(genericNode, _cancellationToken).Symbol as ITypeSymbol;
 
 				if (typeSymbol == null)
 				{
@@ -262,11 +261,9 @@ namespace Acuminator.Vsix.Coloriser
 					return;
 				}
 
-				var semanticModel = _document.GetSemanticModel(_cancellationToken);
-
 				TextSpan leftSpan = node.Left.Span;
 				TextSpan rightSpan = node.Right.Span;
-				ITypeSymbol? typeSymbol = semanticModel.GetSymbolInfo(node).Symbol as ITypeSymbol;
+				ITypeSymbol? typeSymbol = _document.SemanticModel.GetSymbolInfo(node, _cancellationToken).Symbol as ITypeSymbol;
 
 				if (typeSymbol == null)
 				{
@@ -391,12 +388,7 @@ namespace Acuminator.Vsix.Coloriser
 
 			private ITypeSymbol? GetTypeSymbolFromIdentifierNode(SyntaxNode node)
 			{
-				var semanticModel = _document.GetSemanticModel(_cancellationToken);
-
-				if (semanticModel == null)
-					return null;
-
-				var symbolInfo = semanticModel.GetSymbolInfo(node);
+				var symbolInfo = _document.SemanticModel.GetSymbolInfo(node, _cancellationToken);
 				ISymbol? symbol = symbolInfo.Symbol;
 
 				if (symbol == null && symbolInfo.CandidateSymbols.Length == 1)
