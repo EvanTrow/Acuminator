@@ -356,7 +356,9 @@ namespace Acuminator.Vsix.Coloriser
 
 			public override void Visit(SyntaxNode? node)
 			{
-				if (_cancellationToken.IsCancellationRequested)
+				_cancellationToken.ThrowIfCancellationRequested();
+
+				if (node is null || node.IsStructuredTrivia)
 					return;
 
 				if (_visitedNodesCounter < long.MaxValue)
