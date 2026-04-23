@@ -503,9 +503,19 @@ namespace Acuminator.Vsix.Coloriser
 
 				_visitedNodesCounter = 0;
 
-#pragma warning disable VSTHRD110 // Observe result of async calls
-				Shell.ThreadHelper.JoinableTaskFactory.RunAsync(_tagger.RaiseTagsChangedAsync);
-#pragma warning restore VSTHRD110 // Observe result of async calls
+				// Capture the token so the queued callback can detect cancellation
+				// even if it executes after a new tagging cycle has started and cleared the cache.
+				var cancellationToken = _cancellationToken;
+
+				#pragma warning disable VSTHRD110 // Observe result of async calls
+				Shell.ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
+				{
+					if (!cancellationToken.IsCancellationRequested)
+					{
+						await _tagger.RaiseTagsChangedAsync();
+					}
+				});
+				#pragma warning restore VSTHRD110 // Observe result of async calls
 			}
 
 			/// <summary>
