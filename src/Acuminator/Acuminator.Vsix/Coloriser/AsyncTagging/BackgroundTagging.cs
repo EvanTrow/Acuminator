@@ -46,7 +46,7 @@ namespace Acuminator.Vsix.Coloriser
 
 			// Use VS task scheduler from the VS synchronization context to schedule task continuation immediately to main thread
 			// No need for synchronization because FromCurrentSynchronizationContext creates schedulers which wrap around the same synchronization context
-			// Therefore all schedulers should be identical and nothing wrong will happen if multiple threads create will create a scheduler
+			// Therefore all schedulers should be identical and nothing wrong will happen if different thread will create multiple instance of the scheduler in a race condition
 			_vsTaskScheduler = _vsTaskScheduler ?? TaskScheduler.FromCurrentSynchronizationContext();
 			backgroundTagging.TaggingTask = taggingTask.ContinueWith(task => AfterTaggingActionAsync(tagger, backgroundTagging.CancellationToken),  //continuation should be on the UI thread
 																	 backgroundTagging.CancellationToken,
