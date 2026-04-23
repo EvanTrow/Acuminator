@@ -67,7 +67,8 @@ namespace Acuminator.Vsix.Coloriser
 				if (_cancellationToken.IsCancellationRequested || IsVar(nodeText))
 					return;
 
-				ITypeSymbol? typeSymbol = GetTypeSymbolFromIdentifierNode(node);
+				ITypeSymbol? typeSymbol = _document.SemanticModel.GetSymbolOrFirstCandidate(node, _cancellationToken) as ITypeSymbol;
+				_cancellationToken.ThrowIfCancellationRequested();
 
 				if (typeSymbol == null)
 				{
@@ -385,19 +386,6 @@ namespace Acuminator.Vsix.Coloriser
 				return;  //To prevent coloring in XML comments don't call base method
 			}
 			#endregion
-
-			private ITypeSymbol? GetTypeSymbolFromIdentifierNode(SyntaxNode node)
-			{
-				var symbolInfo = _document.SemanticModel.GetSymbolInfo(node, _cancellationToken);
-				ISymbol? symbol = symbolInfo.Symbol;
-
-				if (symbol == null && symbolInfo.CandidateSymbols.Length == 1)
-				{
-					symbol = symbolInfo.CandidateSymbols[0];
-				}
-
-				return symbol as ITypeSymbol;
-			}
 
 			private void AnalyzeTypeParameterNode(IdentifierNameSyntax node, ITypeParameterSymbol typeParameterSymbol)
 			{
