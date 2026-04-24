@@ -50,7 +50,7 @@ namespace Acuminator.Vsix.Coloriser
 			_vsTaskScheduler = _vsTaskScheduler ?? TaskScheduler.FromCurrentSynchronizationContext();
 			backgroundTagging.TaggingTask = taggingTask.ContinueWith(task => AfterTaggingActionAsync(tagger, backgroundTagging.CancellationToken),  //continuation should be on the UI thread
 																	 backgroundTagging.CancellationToken,
-																	 TaskContinuationOptions.NotOnCanceled,
+																	 TaskContinuationOptions.OnlyOnRanToCompletion,
 																	 _vsTaskScheduler);
 			return backgroundTagging;
 		}
