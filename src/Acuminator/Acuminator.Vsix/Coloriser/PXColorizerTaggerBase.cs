@@ -45,7 +45,7 @@ namespace Acuminator.Vsix.Coloriser
 		public virtual IEnumerable<ITagSpan<IClassificationTag>> GetTags(NormalizedSnapshotSpanCollection spans)
 		{
 			if (spans == null || spans.Count == 0 || AcuminatorVSPackage.Instance?.ColoringEnabled != true)
-				return Enumerable.Empty<ITagSpan<IClassificationTag>>();
+				return Array.Empty<ITagSpan<IClassificationTag>>();
 
 			ITextSnapshot snapshot = spans[0].Snapshot;
 

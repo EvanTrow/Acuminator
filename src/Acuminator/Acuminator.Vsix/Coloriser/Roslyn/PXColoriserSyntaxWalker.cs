@@ -67,7 +67,7 @@ namespace Acuminator.Vsix.Coloriser
 				if (_cancellationToken.IsCancellationRequested || IsVar(nodeText))
 					return;
 
-				ITypeSymbol? typeSymbol = GetTypeSymbolFromIdentifierNode(node);
+				ITypeSymbol? typeSymbol = _document.SemanticModel.GetSymbolOrFirstCandidate(node, _cancellationToken) as ITypeSymbol;
 
 				if (typeSymbol == null)
 				{
@@ -103,8 +103,7 @@ namespace Acuminator.Vsix.Coloriser
 				if (_cancellationToken.IsCancellationRequested)
 					return;
 
-				SemanticModel? semanticModel = _document.GetSemanticModel(_cancellationToken);
-				ITypeSymbol? typeSymbol = semanticModel?.GetSymbolInfo(genericNode).Symbol as ITypeSymbol;
+				ITypeSymbol? typeSymbol = _document.SemanticModel.GetSymbolInfo(genericNode, _cancellationToken).Symbol as ITypeSymbol;
 
 				if (typeSymbol == null)
 				{
@@ -262,11 +261,9 @@ namespace Acuminator.Vsix.Coloriser
 					return;
 				}
 
-				var semanticModel = _document.GetSemanticModel(_cancellationToken);
-
 				TextSpan leftSpan = node.Left.Span;
 				TextSpan rightSpan = node.Right.Span;
-				ITypeSymbol? typeSymbol = semanticModel.GetSymbolInfo(node).Symbol as ITypeSymbol;
+				ITypeSymbol? typeSymbol = _document.SemanticModel.GetSymbolInfo(node, _cancellationToken).Symbol as ITypeSymbol;
 
 				if (typeSymbol == null)
 				{
@@ -356,7 +353,7 @@ namespace Acuminator.Vsix.Coloriser
 
 			public override void Visit(SyntaxNode? node)
 			{
-				if (_cancellationToken.IsCancellationRequested)
+				if (_cancellationToken.IsCancellationRequested || node is null || node.IsStructuredTrivia)
 					return;
 
 				if (_visitedNodesCounter < long.MaxValue)
@@ -386,24 +383,6 @@ namespace Acuminator.Vsix.Coloriser
 				return;  //To prevent coloring in XML comments don't call base method
 			}
 			#endregion
-
-			private ITypeSymbol? GetTypeSymbolFromIdentifierNode(SyntaxNode node)
-			{
-				var semanticModel = _document.GetSemanticModel(_cancellationToken);
-
-				if (semanticModel == null)
-					return null;
-
-				var symbolInfo = semanticModel.GetSymbolInfo(node);
-				ISymbol? symbol = symbolInfo.Symbol;
-
-				if (symbol == null && symbolInfo.CandidateSymbols.Length == 1)
-				{
-					symbol = symbolInfo.CandidateSymbols[0];
-				}
-
-				return symbol as ITypeSymbol;
-			}
 
 			private void AnalyzeTypeParameterNode(IdentifierNameSyntax node, ITypeParameterSymbol typeParameterSymbol)
 			{
@@ -470,31 +449,12 @@ namespace Acuminator.Vsix.Coloriser
 				_tagger.OutliningsTagsCache.AddTag(tag);
 			}
 
-			private string? GetAttributeName(AttributeSyntax attribute)
+			private string? GetAttributeName(AttributeSyntax attribute) => attribute.Name switch
 			{
-				foreach (SyntaxNode childNode in attribute.ChildNodes())
-				{
-					if (_cancellationToken.IsCancellationRequested)
-						return null;
-
-					switch (childNode)
-					{
-						case IdentifierNameSyntax attributeName:
-							{
-								return $"[{attributeName.Identifier.ValueText}]";
-							}
-						case QualifiedNameSyntax qualifiedName:
-							{
-								string? identifierText = _tagger.Snapshot?.GetText(qualifiedName.Span);
-								return !identifierText.IsNullOrWhiteSpace()
-									? $"[{identifierText}]"
-									: null;
-							}
-					}
-				}
-
-				return null;
-			}
+				IdentifierNameSyntax attributeName => $"[{attributeName.Identifier.ValueText}]",
+				null 							   => null,
+				_	 							   => $"[{attribute.Name.ToString()}]"
+			};
 
 			private void UpdateCodeEditorIfNecessary()
 			{
@@ -503,9 +463,19 @@ namespace Acuminator.Vsix.Coloriser
 
 				_visitedNodesCounter = 0;
 
-#pragma warning disable VSTHRD110 // Observe result of async calls
-				Shell.ThreadHelper.JoinableTaskFactory.RunAsync(_tagger.RaiseTagsChangedAsync);
-#pragma warning restore VSTHRD110 // Observe result of async calls
+				// Capture the token so the queued callback can detect cancellation
+				// even if it executes after a new tagging cycle has started and cleared the cache.
+				var cancellationToken = _cancellationToken;
+
+				#pragma warning disable VSTHRD110 // Observe result of async calls
+				Shell.ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
+				{
+					if (!cancellationToken.IsCancellationRequested)
+					{
+						await _tagger.RaiseTagsChangedAsync();
+					}
+				});
+				#pragma warning restore VSTHRD110 // Observe result of async calls
 			}
 
 			/// <summary>
