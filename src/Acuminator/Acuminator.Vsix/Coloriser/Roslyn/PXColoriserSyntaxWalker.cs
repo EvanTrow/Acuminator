@@ -68,7 +68,6 @@ namespace Acuminator.Vsix.Coloriser
 					return;
 
 				ITypeSymbol? typeSymbol = _document.SemanticModel.GetSymbolOrFirstCandidate(node, _cancellationToken) as ITypeSymbol;
-				_cancellationToken.ThrowIfCancellationRequested();
 
 				if (typeSymbol == null)
 				{
@@ -354,9 +353,7 @@ namespace Acuminator.Vsix.Coloriser
 
 			public override void Visit(SyntaxNode? node)
 			{
-				_cancellationToken.ThrowIfCancellationRequested();
-
-				if (node is null || node.IsStructuredTrivia)
+				if (_cancellationToken.IsCancellationRequested || node is null || node.IsStructuredTrivia)
 					return;
 
 				if (_visitedNodesCounter < long.MaxValue)
