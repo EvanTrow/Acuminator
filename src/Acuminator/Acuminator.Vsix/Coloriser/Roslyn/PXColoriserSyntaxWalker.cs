@@ -449,25 +449,12 @@ namespace Acuminator.Vsix.Coloriser
 				_tagger.OutliningsTagsCache.AddTag(tag);
 			}
 
-			private string? GetAttributeName(AttributeSyntax attribute)
+			private string? GetAttributeName(AttributeSyntax attribute) => attribute.Name switch
 			{
-				switch (attribute.Name)
-					{
-						case IdentifierNameSyntax attributeName:
-								return $"[{attributeName.Identifier.ValueText}]";
-
-						case QualifiedNameSyntax qualifiedName:
-							{
-								string? identifierText = _tagger.Snapshot?.GetText(qualifiedName.Span);
-								return !identifierText.IsNullOrWhiteSpace()
-									? $"[{identifierText}]"
-									: null;
-							}
-
-					default:
-				return null;
-			}
-			}
+				IdentifierNameSyntax attributeName => $"[{attributeName.Identifier.ValueText}]",
+				null 							   => null,
+				_	 							   => $"[{attribute.Name.ToString()}]"
+			};
 
 			private void UpdateCodeEditorIfNecessary()
 			{
