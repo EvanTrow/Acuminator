@@ -45,13 +45,14 @@ const bqlOperatorNames = new Set([
 ]);
 
 
-const bqlSelectCommandRegex = /(PX)?Select(GroupBy)?(OrderBy)?|Search\d?|PXSetup|PXUpdate|PXSelectReadonly\d?|PXSelectGroupJoin|PXSelectJoin(OrderBy|GroupBy)?|PX(Filtered)?Processing(Join)?/g;
+const bqlSelectCommandRegex = /\b((PX)?Select(GroupBy)?(OrderBy)?|Search\d?|PXSetup|PXUpdate|PXSelectReadonly\d?|PXSelectGroupJoin|PXSelectJoin(OrderBy|GroupBy)?|PX(Filtered)?Processing(Join)?)\b/g;
 const bqlParameterRegex = /\b(Current2?|Optional2?|Required)\b/g;
 
 
 const dacTypeofWithFieldRegex = /typeof\s*\(\s*(?:[A-Za-z_][A-Za-z0-9_]*\.)*([A-Z][A-Za-z0-9_]*)\s*\.\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)/g;
 const dacTypeofRegex = /typeof\s*\(\s*(?:[A-Za-z_][A-Za-z0-9_]*\.)*([A-Z][A-Za-z0-9_]*)\s*\)/g;
 const attributeRegex = /\[(PX[A-Za-z0-9_]+)(?:Attribute)?\b/g;
+const typeofKeywordRegex = /\btypeof\b/g;
 
 const bqlMemberOperatorRegex = /\b(where|where2|and|and2|or|orderby|aggregate|aggregateto|groupby|on|leftjoin|innerjoin|select\d*|selectfrom|search\d*|isequal|equal|isnotequal|notequal|isnull|isnotnull|islike|isless|islessequal|isgreater|isgreaterequal|between|in|fromcurrent|currentvalue|asc|desc|isworkgroupofcontact|isworkgrouporsubgroupofcontact)\b(?=\s*(<|\.|,|>))/gim;
 
@@ -141,6 +142,11 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
       pushToken(builder, document, match.index + 1, match[1], 9);
     }
 
+    for (const match of text.matchAll(typeofKeywordRegex)) {
+      if (match.index === undefined) continue;
+      pushToken(builder, document, match.index, match[0], 7);
+    }
+
     // BracesFormats parity: apply 14-level cyclic brace coloring
     let braceLevel = 0;
     for (let i = 0; i < text.length; i++) {
@@ -156,6 +162,15 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
       }
     }
 
+
+
+    // Square bracket coloring for attribute containers
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (ch === '[' || ch === ']') {
+        pushToken(builder, document, i, ch, 4);
+      }
+    }
 
     // Angle bracket pair coloring for generic/BQL nesting: 14-level cyclic coloring for < and >
     let angleLevel = 0;
