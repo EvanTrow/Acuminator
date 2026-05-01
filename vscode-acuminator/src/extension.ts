@@ -12,8 +12,8 @@ const legend = new vscode.SemanticTokensLegend([
 ]);
 
 const patterns: Array<{ regex: RegExp; tokenType: number; group?: number }> = [
-  { regex: /\bclass\s+([A-Z][A-Za-z0-9_]*)\s*:\s*(?:IBqlTable|PXBqlTable)\b/gm, tokenType: 0, group: 1 },
-  { regex: /\babstract\s+class\s+([a-z][A-Za-z0-9_]*)\s*:\s*Bql(?:String|Int|Bool|Guid|DateTime|Decimal|ByteArray|Long|Short)\.Field</gm, tokenType: 1, group: 1 },
+  { regex: /\b(?:public\s+|protected\s+|internal\s+|private\s+|partial\s+|abstract\s+|sealed\s+)*class\s+([A-Za-z_][A-Za-z0-9_]*)\s*:\s*[^\n{;]*\b(?:IBqlTable|PXBqlTable)\b/gm, tokenType: 0, group: 1 },
+  { regex: /\b(?:public\s+|protected\s+|internal\s+|private\s+|partial\s+|abstract\s+|sealed\s+)*class\s+([A-Za-z_][A-Za-z0-9_]*)\s*:\s*[^\n{;]*\bBql(?:String|Int|Bool|Guid|DateTime|Decimal|ByteArray|Long|Short)\.Field\s*</gm, tokenType: 1, group: 1 },
   { regex: /\b(?:Current2?|Optional2?|Required)\b/gm, tokenType: 2 },
   { regex: /\b(?:Where|Where2|And|And2|Or|OrderBy|AggregateTo|InnerJoin|LeftJoin|On|Set|Values|View|Select|SelectSingle|SelectFrom|Update|Delete|Insert|Search\d?|PXSelect(?:Readonly\d?|GroupJoin|Join(?:OrderBy|GroupBy)?)?|PXSetup|PXUpdate|PX(?:Filtered)?Processing(?:Join)?)\b(?=\s*<|\s*\.)/gm, tokenType: 3 },
   { regex: /\bclass\s+([A-Z][A-Za-z0-9_]*)\s*:\s*PXGraph(?:Extension)?(?:<[^>]+>)?/gm, tokenType: 6, group: 1 },
