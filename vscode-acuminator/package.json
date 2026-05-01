@@ -1,0 +1,47 @@
+{
+  "name": "acuminator-vscode",
+  "displayName": "Acuminator for VS Code",
+  "description": "Acumatica-focused syntax highlighting for C# with Acumatica framework element recognition.",
+  "version": "0.1.0",
+  "publisher": "acuminator",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "acumatica",
+    "acuminator",
+    "csharp",
+    "bql",
+    "px"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "grammars": [
+      {
+        "scopeName": "source.cs.acumatica",
+        "path": "./syntaxes/acumatica-csharp.tmLanguage.json",
+        "injectTo": [
+          "source.cs"
+        ]
+      }
+    ],
+    "configurationDefaults": {
+      "editor.semanticHighlighting.enabled": true
+    }
+  },
+  "scripts": {
+    "build": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "echo 'no lint configured'",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.4.5",
+    "@vscode/vsce": "^2.26.1"
+  }
+}
