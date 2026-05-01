@@ -39,9 +39,13 @@ const dacOperandRegex = /(,|<)?([A-Z]+\w*)\d?</g;
 const bqlOperatorNames = new Set([
   'Where','Where2','And','And2','Or','OrderBy','Aggregate','AggregateTo','GroupBy','On','LeftJoin','InnerJoin','Select','Select2','Select5','SelectFrom','Search','Search2',
   'IsEqual','Equal','IsNotEqual','NotEqual','IsNull','IsNotNull','IsLike','IsLess','IsLessEqual','IsGreater','IsGreaterEqual','Between','In',
-  'FromCurrent','CurrentValue','Asc','Desc','Required','Optional','Optional2','Current','Current2',
+  'FromCurrent','CurrentValue','Asc','Desc','Current','Current2',
   'IsWorkgroupOfContact','IsWorkgroupOrSubgroupOfContact'
 ]);
+
+
+const bqlSelectCommandRegex = /(PX)?Select(GroupBy)?(OrderBy)?|Search\d?|PXSetup|PXUpdate|PXSelectReadonly\d?|PXSelectGroupJoin|PXSelectJoin(OrderBy|GroupBy)?|PX(Filtered)?Processing(Join)?/g;
+const bqlParameterRegex = /\b(Current2?|Optional2?|Required)\b/g;
 
 const bqlMemberOperatorRegex = /\b(Where|Where2|And|And2|Or|OrderBy|Aggregate|AggregateTo|GroupBy|On|LeftJoin|InnerJoin|Select\d*|SelectFrom|Search\d*|IsEqual|Equal|IsNotEqual|NotEqual|IsNull|IsNotNull|IsLike|IsLess|IsLessEqual|IsGreater|IsGreaterEqual|Between|In|FromCurrent|CurrentValue|Asc|Desc|IsWorkgroupOfContact|IsWorkgroupOrSubgroupOfContact)\b(?=\s*(<|\.|,|>))/gm;
 
@@ -64,6 +68,18 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
         const startIndex = pattern.group ? match.index + match[0].indexOf(value) : match.index;
         pushToken(builder, document, startIndex, value, pattern.tokenType);
       }
+    }
+
+    
+    // VS Regex colorizer parity: explicit BQL select command and parameter passes
+    for (const match of text.matchAll(bqlSelectCommandRegex)) {
+      if (match.index === undefined) continue;
+      pushToken(builder, document, match.index, match[0], 4);
+    }
+
+    for (const match of text.matchAll(bqlParameterRegex)) {
+      if (match.index === undefined) continue;
+      pushToken(builder, document, match.index, match[0], 3);
     }
 
     for (const match of text.matchAll(bqlMemberOperatorRegex)) {
