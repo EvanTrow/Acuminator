@@ -13,7 +13,11 @@ const legend = new vscode.SemanticTokensLegend([
   'acuminatorBraceLevel1', 'acuminatorBraceLevel2', 'acuminatorBraceLevel3', 'acuminatorBraceLevel4',
   'acuminatorBraceLevel5', 'acuminatorBraceLevel6', 'acuminatorBraceLevel7', 'acuminatorBraceLevel8',
   'acuminatorBraceLevel9', 'acuminatorBraceLevel10', 'acuminatorBraceLevel11', 'acuminatorBraceLevel12',
-  'acuminatorBraceLevel13', 'acuminatorBraceLevel14'
+  'acuminatorBraceLevel13', 'acuminatorBraceLevel14',
+  'acuminatorAngleLevel1', 'acuminatorAngleLevel2', 'acuminatorAngleLevel3', 'acuminatorAngleLevel4',
+  'acuminatorAngleLevel5', 'acuminatorAngleLevel6', 'acuminatorAngleLevel7', 'acuminatorAngleLevel8',
+  'acuminatorAngleLevel9', 'acuminatorAngleLevel10', 'acuminatorAngleLevel11', 'acuminatorAngleLevel12',
+  'acuminatorAngleLevel13', 'acuminatorAngleLevel14'
 ]);
 
 const declarationPatterns: Array<{ regex: RegExp; tokenType: number; group?: number }> = [
@@ -89,6 +93,22 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
         const tokenType = 8 + Math.min(((Math.max(braceLevel,1) - 1) % 14) + 1, 14);
         pushToken(builder, document, i, ch, tokenType);
         braceLevel = Math.max(0, braceLevel - 1);
+      }
+    }
+
+
+    // Angle bracket pair coloring for generic/BQL nesting: 14-level cyclic coloring for < and >
+    let angleLevel = 0;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (ch === '<') {
+        angleLevel++;
+        const tokenType = 22 + Math.min(((angleLevel - 1) % 14) + 1, 14);
+        pushToken(builder, document, i, ch, tokenType);
+      } else if (ch === '>') {
+        const tokenType = 22 + Math.min(((Math.max(angleLevel, 1) - 1) % 14) + 1, 14);
+        pushToken(builder, document, i, ch, tokenType);
+        angleLevel = Math.max(0, angleLevel - 1);
       }
     }
 

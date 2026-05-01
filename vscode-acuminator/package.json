@@ -102,6 +102,48 @@
           },
           "acuminatorBraceLevel14": {
             "foreground": "#00FF00"
+          },
+          "acuminatorAngleLevel1": {
+            "foreground": "#FFFFFF"
+          },
+          "acuminatorAngleLevel2": {
+            "foreground": "#ACA585"
+          },
+          "acuminatorAngleLevel3": {
+            "foreground": "#FFFF4E"
+          },
+          "acuminatorAngleLevel4": {
+            "foreground": "#FF4E4F"
+          },
+          "acuminatorAngleLevel5": {
+            "foreground": "#4EFFFF"
+          },
+          "acuminatorAngleLevel6": {
+            "foreground": "#FF4FFF"
+          },
+          "acuminatorAngleLevel7": {
+            "foreground": "#7ED321"
+          },
+          "acuminatorAngleLevel8": {
+            "foreground": "#CC9965"
+          },
+          "acuminatorAngleLevel9": {
+            "foreground": "#9933FF"
+          },
+          "acuminatorAngleLevel10": {
+            "foreground": "#FF9900"
+          },
+          "acuminatorAngleLevel11": {
+            "foreground": "#019999"
+          },
+          "acuminatorAngleLevel12": {
+            "foreground": "#FFE000"
+          },
+          "acuminatorAngleLevel13": {
+            "foreground": "#2B91AF"
+          },
+          "acuminatorAngleLevel14": {
+            "foreground": "#00FF00"
           }
         },
         "[*Light*]": {
@@ -173,6 +215,48 @@
               "foreground": "#005CC5"
             },
             "acuminatorBraceLevel14": {
+              "foreground": "#218838"
+            },
+            "acuminatorAngleLevel1": {
+              "foreground": "#363A41"
+            },
+            "acuminatorAngleLevel2": {
+              "foreground": "#7C7C7C"
+            },
+            "acuminatorAngleLevel3": {
+              "foreground": "#FFC109"
+            },
+            "acuminatorAngleLevel4": {
+              "foreground": "#DC3545"
+            },
+            "acuminatorAngleLevel5": {
+              "foreground": "#3CD7D7"
+            },
+            "acuminatorAngleLevel6": {
+              "foreground": "#F012BE"
+            },
+            "acuminatorAngleLevel7": {
+              "foreground": "#28A745"
+            },
+            "acuminatorAngleLevel8": {
+              "foreground": "#CC9965"
+            },
+            "acuminatorAngleLevel9": {
+              "foreground": "#6F42C1"
+            },
+            "acuminatorAngleLevel10": {
+              "foreground": "#FD7E14"
+            },
+            "acuminatorAngleLevel11": {
+              "foreground": "#17A2B8"
+            },
+            "acuminatorAngleLevel12": {
+              "foreground": "#E83E8C"
+            },
+            "acuminatorAngleLevel13": {
+              "foreground": "#005CC5"
+            },
+            "acuminatorAngleLevel14": {
               "foreground": "#218838"
             }
           }
@@ -271,6 +355,62 @@
       {
         "id": "acuminatorBraceLevel14",
         "description": "Brace nesting level 14"
+      },
+      {
+        "id": "acuminatorAngleLevel1",
+        "description": "Angle bracket nesting level 1"
+      },
+      {
+        "id": "acuminatorAngleLevel2",
+        "description": "Angle bracket nesting level 2"
+      },
+      {
+        "id": "acuminatorAngleLevel3",
+        "description": "Angle bracket nesting level 3"
+      },
+      {
+        "id": "acuminatorAngleLevel4",
+        "description": "Angle bracket nesting level 4"
+      },
+      {
+        "id": "acuminatorAngleLevel5",
+        "description": "Angle bracket nesting level 5"
+      },
+      {
+        "id": "acuminatorAngleLevel6",
+        "description": "Angle bracket nesting level 6"
+      },
+      {
+        "id": "acuminatorAngleLevel7",
+        "description": "Angle bracket nesting level 7"
+      },
+      {
+        "id": "acuminatorAngleLevel8",
+        "description": "Angle bracket nesting level 8"
+      },
+      {
+        "id": "acuminatorAngleLevel9",
+        "description": "Angle bracket nesting level 9"
+      },
+      {
+        "id": "acuminatorAngleLevel10",
+        "description": "Angle bracket nesting level 10"
+      },
+      {
+        "id": "acuminatorAngleLevel11",
+        "description": "Angle bracket nesting level 11"
+      },
+      {
+        "id": "acuminatorAngleLevel12",
+        "description": "Angle bracket nesting level 12"
+      },
+      {
+        "id": "acuminatorAngleLevel13",
+        "description": "Angle bracket nesting level 13"
+      },
+      {
+        "id": "acuminatorAngleLevel14",
+        "description": "Angle bracket nesting level 14"
       }
     ]
   },
