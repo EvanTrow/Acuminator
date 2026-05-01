@@ -137,5 +137,10 @@
   },
   "activationEvents": [
     "onLanguage:csharp"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Acumatica/Acuminator.git",
+    "directory": "vscode-acuminator"
+  }
 }
