@@ -1,0 +1,87 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Acumatica C# Injection",
+  "scopeName": "source.cs.acumatica",
+  "injectionSelector": "L:source.cs",
+  "patterns": [
+    {
+      "include": "#px-graph-types"
+    },
+    {
+      "include": "#px-dac-types"
+    },
+    {
+      "include": "#px-event-handlers"
+    },
+    {
+      "include": "#bql-types"
+    },
+    {
+      "include": "#px-attributes"
+    },
+    {
+      "include": "#bql-command-methods"
+    },
+    {
+      "include": "#dac-field-nested-types"
+    }
+  ],
+  "repository": {
+    "px-graph-types": {
+      "patterns": [
+        {
+          "name": "entity.name.type.class.acumatica.graph.cs",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\s*:\\s*(PXGraph(?:Extension)?|PXGraph<[^>]+>)"
+        }
+      ]
+    },
+    "px-dac-types": {
+      "patterns": [
+        {
+          "name": "entity.name.type.class.acumatica.dac.cs",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\s*:\\s*(IBqlTable|PXBqlTable)\\b"
+        }
+      ]
+    },
+    "px-event-handlers": {
+      "patterns": [
+        {
+          "name": "entity.name.function.acumatica.event-handler.cs",
+          "match": "\\b(RowSelected|RowPersisting|RowPersisted|RowInserting|RowInserted|RowUpdating|RowUpdated|RowDeleting|RowDeleted|FieldDefaulting|FieldVerifying|FieldSelecting|FieldUpdated|FieldUpdating|FieldSelecting|CacheAttached|CommandPreparing|ExceptionHandling)\\b"
+        }
+      ]
+    },
+    "bql-types": {
+      "patterns": [
+        {
+          "name": "support.type.acumatica.bql.cs",
+          "match": "\\b(SelectFrom|SearchFor|PXSelect(?:Readonly|Join|GroupBy|OrderBy|Base)?|PXFilteredProcessing(?:Join|OrderBy)?|PXProcessing(?:Join)?|PXAction|PXSetup|PXFilter|Bql(?:String|Int|Bool|Guid|DateTime|Decimal|ByteArray|Long|Short)\\.Field|IBql(Field|Operand|Creator|Unary))\\b"
+        }
+      ]
+    },
+    "px-attributes": {
+      "patterns": [
+        {
+          "name": "storage.type.annotation.acumatica.attribute.cs",
+          "match": "\\[(PX[A-Za-z0-9_]+)(?:Attribute)?\\b"
+        }
+      ]
+    },
+    "bql-command-methods": {
+      "patterns": [
+        {
+          "name": "support.function.acumatica.bql-command.cs",
+          "match": "\\b(Where|Where2|And|And2|Or|OrderBy|AggregateTo|InnerJoin|LeftJoin|On|Set|Values|View|Select|SelectSingle|SelectFrom|Update|Delete|Insert)\\b(?=\\s*<)"
+        }
+      ]
+    },
+    "dac-field-nested-types": {
+      "patterns": [
+        {
+          "name": "entity.name.type.class.acumatica.dac-field.cs",
+          "match": "\\babstract\\s+class\\s+[A-Za-z_][A-Za-z0-9_]*\\s*:\\s*Bql(?:String|Int|Bool|Guid|DateTime|Decimal|ByteArray|Long|Short)\\.Field<[^>]+>"
+        }
+      ]
+    }
+  }
+}

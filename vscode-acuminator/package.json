@@ -1,0 +1,446 @@
+{
+  "name": "acuminator-vscode",
+  "displayName": "Acuminator for VS Code",
+  "description": "Acumatica-focused syntax highlighting for C# with Acumatica framework element recognition.",
+  "version": "0.1.0",
+  "publisher": "acuminator",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "acumatica",
+    "acuminator",
+    "csharp",
+    "bql",
+    "px"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "grammars": [
+      {
+        "scopeName": "source.cs.acumatica",
+        "path": "./syntaxes/acumatica-csharp.tmLanguage.json",
+        "injectTo": [
+          "source.cs"
+        ]
+      }
+    ],
+    "configurationDefaults": {
+      "editor.semanticHighlighting.enabled": true,
+      "editor.semanticTokenColorCustomizations": {
+        "enabled": true,
+        "rules": {
+          "acumaticaDac": {
+            "foreground": "#FF9900"
+          },
+          "acumaticaDacExtension": {
+            "foreground": "#CA9966"
+          },
+          "acumaticaDacField": {
+            "foreground": "#4CFF4F"
+          },
+          "acumaticaBqlParameter": {
+            "foreground": "#FF4FFF"
+          },
+          "acumaticaBqlOperator": {
+            "foreground": "#B579FF"
+          },
+          "acumaticaConstantPrefix": {
+            "foreground": "#FF9999"
+          },
+          "acumaticaConstantEnding": {
+            "foreground": "#019999"
+          },
+          "acumaticaGraph": {
+            "foreground": "#269BC7"
+          },
+          "acumaticaAction": {
+            "foreground": "#BB37A7"
+          },
+          "acuminatorBraceLevel1": {
+            "foreground": "#FFFFFF"
+          },
+          "acuminatorBraceLevel2": {
+            "foreground": "#ACA585"
+          },
+          "acuminatorBraceLevel3": {
+            "foreground": "#FFFF4E"
+          },
+          "acuminatorBraceLevel4": {
+            "foreground": "#FF4E4F"
+          },
+          "acuminatorBraceLevel5": {
+            "foreground": "#4EFFFF"
+          },
+          "acuminatorBraceLevel6": {
+            "foreground": "#FF4FFF"
+          },
+          "acuminatorBraceLevel7": {
+            "foreground": "#7ED321"
+          },
+          "acuminatorBraceLevel8": {
+            "foreground": "#CC9965"
+          },
+          "acuminatorBraceLevel9": {
+            "foreground": "#9933FF"
+          },
+          "acuminatorBraceLevel10": {
+            "foreground": "#FF9900"
+          },
+          "acuminatorBraceLevel11": {
+            "foreground": "#019999"
+          },
+          "acuminatorBraceLevel12": {
+            "foreground": "#FFE000"
+          },
+          "acuminatorBraceLevel13": {
+            "foreground": "#2B91AF"
+          },
+          "acuminatorBraceLevel14": {
+            "foreground": "#00FF00"
+          },
+          "acuminatorAngleLevel1": {
+            "foreground": "#FFFFFF"
+          },
+          "acuminatorAngleLevel2": {
+            "foreground": "#ACA585"
+          },
+          "acuminatorAngleLevel3": {
+            "foreground": "#FFFF4E"
+          },
+          "acuminatorAngleLevel4": {
+            "foreground": "#FF4E4F"
+          },
+          "acuminatorAngleLevel5": {
+            "foreground": "#4EFFFF"
+          },
+          "acuminatorAngleLevel6": {
+            "foreground": "#FF4FFF"
+          },
+          "acuminatorAngleLevel7": {
+            "foreground": "#7ED321"
+          },
+          "acuminatorAngleLevel8": {
+            "foreground": "#CC9965"
+          },
+          "acuminatorAngleLevel9": {
+            "foreground": "#9933FF"
+          },
+          "acuminatorAngleLevel10": {
+            "foreground": "#FF9900"
+          },
+          "acuminatorAngleLevel11": {
+            "foreground": "#019999"
+          },
+          "acuminatorAngleLevel12": {
+            "foreground": "#FFE000"
+          },
+          "acuminatorAngleLevel13": {
+            "foreground": "#2B91AF"
+          },
+          "acuminatorAngleLevel14": {
+            "foreground": "#00FF00"
+          },
+          "acumaticaAttribute": {
+            "foreground": "#29B8DB"
+          }
+        },
+        "[*Light*]": {
+          "rules": {
+            "acumaticaDac": {
+              "foreground": "#FD7E14"
+            },
+            "acumaticaDacExtension": {
+              "foreground": "#CA9966"
+            },
+            "acumaticaDacField": {
+              "foreground": "#28A745"
+            },
+            "acumaticaBqlParameter": {
+              "foreground": "#F012BE"
+            },
+            "acumaticaBqlOperator": {
+              "foreground": "#6F42C1"
+            },
+            "acumaticaConstantPrefix": {
+              "foreground": "#F1797C"
+            },
+            "acumaticaConstantEnding": {
+              "foreground": "#019999"
+            },
+            "acumaticaGraph": {
+              "foreground": "#269BC7"
+            },
+            "acumaticaAction": {
+              "foreground": "#BB37A7"
+            },
+            "acuminatorBraceLevel1": {
+              "foreground": "#363A41"
+            },
+            "acuminatorBraceLevel2": {
+              "foreground": "#7C7C7C"
+            },
+            "acuminatorBraceLevel3": {
+              "foreground": "#FFC109"
+            },
+            "acuminatorBraceLevel4": {
+              "foreground": "#DC3545"
+            },
+            "acuminatorBraceLevel5": {
+              "foreground": "#3CD7D7"
+            },
+            "acuminatorBraceLevel6": {
+              "foreground": "#F012BE"
+            },
+            "acuminatorBraceLevel7": {
+              "foreground": "#28A745"
+            },
+            "acuminatorBraceLevel8": {
+              "foreground": "#CC9965"
+            },
+            "acuminatorBraceLevel9": {
+              "foreground": "#6F42C1"
+            },
+            "acuminatorBraceLevel10": {
+              "foreground": "#FD7E14"
+            },
+            "acuminatorBraceLevel11": {
+              "foreground": "#17A2B8"
+            },
+            "acuminatorBraceLevel12": {
+              "foreground": "#E83E8C"
+            },
+            "acuminatorBraceLevel13": {
+              "foreground": "#005CC5"
+            },
+            "acuminatorBraceLevel14": {
+              "foreground": "#218838"
+            },
+            "acuminatorAngleLevel1": {
+              "foreground": "#363A41"
+            },
+            "acuminatorAngleLevel2": {
+              "foreground": "#7C7C7C"
+            },
+            "acuminatorAngleLevel3": {
+              "foreground": "#FFC109"
+            },
+            "acuminatorAngleLevel4": {
+              "foreground": "#DC3545"
+            },
+            "acuminatorAngleLevel5": {
+              "foreground": "#3CD7D7"
+            },
+            "acuminatorAngleLevel6": {
+              "foreground": "#F012BE"
+            },
+            "acuminatorAngleLevel7": {
+              "foreground": "#28A745"
+            },
+            "acuminatorAngleLevel8": {
+              "foreground": "#CC9965"
+            },
+            "acuminatorAngleLevel9": {
+              "foreground": "#6F42C1"
+            },
+            "acuminatorAngleLevel10": {
+              "foreground": "#FD7E14"
+            },
+            "acuminatorAngleLevel11": {
+              "foreground": "#17A2B8"
+            },
+            "acuminatorAngleLevel12": {
+              "foreground": "#E83E8C"
+            },
+            "acuminatorAngleLevel13": {
+              "foreground": "#005CC5"
+            },
+            "acuminatorAngleLevel14": {
+              "foreground": "#218838"
+            },
+            "acumaticaAttribute": {
+              "foreground": "#007ACC"
+            }
+          }
+        }
+      }
+    },
+    "semanticTokenTypes": [
+      {
+        "id": "acumaticaDac",
+        "description": "DAC type"
+      },
+      {
+        "id": "acumaticaDacExtension",
+        "description": "DAC extension type"
+      },
+      {
+        "id": "acumaticaDacField",
+        "description": "DAC field type"
+      },
+      {
+        "id": "acumaticaBqlParameter",
+        "description": "BQL parameter"
+      },
+      {
+        "id": "acumaticaBqlOperator",
+        "description": "BQL operator"
+      },
+      {
+        "id": "acumaticaConstantPrefix",
+        "description": "BQL constant prefix"
+      },
+      {
+        "id": "acumaticaConstantEnding",
+        "description": "BQL constant ending"
+      },
+      {
+        "id": "acumaticaGraph",
+        "description": "PXGraph type"
+      },
+      {
+        "id": "acumaticaAction",
+        "description": "PXAction member"
+      },
+      {
+        "id": "acumaticaAttribute",
+        "description": "PX attribute name"
+      },
+      {
+        "id": "acuminatorBraceLevel1",
+        "description": "Brace nesting level 1"
+      },
+      {
+        "id": "acuminatorBraceLevel2",
+        "description": "Brace nesting level 2"
+      },
+      {
+        "id": "acuminatorBraceLevel3",
+        "description": "Brace nesting level 3"
+      },
+      {
+        "id": "acuminatorBraceLevel4",
+        "description": "Brace nesting level 4"
+      },
+      {
+        "id": "acuminatorBraceLevel5",
+        "description": "Brace nesting level 5"
+      },
+      {
+        "id": "acuminatorBraceLevel6",
+        "description": "Brace nesting level 6"
+      },
+      {
+        "id": "acuminatorBraceLevel7",
+        "description": "Brace nesting level 7"
+      },
+      {
+        "id": "acuminatorBraceLevel8",
+        "description": "Brace nesting level 8"
+      },
+      {
+        "id": "acuminatorBraceLevel9",
+        "description": "Brace nesting level 9"
+      },
+      {
+        "id": "acuminatorBraceLevel10",
+        "description": "Brace nesting level 10"
+      },
+      {
+        "id": "acuminatorBraceLevel11",
+        "description": "Brace nesting level 11"
+      },
+      {
+        "id": "acuminatorBraceLevel12",
+        "description": "Brace nesting level 12"
+      },
+      {
+        "id": "acuminatorBraceLevel13",
+        "description": "Brace nesting level 13"
+      },
+      {
+        "id": "acuminatorBraceLevel14",
+        "description": "Brace nesting level 14"
+      },
+      {
+        "id": "acuminatorAngleLevel1",
+        "description": "Angle bracket nesting level 1"
+      },
+      {
+        "id": "acuminatorAngleLevel2",
+        "description": "Angle bracket nesting level 2"
+      },
+      {
+        "id": "acuminatorAngleLevel3",
+        "description": "Angle bracket nesting level 3"
+      },
+      {
+        "id": "acuminatorAngleLevel4",
+        "description": "Angle bracket nesting level 4"
+      },
+      {
+        "id": "acuminatorAngleLevel5",
+        "description": "Angle bracket nesting level 5"
+      },
+      {
+        "id": "acuminatorAngleLevel6",
+        "description": "Angle bracket nesting level 6"
+      },
+      {
+        "id": "acuminatorAngleLevel7",
+        "description": "Angle bracket nesting level 7"
+      },
+      {
+        "id": "acuminatorAngleLevel8",
+        "description": "Angle bracket nesting level 8"
+      },
+      {
+        "id": "acuminatorAngleLevel9",
+        "description": "Angle bracket nesting level 9"
+      },
+      {
+        "id": "acuminatorAngleLevel10",
+        "description": "Angle bracket nesting level 10"
+      },
+      {
+        "id": "acuminatorAngleLevel11",
+        "description": "Angle bracket nesting level 11"
+      },
+      {
+        "id": "acuminatorAngleLevel12",
+        "description": "Angle bracket nesting level 12"
+      },
+      {
+        "id": "acuminatorAngleLevel13",
+        "description": "Angle bracket nesting level 13"
+      },
+      {
+        "id": "acuminatorAngleLevel14",
+        "description": "Angle bracket nesting level 14"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "echo 'no lint configured'",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.4.5",
+    "@vscode/vsce": "^2.26.1"
+  },
+  "activationEvents": [
+    "onLanguage:csharp"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Acumatica/Acuminator.git",
+    "directory": "vscode-acuminator"
+  }
+}
