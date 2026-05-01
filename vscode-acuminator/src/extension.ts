@@ -145,11 +145,9 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
       const access = match[1];
       const virt = match[2]?.trim();
       const type = match[3];
-      const name = match[4];
       if (access) pushToken(builder, document, match.index + full.indexOf(access), access, 7);
       if (virt) pushToken(builder, document, match.index + full.indexOf(virt), virt, 7);
       if (type) pushToken(builder, document, match.index + full.indexOf(type), type, 7);
-      if (name) pushToken(builder, document, match.index + full.lastIndexOf(name), name, 2);
     }
 
     for (const match of text.matchAll(bqlFieldGenericRegex)) {
