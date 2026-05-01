@@ -2,27 +2,32 @@ import * as vscode from 'vscode';
 
 const legend = new vscode.SemanticTokensLegend([
   'acumaticaDac',
+  'acumaticaDacExtension',
   'acumaticaDacField',
   'acumaticaBqlParameter',
   'acumaticaBqlOperator',
   'acumaticaConstantPrefix',
   'acumaticaConstantEnding',
   'acumaticaGraph',
-  'acumaticaAction'
+  'acumaticaAction',
+  'acuminatorBraceLevel1', 'acuminatorBraceLevel2', 'acuminatorBraceLevel3', 'acuminatorBraceLevel4',
+  'acuminatorBraceLevel5', 'acuminatorBraceLevel6', 'acuminatorBraceLevel7', 'acuminatorBraceLevel8',
+  'acuminatorBraceLevel9', 'acuminatorBraceLevel10', 'acuminatorBraceLevel11', 'acuminatorBraceLevel12',
+  'acuminatorBraceLevel13', 'acuminatorBraceLevel14'
 ]);
 
 const declarationPatterns: Array<{ regex: RegExp; tokenType: number; group?: number }> = [
   { regex: /\b(?:public\s+|protected\s+|internal\s+|private\s+|partial\s+|abstract\s+|sealed\s+)*class\s+([A-Za-z_][A-Za-z0-9_]*)\s*:\s*[^\n{;]*\b(?:IBqlTable|PXBqlTable)\b/gm, tokenType: 0, group: 1 },
-  { regex: /\b(?:public\s+|protected\s+|internal\s+|private\s+|partial\s+|abstract\s+|sealed\s+)*class\s+([A-Za-z_][A-Za-z0-9_]*)\s*:\s*[^\n{;]*\bBql(?:String|Int|Bool|Guid|DateTime|Decimal|ByteArray|Long|Short)\.Field\s*</gm, tokenType: 1, group: 1 },
-  { regex: /\b(?:Current2?|Optional2?|Required)\b/gm, tokenType: 2 },
-  { regex: /\b(?:Where|Where2|And|And2|Or|OrderBy|AggregateTo|InnerJoin|LeftJoin|On|Set|Values|View|Select|SelectSingle|SelectFrom|Update|Delete|Insert|Search\d?|PXSelect(?:Readonly\d?|GroupJoin|Join(?:OrderBy|GroupBy)?)?|PXSetup|PXUpdate|PX(?:Filtered)?Processing(?:Join)?)\b(?=\s*<|\s*\.)/gm, tokenType: 3 },
-  { regex: /\bclass\s+([A-Z][A-Za-z0-9_]*)\s*:\s*PXGraph(?:Extension)?(?:<[^>]+>)?/gm, tokenType: 6, group: 1 },
-  { regex: /\bPXAction\s*<[^>]+>\s+([A-Za-z_][A-Za-z0-9_]*)\b/gm, tokenType: 7, group: 1 },
-  { regex: /\b([A-Z][A-Za-z0-9_]*)\.PK\b/gm, tokenType: 4, group: 1 },
-  { regex: /\b([A-Z][A-Za-z0-9_]*)\.Constant\b/gm, tokenType: 5, group: 1 }
+  { regex: /\b(?:public\s+|protected\s+|internal\s+|private\s+|partial\s+|abstract\s+|sealed\s+)*class\s+([A-Za-z_][A-Za-z0-9_]*)\s*:\s*[^\n{;]*\bPXCacheExtension\s*</gm, tokenType: 1, group: 1 },
+  { regex: /\b(?:public\s+|protected\s+|internal\s+|private\s+|partial\s+|abstract\s+|sealed\s+)*class\s+([A-Za-z_][A-Za-z0-9_]*)\s*:\s*[^\n{;]*\bBql(?:String|Int|Bool|Guid|DateTime|Decimal|ByteArray|Long|Short)\.Field\s*</gm, tokenType: 2, group: 1 },
+  { regex: /\b(?:Current2?|Optional2?|Required)\b/gm, tokenType: 3 },
+  { regex: /\b(?:Where|Where2|And|And2|Or|OrderBy|AggregateTo|InnerJoin|LeftJoin|On|Set|Values|View|Select|SelectSingle|SelectFrom|Update|Delete|Insert|Search\d?|PXSelect(?:Readonly\d?|GroupJoin|Join(?:OrderBy|GroupBy)?)?|PXSetup|PXUpdate|PX(?:Filtered)?Processing(?:Join)?)\b(?=\s*<|\s*\.)/gm, tokenType: 4 },
+  { regex: /\bclass\s+([A-Z][A-Za-z0-9_]*)\s*:\s*PXGraph(?:Extension)?(?:<[^>]+>)?/gm, tokenType: 7, group: 1 },
+  { regex: /\bPXAction\s*<[^>]+>\s+([A-Za-z_][A-Za-z0-9_]*)\b/gm, tokenType: 8, group: 1 },
+  { regex: /\b([A-Z][A-Za-z0-9_]*)\.PK\b/gm, tokenType: 5, group: 1 },
+  { regex: /\b([A-Z][A-Za-z0-9_]*)\.Constant\b/gm, tokenType: 6, group: 1 }
 ];
 
-// Ports core regex intent from Acuminator.Vsix Coloriser/Regex/Utils/RegExpressions.cs for BQL usage highlighting.
 const dacWithFieldRegex = /<\W*?(?:([A-Z]+\w*\.)?([A-Z]+\w*)+\d?\.\W*([a-z]+\w*\d*)([>|,])?)/g;
 const dacOrConstantRegex = /<\W*?(?:([A-Z]+\w*\.)?([A-Z]+\w*\d?)\W*(>|,))/g;
 const dacOperandRegex = /(,|<)?([A-Z]+\w*)\d?</g;
@@ -31,11 +36,6 @@ function pushToken(builder: vscode.SemanticTokensBuilder, document: vscode.TextD
   if (!value) return;
   const start = document.positionAt(absoluteIndex);
   builder.push(start.line, start.character, value.length, tokenType, 0);
-}
-
-function indexOfCaptureInMatch(full: string, capture: string, hintStart = 0): number {
-  const idx = full.indexOf(capture, hintStart);
-  return idx >= 0 ? idx : full.indexOf(capture);
 }
 
 class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensProvider {
@@ -47,7 +47,6 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
       for (const match of text.matchAll(pattern.regex)) {
         const value = pattern.group ? match[pattern.group] : match[0];
         if (!value || match.index === undefined) continue;
-
         const startIndex = pattern.group ? match.index + match[0].indexOf(value) : match.index;
         pushToken(builder, document, startIndex, value, pattern.tokenType);
       }
@@ -58,37 +57,39 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
       const full = match[0];
       const dac = match[2];
       const dacField = match[3];
-
-      if (dac) {
-        const localIdx = indexOfCaptureInMatch(full, dac);
-        pushToken(builder, document, match.index + localIdx, dac, 0);
-      }
-
+      if (dac) pushToken(builder, document, match.index + full.indexOf(dac), dac, 0);
       if (dacField) {
-        const startFrom = dac ? indexOfCaptureInMatch(full, dac) + dac.length : 0;
-        const localIdx = indexOfCaptureInMatch(full, dacField, startFrom);
-        pushToken(builder, document, match.index + localIdx, dacField, 1);
+        const hint = dac ? full.indexOf(dac) + dac.length : 0;
+        const fieldIdx = full.indexOf(dacField, hint);
+        pushToken(builder, document, match.index + (fieldIdx >= 0 ? fieldIdx : full.indexOf(dacField)), dacField, 2);
       }
     }
 
     for (const match of text.matchAll(dacOrConstantRegex)) {
-      if (match.index === undefined) continue;
-      const full = match[0];
-      const dacOrConst = match[2];
-      if (!dacOrConst) continue;
-
-      const localIdx = indexOfCaptureInMatch(full, dacOrConst);
-      pushToken(builder, document, match.index + localIdx, dacOrConst, 0);
+      if (match.index === undefined || !match[2]) continue;
+      const idx = match[0].indexOf(match[2]);
+      pushToken(builder, document, match.index + idx, match[2], 0);
     }
 
     for (const match of text.matchAll(dacOperandRegex)) {
-      if (match.index === undefined) continue;
-      const full = match[0];
-      const operand = match[2];
-      if (!operand) continue;
+      if (match.index === undefined || !match[2]) continue;
+      const idx = match[0].indexOf(match[2]);
+      pushToken(builder, document, match.index + idx, match[2], 0);
+    }
 
-      const localIdx = indexOfCaptureInMatch(full, operand);
-      pushToken(builder, document, match.index + localIdx, operand, 0);
+    // BracesFormats parity: apply 14-level cyclic brace coloring
+    let braceLevel = 0;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (ch === '{') {
+        braceLevel++;
+        const tokenType = 8 + Math.min(((braceLevel - 1) % 14) + 1, 14);
+        pushToken(builder, document, i, ch, tokenType);
+      } else if (ch === '}') {
+        const tokenType = 8 + Math.min(((Math.max(braceLevel,1) - 1) % 14) + 1, 14);
+        pushToken(builder, document, i, ch, tokenType);
+        braceLevel = Math.max(0, braceLevel - 1);
+      }
     }
 
     return builder.build();
@@ -97,9 +98,7 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
 
 export function activate(context: vscode.ExtensionContext): void {
   const selector: vscode.DocumentSelector = { language: 'csharp', scheme: 'file' };
-  context.subscriptions.push(
-    vscode.languages.registerDocumentSemanticTokensProvider(selector, new AcumaticaSemanticTokensProvider(), legend)
-  );
+  context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider(selector, new AcumaticaSemanticTokensProvider(), legend));
 }
 
 export function deactivate(): void {

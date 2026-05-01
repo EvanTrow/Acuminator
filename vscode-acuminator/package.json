@@ -37,6 +37,9 @@
           "acumaticaDac": {
             "foreground": "#FF9900"
           },
+          "acumaticaDacExtension": {
+            "foreground": "#CA9966"
+          },
           "acumaticaDacField": {
             "foreground": "#4CFF4F"
           },
@@ -57,12 +60,57 @@
           },
           "acumaticaAction": {
             "foreground": "#BB37A7"
+          },
+          "acuminatorBraceLevel1": {
+            "foreground": "#FFFFFF"
+          },
+          "acuminatorBraceLevel2": {
+            "foreground": "#ACA585"
+          },
+          "acuminatorBraceLevel3": {
+            "foreground": "#FFFF4E"
+          },
+          "acuminatorBraceLevel4": {
+            "foreground": "#FF4E4F"
+          },
+          "acuminatorBraceLevel5": {
+            "foreground": "#4EFFFF"
+          },
+          "acuminatorBraceLevel6": {
+            "foreground": "#FF4FFF"
+          },
+          "acuminatorBraceLevel7": {
+            "foreground": "#7ED321"
+          },
+          "acuminatorBraceLevel8": {
+            "foreground": "#CC9965"
+          },
+          "acuminatorBraceLevel9": {
+            "foreground": "#9933FF"
+          },
+          "acuminatorBraceLevel10": {
+            "foreground": "#FF9900"
+          },
+          "acuminatorBraceLevel11": {
+            "foreground": "#019999"
+          },
+          "acuminatorBraceLevel12": {
+            "foreground": "#FFE000"
+          },
+          "acuminatorBraceLevel13": {
+            "foreground": "#2B91AF"
+          },
+          "acuminatorBraceLevel14": {
+            "foreground": "#00FF00"
           }
         },
         "[*Light*]": {
           "rules": {
             "acumaticaDac": {
               "foreground": "#FD7E14"
+            },
+            "acumaticaDacExtension": {
+              "foreground": "#CA9966"
             },
             "acumaticaDacField": {
               "foreground": "#28A745"
@@ -84,6 +132,48 @@
             },
             "acumaticaAction": {
               "foreground": "#BB37A7"
+            },
+            "acuminatorBraceLevel1": {
+              "foreground": "#363A41"
+            },
+            "acuminatorBraceLevel2": {
+              "foreground": "#7C7C7C"
+            },
+            "acuminatorBraceLevel3": {
+              "foreground": "#FFC109"
+            },
+            "acuminatorBraceLevel4": {
+              "foreground": "#DC3545"
+            },
+            "acuminatorBraceLevel5": {
+              "foreground": "#3CD7D7"
+            },
+            "acuminatorBraceLevel6": {
+              "foreground": "#F012BE"
+            },
+            "acuminatorBraceLevel7": {
+              "foreground": "#28A745"
+            },
+            "acuminatorBraceLevel8": {
+              "foreground": "#CC9965"
+            },
+            "acuminatorBraceLevel9": {
+              "foreground": "#6F42C1"
+            },
+            "acuminatorBraceLevel10": {
+              "foreground": "#FD7E14"
+            },
+            "acuminatorBraceLevel11": {
+              "foreground": "#17A2B8"
+            },
+            "acuminatorBraceLevel12": {
+              "foreground": "#E83E8C"
+            },
+            "acuminatorBraceLevel13": {
+              "foreground": "#005CC5"
+            },
+            "acuminatorBraceLevel14": {
+              "foreground": "#218838"
             }
           }
         }
@@ -93,6 +183,10 @@
       {
         "id": "acumaticaDac",
         "description": "DAC type"
+      },
+      {
+        "id": "acumaticaDacExtension",
+        "description": "DAC extension type"
       },
       {
         "id": "acumaticaDacField",
@@ -121,6 +215,62 @@
       {
         "id": "acumaticaAction",
         "description": "PXAction member"
+      },
+      {
+        "id": "acuminatorBraceLevel1",
+        "description": "Brace nesting level 1"
+      },
+      {
+        "id": "acuminatorBraceLevel2",
+        "description": "Brace nesting level 2"
+      },
+      {
+        "id": "acuminatorBraceLevel3",
+        "description": "Brace nesting level 3"
+      },
+      {
+        "id": "acuminatorBraceLevel4",
+        "description": "Brace nesting level 4"
+      },
+      {
+        "id": "acuminatorBraceLevel5",
+        "description": "Brace nesting level 5"
+      },
+      {
+        "id": "acuminatorBraceLevel6",
+        "description": "Brace nesting level 6"
+      },
+      {
+        "id": "acuminatorBraceLevel7",
+        "description": "Brace nesting level 7"
+      },
+      {
+        "id": "acuminatorBraceLevel8",
+        "description": "Brace nesting level 8"
+      },
+      {
+        "id": "acuminatorBraceLevel9",
+        "description": "Brace nesting level 9"
+      },
+      {
+        "id": "acuminatorBraceLevel10",
+        "description": "Brace nesting level 10"
+      },
+      {
+        "id": "acuminatorBraceLevel11",
+        "description": "Brace nesting level 11"
+      },
+      {
+        "id": "acuminatorBraceLevel12",
+        "description": "Brace nesting level 12"
+      },
+      {
+        "id": "acuminatorBraceLevel13",
+        "description": "Brace nesting level 13"
+      },
+      {
+        "id": "acuminatorBraceLevel14",
+        "description": "Brace nesting level 14"
       }
     ]
   },
