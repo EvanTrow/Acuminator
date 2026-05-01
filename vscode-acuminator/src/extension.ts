@@ -68,6 +68,14 @@ function pushToken(builder: vscode.SemanticTokensBuilder, document: vscode.TextD
 class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensProvider {
   provideDocumentSemanticTokens(document: vscode.TextDocument): vscode.ProviderResult<vscode.SemanticTokens> {
     const text = document.getText();
+
+    const isCSharpFile = document.fileName.toLowerCase().endsWith('.cs');
+    const hasPxDataUsing = /(^|\n)\s*using\s+PX\.Data\s*;/m.test(text);
+
+    if (!isCSharpFile || !hasPxDataUsing) {
+      return new vscode.SemanticTokensBuilder(legend).build();
+    }
+
     const builder = new vscode.SemanticTokensBuilder(legend);
 
     for (const pattern of declarationPatterns) {
