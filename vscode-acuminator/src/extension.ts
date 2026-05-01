@@ -55,6 +55,7 @@ const attributeRegex = /\[(PX[A-Za-z0-9_]+)(?:Attribute)?\b/g;
 const bqlFieldGenericRegex = /Bql(?:String|Int|Bool|Guid|DateTime|Decimal|ByteArray|Long|Short)\.Field\s*<\s*([A-Za-z_][A-Za-z0-9_]*)\s*>/g;
 const typeofKeywordRegex = /\btypeof\b/g;
 const propertyDeclarationRegex = /\b(public)\s+(virtual\s+)?([A-Za-z_][A-Za-z0-9_<>\[\]\.?]+)\s+([A-Za-z_][A-Za-z0-9_]*)\s*(?=\{|=>)/gm;
+const methodDeclarationRegex = /\b(public)\s+(virtual\s+)?([A-Za-z_][A-Za-z0-9_<>\[\]\.?]+)\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(/gm;
 
 const bqlMemberOperatorRegex = /\b(where|where2|and|and2|or|orderby|aggregate|aggregateto|groupby|on|leftjoin|innerjoin|select\d*|selectfrom|search\d*|isequal|equal|isnotequal|notequal|isnull|isnotnull|islike|isless|islessequal|isgreater|isgreaterequal|between|in|fromcurrent|currentvalue|asc|desc|isworkgroupofcontact|isworkgrouporsubgroupofcontact)\b(?=\s*(<|\.|,|>))/gim;
 
@@ -145,6 +146,19 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
       if (match.index === undefined || !match[1]) continue;
       const idx = match[0].indexOf(match[1]);
       pushToken(builder, document, match.index + idx, match[1], 0);
+    }
+
+    for (const match of text.matchAll(methodDeclarationRegex)) {
+      if (match.index === undefined) continue;
+      const full = match[0];
+      const access = match[1];
+      const virt = match[2]?.trim();
+      const type = match[3];
+      const name = match[4];
+      if (access) pushToken(builder, document, match.index + full.indexOf(access), access, 7);
+      if (virt) pushToken(builder, document, match.index + full.indexOf(virt), virt, 7);
+      if (type) pushToken(builder, document, match.index + full.indexOf(type), type, 7);
+      if (name) pushToken(builder, document, match.index + full.lastIndexOf(name), name, 8);
     }
 
     for (const match of text.matchAll(propertyDeclarationRegex)) {
