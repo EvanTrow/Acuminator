@@ -43,5 +43,8 @@
     "@types/vscode": "^1.90.0",
     "typescript": "^5.4.5",
     "@vscode/vsce": "^2.26.1"
-  }
+  },
+  "activationEvents": [
+    "onLanguage:csharp"
+  ]
 }
