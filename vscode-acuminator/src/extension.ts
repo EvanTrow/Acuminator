@@ -25,7 +25,6 @@ const declarationPatterns: Array<{ regex: RegExp; tokenType: number; group?: num
   { regex: /\b(?:public\s+|protected\s+|internal\s+|private\s+|partial\s+|abstract\s+|sealed\s+)*class\s+([A-Za-z_][A-Za-z0-9_]*)\s*:\s*[^\n{;]*\b(?:IBqlTable|PXBqlTable)\b/gm, tokenType: 0, group: 1 },
   { regex: /\b(?:public\s+|protected\s+|internal\s+|private\s+|partial\s+|abstract\s+|sealed\s+)*class\s+([A-Za-z_][A-Za-z0-9_]*)\s*:\s*[^\n{;]*\bPXCacheExtension\s*</gm, tokenType: 1, group: 1 },
   { regex: /\b(?:public\s+|protected\s+|internal\s+|private\s+|partial\s+|abstract\s+|sealed\s+)*class\s+([A-Za-z_][A-Za-z0-9_]*)\s*:\s*[^\n{;]*\bBql(?:String|Int|Bool|Guid|DateTime|Decimal|ByteArray|Long|Short)\.Field\s*</gm, tokenType: 2, group: 1 },
-  { regex: /\bpublic\s+(?:virtual\s+)?(?:sealed\s+)?(?:new\s+)?(?:[A-Za-z_][A-Za-z0-9_<>\[\]\.?]+)\s+([A-Za-z_][A-Za-z0-9_]*)\s*(?=\{|=>)/gm, tokenType: 2, group: 1 },
   { regex: /\b(?:Current2?|Optional2?|Required)\b/gm, tokenType: 3 },
   { regex: /\b(?:Where|Where2|And|And2|Or|OrderBy|AggregateTo|InnerJoin|LeftJoin|On|Set|Values|View|Select|SelectSingle|SelectFrom|Update|Delete|Insert|Search\d?|PXSelect(?:Readonly\d?|GroupJoin|Join(?:OrderBy|GroupBy)?)?|PXSetup|PXUpdate|PX(?:Filtered)?Processing(?:Join)?)\b(?=\s*<|\s*\.)/gm, tokenType: 4 },
   { regex: /\bclass\s+([A-Z][A-Za-z0-9_]*)\s*:\s*PXGraph(?:Extension)?(?:<[^>]+>)?/gm, tokenType: 7, group: 1 },
@@ -53,6 +52,7 @@ const bqlParameterRegex = /\b(Current2?|Optional2?|Required)\b/g;
 const dacTypeofWithFieldRegex = /typeof\s*\(\s*(?:[A-Za-z_][A-Za-z0-9_]*\.)*([A-Z][A-Za-z0-9_]*)\s*\.\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)/g;
 const dacTypeofRegex = /typeof\s*\(\s*(?:[A-Za-z_][A-Za-z0-9_]*\.)*([A-Z][A-Za-z0-9_]*)\s*\)/g;
 const attributeRegex = /\[(PX[A-Za-z0-9_]+)(?:Attribute)?\b/g;
+const bqlFieldGenericRegex = /Bql(?:String|Int|Bool|Guid|DateTime|Decimal|ByteArray|Long|Short)\.Field\s*<\s*([A-Za-z_][A-Za-z0-9_]*)\s*>/g;
 const typeofKeywordRegex = /\btypeof\b/g;
 
 const bqlMemberOperatorRegex = /\b(where|where2|and|and2|or|orderby|aggregate|aggregateto|groupby|on|leftjoin|innerjoin|select\d*|selectfrom|search\d*|isequal|equal|isnotequal|notequal|isnull|isnotnull|islike|isless|islessequal|isgreater|isgreaterequal|between|in|fromcurrent|currentvalue|asc|desc|isworkgroupofcontact|isworkgrouporsubgroupofcontact)\b(?=\s*(<|\.|,|>))/gim;
@@ -136,6 +136,12 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
       if (match.index === undefined || !match[1]) continue;
       const idx = match[0].indexOf(match[1]);
       pushToken(builder, document, match.index + idx, match[1], 0);
+    }
+
+    for (const match of text.matchAll(bqlFieldGenericRegex)) {
+      if (match.index === undefined || !match[1]) continue;
+      const idx = match[0].indexOf(match[1]);
+      pushToken(builder, document, match.index + idx, match[1], 2);
     }
 
     for (const match of text.matchAll(attributeRegex)) {
