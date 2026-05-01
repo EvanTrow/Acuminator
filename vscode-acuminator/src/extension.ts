@@ -36,6 +36,16 @@ const dacWithFieldRegex = /<\W*?(?:([A-Z]+\w*\.)?([A-Z]+\w*)+\d?\.\W*([a-z]+\w*\
 const dacOrConstantRegex = /<\W*?(?:([A-Z]+\w*\.)?([A-Z]+\w*\d?)\W*(>|,))/g;
 const dacOperandRegex = /(,|<)?([A-Z]+\w*)\d?</g;
 
+const bqlOperatorNames = new Set([
+  'Where','Where2','And','And2','Or','OrderBy','Aggregate','AggregateTo','GroupBy','On','LeftJoin','InnerJoin','Select','Select2','Select5','SelectFrom','Search','Search2',
+  'IsEqual','Equal','IsNotEqual','NotEqual','IsNull','IsNotNull','IsLike','IsLess','IsLessEqual','IsGreater','IsGreaterEqual','Between','In',
+  'FromCurrent','CurrentValue','Asc','Desc','Required','Optional','Optional2','Current','Current2',
+  'IsWorkgroupOfContact','IsWorkgroupOrSubgroupOfContact'
+]);
+
+const bqlMemberOperatorRegex = /\b(Where|Where2|And|And2|Or|OrderBy|Aggregate|AggregateTo|GroupBy|On|LeftJoin|InnerJoin|Select\d*|SelectFrom|Search\d*|IsEqual|Equal|IsNotEqual|NotEqual|IsNull|IsNotNull|IsLike|IsLess|IsLessEqual|IsGreater|IsGreaterEqual|Between|In|FromCurrent|CurrentValue|Asc|Desc|IsWorkgroupOfContact|IsWorkgroupOrSubgroupOfContact)\b(?=\s*(<|\.|,|>))/gm;
+
+
 function pushToken(builder: vscode.SemanticTokensBuilder, document: vscode.TextDocument, absoluteIndex: number, value: string, tokenType: number): void {
   if (!value) return;
   const start = document.positionAt(absoluteIndex);
@@ -56,6 +66,11 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
       }
     }
 
+    for (const match of text.matchAll(bqlMemberOperatorRegex)) {
+      if (match.index === undefined || !match[1]) continue;
+      pushToken(builder, document, match.index, match[1], 4);
+    }
+
     for (const match of text.matchAll(dacWithFieldRegex)) {
       if (match.index === undefined) continue;
       const full = match[0];
@@ -71,12 +86,14 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
 
     for (const match of text.matchAll(dacOrConstantRegex)) {
       if (match.index === undefined || !match[2]) continue;
+      if (bqlOperatorNames.has(match[2])) continue;
       const idx = match[0].indexOf(match[2]);
       pushToken(builder, document, match.index + idx, match[2], 0);
     }
 
     for (const match of text.matchAll(dacOperandRegex)) {
       if (match.index === undefined || !match[2]) continue;
+      if (bqlOperatorNames.has(match[2])) continue;
       const idx = match[0].indexOf(match[2]);
       pushToken(builder, document, match.index + idx, match[2], 0);
     }
