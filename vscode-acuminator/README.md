@@ -1,21 +1,20 @@
 # Acuminator for Visual Studio Code (Preview)
 
-This folder contains a new VS Code extension scaffold inspired by the Visual Studio Acuminator extension, focused on **Acumatica-specific syntax highlighting** for C# source files.
+This extension now includes a **semantic colorizer layer** to better match the richer coloring style of the Visual Studio extension.
 
-## Current features
+## What was added
 
-- Injection grammar that highlights common Acumatica framework elements in `.cs` files:
-  - Graph and graph extension classes
-  - DAC classes and DAC nested BQL field declarations
-  - Common BQL types and fluent-BQL surface area
-  - Acumatica attributes (`[PX...]`)
-  - Common Acumatica event handler names
+In addition to TextMate regex highlighting, the extension now registers a C# semantic tokens provider that colorizes Acumatica-specific symbols:
 
-## Scope and parity notes
+- DAC class names
+- DAC nested BQL field class names
+- BQL parameter keywords (`Current`, `Current2`, `Optional`, `Optional2`, `Required`)
+- Fluent BQL operators (`Where`, `And`, `Or`, `OrderBy`, joins, etc.)
+- BQL constant-style prefixes/endings
+- `PXGraph`/`PXGraphExtension` class names
+- `PXAction<T>` member names
 
-The original Visual Studio extension includes rich Roslyn-based diagnostics, code fixes, and tool windows. Those are not part of this initial VS Code port yet.
-
-This first version prioritizes syntax highlighting as requested, and provides a base structure where additional VS Code features can be layered in incrementally.
+This mirrors the original Visual Studio colorizer intent more closely than TextMate-only rules.
 
 ## Local development
 
@@ -25,4 +24,4 @@ npm install
 npm run build
 ```
 
-Then press `F5` in VS Code to launch an Extension Development Host.
+Press `F5` to launch an Extension Development Host.

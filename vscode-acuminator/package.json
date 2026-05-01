@@ -30,8 +30,116 @@
       }
     ],
     "configurationDefaults": {
-      "editor.semanticHighlighting.enabled": true
-    }
+      "editor.semanticHighlighting.enabled": true,
+      "editor.semanticTokenColorCustomizations": {
+        "enabled": true,
+        "rules": {
+          "acumaticaDac": "#4EC9B0",
+          "acumaticaDacField": "#9CDCFE",
+          "acumaticaBqlParameter": "#C586C0",
+          "acumaticaBqlOperator": "#DCDCAA",
+          "acumaticaConstantPrefix": "#569CD6",
+          "acumaticaConstantEnding": "#CE9178",
+          "acumaticaGraph": "#4FC1FF",
+          "acumaticaAction": {
+            "foreground": "#FFD700",
+            "fontStyle": "bold"
+          }
+        }
+      }
+    },
+    "semanticTokenTypes": [
+      {
+        "id": "acumaticaDac",
+        "description": "Acumatica DAC type"
+      },
+      {
+        "id": "acumaticaDacField",
+        "description": "Acumatica DAC field nested type"
+      },
+      {
+        "id": "acumaticaBqlParameter",
+        "description": "Acumatica BQL parameter token"
+      },
+      {
+        "id": "acumaticaBqlOperator",
+        "description": "Acumatica BQL operator token"
+      },
+      {
+        "id": "acumaticaConstantPrefix",
+        "description": "Acumatica BQL constant prefix"
+      },
+      {
+        "id": "acumaticaConstantEnding",
+        "description": "Acumatica BQL constant ending"
+      },
+      {
+        "id": "acumaticaGraph",
+        "description": "Acumatica graph type"
+      },
+      {
+        "id": "acumaticaAction",
+        "description": "Acumatica PXAction member"
+      }
+    ],
+    "semanticTokenScopes": [
+      {
+        "scopes": {
+          "acumaticaDac": [
+            "entity.name.type.class.acumatica.dac.cs"
+          ]
+        }
+      },
+      {
+        "scopes": {
+          "acumaticaDacField": [
+            "entity.name.type.class.acumatica.dac-field.cs"
+          ]
+        }
+      },
+      {
+        "scopes": {
+          "acumaticaBqlParameter": [
+            "support.variable.acumatica.bql-parameter.cs"
+          ]
+        }
+      },
+      {
+        "scopes": {
+          "acumaticaBqlOperator": [
+            "keyword.operator.acumatica.bql.cs"
+          ]
+        }
+      },
+      {
+        "scopes": {
+          "acumaticaConstantPrefix": [
+            "support.constant.acumatica.bql-prefix.cs"
+          ]
+        }
+      },
+      {
+        "scopes": {
+          "acumaticaConstantEnding": [
+            "support.constant.acumatica.bql-ending.cs"
+          ]
+        }
+      },
+      {
+        "scopes": {
+          "acumaticaGraph": [
+            "entity.name.type.class.acumatica.graph.cs"
+          ]
+        }
+      },
+      {
+        "scopes": {
+          "acumaticaAction": [
+            "entity.name.function.acumatica.pxaction.cs"
+          ]
+        }
+      }
+    ]
   },
   "scripts": {
     "build": "tsc -p ./",
