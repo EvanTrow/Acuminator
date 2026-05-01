@@ -38,10 +38,10 @@ const dacOrConstantRegex = /<\W*?(?:([A-Z]+\w*\.)?([A-Z]+\w*\d?)\W*(>|,))/g;
 const dacOperandRegex = /(,|<)?([A-Z]+\w*)\d?</g;
 
 const bqlOperatorNames = new Set([
-  'Where','Where2','And','And2','Or','OrderBy','Aggregate','AggregateTo','GroupBy','On','LeftJoin','InnerJoin','Select','Select2','Select5','SelectFrom','Search','Search2',
-  'IsEqual','Equal','IsNotEqual','NotEqual','IsNull','IsNotNull','IsLike','IsLess','IsLessEqual','IsGreater','IsGreaterEqual','Between','In',
-  'FromCurrent','CurrentValue','Asc','Desc','Current','Current2',
-  'IsWorkgroupOfContact','IsWorkgroupOrSubgroupOfContact'
+  'where','where2','and','and2','or','orderby','aggregate','aggregateto','groupby','on','leftjoin','innerjoin','select','select2','select5','selectfrom','search','search2',
+  'isequal','equal','isnotequal','notequal','isnull','isnotnull','islike','isless','islessequal','isgreater','isgreaterequal','between','in',
+  'fromcurrent','currentvalue','asc','desc','current','current2',
+  'isworkgroupofcontact','isworkgrouporsubgroupofcontact'
 ]);
 
 
@@ -49,11 +49,11 @@ const bqlSelectCommandRegex = /(PX)?Select(GroupBy)?(OrderBy)?|Search\d?|PXSetup
 const bqlParameterRegex = /\b(Current2?|Optional2?|Required)\b/g;
 
 
-const dacTypeofWithFieldRegex = /typeof\s*\(\s*([A-Z][A-Za-z0-9_]*)\s*\.\s*([a-z][A-Za-z0-9_]*)\s*\)/g;
-const dacTypeofRegex = /typeof\s*\(\s*([A-Z][A-Za-z0-9_]*)\s*\)/g;
+const dacTypeofWithFieldRegex = /typeof\s*\(\s*(?:[A-Za-z_][A-Za-z0-9_]*\.)*([A-Z][A-Za-z0-9_]*)\s*\.\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)/g;
+const dacTypeofRegex = /typeof\s*\(\s*(?:[A-Za-z_][A-Za-z0-9_]*\.)*([A-Z][A-Za-z0-9_]*)\s*\)/g;
 const attributeRegex = /\[(PX[A-Za-z0-9_]+)(?:Attribute)?\b/g;
 
-const bqlMemberOperatorRegex = /\b(Where|Where2|And|And2|Or|OrderBy|Aggregate|AggregateTo|GroupBy|On|LeftJoin|InnerJoin|Select\d*|SelectFrom|Search\d*|IsEqual|Equal|IsNotEqual|NotEqual|IsNull|IsNotNull|IsLike|IsLess|IsLessEqual|IsGreater|IsGreaterEqual|Between|In|FromCurrent|CurrentValue|Asc|Desc|IsWorkgroupOfContact|IsWorkgroupOrSubgroupOfContact)\b(?=\s*(<|\.|,|>))/gm;
+const bqlMemberOperatorRegex = /\b(where|where2|and|and2|or|orderby|aggregate|aggregateto|groupby|on|leftjoin|innerjoin|select\d*|selectfrom|search\d*|isequal|equal|isnotequal|notequal|isnull|isnotnull|islike|isless|islessequal|isgreater|isgreaterequal|between|in|fromcurrent|currentvalue|asc|desc|isworkgroupofcontact|isworkgrouporsubgroupofcontact)\b(?=\s*(<|\.|,|>))/gim;
 
 
 function pushToken(builder: vscode.SemanticTokensBuilder, document: vscode.TextDocument, absoluteIndex: number, value: string, tokenType: number): void {
@@ -108,14 +108,14 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
 
     for (const match of text.matchAll(dacOrConstantRegex)) {
       if (match.index === undefined || !match[2]) continue;
-      if (bqlOperatorNames.has(match[2])) continue;
+      if (bqlOperatorNames.has(match[2].toLowerCase())) continue;
       const idx = match[0].indexOf(match[2]);
       pushToken(builder, document, match.index + idx, match[2], 0);
     }
 
     for (const match of text.matchAll(dacOperandRegex)) {
       if (match.index === undefined || !match[2]) continue;
-      if (bqlOperatorNames.has(match[2])) continue;
+      if (bqlOperatorNames.has(match[2].toLowerCase())) continue;
       const idx = match[0].indexOf(match[2]);
       pushToken(builder, document, match.index + idx, match[2], 0);
     }
