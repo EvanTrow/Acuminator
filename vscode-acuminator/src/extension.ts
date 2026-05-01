@@ -10,6 +10,7 @@ const legend = new vscode.SemanticTokensLegend([
   'acumaticaConstantEnding',
   'acumaticaGraph',
   'acumaticaAction',
+  'acumaticaAttribute',
   'acuminatorBraceLevel1', 'acuminatorBraceLevel2', 'acuminatorBraceLevel3', 'acuminatorBraceLevel4',
   'acuminatorBraceLevel5', 'acuminatorBraceLevel6', 'acuminatorBraceLevel7', 'acuminatorBraceLevel8',
   'acuminatorBraceLevel9', 'acuminatorBraceLevel10', 'acuminatorBraceLevel11', 'acuminatorBraceLevel12',
@@ -46,6 +47,11 @@ const bqlOperatorNames = new Set([
 
 const bqlSelectCommandRegex = /(PX)?Select(GroupBy)?(OrderBy)?|Search\d?|PXSetup|PXUpdate|PXSelectReadonly\d?|PXSelectGroupJoin|PXSelectJoin(OrderBy|GroupBy)?|PX(Filtered)?Processing(Join)?/g;
 const bqlParameterRegex = /\b(Current2?|Optional2?|Required)\b/g;
+
+
+const dacTypeofWithFieldRegex = /typeof\s*\(\s*([A-Z][A-Za-z0-9_]*)\s*\.\s*([a-z][A-Za-z0-9_]*)\s*\)/g;
+const dacTypeofRegex = /typeof\s*\(\s*([A-Z][A-Za-z0-9_]*)\s*\)/g;
+const attributeRegex = /\[(PX[A-Za-z0-9_]+)(?:Attribute)?\b/g;
 
 const bqlMemberOperatorRegex = /\b(Where|Where2|And|And2|Or|OrderBy|Aggregate|AggregateTo|GroupBy|On|LeftJoin|InnerJoin|Select\d*|SelectFrom|Search\d*|IsEqual|Equal|IsNotEqual|NotEqual|IsNull|IsNotNull|IsLike|IsLess|IsLessEqual|IsGreater|IsGreaterEqual|Between|In|FromCurrent|CurrentValue|Asc|Desc|IsWorkgroupOfContact|IsWorkgroupOrSubgroupOfContact)\b(?=\s*(<|\.|,|>))/gm;
 
@@ -114,16 +120,37 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
       pushToken(builder, document, match.index + idx, match[2], 0);
     }
 
+
+    for (const match of text.matchAll(dacTypeofWithFieldRegex)) {
+      if (match.index === undefined) continue;
+      const full = match[0];
+      const dac = match[1];
+      const field = match[2];
+      if (dac) pushToken(builder, document, match.index + full.indexOf(dac), dac, 0);
+      if (field) pushToken(builder, document, match.index + full.lastIndexOf(field), field, 2);
+    }
+
+    for (const match of text.matchAll(dacTypeofRegex)) {
+      if (match.index === undefined || !match[1]) continue;
+      const idx = match[0].indexOf(match[1]);
+      pushToken(builder, document, match.index + idx, match[1], 0);
+    }
+
+    for (const match of text.matchAll(attributeRegex)) {
+      if (match.index === undefined || !match[1]) continue;
+      pushToken(builder, document, match.index + 1, match[1], 9);
+    }
+
     // BracesFormats parity: apply 14-level cyclic brace coloring
     let braceLevel = 0;
     for (let i = 0; i < text.length; i++) {
       const ch = text[i];
       if (ch === '{') {
         braceLevel++;
-        const tokenType = 8 + Math.min(((braceLevel - 1) % 14) + 1, 14);
+        const tokenType = 10 + Math.min(((braceLevel - 1) % 14) + 1, 14);
         pushToken(builder, document, i, ch, tokenType);
       } else if (ch === '}') {
-        const tokenType = 8 + Math.min(((Math.max(braceLevel,1) - 1) % 14) + 1, 14);
+        const tokenType = 10 + Math.min(((Math.max(braceLevel,1) - 1) % 14) + 1, 14);
         pushToken(builder, document, i, ch, tokenType);
         braceLevel = Math.max(0, braceLevel - 1);
       }
@@ -136,10 +163,10 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
       const ch = text[i];
       if (ch === '<') {
         angleLevel++;
-        const tokenType = 22 + Math.min(((angleLevel - 1) % 14) + 1, 14);
+        const tokenType = 24 + Math.min(((angleLevel - 1) % 14) + 1, 14);
         pushToken(builder, document, i, ch, tokenType);
       } else if (ch === '>') {
-        const tokenType = 22 + Math.min(((Math.max(angleLevel, 1) - 1) % 14) + 1, 14);
+        const tokenType = 24 + Math.min(((Math.max(angleLevel, 1) - 1) % 14) + 1, 14);
         pushToken(builder, document, i, ch, tokenType);
         angleLevel = Math.max(0, angleLevel - 1);
       }

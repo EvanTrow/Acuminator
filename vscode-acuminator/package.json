@@ -144,6 +144,9 @@
           },
           "acuminatorAngleLevel14": {
             "foreground": "#00FF00"
+          },
+          "acumaticaAttribute": {
+            "foreground": "#DCDCAA"
           }
         },
         "[*Light*]": {
@@ -258,6 +261,9 @@
             },
             "acuminatorAngleLevel14": {
               "foreground": "#218838"
+            },
+            "acumaticaAttribute": {
+              "foreground": "#795E26"
             }
           }
         }
@@ -299,6 +305,10 @@
       {
         "id": "acumaticaAction",
         "description": "PXAction member"
+      },
+      {
+        "id": "acumaticaAttribute",
+        "description": "PX attribute name"
       },
       {
         "id": "acuminatorBraceLevel1",
