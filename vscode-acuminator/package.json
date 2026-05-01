@@ -146,7 +146,7 @@
             "foreground": "#00FF00"
           },
           "acumaticaAttribute": {
-            "foreground": "#4CFF4F"
+            "foreground": "#29B8DB"
           }
         },
         "[*Light*]": {
@@ -263,7 +263,7 @@
               "foreground": "#218838"
             },
             "acumaticaAttribute": {
-              "foreground": "#28A745"
+              "foreground": "#007ACC"
             }
           }
         }
