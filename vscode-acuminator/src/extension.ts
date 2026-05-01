@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
 
 const legend = new vscode.SemanticTokensLegend([
-  'acumaticaDac',
-  'acumaticaDacField',
-  'acumaticaBqlParameter',
-  'acumaticaBqlOperator',
-  'acumaticaConstantPrefix',
-  'acumaticaConstantEnding',
-  'acumaticaGraph',
-  'acumaticaAction'
+  'class',        // DAC
+  'type',         // DAC field
+  'parameter',    // BQL parameters
+  'keyword',      // BQL operators
+  'enumMember',   // BQL constant prefix
+  'property',     // BQL constant ending
+  'class',        // PXGraph/PXGraphExtension
+  'method'        // PXAction member
 ]);
 
 const patterns: Array<{ regex: RegExp; tokenType: number; group?: number }> = [
