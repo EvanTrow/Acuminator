@@ -1,21 +1,21 @@
 import * as vscode from 'vscode';
 
 const legend = new vscode.SemanticTokensLegend([
-  'class',        // DAC
-  'type',         // DAC field
-  'parameter',    // BQL parameters
-  'keyword',      // BQL operators
-  'enumMember',   // BQL constant prefix
-  'property',     // BQL constant ending
-  'class',        // PXGraph/PXGraphExtension
-  'method'        // PXAction member
+  'acumaticaDac',
+  'acumaticaDacField',
+  'acumaticaBqlParameter',
+  'acumaticaBqlOperator',
+  'acumaticaConstantPrefix',
+  'acumaticaConstantEnding',
+  'acumaticaGraph',
+  'acumaticaAction'
 ]);
 
 const patterns: Array<{ regex: RegExp; tokenType: number; group?: number }> = [
   { regex: /\bclass\s+([A-Z][A-Za-z0-9_]*)\s*:\s*(?:IBqlTable|PXBqlTable)\b/gm, tokenType: 0, group: 1 },
   { regex: /\babstract\s+class\s+([a-z][A-Za-z0-9_]*)\s*:\s*Bql(?:String|Int|Bool|Guid|DateTime|Decimal|ByteArray|Long|Short)\.Field</gm, tokenType: 1, group: 1 },
   { regex: /\b(?:Current2?|Optional2?|Required)\b/gm, tokenType: 2 },
-  { regex: /\b(?:Where|Where2|And|And2|Or|OrderBy|AggregateTo|InnerJoin|LeftJoin|On|Set|Values|View|Select|SelectSingle|SelectFrom|Update|Delete|Insert)\b(?=\s*<)/gm, tokenType: 3 },
+  { regex: /\b(?:Where|Where2|And|And2|Or|OrderBy|AggregateTo|InnerJoin|LeftJoin|On|Set|Values|View|Select|SelectSingle|SelectFrom|Update|Delete|Insert|Search\d?|PXSelect(?:Readonly\d?|GroupJoin|Join(?:OrderBy|GroupBy)?)?|PXSetup|PXUpdate|PX(?:Filtered)?Processing(?:Join)?)\b(?=\s*<|\s*\.)/gm, tokenType: 3 },
   { regex: /\bclass\s+([A-Z][A-Za-z0-9_]*)\s*:\s*PXGraph(?:Extension)?(?:<[^>]+>)?/gm, tokenType: 6, group: 1 },
   { regex: /\bPXAction\s*<[^>]+>\s+([A-Za-z_][A-Za-z0-9_]*)\b/gm, tokenType: 7, group: 1 },
   { regex: /\b([A-Z][A-Za-z0-9_]*)\.PK\b/gm, tokenType: 4, group: 1 },
@@ -30,10 +30,7 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
     for (const pattern of patterns) {
       for (const match of text.matchAll(pattern.regex)) {
         const value = pattern.group ? match[pattern.group] : match[0];
-
-        if (!value || match.index === undefined) {
-          continue;
-        }
+        if (!value || match.index === undefined) continue;
 
         const startIndex = pattern.group ? match.index + match[0].indexOf(value) : match.index;
         const start = document.positionAt(startIndex);
@@ -47,7 +44,6 @@ class AcumaticaSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
 
 export function activate(context: vscode.ExtensionContext): void {
   const selector: vscode.DocumentSelector = { language: 'csharp', scheme: 'file' };
-
   context.subscriptions.push(
     vscode.languages.registerDocumentSemanticTokensProvider(selector, new AcumaticaSemanticTokensProvider(), legend)
   );

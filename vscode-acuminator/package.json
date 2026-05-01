@@ -30,8 +30,99 @@
       }
     ],
     "configurationDefaults": {
-      "editor.semanticHighlighting.enabled": true
-    }
+      "editor.semanticHighlighting.enabled": true,
+      "editor.semanticTokenColorCustomizations": {
+        "enabled": true,
+        "rules": {
+          "acumaticaDac": {
+            "foreground": "#FF9900"
+          },
+          "acumaticaDacField": {
+            "foreground": "#4CFF4F"
+          },
+          "acumaticaBqlParameter": {
+            "foreground": "#FF4FFF"
+          },
+          "acumaticaBqlOperator": {
+            "foreground": "#B579FF"
+          },
+          "acumaticaConstantPrefix": {
+            "foreground": "#FF9999"
+          },
+          "acumaticaConstantEnding": {
+            "foreground": "#019999"
+          },
+          "acumaticaGraph": {
+            "foreground": "#269BC7"
+          },
+          "acumaticaAction": {
+            "foreground": "#BB37A7"
+          }
+        },
+        "[*Light*]": {
+          "rules": {
+            "acumaticaDac": {
+              "foreground": "#FD7E14"
+            },
+            "acumaticaDacField": {
+              "foreground": "#28A745"
+            },
+            "acumaticaBqlParameter": {
+              "foreground": "#F012BE"
+            },
+            "acumaticaBqlOperator": {
+              "foreground": "#6F42C1"
+            },
+            "acumaticaConstantPrefix": {
+              "foreground": "#F1797C"
+            },
+            "acumaticaConstantEnding": {
+              "foreground": "#019999"
+            },
+            "acumaticaGraph": {
+              "foreground": "#269BC7"
+            },
+            "acumaticaAction": {
+              "foreground": "#BB37A7"
+            }
+          }
+        }
+      }
+    },
+    "semanticTokenTypes": [
+      {
+        "id": "acumaticaDac",
+        "description": "DAC type"
+      },
+      {
+        "id": "acumaticaDacField",
+        "description": "DAC field type"
+      },
+      {
+        "id": "acumaticaBqlParameter",
+        "description": "BQL parameter"
+      },
+      {
+        "id": "acumaticaBqlOperator",
+        "description": "BQL operator"
+      },
+      {
+        "id": "acumaticaConstantPrefix",
+        "description": "BQL constant prefix"
+      },
+      {
+        "id": "acumaticaConstantEnding",
+        "description": "BQL constant ending"
+      },
+      {
+        "id": "acumaticaGraph",
+        "description": "PXGraph type"
+      },
+      {
+        "id": "acumaticaAction",
+        "description": "PXAction member"
+      }
+    ]
   },
   "scripts": {
     "build": "tsc -p ./",
